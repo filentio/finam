@@ -1,1 +1,21 @@
+# Finam onboarding analysis helpers
 
+В этом репозитории собраны артефакты для анализа процесса открытия нового счёта (CJM AS-IS) и лучшие практики онбординга.
+
+## Документы
+
+- `docs/cjm-asis-template.md` — шаблон CJM AS-IS для заполнения по видео/HAR
+- `docs/broker-onboarding-best-practices.md` — best practices и чеклист улучшений
+- `docs/problems-hypotheses.md` — типовые проблемы (гипотезы) и как их проверять
+
+## Утилиты
+
+### Сводка по HAR (сетевые логи)
+
+Экспортируйте HAR из Chrome DevTools (Network → Preserve log → Export HAR), затем:
+
+```bash
+node tools/har-summary.js path/to/file.har
+```
+
+Скрипт выведет топ доменов/эндпоинтов, ошибки, редиректы и самые медленные запросы — полезно для поиска узких мест и “тупиков” онбординга.
