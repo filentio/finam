@@ -21,6 +21,19 @@
 
 По умолчанию виджет сам найдет блок с атрибутом `data-finam-tariff-widget` и отрисуется внутри него.
 
+### 2.1) Быстрая подстройка под дизайн страницы (через CSS переменные)
+
+```html
+<div
+  data-finam-tariff-widget
+  style="
+    --ftw-primary: #0056b3;
+    --ftw-radius: 16px;
+  "
+></div>
+<script src="finam-tariff-widget.js"></script>
+```
+
 ### 3) Встраивание с настройками
 
 ```html

@@ -339,51 +339,58 @@
     return (
       '' +
       ':host{all:initial}' +
-      '.ftw{--ftw-bg:#f8f8f7;--ftw-card:#fff;--ftw-text:#1a1a19;--ftw-muted:#6b6b68;--ftw-border:#1a1a19;--ftw-primary:#00c853;--ftw-primary-2:#0056b3;--ftw-danger:#d50000;--ftw-shadow:8px 8px 0 rgba(0,0,0,.10);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ftw-text)}' +
+      /* Neutral corporate (Finam-like) defaults. You can override via CSS variables on the container:
+         --ftw-primary, --ftw-bg, --ftw-card, --ftw-text, --ftw-muted, --ftw-border, --ftw-radius, --ftw-shadow */
+      '.ftw{--ftw-bg:transparent;--ftw-card:#fff;--ftw-text:#0b1220;--ftw-muted:#5b667a;--ftw-border:#e6eaf2;--ftw-primary:#0b5fff;--ftw-danger:#d50000;--ftw-radius:16px;--ftw-shadow:0 12px 30px rgba(11,18,32,.10);--ftw-shadow-sm:0 6px 16px rgba(11,18,32,.08);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ftw-text)}' +
       '.ftw *{box-sizing:border-box}' +
-      '.ftw .wrap{width:100%;max-width:920px;margin:0 auto;background:var(--ftw-bg);padding:16px;border-radius:16px}' +
-      '.ftw .card{background:var(--ftw-card);border:2px solid var(--ftw-border);border-radius:16px;box-shadow:var(--ftw-shadow);padding:16px}' +
+      '.ftw .wrap{width:100%;max-width:980px;margin:0 auto;background:var(--ftw-bg);padding:0}' +
+      '.ftw .card{background:var(--ftw-card);border:1px solid var(--ftw-border);border-radius:var(--ftw-radius);box-shadow:var(--ftw-shadow);padding:20px}' +
       '.ftw .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}' +
-      '.ftw .title{font-size:22px;line-height:1.2;font-weight:800;text-transform:uppercase;letter-spacing:.02em}' +
-      '.ftw .subtitle{margin-top:8px;color:var(--ftw-muted);font-size:14px;line-height:1.45;font-weight:600}' +
-      '.ftw .tabs{display:flex;gap:8px;margin-top:12px}' +
-      '.ftw .tab{border:2px solid var(--ftw-border);background:var(--ftw-card);border-radius:999px;padding:10px 12px;font-weight:800;font-size:12px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}' +
-      '.ftw .tab[aria-selected="true"]{background:var(--ftw-primary);color:#000}' +
-      '.ftw .progress{margin-top:12px;height:10px;border:2px solid var(--ftw-border);border-radius:999px;overflow:hidden;background:#fff}' +
+      '.ftw .title{font-size:22px;line-height:1.25;font-weight:800;margin:0}' +
+      '.ftw .subtitle{margin-top:10px;color:var(--ftw-muted);font-size:14px;line-height:1.55;font-weight:500}' +
+      '.ftw .tabs{display:flex;gap:8px;margin-top:16px}' +
+      '.ftw .tab{border:1px solid var(--ftw-border);background:#f6f8fc;border-radius:999px;padding:10px 12px;font-weight:700;font-size:13px;cursor:pointer;color:var(--ftw-text)}' +
+      '.ftw .tab:hover{background:#eef3ff}' +
+      '.ftw .tab[aria-selected="true"]{background:rgba(11,95,255,.10);border-color:rgba(11,95,255,.25);color:var(--ftw-primary)}' +
+      '.ftw .progress{margin-top:16px;height:8px;border-radius:999px;overflow:hidden;background:#eef2f8}' +
       '.ftw .bar{height:100%;background:var(--ftw-primary);width:0%}' +
       '.ftw .qhead{margin-top:10px}' +
-      '.ftw .qtitle{font-weight:900;font-size:16px;line-height:1.3}' +
-      '.ftw .qdesc{margin-top:6px;color:var(--ftw-muted);font-size:13px;font-weight:600;line-height:1.4}' +
-      '.ftw .grid{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}' +
-      '@media (max-width:640px){.ftw .grid{grid-template-columns:1fr}.ftw .wrap{padding:12px}}' +
-      '.ftw .opt{border:2px solid var(--ftw-border);background:#fff;border-radius:14px;padding:12px;cursor:pointer;box-shadow:4px 4px 0 rgba(0,0,0,.08)}' +
-      '.ftw .opt:hover{transform:translateY(-1px)}' +
-      '.ftw .opt[aria-pressed="true"]{outline:3px solid rgba(0,200,83,.35)}' +
-      '.ftw .optL{font-weight:900}' +
-      '.ftw .optD{margin-top:4px;color:var(--ftw-muted);font-weight:600;font-size:12px;line-height:1.35}' +
-      '.ftw .actions{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap}' +
-      '.ftw .btn{border:2px solid var(--ftw-border);border-radius:14px;background:#fff;cursor:pointer;padding:10px 12px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;font-size:12px;box-shadow:4px 4px 0 rgba(0,0,0,.08)}' +
-      '.ftw .btn.primary{background:var(--ftw-primary)}' +
-      '.ftw .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}' +
+      '.ftw .qtitle{font-weight:800;font-size:16px;line-height:1.35}' +
+      '.ftw .qdesc{margin-top:6px;color:var(--ftw-muted);font-size:13px;font-weight:500;line-height:1.55}' +
+      '.ftw .grid{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}' +
+      '@media (max-width:640px){.ftw .grid{grid-template-columns:1fr}}' +
+      '.ftw .opt{border:1px solid var(--ftw-border);background:#fff;border-radius:14px;padding:14px;cursor:pointer;box-shadow:var(--ftw-shadow-sm);transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease}' +
+      '.ftw .opt:hover{transform:translateY(-1px);border-color:rgba(11,95,255,.35);background:#fbfdff}' +
+      '.ftw .opt[aria-pressed="true"]{border-color:rgba(11,95,255,.45);box-shadow:0 10px 22px rgba(11,95,255,.12)}' +
+      '.ftw .optL{font-weight:800}' +
+      '.ftw .optD{margin-top:6px;color:var(--ftw-muted);font-weight:500;font-size:12px;line-height:1.45}' +
+      '.ftw .actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:16px;flex-wrap:wrap}' +
+      '.ftw .btn{border:1px solid var(--ftw-border);border-radius:12px;background:#fff;cursor:pointer;padding:10px 14px;font-weight:700;font-size:13px;transition:background .12s ease,border-color .12s ease,transform .12s ease}' +
+      '.ftw .btn:hover{background:#f6f8fc}' +
+      '.ftw .btn.primary{background:var(--ftw-primary);border-color:var(--ftw-primary);color:#fff}' +
+      '.ftw .btn.primary:hover{background:#0a57e8}' +
+      '.ftw .btn:disabled{opacity:.55;cursor:not-allowed}' +
       '.ftw .result{margin-top:14px}' +
-      '.ftw .badge{display:inline-block;background:rgba(0,200,83,.18);border:2px solid var(--ftw-border);border-radius:999px;padding:6px 10px;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.04em}' +
-      '.ftw .tariffName{margin-top:10px;font-size:18px;font-weight:1000}' +
-      '.ftw .tariffDesc{margin-top:6px;color:var(--ftw-muted);font-weight:600;font-size:13px;line-height:1.45}' +
-      '.ftw .kpis{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}' +
+      '.ftw .badge{display:inline-flex;gap:8px;align-items:center;background:rgba(11,95,255,.10);border:1px solid rgba(11,95,255,.20);border-radius:999px;padding:7px 10px;font-weight:700;font-size:12px;color:var(--ftw-primary)}' +
+      '.ftw .tariffName{margin-top:12px;font-size:18px;font-weight:800}' +
+      '.ftw .tariffDesc{margin-top:6px;color:var(--ftw-muted);font-weight:500;font-size:13px;line-height:1.55}' +
+      '.ftw .kpis{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}' +
       '@media (max-width:640px){.ftw .kpis{grid-template-columns:1fr}}' +
-      '.ftw .kpi{border:2px dashed var(--ftw-border);border-radius:14px;padding:12px;background:#fff}' +
-      '.ftw .kpiT{font-weight:900;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--ftw-muted)}' +
-      '.ftw .kpiV{margin-top:6px;font-weight:1000;font-size:18px}' +
+      '.ftw .kpi{border:1px solid var(--ftw-border);border-radius:14px;padding:14px;background:#fbfdff}' +
+      '.ftw .kpiT{font-weight:700;font-size:12px;color:var(--ftw-muted)}' +
+      '.ftw .kpiV{margin-top:8px;font-weight:800;font-size:18px}' +
       '.ftw .list{margin-top:12px;padding-left:18px;color:var(--ftw-text)}' +
-      '.ftw .list li{margin:6px 0;color:var(--ftw-muted);font-weight:650;line-height:1.4}' +
-      '.ftw .warn{margin-top:10px;border:2px solid var(--ftw-border);border-radius:14px;padding:12px;background:rgba(255,214,0,.18)}' +
-      '.ftw .warnT{font-weight:1000;text-transform:uppercase;letter-spacing:.04em;font-size:12px}' +
+      '.ftw .list li{margin:6px 0;color:var(--ftw-muted);font-weight:500;line-height:1.55}' +
+      '.ftw .warn{margin-top:12px;border:1px solid rgba(255,193,7,.45);border-radius:14px;padding:14px;background:rgba(255,193,7,.12)}' +
+      '.ftw .warnT{font-weight:800;font-size:12px}' +
       '.ftw .calcHead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}' +
       '.ftw .table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px}' +
-      '.ftw .table th,.ftw .table td{border:2px solid var(--ftw-border);padding:10px;font-weight:800;font-size:12px;background:#fff}' +
-      '.ftw .table th{background:var(--ftw-bg);text-transform:uppercase;letter-spacing:.04em}' +
-      '.ftw select,.ftw input{border:2px solid var(--ftw-border);border-radius:12px;padding:8px 10px;font-weight:800;background:#fff;width:100%}' +
-      '.ftw .mini{font-size:11px;color:var(--ftw-muted);font-weight:700}' +
+      '.ftw .table th,.ftw .table td{border-bottom:1px solid var(--ftw-border);padding:10px;font-weight:600;font-size:12px;background:transparent;vertical-align:top}' +
+      '.ftw .table th{font-weight:700;color:var(--ftw-muted)}' +
+      '.ftw .table tr:last-child td{border-bottom:none}' +
+      '.ftw select,.ftw input{border:1px solid var(--ftw-border);border-radius:12px;padding:9px 10px;font-weight:600;background:#fff;width:100%}' +
+      '.ftw select:focus,.ftw input:focus{outline:none;border-color:rgba(11,95,255,.45);box-shadow:0 0 0 4px rgba(11,95,255,.12)}' +
+      '.ftw .mini{font-size:11px;color:var(--ftw-muted);font-weight:500}' +
       ''
     );
   }
@@ -462,12 +469,12 @@
     var self = this;
     var head = el('div', { class: 'card' });
     head.appendChild(
-      el('div', { class: 'title', html: 'НЕ НАДО<br>ПЕРЕПЛАЧИВАТЬ<br>КОМИССИИ' })
+      el('div', { class: 'title', text: 'Подбор тарифа и расчет комиссий' })
     );
     head.appendChild(
       el('div', {
         class: 'subtitle',
-        text: 'Пройдите опрос за 1 минуту и узнайте, как сэкономить на комиссиях, выбрав подходящий тариф.',
+        text: 'Пройдите короткий опрос или добавьте сделки в калькулятор — виджет подскажет, какой тариф может быть выгоднее.',
       })
     );
 
