@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.3.5
+ * Version: 0.3.6
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.3.5';
+  var VERSION = '0.3.6';
 
   var DEFAULTS = {
     // 'intro' | 'questionnaire'
@@ -290,6 +290,10 @@
       '.ftw *{box-sizing:border-box}' +
       '.ftw .wrap{width:100%}' +
       '.ftw .tw-widget{max-width:980px;margin:0 auto;border-radius:var(--tw-radius-card);background:linear-gradient(135deg,var(--tw-surface) 0%,var(--tw-surface-2) 100%);box-shadow:0 30px 80px var(--tw-shadow);padding:var(--tw-card-pad);color:var(--tw-text-primary);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,\"Noto Sans\",\"Helvetica Neue\",sans-serif}' +
+      /* Hero variant (intro): richer background like reference */
+      '.ftw .tw-widget.tw-hero{position:relative;overflow:hidden;padding:34px;border:1px solid rgba(245,200,76,0.18);box-shadow:0 36px 100px rgba(0,0,0,0.55);background:radial-gradient(120% 90% at 85% 25%, rgba(245,200,76,0.22), transparent 62%),radial-gradient(90% 70% at 35% 80%, rgba(255,255,255,0.10), transparent 58%),radial-gradient(140% 120% at 10% 10%, rgba(255,255,255,0.06), transparent 55%),linear-gradient(135deg,#070A10 0%, #141824 100%)}' +
+      '.ftw .tw-widget.tw-hero::before{content:\"\";position:absolute;inset:-2px;border-radius:inherit;padding:2px;background:linear-gradient(135deg, rgba(245,200,76,0.35), rgba(255,255,255,0.08), rgba(245,200,76,0.15));-webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}' +
+      '.ftw .tw-widget.tw-hero::after{content:\"\";position:absolute;inset:0;pointer-events:none;opacity:.9;background:radial-gradient(100% 50% at 80% 30%, rgba(245,200,76,0.16), transparent 60%),repeating-radial-gradient(circle at 75% 45%, rgba(245,200,76,0.10) 0 1px, transparent 1px 10px),repeating-radial-gradient(circle at 65% 55%, rgba(255,255,255,0.08) 0 1px, transparent 1px 12px)}' +
       '.ftw .tw-h2{font-size:var(--tw-h2-size);line-height:var(--tw-h2-lh);font-weight:var(--tw-h2-weight);margin:0 0 8px 0;color:var(--tw-text-primary)}' +
       '.ftw .tw-h3{font-size:var(--tw-h3-size);line-height:var(--tw-h3-lh);font-weight:var(--tw-h3-weight);margin:0 0 12px 0;color:var(--tw-text-primary)}' +
       '.ftw .tw-body{font-size:var(--tw-body-size);line-height:var(--tw-body-lh);font-weight:var(--tw-body-weight);margin:0 0 18px 0;color:var(--tw-text-secondary)}' +
@@ -299,6 +303,11 @@
       /* Right decorative premium visual (no content) */
       '.ftw .tw-premium-visual{width:100%;min-height:180px;border-radius:16px;position:relative;overflow:hidden;background:radial-gradient(120% 90% at 80% 25%, rgba(245,200,76,0.22), transparent 60%),radial-gradient(90% 70% at 30% 80%, rgba(255,255,255,0.10), transparent 55%),linear-gradient(135deg,#0B0E14 0%,#141824 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06)}' +
       '.ftw .tw-premium-visual::after{content:\"\";position:absolute;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8}' +
+      '.ftw .tw-widget.tw-hero .tw-premium-visual{min-height:260px}' +
+      '.ftw .tw-widget.tw-hero .tw-h2{font-size:44px;line-height:1.06;margin:0 0 14px 0;letter-spacing:-0.02em}' +
+      '@media (max-width:640px){.ftw .tw-widget.tw-hero .tw-h2{font-size:34px}}' +
+      '.ftw .tw-widget.tw-hero .tw-body{font-size:18px;line-height:1.5;margin:0 0 22px 0;max-width:520px}' +
+      '.ftw .tw-widget.tw-hero .tw-btn{padding:14px 22px;font-size:16px;border-radius:14px}' +
       '.ftw .tw-progress-bar{width:100%;height:4px;border-radius:999px;background:var(--tw-border);overflow:hidden;margin:0 0 18px 0}' +
       '.ftw .tw-progress-bar > div{height:100%;width:var(--tw-progress,0%);background:var(--tw-primary);border-radius:999px}' +
       '.ftw .tw-options{display:flex;flex-direction:column;gap:12px;margin:0 0 16px 0}' +
@@ -410,7 +419,7 @@
     container.appendChild(
       el(
         'div',
-        { class: 'tw-widget' },
+        { class: 'tw-widget tw-hero' },
         el(
           'div',
           { class: 'tw-two-col' },
