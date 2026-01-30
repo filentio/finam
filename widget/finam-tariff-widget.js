@@ -1,18 +1,17 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.3.7
+ * Version: 1.0.0
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.3.7';
+  var VERSION = '1.0.0';
 
   var DEFAULTS = {
-    // 'intro' | 'questionnaire'
-    initialView: 'intro',
-    showTabs: false,
-    loadFonts: true,
+    // 'form' | 'result'
+    initialView: 'form',
+    loadFonts: false, // no external dependencies by default
     shadowDom: true,
     analytics: true,
     onEvent: null, // (name: string, payload: object) => void
@@ -59,95 +58,33 @@
     return null;
   }
 
-  function otherTariffs(id) {
-    var out = [];
-    for (var i = 0; i < TARIFF_CATALOG.length; i++) if (TARIFF_CATALOG[i].id !== id) out.push(TARIFF_CATALOG[i]);
-    return out;
-  }
-
-  var TARIFFS = {
-    longterm: {
-      id: 'longterm',
-      name: 'Долгосрочный портфель',
-      description: '',
-      features: [],
-      warnings: [],
-      icon: null,
-    },
-    daily: {
-      id: 'daily',
-      name: 'Единый дневной',
-      description: '',
-      features: [],
-      warnings: [],
-      icon: null,
-    },
-    strateg: {
-      id: 'strateg',
-      name: 'Стратег',
-      description: '',
-      features: [],
-      warnings: [],
-      icon: null,
-    },
-    freetrade: {
-      id: 'freetrade',
-      name: 'Инвестор',
-      description: '',
-      features: [],
-      warnings: [],
-      icon: null,
-    },
-    consulting: {
-      id: 'consulting',
-      name: 'Единый консультационный',
-      description: '',
-      features: [],
-      warnings: [],
-      icon: null,
-    },
-  };
-
   var QUESTIONS = [
     {
-      id: 'q1_goal',
-      title: 'Для чего вы планируете инвестировать?',
+      id: 'q1_style',
+      title: 'Как вы обычно торгуете?',
       options: [
-        { value: 'a1_save', label: 'Хочу сохранить деньги и понемногу приумножать' },
-        { value: 'a2_active', label: 'Планирую активно торговать' },
-        { value: 'a3_try', label: 'Хочу попробовать инвестиции и разобраться' },
-        { value: 'a4_unsure', label: 'Пока не уверен(а), хочу посмотреть' },
+        { value: 'rare', label: 'Редко / держу надолго' },
+        { value: 'often', label: 'Часто / внутри дня' },
       ],
+      required: true,
     },
     {
-      id: 'q2_frequency',
-      title: 'Как часто вы планируете покупать или продавать активы?',
-      helperText: 'Это поможет учесть комиссии и доступные инструменты',
+      id: 'q2_consulting',
+      title: 'Нужны консультации и сопровождение?',
       options: [
-        { value: 'b1_rare', label: 'Несколько раз в год' },
-        { value: 'b2_month', label: 'Несколько раз в месяц' },
-        { value: 'b3_daily', label: 'Почти каждый день' },
-        { value: 'b4_unknown', label: 'Пока не знаю' },
+        { value: 'yes', label: 'Да' },
+        { value: 'no', label: 'Нет' },
       ],
+      required: true,
     },
     {
-      id: 'q3_instruments',
-      title: 'Чем вы планируете торговать?',
+      id: 'q3_lowFees',
+      title: 'Важны минимальные комиссии при обороте?',
       options: [
-        { value: 'c1_stocks', label: 'Акции и облигации' },
-        { value: 'c2_futures', label: 'Фьючерсы / активная торговля' },
-        { value: 'c3_currency', label: 'Валюта' },
-        { value: 'c4_unknown', label: 'Пока не знаю' },
+        { value: 'yes', label: 'Да' },
+        { value: 'no', label: 'Не критично' },
       ],
-    },
-    {
-      id: 'q4_assistance',
-      title: 'Нужна ли вам помощь при инвестировании?',
-      options: [
-        { value: 'd1_yes', label: 'Да, хочу подсказки и сопровождение' },
-        { value: 'd2_sometimes', label: 'Иногда, но в целом сам(а)' },
-        { value: 'd3_no', label: 'Нет, всё делаю сам(а)' },
-      ],
+      required: true,
     },
   ];
 
@@ -219,26 +156,9 @@
 
   // (scoring-based matching removed; we use strict conservative rules below)
 
-  // Conservative mapping (STRICT). Returns exactly ONE tariff id from whitelist.
-  function recommendTariffId(answers) {
-    // Rule 1 — Consultation need
-    if (answers.q4_assistance === 'd1_yes') return 'n5_consulting';
-    // Rule 2 — Futures / active trading instrument
-    if (answers.q3_instruments === 'c2_futures') return 'n2_day';
-    // Rule 3 — Explicit active trading intent
-    if (answers.q1_goal === 'a2_active') return 'n2_day';
-    // Rule 4 — Long-term intent
-    if (answers.q1_goal === 'a1_save') return 'n1_dolgosrochniy';
-    // Rule 5 — Try & learn
-    if (answers.q1_goal === 'a3_try') return 'n3_investor';
-    // Rule 6 — Fallback
-    return 'n3_investor';
-  }
-
   // Result copy (STRICT, NO assumptions).
   var RESULT_COPY = {
     n1_dolgosrochniy: {
-      title: 'Вам подойдёт тариф «Долгосрочный портфель»',
       benefits: [
         'Подходит для спокойного долгосрочного подхода',
         'Удобен, если вы реже совершаете сделки',
@@ -246,7 +166,6 @@
       ],
     },
     n2_day: {
-      title: 'Вам подойдёт тариф «Единый дневной»',
       benefits: [
         'Подходит, если вы планируете активные сделки',
         'Удобен для динамичной торговли',
@@ -254,7 +173,6 @@
       ],
     },
     n3_investor: {
-      title: 'Вам подойдёт тариф «Инвестор»',
       benefits: [
         'Понятный старт без лишней сложности',
         'Подходит, если вы пока определяетесь со стратегией',
@@ -262,15 +180,13 @@
       ],
     },
     n4_strateg: {
-      title: 'Вам подойдёт тариф «Стратег»',
       benefits: [
-        'Подходит для более продвинутого подхода',
-        'Удобен, если вы уверенно ориентируетесь в инвестициях',
         'Можно перейти и посмотреть условия тарифа',
+        'Подходит, если вам ближе готовые подходы',
+        'Помогает действовать более системно',
       ],
     },
     n5_consulting: {
-      title: 'Вам подойдёт тариф «Единый консультационный»',
       benefits: [
         'Подходит, если вам важны подсказки и сопровождение',
         'Помогает инвестировать с поддержкой',
@@ -285,53 +201,72 @@
     return (
       '' +
       ':host{all:initial}' +
-      /* Premium dark theme (scoped). */
-      '.ftw{--tw-bg-page:#F2F4F7;--tw-surface:#0B0E14;--tw-surface-2:#141824;--tw-text-primary:#FFFFFF;--tw-text-secondary:rgba(255,255,255,0.72);--tw-border:rgba(255,255,255,0.10);--tw-border-strong:rgba(255,255,255,0.16);--tw-shadow:rgba(0,0,0,0.45);--tw-primary:#F5C84C;--tw-primary-hover:#EAB83E;--tw-primary-text:#111827;--tw-secondary:rgba(255,255,255,0.10);--tw-secondary-hover:rgba(255,255,255,0.16);--tw-radio-selected-bg:rgba(245,200,76,0.12);--tw-radio-selected-border:#F5C84C;--tw-radius-card:20px;--tw-radius-button:12px;--tw-radius-item:14px;--tw-card-pad:28px;--tw-h2-size:32px;--tw-h2-lh:38px;--tw-h2-weight:900;--tw-h3-size:22px;--tw-h3-lh:28px;--tw-h3-weight:800;--tw-body-size:14px;--tw-body-lh:20px;--tw-body-weight:500;--tw-meta-size:12px;--tw-meta-lh:16px;--tw-meta-weight:700}' +
+      /* Tokens (Finam premium dark + gold). */
+      '.ftw{' +
+      '--ui-font: \"Inter var\", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;' +
+      '--ui-bg-dark:#151519;' +
+      '--ui-border-on-dark:hsla(0,0%,100%,.12);' +
+      '--ui-text-inverse:#ebebf2;' +
+      '--ui-text-inverse-secondary:rgb(164,164,178);' +
+      '--ui-brand:#ffc759;' +
+      '--ui-brand-hover:#ffba30;' +
+      '--ui-brand-pressed:#f9a605;' +
+      '--ui-gradient-premium:linear-gradient(225deg, rgba(192,192,204,.24) -0.21%, rgba(0,0,0,.2) 45.81%, rgba(0,0,0,.4) 96.67%), #151519;' +
+      '--ui-gradient-gold-soft:radial-gradient(90% 120% at 20% 10%, rgba(255,199,89,.22) 0%, rgba(255,199,89,0) 55%);' +
+      '--ui-gradient-gold-edge:radial-gradient(70% 120% at 100% 0%, rgba(255,186,48,.18) 0%, rgba(255,186,48,0) 60%);' +
+      '--ui-shadow-cardDark:0px 5px 10px 0px rgba(57,57,66,.16), 0px 15px 20px 0px rgba(57,57,66,.16), 0px 25px 50px 0px rgba(57,57,66,.16);' +
+      '--ui-shadow-cardMid:0px 2px 6px 0px rgba(57,57,66,.06), 0px 10px 20px 0px rgba(57,57,66,.06);' +
+      '--ui-radius-shell:32px;' +
+      '--ui-radius-card:24px;' +
+      '--ui-radius-item:16px;' +
+      '--ui-radius-btn:12px;' +
+      '}' +
       '.ftw *{box-sizing:border-box}' +
       '.ftw .wrap{width:100%}' +
-      '.ftw .tw-widget{max-width:980px;margin:0 auto;border-radius:var(--tw-radius-card);background:linear-gradient(135deg,var(--tw-surface) 0%,var(--tw-surface-2) 100%);box-shadow:0 30px 80px var(--tw-shadow);padding:var(--tw-card-pad);color:var(--tw-text-primary);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,\"Noto Sans\",\"Helvetica Neue\",sans-serif}' +
-      /* Hero variant (intro): richer background like reference */
-      '.ftw .tw-widget.tw-hero{position:relative;overflow:hidden;padding:34px;border:1px solid rgba(245,200,76,0.18);box-shadow:0 36px 100px rgba(0,0,0,0.55);background:radial-gradient(120% 90% at 85% 25%, rgba(245,200,76,0.22), transparent 62%),radial-gradient(90% 70% at 35% 80%, rgba(255,255,255,0.10), transparent 58%),radial-gradient(140% 120% at 10% 10%, rgba(255,255,255,0.06), transparent 55%),linear-gradient(135deg,#070A10 0%, #141824 100%)}' +
-      '.ftw .tw-widget.tw-hero::before{content:\"\";position:absolute;inset:-2px;border-radius:inherit;padding:2px;background:linear-gradient(135deg, rgba(245,200,76,0.35), rgba(255,255,255,0.08), rgba(245,200,76,0.15));-webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}' +
-      '.ftw .tw-widget.tw-hero::after{content:\"\";position:absolute;inset:0;pointer-events:none;opacity:.9;background:radial-gradient(100% 50% at 80% 30%, rgba(245,200,76,0.16), transparent 60%),repeating-radial-gradient(circle at 75% 45%, rgba(245,200,76,0.10) 0 1px, transparent 1px 10px),repeating-radial-gradient(circle at 65% 55%, rgba(255,255,255,0.08) 0 1px, transparent 1px 12px)}' +
-      '.ftw .tw-h2{font-size:var(--tw-h2-size);line-height:var(--tw-h2-lh);font-weight:var(--tw-h2-weight);margin:0 0 8px 0;color:var(--tw-text-primary)}' +
-      '.ftw .tw-h3{font-size:var(--tw-h3-size);line-height:var(--tw-h3-lh);font-weight:var(--tw-h3-weight);margin:0 0 12px 0;color:var(--tw-text-primary)}' +
-      '.ftw .tw-body{font-size:var(--tw-body-size);line-height:var(--tw-body-lh);font-weight:var(--tw-body-weight);margin:0 0 18px 0;color:var(--tw-text-secondary)}' +
-      '.ftw .tw-meta{font-size:var(--tw-meta-size);line-height:var(--tw-meta-lh);font-weight:var(--tw-meta-weight);color:var(--tw-text-secondary);margin:0 0 8px 0}' +
-      '.ftw .tw-two-col{display:grid;grid-template-columns:1.1fr 0.9fr;gap:24px;align-items:center}' +
-      '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}}' +
-      /* Right decorative premium visual (no content) */
-      '.ftw .tw-premium-visual{width:100%;min-height:180px;border-radius:16px;position:relative;overflow:hidden;background:radial-gradient(120% 90% at 80% 25%, rgba(245,200,76,0.22), transparent 60%),radial-gradient(90% 70% at 30% 80%, rgba(255,255,255,0.10), transparent 55%),linear-gradient(135deg,#0B0E14 0%,#141824 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06)}' +
+      /* Shell */
+      '.ftw .tw-shell{font-family:var(--ui-font);border-radius:var(--ui-radius-shell);background:var(--ui-gradient-premium);box-shadow:var(--ui-shadow-cardDark);border:1px solid var(--ui-border-on-dark);color:var(--ui-text-inverse);overflow:hidden}' +
+      '.ftw .tw-header{padding:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;background-image:var(--ui-gradient-gold-edge)}' +
+      '.ftw .tw-h1{font-size:24px;line-height:28px;font-weight:700;color:var(--ui-text-inverse);margin:0}' +
+      '.ftw .tw-h2{font-size:32px;line-height:38px;font-weight:900;color:var(--ui-text-inverse);margin:0}' +
+      '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
+      /* Body grid */
+      '.ftw .tw-two-col{display:grid;grid-template-columns:1.05fr 0.95fr;gap:24px;align-items:stretch;padding:24px}' +
+      '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}.ftw .tw-premium-visual{display:none}}' +
+      /* Premium visual */
+      '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background-image:var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge);background-color:var(--ui-bg-dark);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);position:relative;min-height:260px;overflow:hidden}' +
       '.ftw .tw-premium-visual::after{content:\"\";position:absolute;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8}' +
-      '.ftw .tw-widget.tw-hero .tw-premium-visual{min-height:260px}' +
-      '.ftw .tw-widget.tw-hero .tw-h2{letter-spacing:-0.02em}' +
-      '.ftw .tw-widget.tw-hero .tw-body{margin:0 0 22px 0;max-width:520px}' +
-      '.ftw .tw-progress-bar{width:100%;height:4px;border-radius:999px;background:var(--tw-border);overflow:hidden;margin:0 0 18px 0}' +
-      '.ftw .tw-progress-bar > div{height:100%;width:var(--tw-progress,0%);background:var(--tw-primary);border-radius:999px}' +
-      '.ftw .tw-options{display:flex;flex-direction:column;gap:12px;margin:0 0 16px 0}' +
-      '.ftw .tw-option{border:1px solid var(--tw-border);border-radius:var(--tw-radius-item);padding:14px 14px;display:grid;grid-template-columns:1fr 28px;align-items:center;cursor:pointer;background:rgba(255,255,255,0.04);transition:background .15s ease,border-color .15s ease}' +
-      '.ftw .tw-option:hover{border-color:var(--tw-border-strong);background:rgba(255,255,255,0.06)}' +
-      '.ftw .tw-option.is-selected{background:var(--tw-radio-selected-bg);border-color:var(--tw-radio-selected-border)}' +
-      '.ftw .tw-option-text{font-size:14px;line-height:20px;font-weight:700;color:var(--tw-text-primary)}' +
-      '.ftw .tw-option-check{width:18px;height:18px;border-radius:999px;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;justify-self:end}' +
-      '.ftw .tw-option.is-selected .tw-option-check{border-color:var(--tw-primary);background:var(--tw-primary)}' +
-      '.ftw .tw-option.is-selected .tw-option-check::after{content:\"✓\";color:#1F2937;font-size:12px;font-weight:900;transform:translateY(-.5px)}' +
-      '.ftw .tw-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px}' +
+      /* Inner card */
+      '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
+      '.ftw .tw-questionTitle{font-size:20px;line-height:24px;font-weight:700;color:var(--ui-text-inverse);margin:0 0 12px 0}' +
+      /* Options */
+      '.ftw .tw-options{display:flex;flex-direction:column;gap:16px;margin:0 0 20px 0}' +
+      '.ftw .tw-option{border-radius:var(--ui-radius-item);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);padding:16px;cursor:pointer;display:grid;grid-template-columns:1fr 28px;align-items:center;transition:background .15s ease,border-color .15s ease}' +
+      '.ftw .tw-option:hover{background:rgba(255,255,255,0.06)}' +
+      '.ftw .tw-option.is-selected{background:rgba(255,199,89,0.10);border-color:rgba(255,186,48,0.45)}' +
+      '.ftw .tw-option-text{font-size:16px;line-height:20px;font-weight:500;color:var(--ui-text-inverse)}' +
+      '.ftw .tw-option-check{width:18px;height:18px;border-radius:999px;border:2px solid rgba(255,255,255,0.25);justify-self:end;display:flex;align-items:center;justify-content:center}' +
+      '.ftw .tw-option.is-selected .tw-option-check{border-color:var(--ui-brand);background:var(--ui-brand)}' +
+      '.ftw .tw-option.is-selected .tw-option-check::after{content:\"✓\";color:#000;font-size:12px;font-weight:900}' +
+      /* Divider */
+      '.ftw .tw-divider{height:1px;background:hsla(0,0%,100%,.12);margin:16px 0}' +
+      /* Bullets */
+      '.ftw .tw-bullets{list-style:none;padding:0;margin:16px 0;display:flex;flex-direction:column;gap:10px}' +
+      '.ftw .tw-bullets li{display:grid;grid-template-columns:12px 1fr;gap:10px;align-items:start;color:var(--ui-text-inverse);font-weight:700;font-size:14px;line-height:20px}' +
+      '.ftw .tw-bullets li::before{content:\"\";width:8px;height:8px;margin-top:6px;border-radius:999px;background:var(--ui-brand)}' +
+      /* Actions */
+      '.ftw .tw-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;flex-wrap:wrap}' +
       '.ftw .tw-actions-left{display:flex;gap:10px;flex-wrap:wrap}' +
       '.ftw .tw-actions-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}' +
-      '.ftw .tw-btn{border:none;border-radius:var(--tw-radius-button);padding:10px 16px;font-weight:700;font-size:14px;line-height:18px;cursor:pointer;transition:background .15s ease,transform .05s ease}' +
+      /* Buttons */
+      '.ftw .tw-btn{height:48px;padding:0 20px;border-radius:var(--ui-radius-btn);font-family:var(--ui-font);font-size:16px;line-height:20px;font-weight:500;border:none;cursor:pointer;transition:background .15s ease, transform .05s ease}' +
       '.ftw .tw-btn:active{transform:translateY(1px)}' +
-      '.ftw .tw-btn-primary{background:var(--tw-primary)!important;color:var(--tw-primary-text)!important;font-weight:800}' +
-      '.ftw .tw-btn-primary:hover{background:var(--tw-primary-hover)!important}' +
-      '.ftw .tw-btn-secondary{background:var(--tw-secondary)!important;color:var(--tw-text-primary)!important;font-weight:800}' +
-      '.ftw .tw-btn-secondary:hover{background:var(--tw-secondary-hover)!important}' +
-      '.ftw .tw-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}' +
-      '.ftw .tw-link{color:rgba(255,255,255,0.88);text-decoration:none;font-weight:800;font-size:14px;cursor:pointer}' +
-      '.ftw .tw-link:hover{text-decoration:underline}' +
-      '.ftw .tw-bullets{list-style:none;padding:0;margin:14px 0 14px 0;display:flex;flex-direction:column;gap:10px}' +
-      '.ftw .tw-bullets li{display:grid;grid-template-columns:12px 1fr;gap:10px;align-items:start;color:rgba(255,255,255,0.90);font-weight:700;font-size:14px;line-height:20px}' +
-      '.ftw .tw-bullets li::before{content:\"\";width:8px;height:8px;margin-top:6px;border-radius:999px;background:var(--tw-primary)}' +
-      '.ftw .tw-btn:focus-visible,.ftw .tw-option:focus-visible,.ftw .tw-link:focus-visible{outline:2px solid var(--tw-primary);outline-offset:2px}' +
+      '.ftw .tw-btn-primary{background:var(--ui-brand);color:#000}' +
+      '.ftw .tw-btn-primary:hover{background:var(--ui-brand-hover)}' +
+      '.ftw .tw-btn-secondary{background:rgba(255,255,255,0.08);color:var(--ui-text-inverse);border:1px solid var(--ui-border-on-dark)}' +
+      '.ftw .tw-btn-secondary:hover{background:rgba(255,255,255,0.12)}' +
+      '.ftw .tw-btn[disabled]{opacity:0.6;cursor:not-allowed;transform:none}' +
+      /* Focus */
+      '.ftw .tw-btn:focus-visible,.ftw .tw-option:focus-visible{outline:2px solid var(--ui-brand);outline-offset:2px}' +
       ''
     );
   }
@@ -361,22 +296,15 @@
     this.mountPoint = target;
     this.dom = createRoot(target, this.options);
 
-    var initialStep = 0;
-    var initialView = this.options.initialView || 'intro';
-    if (initialView === 'intro') initialStep = -1;
-    if (initialView === 'questionnaire') initialStep = 0;
-
+    var initialView = this.options.initialView || 'form';
     this.state = {
-      view: 'questionnaire',
-      step: initialStep, // -1 = intro, 0.. = questions, >= QUESTIONS.length = result
+      mode: initialView === 'result' ? 'result' : 'form', // 'form' | 'result' | 'error'
       answers: {
-        q1_goal: null,
-        q2_frequency: null,
-        q3_instruments: null,
-        q4_assistance: null,
+        q1_style: null,
+        q2_consulting: null,
+        q3_lowFees: null,
       },
-      manualOnly: false,
-      prevStep: 0,
+      resultTariffId: null,
     };
 
     track(this, 'widget_init', {});
@@ -394,168 +322,109 @@
     this.render();
   };
 
-  Widget.prototype.canNext = function () {
-    var q = QUESTIONS[this.state.step];
-    return q && this.state.answers[q.id] != null;
+  Widget.prototype.canSubmit = function () {
+    for (var i = 0; i < QUESTIONS.length; i++) {
+      var q = QUESTIONS[i];
+      if (q.required && this.state.answers[q.id] == null) return false;
+    }
+    return true;
   };
 
   Widget.prototype.resetQuestionnaire = function () {
-    this.state.step = -1;
-    this.state.answers = {
-      q1_goal: null,
-      q2_frequency: null,
-      q3_instruments: null,
-      q4_assistance: null,
-    };
-    this.state.manualOnly = false;
-    this.state.prevStep = 0;
+    this.state.mode = 'form';
+    this.state.answers = { q1_style: null, q2_consulting: null, q3_lowFees: null };
+    this.state.resultTariffId = null;
     this.render();
   };
 
-  Widget.prototype.renderIntro = function (container) {
+  Widget.prototype.recommendTariffId = function () {
+    var a = this.state.answers;
+    if (a.q2_consulting === 'yes') return 'n5_consulting';
+    if (a.q1_style === 'often' || a.q3_lowFees === 'yes') return 'n2_day';
+    if (a.q1_style === 'rare') return 'n1_dolgosrochniy';
+    return 'n3_investor';
+  };
+
+  Widget.prototype.renderFormScreen = function (container) {
     var self = this;
-    container.appendChild(
+
+    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var header = el(
+      'div',
+      { class: 'tw-header tw-widgetHeader' },
       el(
         'div',
-        { class: 'tw-widget tw-hero' },
-        el(
-          'div',
-          { class: 'tw-two-col' },
-          el(
-            'div',
-            null,
-            el('div', { class: 'tw-h2', text: 'Подберём подходящий тариф за 1 минуту' }),
-            el('div', { class: 'tw-body', text: 'Ответьте на несколько вопросов — мы покажем тариф, который лучше всего подойдёт под ваши задачи' }),
-            el(
-              'div',
-              { class: 'tw-actions' },
-              el('div', { class: 'tw-actions-left' }),
-              el(
-                'div',
-                { class: 'tw-actions-right' },
-                el('button', {
-                  class: 'tw-btn tw-btn-primary',
-                  onClick: function () {
-                    track(self, 'widget_start', {});
-                    self.setState({ step: 0 });
-                  },
-                  text: 'Начать подбор',
-                })
-              )
-            )
-          ),
-          el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' })
-        )
+        null,
+        el('div', { class: 'tw-h1', text: 'Поможем подобрать тариф' }),
+        el('div', { class: 'tw-secondaryText', text: 'Ответьте на 2–4 вопроса — покажем подходящий тариф.' })
       )
     );
-  };
+    shell.appendChild(header);
 
-  Widget.prototype.renderProgress = function (container) {
-    var step = this.state.step;
-    var total = QUESTIONS.length;
-    var current = Math.min(total, Math.max(1, step + 1));
-    container.appendChild(el('div', { class: 'tw-meta', text: 'Вопрос ' + current + ' из ' + total }));
-    var wrap = el('div', { class: 'tw-progress-bar' }, el('div', {}));
-    wrap.style.setProperty('--tw-progress', Math.round((current / total) * 100) + '%');
-    container.appendChild(wrap);
-  };
+    var grid = el(
+      'div',
+      { class: 'tw-two-col' },
+      el('div', null),
+      el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' })
+    );
+    var left = grid.querySelector('.tw-two-col > div');
 
-  Widget.prototype.renderQuestionnaire = function (container) {
-    var self = this;
-    var step = this.state.step;
-    var q = QUESTIONS[step];
-
-    var card = el('div', { class: 'tw-widget' });
-
-    this.renderProgress(card);
-    card.appendChild(el('div', { class: 'tw-h3', text: q.title }));
-
-    var group = el('div', { class: 'tw-options', role: 'radiogroup', 'aria-label': q.title });
-    var rows = [];
-    function onGroupKeydown(e) {
-      var key = e.key;
-      var idx = rows.indexOf(document.activeElement);
-      if (idx < 0) idx = 0;
-      if (key === 'ArrowDown' || key === 'ArrowRight') {
-        e.preventDefault();
-        rows[(idx + 1 + rows.length) % rows.length].focus();
-      } else if (key === 'ArrowUp' || key === 'ArrowLeft') {
-        e.preventDefault();
-        rows[(idx - 1 + rows.length) % rows.length].focus();
-      }
+    var card = el('div', { class: 'tw-card' });
+    for (var i = 0; i < QUESTIONS.length; i++) {
+      (function (q) {
+        card.appendChild(el('div', { class: 'tw-questionTitle', text: q.title }));
+        var group = el('div', { class: 'tw-options', role: 'radiogroup', 'aria-label': q.title });
+        q.options.forEach(function (o) {
+          var checked = self.state.answers[q.id] === o.value;
+          var row = el('button', {
+            class: checked ? 'tw-option is-selected' : 'tw-option',
+            role: 'radio',
+            'aria-checked': checked ? 'true' : 'false',
+            onClick: function () {
+              self.setAnswer(q.id, o.value);
+            },
+          });
+          row.appendChild(el('div', { class: 'tw-option-text', text: o.label }));
+          row.appendChild(el('div', { class: 'tw-option-check', 'aria-hidden': 'true' }));
+          group.appendChild(row);
+        });
+        card.appendChild(group);
+      })(QUESTIONS[i]);
     }
-    group.addEventListener('keydown', onGroupKeydown);
 
-    q.options.forEach(function (o) {
-      var checked = self.state.answers[q.id] === o.value;
-      var row = el('button', {
-        class: checked ? 'tw-option is-selected' : 'tw-option',
-        role: 'radio',
-        'aria-checked': checked ? 'true' : 'false',
-        onClick: function () {
-          self.setAnswer(q.id, o.value);
-        },
-      });
-      row.appendChild(el('div', { class: 'tw-option-text', text: o.label }));
-      row.appendChild(el('div', { class: 'tw-option-check', 'aria-hidden': 'true' }));
-      row.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          row.click();
-        }
-      });
-      row.tabIndex = checked ? 0 : -1;
-      rows.push(row);
-      group.appendChild(row);
-    });
-    card.appendChild(group);
-
-    if (q.helperText) card.appendChild(el('div', { class: 'tw-meta', text: q.helperText }));
-
-    var backBtn = el('button', {
-      class: 'tw-btn tw-btn-secondary',
-      disabled: step === 0,
-      onClick: function () {
-        if (step === 0) return;
-        self.setState({ step: Math.max(0, step - 1) });
-      },
-      text: 'Назад',
-    });
-
-    var next = el('button', {
+    var btnShow = el('button', {
       class: 'tw-btn tw-btn-primary',
-      disabled: !self.canNext(),
+      disabled: !self.canSubmit(),
       onClick: function () {
-        if (step < QUESTIONS.length - 1) self.setState({ step: step + 1 });
-        else {
-          track(self, 'widget_completed', {});
-          self.setState({ step: QUESTIONS.length });
-        }
+        if (!self.canSubmit()) return;
+        track(self, 'widget_completed', {});
+        var resultTariffId = self.recommendTariffId();
+        assertValidTariff(resultTariffId);
+        self.setState({ mode: 'result', resultTariffId: resultTariffId });
       },
-      text: 'Далее',
+      text: 'Показать тариф',
     });
 
-    var manual = el('a', {
-      class: 'tw-link',
-      href: '#',
-      text: 'Я хочу выбрать тариф самостоятельно',
-      onClick: function (e) {
-        e.preventDefault();
-        track(self, 'manual_tariff_selection', {});
-        self.setState({ step: QUESTIONS.length, manualOnly: true, prevStep: step });
+    var btnReset = el('button', {
+      class: 'tw-btn tw-btn-secondary',
+      onClick: function () {
+        self.resetQuestionnaire();
       },
+      text: 'Сбросить',
     });
 
     card.appendChild(
       el(
         'div',
         { class: 'tw-actions' },
-        el('div', { class: 'tw-actions-left' }, manual),
-        el('div', { class: 'tw-actions-right' }, backBtn, next)
+        el('div', { class: 'tw-actions-left' }, btnReset),
+        el('div', { class: 'tw-actions-right' }, btnShow)
       )
     );
 
-    container.appendChild(card);
+    left.appendChild(card);
+    shell.appendChild(grid);
+    container.appendChild(shell);
   };
 
   Widget.prototype.openTariff = function (tariffId) {
@@ -565,109 +434,85 @@
     if (!t) return;
     track(this, 'tariff_recommended', { tariff_id: tariffId });
     try {
-      window.location.href = t.url;
+      var w = window.open(t.url, '_blank', 'noopener,noreferrer');
+      if (!w) window.location.href = t.url;
     } catch (_) {}
   };
 
   Widget.prototype.renderResultScreen = function (container) {
     var self = this;
-
-    // Manual selection screen (escape route): show ONLY the 5 whitelisted tariffs.
-    if (this.state.manualOnly) {
-      var manualCard = el('div', { class: 'tw-widget' });
-      manualCard.appendChild(el('div', { class: 'tw-actions' },
-        el('div', { class: 'tw-actions-left' },
-          el('button', {
-            class: 'tw-btn tw-btn-secondary',
-            onClick: function () {
-              self.setState({ step: self.state.prevStep || 0, manualOnly: false });
-            },
-            text: 'Назад',
-          })
-        ),
-        el('div', { class: 'tw-actions-left' })
-      ));
-
-      var list = el('div', { class: 'tw-options' });
-      for (var i = 0; i < TARIFF_CATALOG.length; i++) {
-        (function (t) {
-          var row = el('button', {
-            class: 'tw-option',
-            onClick: function () {
-              self.openTariff(t.id);
-            },
-          });
-          row.appendChild(el('div', { class: 'tw-option-text', text: t.name }));
-          row.appendChild(el('div', { class: 'tw-option-check', 'aria-hidden': 'true' }));
-          list.appendChild(row);
-        })(TARIFF_CATALOG[i]);
-      }
-      manualCard.appendChild(list);
-      container.appendChild(manualCard);
+    var tariffId = this.state.resultTariffId || this.recommendTariffId();
+    assertValidTariff(tariffId);
+    var tariff = tariffById(tariffId);
+    if (!tariff) {
+      this.setState({ mode: 'error' });
       return;
     }
 
-    var tariffId = recommendTariffId(this.state.answers);
-    assertValidTariff(tariffId);
-    var tariff = tariffById(tariffId);
-    var rc = RESULT_COPY[tariffId];
-
-    if (!tariff || !rc) {
-      tariffId = 'n3_investor';
-      tariff = tariffById(tariffId);
-      rc = RESULT_COPY[tariffId];
-    }
-
-    var card = el(
+    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var header = el(
       'div',
-      { class: 'tw-widget' },
+      { class: 'tw-header tw-widgetHeader' },
       el(
         'div',
-        { class: 'tw-two-col' },
-        el('div', null),
-        el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' })
+        null,
+        el('div', { class: 'tw-h1', text: 'Поможем подобрать тариф' }),
+        el('div', { class: 'tw-secondaryText', text: 'Результат подбора' })
       )
     );
-    var left = card.querySelector('.tw-two-col > div');
-    left.appendChild(el('div', { class: 'tw-h2', text: rc.title }));
-    left.appendChild(el('div', { class: 'tw-body', text: 'Мы подобрали его на основе ваших ответов' }));
+    shell.appendChild(header);
 
-    if (rc && Array.isArray(rc.benefits)) {
-      var list = el('ul', { class: 'tw-bullets' });
-      rc.benefits.slice(0, 3).forEach(function (b) {
-        list.appendChild(el('li', { text: b }));
-      });
-      left.appendChild(list);
-    }
+    var grid = el(
+      'div',
+      { class: 'tw-two-col' },
+      el('div', null),
+      el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' })
+    );
+    var left = grid.querySelector('.tw-two-col > div');
 
-    // Result: exactly one tariff. No "Посмотреть другие тарифы".
-    left.appendChild(
+    var card = el('div', { class: 'tw-card' });
+    card.appendChild(el('div', { class: 'tw-h2', text: 'Вам подходит тариф: ' + tariff.name }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Мы подобрали его на основе ваших ответов.' }));
+    card.appendChild(el('div', { class: 'tw-divider' }));
+
+    var bullets = el('ul', { class: 'tw-bullets' });
+    var rc = RESULT_COPY[tariffId];
+    var items = rc && rc.benefits ? rc.benefits : [];
+    for (var i = 0; i < items.length && i < 3; i++) bullets.appendChild(el('li', { text: items[i] }));
+    card.appendChild(bullets);
+
+    card.appendChild(
       el(
         'div',
         { class: 'tw-actions' },
-        el('div', { class: 'tw-actions-left' }),
+        el('div', { class: 'tw-actions-left' },
+          el('button', { class: 'tw-btn tw-btn-secondary', onClick: function () { self.resetQuestionnaire(); }, text: 'Пройти заново' })
+        ),
         el('div', { class: 'tw-actions-right' },
-          el('button', {
-            class: 'tw-btn tw-btn-secondary',
-            onClick: function () {
-              self.resetQuestionnaire();
-            },
-            text: 'Повторить опрос',
-          }),
-          el('button', {
-            class: 'tw-btn tw-btn-primary',
-            onClick: function () {
-              self.openTariff(tariffId);
-            },
-            text: 'Перейти к тарифу',
-          })
+          el('button', { class: 'tw-btn tw-btn-primary', onClick: function () { self.openTariff(tariffId); }, text: 'Перейти к тарифу' })
         )
       )
     );
 
-    // ResultScreen must show exactly ONE tariff (no embedded alternatives list).
+    left.appendChild(card);
+    shell.appendChild(grid);
+    container.appendChild(shell);
+  };
 
-    container.appendChild(card);
+  Widget.prototype.renderErrorScreen = function (container) {
+    var self = this;
+    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var card = el('div', { class: 'tw-card' });
+    card.appendChild(el('div', { class: 'tw-h2', text: 'Не удалось подобрать тариф' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Попробуйте выбрать варианты ещё раз.' }));
+    card.appendChild(el('div', { class: 'tw-actions' },
+      el('div', { class: 'tw-actions-left' }),
+      el('div', { class: 'tw-actions-right' },
+        el('button', { class: 'tw-btn tw-btn-primary', onClick: function () { self.resetQuestionnaire(); }, text: 'Вернуться к вопросам' })
+      )
+    ));
+    shell.appendChild(card);
+    container.appendChild(shell);
   };
 
   Widget.prototype.render = function () {
@@ -675,13 +520,9 @@
     while (host.firstChild) host.removeChild(host.firstChild);
 
     var wrap = el('div', { class: 'wrap' });
-    if (this.state.step < 0) {
-      this.renderIntro(wrap);
-    } else if (this.state.step >= QUESTIONS.length) {
-      this.renderResultScreen(wrap);
-    } else {
-      this.renderQuestionnaire(wrap);
-    }
+    if (this.state.mode === 'result') this.renderResultScreen(wrap);
+    else if (this.state.mode === 'error') this.renderErrorScreen(wrap);
+    else this.renderFormScreen(wrap);
 
     host.appendChild(wrap);
   };
