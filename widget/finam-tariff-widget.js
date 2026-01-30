@@ -48,7 +48,18 @@
     },
   ];
 
+  // Runtime safety guard: only these IDs are allowed.
+  var ALLOWED_TARIFF_IDS = ['n1_dolgosrochniy', 'n2_day', 'n3_investor', 'n4_strateg', 'n5_consulting'];
+
+  function assertValidTariff(tariffId) {
+    for (var i = 0; i < ALLOWED_TARIFF_IDS.length; i++) {
+      if (ALLOWED_TARIFF_IDS[i] === tariffId) return;
+    }
+    throw new Error('Invalid tariff generated: ' + tariffId);
+  }
+
   function tariffById(id) {
+    assertValidTariff(id);
     for (var i = 0; i < TARIFF_CATALOG.length; i++) if (TARIFF_CATALOG[i].id === id) return TARIFF_CATALOG[i];
     return null;
   }
@@ -535,6 +546,7 @@
 
   Widget.prototype.openTariff = function (tariffId) {
     // tariffId must be from STRICT WHITELIST
+    assertValidTariff(tariffId);
     var t = tariffById(tariffId);
     if (!t) return;
     track(this, 'tariff_recommended', { tariff_id: tariffId });
@@ -546,6 +558,7 @@
   Widget.prototype.renderResultScreen = function (container) {
     var self = this;
     var tariffId = recommendTariffId(this.state.answers);
+    assertValidTariff(tariffId);
     var tariff = tariffById(tariffId);
     var rc = RESULT_COPY[tariffId];
 
