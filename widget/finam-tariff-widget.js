@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.3.6
+ * Version: 0.3.7
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.3.6';
+  var VERSION = '0.3.7';
 
   var DEFAULTS = {
     // 'intro' | 'questionnaire'
@@ -286,7 +286,7 @@
       '' +
       ':host{all:initial}' +
       /* Premium dark theme (scoped). */
-      '.ftw{--tw-bg-page:#F2F4F7;--tw-surface:#0B0E14;--tw-surface-2:#141824;--tw-text-primary:#FFFFFF;--tw-text-secondary:rgba(255,255,255,0.72);--tw-border:rgba(255,255,255,0.10);--tw-border-strong:rgba(255,255,255,0.16);--tw-shadow:rgba(0,0,0,0.45);--tw-primary:#F5C84C;--tw-primary-hover:#EAB83E;--tw-primary-text:#111827;--tw-secondary:rgba(255,255,255,0.10);--tw-secondary-hover:rgba(255,255,255,0.16);--tw-radio-selected-bg:rgba(245,200,76,0.12);--tw-radio-selected-border:#F5C84C;--tw-radius-card:20px;--tw-radius-button:12px;--tw-radius-item:14px;--tw-card-pad:28px;--tw-h2-size:28px;--tw-h2-lh:34px;--tw-h2-weight:800;--tw-h3-size:22px;--tw-h3-lh:28px;--tw-h3-weight:800;--tw-body-size:14px;--tw-body-lh:20px;--tw-body-weight:500;--tw-meta-size:12px;--tw-meta-lh:16px;--tw-meta-weight:700}' +
+      '.ftw{--tw-bg-page:#F2F4F7;--tw-surface:#0B0E14;--tw-surface-2:#141824;--tw-text-primary:#FFFFFF;--tw-text-secondary:rgba(255,255,255,0.72);--tw-border:rgba(255,255,255,0.10);--tw-border-strong:rgba(255,255,255,0.16);--tw-shadow:rgba(0,0,0,0.45);--tw-primary:#F5C84C;--tw-primary-hover:#EAB83E;--tw-primary-text:#111827;--tw-secondary:rgba(255,255,255,0.10);--tw-secondary-hover:rgba(255,255,255,0.16);--tw-radio-selected-bg:rgba(245,200,76,0.12);--tw-radio-selected-border:#F5C84C;--tw-radius-card:20px;--tw-radius-button:12px;--tw-radius-item:14px;--tw-card-pad:28px;--tw-h2-size:32px;--tw-h2-lh:38px;--tw-h2-weight:900;--tw-h3-size:22px;--tw-h3-lh:28px;--tw-h3-weight:800;--tw-body-size:14px;--tw-body-lh:20px;--tw-body-weight:500;--tw-meta-size:12px;--tw-meta-lh:16px;--tw-meta-weight:700}' +
       '.ftw *{box-sizing:border-box}' +
       '.ftw .wrap{width:100%}' +
       '.ftw .tw-widget{max-width:980px;margin:0 auto;border-radius:var(--tw-radius-card);background:linear-gradient(135deg,var(--tw-surface) 0%,var(--tw-surface-2) 100%);box-shadow:0 30px 80px var(--tw-shadow);padding:var(--tw-card-pad);color:var(--tw-text-primary);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,\"Noto Sans\",\"Helvetica Neue\",sans-serif}' +
@@ -304,10 +304,8 @@
       '.ftw .tw-premium-visual{width:100%;min-height:180px;border-radius:16px;position:relative;overflow:hidden;background:radial-gradient(120% 90% at 80% 25%, rgba(245,200,76,0.22), transparent 60%),radial-gradient(90% 70% at 30% 80%, rgba(255,255,255,0.10), transparent 55%),linear-gradient(135deg,#0B0E14 0%,#141824 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06)}' +
       '.ftw .tw-premium-visual::after{content:\"\";position:absolute;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8}' +
       '.ftw .tw-widget.tw-hero .tw-premium-visual{min-height:260px}' +
-      '.ftw .tw-widget.tw-hero .tw-h2{font-size:44px;line-height:1.06;margin:0 0 14px 0;letter-spacing:-0.02em}' +
-      '@media (max-width:640px){.ftw .tw-widget.tw-hero .tw-h2{font-size:34px}}' +
-      '.ftw .tw-widget.tw-hero .tw-body{font-size:18px;line-height:1.5;margin:0 0 22px 0;max-width:520px}' +
-      '.ftw .tw-widget.tw-hero .tw-btn{padding:14px 22px;font-size:16px;border-radius:14px}' +
+      '.ftw .tw-widget.tw-hero .tw-h2{letter-spacing:-0.02em}' +
+      '.ftw .tw-widget.tw-hero .tw-body{margin:0 0 22px 0;max-width:520px}' +
       '.ftw .tw-progress-bar{width:100%;height:4px;border-radius:999px;background:var(--tw-border);overflow:hidden;margin:0 0 18px 0}' +
       '.ftw .tw-progress-bar > div{height:100%;width:var(--tw-progress,0%);background:var(--tw-primary);border-radius:999px}' +
       '.ftw .tw-options{display:flex;flex-direction:column;gap:12px;margin:0 0 16px 0}' +
@@ -642,6 +640,7 @@
       left.appendChild(list);
     }
 
+    // Result: exactly one tariff. No "Посмотреть другие тарифы".
     left.appendChild(
       el(
         'div',
@@ -651,9 +650,9 @@
           el('button', {
             class: 'tw-btn tw-btn-secondary',
             onClick: function () {
-              self.setState({ manualOnly: true, prevStep: QUESTIONS.length });
+              self.resetQuestionnaire();
             },
-            text: 'Посмотреть другие тарифы',
+            text: 'Повторить опрос',
           }),
           el('button', {
             class: 'tw-btn tw-btn-primary',
