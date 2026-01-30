@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.7
+  * Version: 1.0.8
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.7';
+  var VERSION = '1.0.8';
 
   var DEFAULTS = {
     // 'form' | 'result'
@@ -309,11 +309,13 @@
       '@media (max-width:860px){.ftw .tw-shell-bg::before{background-size:680px auto}}' +
       /* Premium visual */
       '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background-color:var(--ui-bg-dark);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);position:relative;min-height:260px;overflow:hidden}' +
-      '.ftw .tw-premium-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0.92;filter:saturate(1.05) contrast(1.05);transform:scale(1.03)}' +
+      '.ftw .tw-premium-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:right center;background-repeat:no-repeat;opacity:0.92;filter:saturate(1.05) contrast(1.05);transform:scale(1.03)}' +
       '.ftw .tw-premium-overlay{position:absolute;inset:0;z-index:1;background-image:var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge);pointer-events:none}' +
       '.ftw .tw-premium-visual::after{content:\"\";position:absolute;z-index:2;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8;pointer-events:none}' +
       /* Inner card */
       '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
+      /* Solid card (questions/results) to keep readability over visuals */
+      '.ftw .tw-cardSolid{background:rgba(21,21,25,0.92);border:1px solid rgba(255,255,255,0.14);box-shadow:var(--ui-shadow-cardDark)}' +
       '.ftw .tw-questionTitle{font-size:20px;line-height:24px;font-weight:700;color:var(--ui-text-inverse);margin:0 0 12px 0}' +
       '.ftw .tw-progress{height:4px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;margin:8px 0 18px 0}' +
       '.ftw .tw-progress > div{height:100%;width:var(--tw-progress,0%);background:var(--ui-brand);border-radius:999px}' +
@@ -504,8 +506,7 @@
     var total = QUESTIONS.length;
     var current = this.state.step + 1;
 
-    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
-    this.applyBackgroundImage(shell);
+    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
     if (this._fixedQuestionHeight) shell.style.minHeight = this._fixedQuestionHeight + 'px';
     var header = el(
       'div',
@@ -519,10 +520,11 @@
     );
     shell.appendChild(header);
 
-    // Single column on question screens: no right block, image is in the shell background.
-    var body = el('div', { class: 'tw-one-col' });
+    // Two columns on questions: stable card width, visual on the right.
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    var left = grid.firstChild;
 
-    var card = el('div', { class: 'tw-card' });
+    var card = el('div', { class: 'tw-card tw-cardSolid' });
     card.appendChild(el('div', { class: 'tw-meta', text: 'Вопрос ' + current + ' из ' + total }));
     var pb = el('div', { class: 'tw-progress' }, el('div', {}));
     pb.style.setProperty('--tw-progress', Math.round((current / total) * 100) + '%');
@@ -585,8 +587,8 @@
       )
     );
 
-    body.appendChild(card);
-    shell.appendChild(body);
+    left.appendChild(card);
+    shell.appendChild(grid);
     container.appendChild(shell);
   };
 
@@ -612,8 +614,7 @@
       return;
     }
 
-    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
-    this.applyBackgroundImage(shell);
+    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
     var header = el(
       'div',
       { class: 'tw-header tw-widgetHeader' },
@@ -626,9 +627,10 @@
     );
     shell.appendChild(header);
 
-    var body = el('div', { class: 'tw-one-col' });
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    var left = grid.firstChild;
 
-    var card = el('div', { class: 'tw-card' });
+    var card = el('div', { class: 'tw-card tw-cardSolid' });
     card.appendChild(el('div', { class: 'tw-h2', text: 'Вам подходит тариф: ' + tariff.name }));
     card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Мы подобрали его на основе ваших ответов.' }));
     card.appendChild(el('div', { class: 'tw-divider' }));
@@ -652,8 +654,8 @@
       )
     );
 
-    body.appendChild(card);
-    shell.appendChild(body);
+    left.appendChild(card);
+    shell.appendChild(grid);
     container.appendChild(shell);
   };
 
