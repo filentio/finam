@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.1
+ * Version: 1.0.2
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.1';
+  var VERSION = '1.0.2';
 
   var DEFAULTS = {
     // 'form' | 'result'
@@ -246,7 +246,8 @@
       '.ftw .tw-shell{font-family:var(--ui-font);border-radius:var(--ui-radius-shell);background:var(--ui-gradient-premium);box-shadow:var(--ui-shadow-cardDark);border:1px solid var(--ui-border-on-dark);color:var(--ui-text-inverse);overflow:hidden}' +
       '.ftw .tw-header{padding:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;background-image:var(--ui-gradient-gold-edge)}' +
       '.ftw .tw-h1{font-size:24px;line-height:28px;font-weight:700;color:var(--ui-text-inverse);margin:0}' +
-      '.ftw .tw-h2{font-size:32px;line-height:38px;font-weight:900;color:var(--ui-text-inverse);margin:0}' +
+      /* Card H2 (match tariff card): 40/48/700/-0.384 */
+      '.ftw .tw-h2{font-size:40px;line-height:48px;font-weight:700;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
       '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
       '.ftw .tw-meta{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin:0 0 10px 0}' +
       /* Body grid */
@@ -280,7 +281,8 @@
       '.ftw .tw-actions-left{display:flex;gap:10px;flex-wrap:wrap}' +
       '.ftw .tw-actions-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}' +
       /* Buttons */
-      '.ftw .tw-btn{height:48px;padding:0 20px;border-radius:var(--ui-radius-btn);font-family:var(--ui-font);font-size:16px;line-height:20px;font-weight:500;border:none;cursor:pointer;transition:background .15s ease, transform .05s ease}' +
+      /* Buttons (match tariff card paddings + SemiBold) */
+      '.ftw .tw-btn{height:48px;padding:0 24px;border-radius:var(--ui-radius-btn);font-family:var(--ui-font);font-size:16px;line-height:20px;font-weight:600;border:none;cursor:pointer;transition:background .15s ease, transform .05s ease}' +
       '.ftw .tw-btn:active{transform:translateY(1px)}' +
       '.ftw .tw-btn-primary{background:var(--ui-brand);color:#000}' +
       '.ftw .tw-btn-primary:hover{background:var(--ui-brand-hover)}' +
