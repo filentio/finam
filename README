@@ -35,17 +35,9 @@
 <script src="finam-tariff-widget.js"></script>
 ```
 
-### 2.2) Ссылка “выбрать тариф самостоятельно”
+### 2.2) “Я хочу выбрать тариф самостоятельно”
 
-```html
-<div data-finam-tariff-widget></div>
-<script src="finam-tariff-widget.js"></script>
-<script>
-  FinamTariffWidget.mount(document.querySelector('[data-finam-tariff-widget]'), {
-    manualUrl: 'https://broker.finam.ru/landing/tariff-learn-more/', 
-  });
-</script>
-```
+Никаких внешних ссылок не требуется: по клику виджет покажет список из **5 тарифов** (строго из whitelist) прямо внутри виджета.
 
 ### 3) Встраивание с настройками
 
