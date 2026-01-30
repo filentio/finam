@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.4
+ * Version: 1.0.5
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.4';
+  var VERSION = '1.0.5';
 
   var DEFAULTS = {
     // 'form' | 'result'
@@ -247,7 +247,9 @@
       '.ftw .tw-header{padding:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;background-image:var(--ui-gradient-gold-edge)}' +
       '.ftw .tw-h1{font-size:24px;line-height:28px;font-weight:700;color:var(--ui-text-inverse);margin:0}' +
       /* Card H2 (match tariff card): 40/48/700/-0.384 */
-      '.ftw .tw-h2{font-size:40px;line-height:48px;font-weight:700;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
+      '.ftw .tw-h2{font-size:32px;line-height:38px;font-weight:700;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
+      '.ftw .tw-heroTitle{font-size:36px;line-height:42px;font-weight:800;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
+      '@media (max-width:860px){.ftw .tw-heroTitle{font-size:30px;line-height:36px}}' +
       '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
       '.ftw .tw-meta{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin:0 0 10px 0}' +
       /* Body grid */
@@ -390,8 +392,8 @@
     var left = grid.querySelector('.tw-two-col > div');
 
     var card = el('div', { class: 'tw-card' });
-    card.appendChild(el('div', { class: 'tw-h2', text: 'Подберём подходящий тариф за 1 минуту' }));
-    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — мы покажем тариф, который лучше всего подойдёт под ваши задачи.' }));
+    card.appendChild(el('div', { class: 'tw-heroTitle', text: 'Выберите тариф, который подойдёт именно вам' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Предложим оптимальный тариф без лишних сложностей.' }));
     card.appendChild(
       el('div', { class: 'tw-actions' },
         el('div', { class: 'tw-actions-left' }),
