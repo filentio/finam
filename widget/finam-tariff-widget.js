@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.6
+ * Version: 1.0.7
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.6';
+  var VERSION = '1.0.7';
 
   var DEFAULTS = {
     // 'form' | 'result'
@@ -297,9 +297,16 @@
       '@media (max-width:860px){.ftw .tw-heroTitle{font-size:30px;line-height:36px}}' +
       '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
       '.ftw .tw-meta{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin:0 0 10px 0}' +
+      /* One-column body (used for questions/results to avoid layout jumps) */
+      '.ftw .tw-one-col{padding:24px}' +
       /* Body grid */
       '.ftw .tw-two-col{display:grid;grid-template-columns:1.05fr 0.95fr;gap:24px;align-items:stretch;padding:24px}' +
       '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}.ftw .tw-premium-visual{display:none}}' +
+      /* Background image mode (question/result): image is part of whole module background */
+      '.ftw .tw-shell-bg{position:relative}' +
+      '.ftw .tw-shell-bg::before{content:\"\";position:absolute;inset:0;z-index:0;background-image:var(--tw-bg-img, none);background-repeat:no-repeat;background-position:center;background-size:var(--tw-bg-size, 820px auto);opacity:0.92;filter:saturate(1.06) contrast(1.06);pointer-events:none}' +
+      '.ftw .tw-shell-bg > *{position:relative;z-index:1}' +
+      '@media (max-width:860px){.ftw .tw-shell-bg::before{background-size:680px auto}}' +
       /* Premium visual */
       '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background-color:var(--ui-bg-dark);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);position:relative;min-height:260px;overflow:hidden}' +
       '.ftw .tw-premium-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0.92;filter:saturate(1.05) contrast(1.05);transform:scale(1.03)}' +
@@ -374,6 +381,10 @@
     this.mountPoint = target;
     this.dom = createRoot(target, this.options);
 
+    // Fixed height for question screens (avoids layout jumps).
+    // Set when user enters questionnaire.
+    this._fixedQuestionHeight = 0;
+
     this.state = {
       mode: 'intro', // 'intro' | 'question' | 'result' | 'error'
       step: 0,
@@ -436,6 +447,12 @@
     return wrap;
   };
 
+  Widget.prototype.applyBackgroundImage = function (shell) {
+    if (!shell) return;
+    if (!this.options.premiumVisualImageUrl) return;
+    shell.style.setProperty('--tw-bg-img', 'url("' + safeCssUrl(this.options.premiumVisualImageUrl) + '")');
+  };
+
   Widget.prototype.renderIntroScreen = function (container) {
     var self = this;
     var shell = el('div', { class: 'tw-shell tw-widgetShell' });
@@ -465,6 +482,9 @@
             class: 'tw-btn tw-btn-primary',
             onClick: function () {
               track(self, 'widget_start', {});
+              // Fix questionnaire height to prevent layout jumps between questions.
+              // Value chosen to comfortably fit longest question on desktop.
+              self._fixedQuestionHeight = 620;
               self.setState({ mode: 'question', step: 0 });
             },
             text: 'Начать подбор',
@@ -484,7 +504,9 @@
     var total = QUESTIONS.length;
     var current = this.state.step + 1;
 
-    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
+    if (this._fixedQuestionHeight) shell.style.minHeight = this._fixedQuestionHeight + 'px';
     var header = el(
       'div',
       { class: 'tw-header tw-widgetHeader' },
@@ -497,8 +519,8 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
-    var left = grid.firstChild;
+    // Single column on question screens: no right block, image is in the shell background.
+    var body = el('div', { class: 'tw-one-col' });
 
     var card = el('div', { class: 'tw-card' });
     card.appendChild(el('div', { class: 'tw-meta', text: 'Вопрос ' + current + ' из ' + total }));
@@ -541,6 +563,10 @@
       disabled: !this.canNext(),
       onClick: function () {
         if (!self.canNext()) return;
+        try {
+          var h = Math.ceil(shell.getBoundingClientRect().height || 0);
+          if (h) self._fixedQuestionHeight = Math.max(self._fixedQuestionHeight || 0, h);
+        } catch (_) {}
         if (!isLast) self.setState({ step: self.state.step + 1 });
         else {
           track(self, 'widget_completed', {});
@@ -559,8 +585,8 @@
       )
     );
 
-    left.appendChild(card);
-    shell.appendChild(grid);
+    body.appendChild(card);
+    shell.appendChild(body);
     container.appendChild(shell);
   };
 
@@ -586,7 +612,8 @@
       return;
     }
 
-    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
     var header = el(
       'div',
       { class: 'tw-header tw-widgetHeader' },
@@ -599,8 +626,7 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
-    var left = grid.firstChild;
+    var body = el('div', { class: 'tw-one-col' });
 
     var card = el('div', { class: 'tw-card' });
     card.appendChild(el('div', { class: 'tw-h2', text: 'Вам подходит тариф: ' + tariff.name }));
@@ -626,8 +652,8 @@
       )
     );
 
-    left.appendChild(card);
-    shell.appendChild(grid);
+    body.appendChild(card);
+    shell.appendChild(body);
     container.appendChild(shell);
   };
 
