@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.0
+ * Version: 1.0.1
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
 
   var DEFAULTS = {
     // 'form' | 'result'
@@ -58,31 +58,49 @@
     return null;
   }
 
+  // Questions (step-by-step flow)
   var QUESTIONS = [
     {
-      id: 'q1_style',
-      title: 'Как вы обычно торгуете?',
+      id: 'q1_goal',
+      title: 'Для чего вы планируете инвестировать?',
       options: [
-        { value: 'rare', label: 'Редко / держу надолго' },
-        { value: 'often', label: 'Часто / внутри дня' },
+        { value: 'a1_save', label: 'Хочу сохранить деньги и понемногу приумножать' },
+        { value: 'a2_active', label: 'Планирую активно торговать' },
+        { value: 'a3_try', label: 'Хочу попробовать инвестиции и разобраться' },
+        { value: 'a4_unsure', label: 'Пока не уверен(а), хочу посмотреть' },
       ],
       required: true,
     },
     {
-      id: 'q2_consulting',
-      title: 'Нужны консультации и сопровождение?',
+      id: 'q2_frequency',
+      title: 'Как часто вы планируете покупать или продавать активы?',
+      helperText: 'Это поможет учесть комиссии и доступные инструменты',
       options: [
-        { value: 'yes', label: 'Да' },
-        { value: 'no', label: 'Нет' },
+        { value: 'b1_rare', label: 'Несколько раз в год' },
+        { value: 'b2_month', label: 'Несколько раз в месяц' },
+        { value: 'b3_daily', label: 'Почти каждый день' },
+        { value: 'b4_unknown', label: 'Пока не знаю' },
       ],
       required: true,
     },
     {
-      id: 'q3_lowFees',
-      title: 'Важны минимальные комиссии при обороте?',
+      id: 'q3_instruments',
+      title: 'Чем вы планируете торговать?',
       options: [
-        { value: 'yes', label: 'Да' },
-        { value: 'no', label: 'Не критично' },
+        { value: 'c1_stocks', label: 'Акции и облигации' },
+        { value: 'c2_futures', label: 'Фьючерсы / активная торговля' },
+        { value: 'c3_currency', label: 'Валюта' },
+        { value: 'c4_unknown', label: 'Пока не знаю' },
+      ],
+      required: true,
+    },
+    {
+      id: 'q4_assistance',
+      title: 'Нужна ли вам помощь при инвестировании?',
+      options: [
+        { value: 'd1_yes', label: 'Да, хочу подсказки и сопровождение' },
+        { value: 'd2_sometimes', label: 'Иногда, но в целом сам(а)' },
+        { value: 'd3_no', label: 'Нет, всё делаю сам(а)' },
       ],
       required: true,
     },
@@ -216,10 +234,11 @@
       '--ui-gradient-gold-edge:radial-gradient(70% 120% at 100% 0%, rgba(255,186,48,.18) 0%, rgba(255,186,48,0) 60%);' +
       '--ui-shadow-cardDark:0px 5px 10px 0px rgba(57,57,66,.16), 0px 15px 20px 0px rgba(57,57,66,.16), 0px 25px 50px 0px rgba(57,57,66,.16);' +
       '--ui-shadow-cardMid:0px 2px 6px 0px rgba(57,57,66,.06), 0px 10px 20px 0px rgba(57,57,66,.06);' +
-      '--ui-radius-shell:32px;' +
-      '--ui-radius-card:24px;' +
-      '--ui-radius-item:16px;' +
-      '--ui-radius-btn:12px;' +
+      /* Slightly smaller rounding (per request) */
+      '--ui-radius-shell:24px;' +
+      '--ui-radius-card:16px;' +
+      '--ui-radius-item:12px;' +
+      '--ui-radius-btn:10px;' +
       '}' +
       '.ftw *{box-sizing:border-box}' +
       '.ftw .wrap{width:100%}' +
@@ -229,6 +248,7 @@
       '.ftw .tw-h1{font-size:24px;line-height:28px;font-weight:700;color:var(--ui-text-inverse);margin:0}' +
       '.ftw .tw-h2{font-size:32px;line-height:38px;font-weight:900;color:var(--ui-text-inverse);margin:0}' +
       '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
+      '.ftw .tw-meta{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin:0 0 10px 0}' +
       /* Body grid */
       '.ftw .tw-two-col{display:grid;grid-template-columns:1.05fr 0.95fr;gap:24px;align-items:stretch;padding:24px}' +
       '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}.ftw .tw-premium-visual{display:none}}' +
@@ -238,6 +258,8 @@
       /* Inner card */
       '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
       '.ftw .tw-questionTitle{font-size:20px;line-height:24px;font-weight:700;color:var(--ui-text-inverse);margin:0 0 12px 0}' +
+      '.ftw .tw-progress{height:4px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;margin:8px 0 18px 0}' +
+      '.ftw .tw-progress > div{height:100%;width:var(--tw-progress,0%);background:var(--ui-brand);border-radius:999px}' +
       /* Options */
       '.ftw .tw-options{display:flex;flex-direction:column;gap:16px;margin:0 0 20px 0}' +
       '.ftw .tw-option{border-radius:var(--ui-radius-item);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);padding:16px;cursor:pointer;display:grid;grid-template-columns:1fr 28px;align-items:center;transition:background .15s ease,border-color .15s ease}' +
@@ -296,13 +318,14 @@
     this.mountPoint = target;
     this.dom = createRoot(target, this.options);
 
-    var initialView = this.options.initialView || 'form';
     this.state = {
-      mode: initialView === 'result' ? 'result' : 'form', // 'form' | 'result' | 'error'
+      mode: 'intro', // 'intro' | 'question' | 'result' | 'error'
+      step: 0,
       answers: {
-        q1_style: null,
-        q2_consulting: null,
-        q3_lowFees: null,
+        q1_goal: null,
+        q2_frequency: null,
+        q3_instruments: null,
+        q4_assistance: null,
       },
       resultTariffId: null,
     };
@@ -322,31 +345,77 @@
     this.render();
   };
 
-  Widget.prototype.canSubmit = function () {
-    for (var i = 0; i < QUESTIONS.length; i++) {
-      var q = QUESTIONS[i];
-      if (q.required && this.state.answers[q.id] == null) return false;
-    }
-    return true;
+  Widget.prototype.canNext = function () {
+    var q = QUESTIONS[this.state.step];
+    return q && this.state.answers[q.id] != null;
   };
 
   Widget.prototype.resetQuestionnaire = function () {
-    this.state.mode = 'form';
-    this.state.answers = { q1_style: null, q2_consulting: null, q3_lowFees: null };
+    this.state.mode = 'intro';
+    this.state.step = 0;
+    this.state.answers = { q1_goal: null, q2_frequency: null, q3_instruments: null, q4_assistance: null };
     this.state.resultTariffId = null;
     this.render();
   };
 
   Widget.prototype.recommendTariffId = function () {
+    // Conservative mapping for restored questions
     var a = this.state.answers;
-    if (a.q2_consulting === 'yes') return 'n5_consulting';
-    if (a.q1_style === 'often' || a.q3_lowFees === 'yes') return 'n2_day';
-    if (a.q1_style === 'rare') return 'n1_dolgosrochniy';
+    if (a.q4_assistance === 'd1_yes') return 'n5_consulting';
+    if (a.q3_instruments === 'c2_futures') return 'n2_day';
+    if (a.q1_goal === 'a2_active') return 'n2_day';
+    if (a.q1_goal === 'a1_save') return 'n1_dolgosrochniy';
+    if (a.q1_goal === 'a3_try') return 'n3_investor';
     return 'n3_investor';
   };
 
-  Widget.prototype.renderFormScreen = function (container) {
+  Widget.prototype.renderIntroScreen = function (container) {
     var self = this;
+    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var header = el(
+      'div',
+      { class: 'tw-header tw-widgetHeader' },
+      el(
+        'div',
+        null,
+        el('div', { class: 'tw-h1', text: 'Поможем подобрать тариф' }),
+        el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — покажем подходящий тариф.' })
+      )
+    );
+    shell.appendChild(header);
+
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
+    var left = grid.querySelector('.tw-two-col > div');
+
+    var card = el('div', { class: 'tw-card' });
+    card.appendChild(el('div', { class: 'tw-h2', text: 'Подберём подходящий тариф за 1 минуту' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — мы покажем тариф, который лучше всего подойдёт под ваши задачи.' }));
+    card.appendChild(
+      el('div', { class: 'tw-actions' },
+        el('div', { class: 'tw-actions-left' }),
+        el('div', { class: 'tw-actions-right' },
+          el('button', {
+            class: 'tw-btn tw-btn-primary',
+            onClick: function () {
+              track(self, 'widget_start', {});
+              self.setState({ mode: 'question', step: 0 });
+            },
+            text: 'Начать подбор',
+          })
+        )
+      )
+    );
+
+    left.appendChild(card);
+    shell.appendChild(grid);
+    container.appendChild(shell);
+  };
+
+  Widget.prototype.renderQuestionScreen = function (container) {
+    var self = this;
+    var q = QUESTIONS[this.state.step];
+    var total = QUESTIONS.length;
+    var current = this.state.step + 1;
 
     var shell = el('div', { class: 'tw-shell tw-widgetShell' });
     var header = el(
@@ -356,69 +425,70 @@
         'div',
         null,
         el('div', { class: 'tw-h1', text: 'Поможем подобрать тариф' }),
-        el('div', { class: 'tw-secondaryText', text: 'Ответьте на 2–4 вопроса — покажем подходящий тариф.' })
+        el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — покажем подходящий тариф.' })
       )
     );
     shell.appendChild(header);
 
-    var grid = el(
-      'div',
-      { class: 'tw-two-col' },
-      el('div', null),
-      el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' })
-    );
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
     var left = grid.querySelector('.tw-two-col > div');
 
     var card = el('div', { class: 'tw-card' });
-    for (var i = 0; i < QUESTIONS.length; i++) {
-      (function (q) {
-        card.appendChild(el('div', { class: 'tw-questionTitle', text: q.title }));
-        var group = el('div', { class: 'tw-options', role: 'radiogroup', 'aria-label': q.title });
-        q.options.forEach(function (o) {
-          var checked = self.state.answers[q.id] === o.value;
-          var row = el('button', {
-            class: checked ? 'tw-option is-selected' : 'tw-option',
-            role: 'radio',
-            'aria-checked': checked ? 'true' : 'false',
-            onClick: function () {
-              self.setAnswer(q.id, o.value);
-            },
-          });
-          row.appendChild(el('div', { class: 'tw-option-text', text: o.label }));
-          row.appendChild(el('div', { class: 'tw-option-check', 'aria-hidden': 'true' }));
-          group.appendChild(row);
-        });
-        card.appendChild(group);
-      })(QUESTIONS[i]);
-    }
+    card.appendChild(el('div', { class: 'tw-meta', text: 'Вопрос ' + current + ' из ' + total }));
+    var pb = el('div', { class: 'tw-progress' }, el('div', {}));
+    pb.style.setProperty('--tw-progress', Math.round((current / total) * 100) + '%');
+    card.appendChild(pb);
 
-    var btnShow = el('button', {
-      class: 'tw-btn tw-btn-primary',
-      disabled: !self.canSubmit(),
+    card.appendChild(el('div', { class: 'tw-questionTitle', text: q.title }));
+    var group = el('div', { class: 'tw-options', role: 'radiogroup', 'aria-label': q.title });
+    q.options.forEach(function (o) {
+      var checked = self.state.answers[q.id] === o.value;
+      var row = el('button', {
+        class: checked ? 'tw-option is-selected' : 'tw-option',
+        role: 'radio',
+        'aria-checked': checked ? 'true' : 'false',
+        onClick: function () {
+          self.setAnswer(q.id, o.value);
+        },
+      });
+      row.appendChild(el('div', { class: 'tw-option-text', text: o.label }));
+      row.appendChild(el('div', { class: 'tw-option-check', 'aria-hidden': 'true' }));
+      group.appendChild(row);
+    });
+    card.appendChild(group);
+    if (q.helperText) card.appendChild(el('div', { class: 'tw-secondaryText', text: q.helperText }));
+
+    var back = el('button', {
+      class: 'tw-btn tw-btn-secondary',
+      disabled: this.state.step === 0,
       onClick: function () {
-        if (!self.canSubmit()) return;
-        track(self, 'widget_completed', {});
-        var resultTariffId = self.recommendTariffId();
-        assertValidTariff(resultTariffId);
-        self.setState({ mode: 'result', resultTariffId: resultTariffId });
+        if (self.state.step === 0) return;
+        self.setState({ step: Math.max(0, self.state.step - 1) });
       },
-      text: 'Показать тариф',
+      text: 'Назад',
     });
 
-    var btnReset = el('button', {
-      class: 'tw-btn tw-btn-secondary',
+    var isLast = this.state.step === total - 1;
+    var next = el('button', {
+      class: 'tw-btn tw-btn-primary',
+      disabled: !this.canNext(),
       onClick: function () {
-        self.resetQuestionnaire();
+        if (!self.canNext()) return;
+        if (!isLast) self.setState({ step: self.state.step + 1 });
+        else {
+          track(self, 'widget_completed', {});
+          var id = self.recommendTariffId();
+          assertValidTariff(id);
+          self.setState({ mode: 'result', resultTariffId: id });
+        }
       },
-      text: 'Сбросить',
+      text: isLast ? 'Показать тариф' : 'Далее',
     });
 
     card.appendChild(
-      el(
-        'div',
-        { class: 'tw-actions' },
-        el('div', { class: 'tw-actions-left' }, btnReset),
-        el('div', { class: 'tw-actions-right' }, btnShow)
+      el('div', { class: 'tw-actions' },
+        el('div', { class: 'tw-actions-left' }),
+        el('div', { class: 'tw-actions-right' }, back, next)
       )
     );
 
@@ -522,7 +592,8 @@
     var wrap = el('div', { class: 'wrap' });
     if (this.state.mode === 'result') this.renderResultScreen(wrap);
     else if (this.state.mode === 'error') this.renderErrorScreen(wrap);
-    else this.renderFormScreen(wrap);
+    else if (this.state.mode === 'question') this.renderQuestionScreen(wrap);
+    else this.renderIntroScreen(wrap);
 
     host.appendChild(wrap);
   };
