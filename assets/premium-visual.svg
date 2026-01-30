@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g0" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 120) rotate(35) scale(900 700)">
+      <stop stop-color="#FFC759" stop-opacity="0.38"/>
+      <stop offset="0.55" stop-color="#151519" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#151519" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(980 120) rotate(145) scale(1000 760)">
+      <stop stop-color="#FFBA30" stop-opacity="0.28"/>
+      <stop offset="0.6" stop-color="#151519" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#151519" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.48" stop-color="#FFFFFF" stop-opacity="0.09"/>
+      <stop offset="0.62" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFD58A"/>
+      <stop offset="0.55" stop-color="#FFC759"/>
+      <stop offset="1" stop-color="#F2A900"/>
+    </linearGradient>
+    <filter id="blur" x="-40" y="-40" width="1280" height="880" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="800" rx="48" fill="#151519"/>
+  <rect width="1200" height="800" rx="48" fill="url(#g0)"/>
+  <rect width="1200" height="800" rx="48" fill="url(#g1)"/>
+
+  <!-- Soft blobs -->
+  <g opacity="0.55" filter="url(#blur)">
+    <path d="M220 520c80-130 210-200 360-180 170 22 310 140 330 290 18 136-78 248-224 270-218 32-540-96-466-380Z" fill="#FFC759" fill-opacity="0.10"/>
+    <path d="M860 260c140 10 240 84 250 190 10 112-88 184-232 182-192-2-290-160-238-266 40-82 112-112 220-106Z" fill="#FFBA30" fill-opacity="0.09"/>
+  </g>
+
+  <!-- Abstract device -->
+  <g transform="translate(540 400) rotate(-8)">
+    <rect x="-240" y="-120" width="520" height="300" rx="34" fill="#0F0F12" stroke="#FFFFFF" stroke-opacity="0.10"/>
+    <rect x="-210" y="-92" width="460" height="240" rx="24" fill="#111116" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <path d="M-210 48c92-22 170-44 248-44 88 0 152 22 212 46" stroke="#FFC759" stroke-opacity="0.35" stroke-width="2"/>
+    <path d="M-210 86c90-30 168-56 252-56 92 0 160 26 208 58" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="2"/>
+    <circle cx="220" cy="150" r="8" fill="#FFC759" fill-opacity="0.35"/>
+  </g>
+
+  <!-- Coins -->
+  <g transform="translate(210 310)">
+    <g opacity="0.95">
+      <ellipse cx="0" cy="170" rx="88" ry="18" fill="#000000" fill-opacity="0.35"/>
+      <g transform="translate(0 12)">
+        <ellipse cx="0" cy="130" rx="86" ry="18" fill="url(#coin)"/>
+        <rect x="-86" y="28" width="172" height="102" fill="url(#coin)" fill-opacity="0.88"/>
+        <ellipse cx="0" cy="28" rx="86" ry="18" fill="url(#coin)"/>
+        <ellipse cx="0" cy="28" rx="70" ry="12" fill="#FFFFFF" fill-opacity="0.14"/>
+      </g>
+    </g>
+    <g transform="translate(170 -30)" opacity="0.9">
+      <ellipse cx="0" cy="210" rx="70" ry="15" fill="#000000" fill-opacity="0.35"/>
+      <ellipse cx="0" cy="170" rx="68" ry="15" fill="url(#coin)"/>
+      <rect x="-68" y="70" width="136" height="100" fill="url(#coin)" fill-opacity="0.84"/>
+      <ellipse cx="0" cy="70" rx="68" ry="15" fill="url(#coin)"/>
+      <ellipse cx="0" cy="70" rx="56" ry="10" fill="#FFFFFF" fill-opacity="0.12"/>
+    </g>
+  </g>
+
+  <!-- Shine band -->
+  <g opacity="0.85" transform="translate(0 0) rotate(12 600 400)">
+    <rect x="-200" y="340" width="1600" height="90" fill="url(#shine)"/>
+  </g>
+
+  <!-- Border highlight -->
+  <rect x="1" y="1" width="1198" height="798" rx="47" stroke="#FFFFFF" stroke-opacity="0.10"/>
+</svg>

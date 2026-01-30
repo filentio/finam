@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.5
+ * Version: 1.0.6
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.5';
+  var VERSION = '1.0.6';
 
   var DEFAULTS = {
     // 'form' | 'result'
@@ -15,6 +15,10 @@
     shadowDom: true,
     analytics: true,
     onEvent: null, // (name: string, payload: object) => void
+    // 'auto' | '' | null | false | string (URL)
+    // - 'auto' tries to load /assets/premium-visual.svg next to the script host (jsDelivr/raw/local)
+    // - empty/false disables the image and keeps abstract gradients
+    premiumVisualImageUrl: 'auto',
   };
 
   // STRICT WHITELIST (DO NOT CHANGE NAMES/URLS)
@@ -113,6 +117,47 @@
     link.rel = 'stylesheet';
     link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
     document.head.appendChild(link);
+  }
+
+  function getCurrentScriptSrc() {
+    try {
+      if (document.currentScript && document.currentScript.src) return document.currentScript.src;
+    } catch (_) {}
+    try {
+      var scripts = document.getElementsByTagName('script');
+      for (var i = scripts.length - 1; i >= 0; i--) {
+        var src = scripts[i] && scripts[i].src ? String(scripts[i].src) : '';
+        if (src && src.indexOf('finam-tariff-widget.js') !== -1) return src;
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  function guessRepoBaseFromScriptSrc(src) {
+    if (!src) return '';
+    var clean = String(src).split('#')[0].split('?')[0];
+
+    // jsDelivr: https://cdn.jsdelivr.net/gh/<user>/<repo>@<ref>/widget/finam-tariff-widget.js
+    var m = clean.match(/^(https?:\/\/cdn\.jsdelivr\.net\/gh\/[^\/]+\/[^@\/]+@[^\/]+)\/.+$/i);
+    if (m && m[1]) return m[1] + '/';
+
+    // Raw GitHub: https://raw.githubusercontent.com/<user>/<repo>/<ref>/widget/finam-tariff-widget.js
+    var m2 = clean.match(/^(https?:\/\/raw\.githubusercontent\.com\/[^\/]+\/[^\/]+\/[^\/]+)\/.+$/i);
+    if (m2 && m2[1]) return m2[1] + '/';
+
+    // Local or other host: strip /widget/finam-tariff-widget.js
+    return clean.replace(/\/widget\/finam-tariff-widget\.js$/i, '/');
+  }
+
+  function defaultPremiumVisualUrl() {
+    var base = guessRepoBaseFromScriptSrc(getCurrentScriptSrc());
+    if (!base) return '';
+    return base + 'assets/premium-visual.svg';
+  }
+
+  function safeCssUrl(u) {
+    // Avoid breaking out of url("...") context.
+    return String(u).replace(/"/g, '%22');
   }
 
   function formatRUB(n) {
@@ -256,8 +301,10 @@
       '.ftw .tw-two-col{display:grid;grid-template-columns:1.05fr 0.95fr;gap:24px;align-items:stretch;padding:24px}' +
       '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}.ftw .tw-premium-visual{display:none}}' +
       /* Premium visual */
-      '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background-image:var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge);background-color:var(--ui-bg-dark);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);position:relative;min-height:260px;overflow:hidden}' +
-      '.ftw .tw-premium-visual::after{content:\"\";position:absolute;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8}' +
+      '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background-color:var(--ui-bg-dark);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);position:relative;min-height:260px;overflow:hidden}' +
+      '.ftw .tw-premium-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0.92;filter:saturate(1.05) contrast(1.05);transform:scale(1.03)}' +
+      '.ftw .tw-premium-overlay{position:absolute;inset:0;z-index:1;background-image:var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge);pointer-events:none}' +
+      '.ftw .tw-premium-visual::after{content:\"\";position:absolute;z-index:2;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8;pointer-events:none}' +
       /* Inner card */
       '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
       '.ftw .tw-questionTitle{font-size:20px;line-height:24px;font-weight:700;color:var(--ui-text-inverse);margin:0 0 12px 0}' +
@@ -319,6 +366,11 @@
 
     if (this.options.loadFonts) ensureFonts();
 
+    if (this.options.premiumVisualImageUrl === 'auto') {
+      this.options.premiumVisualImageUrl = defaultPremiumVisualUrl();
+    }
+    if (!this.options.premiumVisualImageUrl) this.options.premiumVisualImageUrl = '';
+
     this.mountPoint = target;
     this.dom = createRoot(target, this.options);
 
@@ -373,6 +425,17 @@
     return 'n3_investor';
   };
 
+  Widget.prototype.createPremiumVisual = function () {
+    var wrap = el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' });
+    if (this.options.premiumVisualImageUrl) {
+      var img = el('div', { class: 'tw-premium-img' });
+      img.style.backgroundImage = 'url("' + safeCssUrl(this.options.premiumVisualImageUrl) + '")';
+      wrap.appendChild(img);
+    }
+    wrap.appendChild(el('div', { class: 'tw-premium-overlay' }));
+    return wrap;
+  };
+
   Widget.prototype.renderIntroScreen = function (container) {
     var self = this;
     var shell = el('div', { class: 'tw-shell tw-widgetShell' });
@@ -388,8 +451,8 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
-    var left = grid.querySelector('.tw-two-col > div');
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card' });
     card.appendChild(el('div', { class: 'tw-heroTitle', text: 'Выберите тариф, который подойдёт именно вам' }));
@@ -434,8 +497,8 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
-    var left = grid.querySelector('.tw-two-col > div');
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card' });
     card.appendChild(el('div', { class: 'tw-meta', text: 'Вопрос ' + current + ' из ' + total }));
@@ -536,8 +599,8 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
-    var left = grid.querySelector('.tw-two-col > div');
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card' });
     card.appendChild(el('div', { class: 'tw-h2', text: 'Вам подходит тариф: ' + tariff.name }));
