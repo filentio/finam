@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.2.0
+ * Version: 0.2.1
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.2.0';
+  var VERSION = '0.2.1';
 
   var DEFAULTS = {
     // 'intro' | 'questionnaire' | 'calculator'
@@ -102,15 +102,6 @@
         { value: 'yes', label: 'Да, хочу подсказки и сопровождение' },
         { value: 'sometimes', label: 'Иногда, но в целом сам(а)' },
         { value: 'no', label: 'Нет, всё делаю сам(а)' },
-      ],
-    },
-    {
-      id: 'experience',
-      title: 'Какой у вас опыт в инвестициях?',
-      options: [
-        { value: 'novice', label: 'Я новичок' },
-        { value: 'some', label: 'Уже есть опыт' },
-        { value: 'confident', label: 'Уверенно разбираюсь' },
       ],
     },
   ];
@@ -222,16 +213,6 @@
     // Q4 Assistance
     if (a.assistance === 'yes') score.consulting += 70;
     else if (a.assistance === 'sometimes') score.consulting += 20;
-
-    // Q5 Experience
-    if (a.experience === 'novice') {
-      score.freetrade += 15;
-      score.consulting += 10;
-    } else if (a.experience === 'some') {
-      score.strateg += 10;
-    } else if (a.experience === 'confident') {
-      score.daily += 10;
-    }
 
     return score;
   }
@@ -448,7 +429,6 @@
         frequency: null,
         instruments: null,
         assistance: null,
-        experience: null,
       },
       deals: [],
     };
@@ -480,7 +460,6 @@
       frequency: null,
       instruments: null,
       assistance: null,
-      experience: null,
     };
     this.render();
   };
