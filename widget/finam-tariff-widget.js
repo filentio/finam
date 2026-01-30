@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.3.4
+ * Version: 0.3.5
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.3.4';
+  var VERSION = '0.3.5';
 
   var DEFAULTS = {
     // 'intro' | 'questionnaire'
@@ -48,13 +48,9 @@
   ];
 
   // Runtime safety guard: only these IDs are allowed.
-  var ALLOWED_TARIFF_IDS = ['n1_dolgosrochniy', 'n2_day', 'n3_investor', 'n4_strateg', 'n5_consulting'];
-
+  var ALLOWED = new Set(['n1_dolgosrochniy', 'n2_day', 'n3_investor', 'n4_strateg', 'n5_consulting']);
   function assertValidTariff(tariffId) {
-    for (var i = 0; i < ALLOWED_TARIFF_IDS.length; i++) {
-      if (ALLOWED_TARIFF_IDS[i] === tariffId) return;
-    }
-    throw new Error('Invalid tariff generated: ' + tariffId);
+    if (!ALLOWED.has(tariffId)) throw new Error('Invalid tariff id');
   }
 
   function tariffById(id) {
@@ -289,27 +285,28 @@
     return (
       '' +
       ':host{all:initial}' +
-      /* Theme (matches reference screen). Scoped to widget root. */
-      '.ftw{--tw-bg-page:#F7F4EF;--tw-surface:#FFFFFF;--tw-text-primary:#111827;--tw-text-secondary:#6B7280;--tw-border:#E5E7EB;--tw-shadow:rgba(17, 24, 39, 0.08);--tw-primary:#F5C84C;--tw-primary-hover:#EAB83E;--tw-primary-text:#1F2937;--tw-secondary:#F3F4F6;--tw-secondary-hover:#EDEFF2;--tw-radio-selected-bg:#FFF6D8;--tw-radio-selected-border:#F5C84C;--tw-radius-card:18px;--tw-radius-button:12px;--tw-radius-item:12px;--tw-card-pad:28px;--tw-gap-lg:20px;--tw-gap-md:14px;--tw-gap-sm:10px;--tw-h2-size:28px;--tw-h2-lh:34px;--tw-h2-weight:800;--tw-h3-size:22px;--tw-h3-lh:28px;--tw-h3-weight:800;--tw-body-size:14px;--tw-body-lh:20px;--tw-body-weight:500;--tw-meta-size:12px;--tw-meta-lh:16px;--tw-meta-weight:600}' +
+      /* Premium dark theme (scoped). */
+      '.ftw{--tw-bg-page:#F2F4F7;--tw-surface:#0B0E14;--tw-surface-2:#141824;--tw-text-primary:#FFFFFF;--tw-text-secondary:rgba(255,255,255,0.72);--tw-border:rgba(255,255,255,0.10);--tw-border-strong:rgba(255,255,255,0.16);--tw-shadow:rgba(0,0,0,0.45);--tw-primary:#F5C84C;--tw-primary-hover:#EAB83E;--tw-primary-text:#111827;--tw-secondary:rgba(255,255,255,0.10);--tw-secondary-hover:rgba(255,255,255,0.16);--tw-radio-selected-bg:rgba(245,200,76,0.12);--tw-radio-selected-border:#F5C84C;--tw-radius-card:20px;--tw-radius-button:12px;--tw-radius-item:14px;--tw-card-pad:28px;--tw-h2-size:28px;--tw-h2-lh:34px;--tw-h2-weight:800;--tw-h3-size:22px;--tw-h3-lh:28px;--tw-h3-weight:800;--tw-body-size:14px;--tw-body-lh:20px;--tw-body-weight:500;--tw-meta-size:12px;--tw-meta-lh:16px;--tw-meta-weight:700}' +
       '.ftw *{box-sizing:border-box}' +
       '.ftw .wrap{width:100%}' +
-      '.ftw .tw-widget{max-width:980px;margin:0 auto;background:var(--tw-surface);border-radius:var(--tw-radius-card);box-shadow:0 10px 30px var(--tw-shadow);padding:var(--tw-card-pad);color:var(--tw-text-primary);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,\"Noto Sans\",\"Helvetica Neue\",sans-serif}' +
-      '.ftw .tw-h2{font-size:var(--tw-h2-size);line-height:var(--tw-h2-lh);font-weight:var(--tw-h2-weight);margin:0 0 8px 0}' +
-      '.ftw .tw-h3{font-size:var(--tw-h3-size);line-height:var(--tw-h3-lh);font-weight:var(--tw-h3-weight);margin:0 0 12px 0}' +
-      '.ftw .tw-body{font-size:var(--tw-body-size);line-height:var(--tw-body-lh);font-weight:var(--tw-body-weight);color:var(--tw-text-secondary);margin:0 0 18px 0}' +
+      '.ftw .tw-widget{max-width:980px;margin:0 auto;border-radius:var(--tw-radius-card);background:linear-gradient(135deg,var(--tw-surface) 0%,var(--tw-surface-2) 100%);box-shadow:0 30px 80px var(--tw-shadow);padding:var(--tw-card-pad);color:var(--tw-text-primary);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,\"Noto Sans\",\"Helvetica Neue\",sans-serif}' +
+      '.ftw .tw-h2{font-size:var(--tw-h2-size);line-height:var(--tw-h2-lh);font-weight:var(--tw-h2-weight);margin:0 0 8px 0;color:var(--tw-text-primary)}' +
+      '.ftw .tw-h3{font-size:var(--tw-h3-size);line-height:var(--tw-h3-lh);font-weight:var(--tw-h3-weight);margin:0 0 12px 0;color:var(--tw-text-primary)}' +
+      '.ftw .tw-body{font-size:var(--tw-body-size);line-height:var(--tw-body-lh);font-weight:var(--tw-body-weight);margin:0 0 18px 0;color:var(--tw-text-secondary)}' +
       '.ftw .tw-meta{font-size:var(--tw-meta-size);line-height:var(--tw-meta-lh);font-weight:var(--tw-meta-weight);color:var(--tw-text-secondary);margin:0 0 8px 0}' +
       '.ftw .tw-two-col{display:grid;grid-template-columns:1.1fr 0.9fr;gap:24px;align-items:center}' +
       '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}}' +
-      '.ftw .tw-illustration{display:flex;justify-content:center;align-items:center}' +
-      '.ftw .tw-illustration img{width:100%;max-width:360px;height:auto}' +
+      /* Right decorative premium visual (no content) */
+      '.ftw .tw-premium-visual{width:100%;min-height:180px;border-radius:16px;position:relative;overflow:hidden;background:radial-gradient(120% 90% at 80% 25%, rgba(245,200,76,0.22), transparent 60%),radial-gradient(90% 70% at 30% 80%, rgba(255,255,255,0.10), transparent 55%),linear-gradient(135deg,#0B0E14 0%,#141824 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06)}' +
+      '.ftw .tw-premium-visual::after{content:\"\";position:absolute;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8}' +
       '.ftw .tw-progress-bar{width:100%;height:4px;border-radius:999px;background:var(--tw-border);overflow:hidden;margin:0 0 18px 0}' +
       '.ftw .tw-progress-bar > div{height:100%;width:var(--tw-progress,0%);background:var(--tw-primary);border-radius:999px}' +
       '.ftw .tw-options{display:flex;flex-direction:column;gap:12px;margin:0 0 16px 0}' +
-      '.ftw .tw-option{border:1px solid var(--tw-border);border-radius:var(--tw-radius-item);padding:14px 14px;display:grid;grid-template-columns:1fr 24px;align-items:center;cursor:pointer;background:var(--tw-surface);transition:background .15s ease,border-color .15s ease}' +
-      '.ftw .tw-option:hover{background:#FAFAFA}' +
+      '.ftw .tw-option{border:1px solid var(--tw-border);border-radius:var(--tw-radius-item);padding:14px 14px;display:grid;grid-template-columns:1fr 28px;align-items:center;cursor:pointer;background:rgba(255,255,255,0.04);transition:background .15s ease,border-color .15s ease}' +
+      '.ftw .tw-option:hover{border-color:var(--tw-border-strong);background:rgba(255,255,255,0.06)}' +
       '.ftw .tw-option.is-selected{background:var(--tw-radio-selected-bg);border-color:var(--tw-radio-selected-border)}' +
-      '.ftw .tw-option-text{font-size:14px;line-height:20px;font-weight:600;color:var(--tw-text-primary)}' +
-      '.ftw .tw-option-check{width:18px;height:18px;border-radius:999px;border:2px solid #D1D5DB;display:flex;align-items:center;justify-content:center;justify-self:end}' +
+      '.ftw .tw-option-text{font-size:14px;line-height:20px;font-weight:700;color:var(--tw-text-primary)}' +
+      '.ftw .tw-option-check{width:18px;height:18px;border-radius:999px;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;justify-self:end}' +
       '.ftw .tw-option.is-selected .tw-option-check{border-color:var(--tw-primary);background:var(--tw-primary)}' +
       '.ftw .tw-option.is-selected .tw-option-check::after{content:\"✓\";color:#1F2937;font-size:12px;font-weight:900;transform:translateY(-.5px)}' +
       '.ftw .tw-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px}' +
@@ -317,15 +314,15 @@
       '.ftw .tw-actions-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}' +
       '.ftw .tw-btn{border:none;border-radius:var(--tw-radius-button);padding:10px 16px;font-weight:700;font-size:14px;line-height:18px;cursor:pointer;transition:background .15s ease,transform .05s ease}' +
       '.ftw .tw-btn:active{transform:translateY(1px)}' +
-      '.ftw .tw-btn-primary{background:var(--tw-primary);color:var(--tw-primary-text)}' +
-      '.ftw .tw-btn-primary:hover{background:var(--tw-primary-hover)}' +
-      '.ftw .tw-btn-secondary{background:var(--tw-secondary);color:var(--tw-text-primary)}' +
-      '.ftw .tw-btn-secondary:hover{background:var(--tw-secondary-hover)}' +
+      '.ftw .tw-btn-primary{background:var(--tw-primary)!important;color:var(--tw-primary-text)!important;font-weight:800}' +
+      '.ftw .tw-btn-primary:hover{background:var(--tw-primary-hover)!important}' +
+      '.ftw .tw-btn-secondary{background:var(--tw-secondary)!important;color:var(--tw-text-primary)!important;font-weight:800}' +
+      '.ftw .tw-btn-secondary:hover{background:var(--tw-secondary-hover)!important}' +
       '.ftw .tw-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}' +
-      '.ftw .tw-link{color:var(--tw-text-primary);text-decoration:none;font-weight:700;font-size:14px;cursor:pointer}' +
+      '.ftw .tw-link{color:rgba(255,255,255,0.88);text-decoration:none;font-weight:800;font-size:14px;cursor:pointer}' +
       '.ftw .tw-link:hover{text-decoration:underline}' +
       '.ftw .tw-bullets{list-style:none;padding:0;margin:14px 0 14px 0;display:flex;flex-direction:column;gap:10px}' +
-      '.ftw .tw-bullets li{display:grid;grid-template-columns:12px 1fr;gap:10px;align-items:start;color:var(--tw-text-primary);font-weight:600;font-size:14px;line-height:20px}' +
+      '.ftw .tw-bullets li{display:grid;grid-template-columns:12px 1fr;gap:10px;align-items:start;color:rgba(255,255,255,0.90);font-weight:700;font-size:14px;line-height:20px}' +
       '.ftw .tw-bullets li::before{content:\"\";width:8px;height:8px;margin-top:6px;border-radius:999px;background:var(--tw-primary)}' +
       '.ftw .tw-btn:focus-visible,.ftw .tw-option:focus-visible,.ftw .tw-link:focus-visible{outline:2px solid var(--tw-primary);outline-offset:2px}' +
       ''
@@ -371,7 +368,6 @@
         q3_instruments: null,
         q4_assistance: null,
       },
-      showAlternatives: false,
       manualOnly: false,
       prevStep: 0,
     };
@@ -404,7 +400,6 @@
       q3_instruments: null,
       q4_assistance: null,
     };
-    this.state.showAlternatives = false;
     this.state.manualOnly = false;
     this.state.prevStep = 0;
     this.render();
@@ -412,26 +407,40 @@
 
   Widget.prototype.renderIntro = function (container) {
     var self = this;
-    container.appendChild(el('div', { class: 'tw-widget' },
-      el('div', { class: 'tw-two-col' },
-        el('div', null,
-          el('div', { class: 'tw-h2', text: 'Подберём подходящий тариф за 1 минуту' }),
-          el('div', { class: 'tw-body', text: 'Ответьте на несколько вопросов — мы покажем тариф, который лучше всего подойдёт под ваши задачи' }),
-          el('div', { class: 'tw-actions' },
-            el('div', { class: 'tw-actions-left' }),
-            el('button', {
-              class: 'tw-btn tw-btn-primary',
-              onClick: function () {
-                track(self, 'widget_start', {});
-                self.setState({ step: 0 });
-              },
-              text: 'Начать подбор',
-            })
-          )
-        ),
-        el('div', { class: 'tw-illustration', html: '' })
+    container.appendChild(
+      el(
+        'div',
+        { class: 'tw-widget' },
+        el(
+          'div',
+          { class: 'tw-two-col' },
+          el(
+            'div',
+            null,
+            el('div', { class: 'tw-h2', text: 'Подберём подходящий тариф за 1 минуту' }),
+            el('div', { class: 'tw-body', text: 'Ответьте на несколько вопросов — мы покажем тариф, который лучше всего подойдёт под ваши задачи' }),
+            el(
+              'div',
+              { class: 'tw-actions' },
+              el('div', { class: 'tw-actions-left' }),
+              el(
+                'div',
+                { class: 'tw-actions-right' },
+                el('button', {
+                  class: 'tw-btn tw-btn-primary',
+                  onClick: function () {
+                    track(self, 'widget_start', {});
+                    self.setState({ step: 0 });
+                  },
+                  text: 'Начать подбор',
+                })
+              )
+            )
+          ),
+          el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' })
+        )
       )
-    ));
+    );
   };
 
   Widget.prototype.renderProgress = function (container) {
@@ -526,7 +535,7 @@
       onClick: function (e) {
         e.preventDefault();
         track(self, 'manual_tariff_selection', {});
-        self.setState({ step: QUESTIONS.length, showAlternatives: true, manualOnly: true, prevStep: step });
+        self.setState({ step: QUESTIONS.length, manualOnly: true, prevStep: step });
       },
     });
 
@@ -564,7 +573,7 @@
           el('button', {
             class: 'tw-btn tw-btn-secondary',
             onClick: function () {
-              self.setState({ step: self.state.prevStep || 0, manualOnly: false, showAlternatives: false });
+              self.setState({ step: self.state.prevStep || 0, manualOnly: false });
             },
             text: 'Назад',
           })
@@ -602,35 +611,38 @@
       rc = RESULT_COPY[tariffId];
     }
 
-    var card = el('div', { class: 'tw-widget' });
-    card.appendChild(el('div', { class: 'tw-h2', text: rc.title }));
-    card.appendChild(el('div', { class: 'tw-body', text: 'Мы подобрали его на основе ваших ответов' }));
+    var card = el(
+      'div',
+      { class: 'tw-widget' },
+      el(
+        'div',
+        { class: 'tw-two-col' },
+        el('div', null),
+        el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' })
+      )
+    );
+    var left = card.querySelector('.tw-two-col > div');
+    left.appendChild(el('div', { class: 'tw-h2', text: rc.title }));
+    left.appendChild(el('div', { class: 'tw-body', text: 'Мы подобрали его на основе ваших ответов' }));
 
     if (rc && Array.isArray(rc.benefits)) {
       var list = el('ul', { class: 'tw-bullets' });
       rc.benefits.slice(0, 3).forEach(function (b) {
         list.appendChild(el('li', { text: b }));
       });
-      card.appendChild(list);
+      left.appendChild(list);
     }
 
-    card.appendChild(
+    left.appendChild(
       el(
         'div',
         { class: 'tw-actions' },
         el('div', { class: 'tw-actions-left' }),
-        el('div', { class: 'tw-actions-left' },
+        el('div', { class: 'tw-actions-right' },
           el('button', {
             class: 'tw-btn tw-btn-secondary',
             onClick: function () {
-              self.resetQuestionnaire();
-            },
-            text: 'Повторить опрос',
-          }),
-          el('button', {
-            class: 'tw-btn tw-btn-secondary',
-            onClick: function () {
-              self.setState({ showAlternatives: !self.state.showAlternatives });
+              self.setState({ manualOnly: true, prevStep: QUESTIONS.length });
             },
             text: 'Посмотреть другие тарифы',
           }),
@@ -645,24 +657,7 @@
       )
     );
 
-    if (this.state.showAlternatives) {
-      var others = otherTariffs(tariffId);
-      var cards = el('div', { class: 'tw-options' });
-      for (var i = 0; i < others.length; i++) {
-        (function (t) {
-          var row = el('button', {
-            class: 'tw-option',
-            onClick: function () {
-              self.openTariff(t.id);
-            },
-          });
-          row.appendChild(el('div', { class: 'tw-option-text', text: t.name }));
-          row.appendChild(el('div', { class: 'tw-option-check', 'aria-hidden': 'true' }));
-          cards.appendChild(row);
-        })(others[i]);
-      }
-      card.appendChild(cards);
-    }
+    // ResultScreen must show exactly ONE tariff (no embedded alternatives list).
 
     container.appendChild(card);
   };
