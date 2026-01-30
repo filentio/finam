@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.3.2
+ * Version: 0.3.3
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.3.2';
+  var VERSION = '0.3.3';
 
   var DEFAULTS = {
     // 'intro' | 'questionnaire'
@@ -314,6 +314,7 @@
       '.ftw .tw-option.is-selected .tw-option-check::after{content:\"✓\";color:#1F2937;font-size:12px;font-weight:900;transform:translateY(-.5px)}' +
       '.ftw .tw-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px}' +
       '.ftw .tw-actions-left{display:flex;gap:10px;flex-wrap:wrap}' +
+      '.ftw .tw-actions-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}' +
       '.ftw .tw-btn{border:none;border-radius:var(--tw-radius-button);padding:10px 16px;font-weight:700;font-size:14px;line-height:18px;cursor:pointer;transition:background .15s ease,transform .05s ease}' +
       '.ftw .tw-btn:active{transform:translateY(1px)}' +
       '.ftw .tw-btn-primary{background:var(--tw-primary);color:var(--tw-primary-text)}' +
@@ -495,16 +496,15 @@
 
     if (q.helperText) card.appendChild(el('div', { class: 'tw-meta', text: q.helperText }));
 
-    var backBtn = null;
-    if (step > 0) {
-      backBtn = el('button', {
-        class: 'tw-btn tw-btn-secondary',
-        onClick: function () {
-          self.setState({ step: Math.max(0, step - 1) });
-        },
-        text: 'Назад',
-      });
-    }
+    var backBtn = el('button', {
+      class: 'tw-btn tw-btn-secondary',
+      disabled: step === 0,
+      onClick: function () {
+        if (step === 0) return;
+        self.setState({ step: Math.max(0, step - 1) });
+      },
+      text: 'Назад',
+    });
 
     var next = el('button', {
       class: 'tw-btn tw-btn-primary',
@@ -534,8 +534,8 @@
       el(
         'div',
         { class: 'tw-actions' },
-        el('div', { class: 'tw-actions-left' }, backBtn || el('span', { text: '' })),
-        el('div', { class: 'tw-actions-left' }, next, manual)
+        el('div', { class: 'tw-actions-left' }, manual),
+        el('div', { class: 'tw-actions-right' }, backBtn, next)
       )
     );
 
