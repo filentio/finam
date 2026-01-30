@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.3.3
+ * Version: 0.3.4
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.3.3';
+  var VERSION = '0.3.4';
 
   var DEFAULTS = {
     // 'intro' | 'questionnaire'
@@ -621,11 +621,11 @@
         el('div', { class: 'tw-actions-left' }),
         el('div', { class: 'tw-actions-left' },
           el('button', {
-            class: 'tw-btn tw-btn-primary',
+            class: 'tw-btn tw-btn-secondary',
             onClick: function () {
-              self.openTariff(tariffId);
+              self.resetQuestionnaire();
             },
-            text: 'Перейти к тарифу',
+            text: 'Повторить опрос',
           }),
           el('button', {
             class: 'tw-btn tw-btn-secondary',
@@ -633,6 +633,13 @@
               self.setState({ showAlternatives: !self.state.showAlternatives });
             },
             text: 'Посмотреть другие тарифы',
+          }),
+          el('button', {
+            class: 'tw-btn tw-btn-primary',
+            onClick: function () {
+              self.openTariff(tariffId);
+            },
+            text: 'Перейти к тарифу',
           })
         )
       )
