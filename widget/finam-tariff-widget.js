@@ -1,142 +1,116 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.1.0
+ * Version: 0.2.0
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.1.0';
+  var VERSION = '0.2.0';
 
   var DEFAULTS = {
-    initialView: 'questionnaire', // 'questionnaire' | 'calculator'
-    showTabs: true,
+    // 'intro' | 'questionnaire' | 'calculator'
+    // (calculator is optional legacy mode; default flow follows the spec)
+    initialView: 'intro',
+    showTabs: false,
     loadFonts: true,
     shadowDom: true,
+    manualUrl: '#',
+    tariffLinks: {}, // { [tariffId]: url }
+    analytics: true,
+    onEvent: null, // (name: string, payload: object) => void
   };
 
   var TARIFFS = {
     longterm: {
       id: 'longterm',
-      name: 'Долгосрочный портфель',
-      description: 'Идеален для инвесторов, которые покупают и держат. 0% комиссии за покупку.',
-      buyCommission: 0,
-      sellCommission: 0.0028,
-      monthlyFee: 0,
-      features: ['0% комиссия за покупку акций и облигаций РФ', 'Нет абонентской платы', 'Подходит для стратегии Buy & Hold'],
-      warnings: ['Высокая комиссия за продажу (0.28%)', 'Не подходит для активной торговли'],
+      name: 'Инвестор',
+      description: 'Для спокойного инвестирования и сделок без высокой частоты.',
+      features: ['Подходит для редких и средних по частоте сделок', 'Понятные условия без лишних опций', 'Хороший выбор для начала'],
+      warnings: [],
       icon: null,
     },
     daily: {
       id: 'daily',
-      name: 'Единый дневной',
-      description: 'Для активных трейдеров. Чем больше оборот, тем ниже комиссия.',
-      buyCommission: 'от 0.018%',
-      sellCommission: 'от 0.018%',
-      monthlyFee: 177,
-      features: ['Комиссия снижается с ростом оборота', 'Одинаковая комиссия на покупку и продажу', 'Выгодно при обороте от 100 000 ₽ в день'],
+      name: 'Активный трейдер',
+      description: 'Для частых операций и активной торговли.',
+      features: ['Оптимален при высокой частоте сделок', 'Подходит для активной торговли', 'Удобно, когда сделки — почти каждый день'],
       warnings: [],
       icon: null,
     },
     strateg: {
       id: 'strateg',
-      name: 'Стратег',
-      description: 'Сбалансированный тариф для регулярной, но не частой торговли.',
-      buyCommission: 'от 0.018%',
-      sellCommission: 'от 0.018%',
-      monthlyFee: 200,
-      features: ['Универсальные условия', 'Подходит для среднесрочных стратегий'],
+      name: 'Сбалансированный',
+      description: 'Универсальный вариант, если частота сделок средняя или пока не уверены.',
+      features: ['Подходит для большинства сценариев', 'Комфортный “по умолчанию”', 'Хорош, если ответы смешанные'],
       warnings: [],
       icon: null,
     },
     freetrade: {
       id: 'freetrade',
       name: 'Free Trade',
-      description: 'Тест-драйв для новичков. Специальные условия на первые 30 дней.',
-      buyCommission: 0.000177,
-      sellCommission: 0.000177,
-      monthlyFee: 177,
-      features: ['Минимальные комиссии', 'Идеально для обучения', 'Фиксированная плата 177 ₽/мес'],
-      warnings: ['Действует только 30 дней', 'Автоматическая смена тарифа после пробного периода'],
+      description: 'Для тех, кто хочет попробовать и разобраться.',
+      features: ['Подходит, чтобы “попробовать инвестиции”', 'Простой старт без лишних настроек', 'Можно понять механику на практике'],
+      warnings: [],
       icon: null,
     },
     consulting: {
       id: 'consulting',
-      name: 'Единый консультационный',
-      description: 'Для тех, кому нужны инвестиционные идеи и поддержка экспертов.',
-      buyCommission: 'Индивидуально',
-      sellCommission: 'Индивидуально',
-      monthlyFee: 0,
-      features: ['Доступ к аналитике и идеям', 'Помощь в принятии решений', 'Персональный подход'],
-      warnings: ['Комиссии выше, чем на самостоятельных тарифах'],
+      name: 'С сопровождением',
+      description: 'Если хотите подсказки и поддержку при инвестировании.',
+      features: ['Подсказки и сопровождение', 'Помогает, когда важна уверенность', 'Хорошо для новичков и занятых'],
+      warnings: [],
       icon: null,
     },
   };
 
   var QUESTIONS = [
     {
-      id: 'experience',
-      title: 'Ваш опыт инвестирования?',
+      id: 'goal',
+      title: 'Для чего вы планируете инвестировать?',
       options: [
-        { value: 'beginner', label: 'Я только начинаю', description: 'Делаю первые шаги' },
-        { value: 'intermediate', label: 'Уже есть опыт', description: 'Разбираюсь в основах' },
-        { value: 'experienced', label: 'Опытный инвестор', description: 'Хорошо понимаю рынок' },
-        { value: 'pro', label: 'Профессионал', description: 'Торговля — моя работа' },
-      ],
-    },
-    {
-      id: 'strategy',
-      title: 'Ваша торговая стратегия?',
-      options: [
-        { value: 'longterm', label: 'Долгосрочное инвестирование', description: 'Купил и держу' },
-        { value: 'mediumterm', label: 'Среднесрочная торговля', description: 'Сделки раз в месяц' },
-        { value: 'active', label: 'Активная торговля', description: 'Несколько сделок в неделю' },
-        { value: 'intraday', label: 'Интрадей', description: 'Торговля внутри дня' },
-        { value: 'undecided', label: 'Пока не определился', description: 'Хочу попробовать разное' },
+        { value: 'preserve', label: 'Хочу сохранить деньги и понемногу приумножать' },
+        { value: 'active', label: 'Планирую активно торговать' },
+        { value: 'try', label: 'Хочу попробовать инвестиции и разобраться' },
+        { value: 'unsure', label: 'Пока не уверен(а), хочу посмотреть' },
       ],
     },
     {
       id: 'frequency',
-      title: 'Как часто планируете совершать сделки?',
+      title: 'Как часто вы планируете покупать или продавать активы?',
       options: [
-        { value: 3, label: 'Редко', description: '1-5 сделок в месяц' },
-        { value: 15, label: 'Иногда', description: '5-20 сделок в месяц' },
-        { value: 35, label: 'Регулярно', description: '20-50 сделок в месяц' },
-        { value: 75, label: 'Очень часто', description: '50-100 сделок в месяц' },
-        { value: 150, label: 'Постоянно', description: '100+ сделок в месяц' },
+        { value: 'year', label: 'Несколько раз в год' },
+        { value: 'month', label: 'Несколько раз в месяц' },
+        { value: 'day', label: 'Почти каждый день' },
+        { value: 'unknown', label: 'Пока не знаю' },
       ],
     },
     {
-      id: 'volume',
-      title: 'Предполагаемый месячный оборот?',
-      description: 'Сумма всех покупок и продаж',
+      id: 'instruments',
+      title: 'Чем вы планируете торговать?',
       options: [
-        { value: 50000, label: 'До 100 000 ₽' },
-        { value: 300000, label: '100к - 500к ₽' },
-        { value: 750000, label: '500к - 1 млн ₽' },
-        { value: 3000000, label: '1 млн - 5 млн ₽' },
-        { value: 10000000, label: 'Более 5 млн ₽' },
-        { value: 0, label: 'Затрудняюсь ответить', description: 'Посчитаем по среднему' },
+        { value: 'stocks', label: 'Акции и облигации' },
+        { value: 'futures', label: 'Фьючерсы / активная торговля' },
+        { value: 'currency', label: 'Валюта' },
+        { value: 'unknown', label: 'Пока не знаю' },
       ],
     },
     {
-      id: 'operationBalance',
-      title: 'Баланс покупок и продаж?',
-      description: 'Например: купили на 100к, продали на 20к = больше покупок',
+      id: 'assistance',
+      title: 'Нужна ли вам помощь при инвестировании?',
       options: [
-        { value: 'onlyBuy', label: 'Только покупать', description: 'Накопление портфеля' },
-        { value: 'moreBuy', label: 'Больше покупать', description: 'Покупок > Продаж' },
-        { value: 'equal', label: 'Примерно поровну', description: 'Покупки ≈ Продажи' },
-        { value: 'moreSell', label: 'Больше продавать', description: 'Продаж > Покупок' },
+        { value: 'yes', label: 'Да, хочу подсказки и сопровождение' },
+        { value: 'sometimes', label: 'Иногда, но в целом сам(а)' },
+        { value: 'no', label: 'Нет, всё делаю сам(а)' },
       ],
     },
     {
-      id: 'needConsulting',
-      title: 'Нужна ли помощь экспертов?',
+      id: 'experience',
+      title: 'Какой у вас опыт в инвестициях?',
       options: [
-        { value: 'yes', label: 'Да, нужны идеи', description: 'Хочу получать рекомендации' },
-        { value: 'maybe', label: 'Возможно иногда', description: 'Буду думать' },
-        { value: 'no', label: 'Нет, я сам', description: 'Принимаю решения самостоятельно' },
+        { value: 'novice', label: 'Я новичок' },
+        { value: 'some', label: 'Уже есть опыт' },
+        { value: 'confident', label: 'Уверенно разбираюсь' },
       ],
     },
   ];
@@ -185,50 +159,100 @@
     return node;
   }
 
+  function track(widget, name, payload) {
+    if (!widget || !widget.options || widget.options.analytics === false) return;
+    var detail = payload || {};
+    detail.event = name;
+    detail.widget = 'tariff_selection_widget';
+    detail.version = VERSION;
+
+    try {
+      if (typeof widget.options.onEvent === 'function') widget.options.onEvent(name, detail);
+    } catch (_) {}
+
+    try {
+      var ev = new CustomEvent('finamTariffWidget', { detail: detail });
+      (widget.mountPoint || document).dispatchEvent(ev);
+      window.dispatchEvent(ev);
+    } catch (_) {}
+
+    try {
+      if (Array.isArray(window.dataLayer)) window.dataLayer.push(detail);
+    } catch (_) {}
+  }
+
   function computeScores(a) {
-    // Логика повторяет vA из текущей реализации
+    // Scoring tuned for "guided questionnaire" flow, low jargon.
     var score = { longterm: 0, daily: 0, strateg: 0, freetrade: 0, consulting: 0 };
 
-    if (a.experience === 'beginner') {
-      score.freetrade += 30;
-      score.consulting += 20;
-    } else if (a.experience === 'pro') {
-      score.daily += 20;
+    // Q1 Goal
+    if (a.goal === 'preserve') {
+      score.longterm += 50;
+      score.strateg += 20;
+    } else if (a.goal === 'active') {
+      score.daily += 55;
+      score.strateg += 10;
+    } else if (a.goal === 'try') {
+      score.freetrade += 50;
+      score.consulting += 10;
+    } else if (a.goal === 'unsure') {
+      score.strateg += 35;
+      score.freetrade += 20;
     }
 
-    if (a.strategy === 'longterm') score.longterm += 50;
-    else if (a.strategy === 'active' || a.strategy === 'intraday') score.daily += 50;
-    else if (a.strategy === 'mediumterm') score.strateg += 40;
-    else if (a.strategy === 'undecided') score.freetrade += 40;
+    // Q2 Frequency
+    if (a.frequency === 'year') score.longterm += 35;
+    else if (a.frequency === 'month') score.strateg += 35;
+    else if (a.frequency === 'day') score.daily += 45;
+    else if (a.frequency === 'unknown') score.strateg += 20;
 
-    if (a.operationBalance === 'onlyBuy' || a.operationBalance === 'moreBuy') {
-      score.longterm += 40;
-    } else if (a.operationBalance === 'equal' || a.operationBalance === 'moreSell') {
-      score.daily += 30;
-      score.strateg += 25;
+    // Q3 Instruments
+    if (a.instruments === 'stocks') {
+      score.longterm += 25;
+      score.strateg += 15;
+    } else if (a.instruments === 'futures') {
+      score.daily += 35;
+    } else if (a.instruments === 'currency') {
+      score.strateg += 20;
+      score.daily += 10;
+    } else if (a.instruments === 'unknown') {
+      score.strateg += 15;
     }
 
-    if (a.frequency <= 5) score.longterm += 30;
-    else if (a.frequency > 20) score.daily += 40;
-    else score.strateg += 30;
+    // Q4 Assistance
+    if (a.assistance === 'yes') score.consulting += 70;
+    else if (a.assistance === 'sometimes') score.consulting += 20;
 
-    if (a.needConsulting === 'yes') score.consulting += 100;
-
-    if (a.volume > 5000000) score.daily += 20;
+    // Q5 Experience
+    if (a.experience === 'novice') {
+      score.freetrade += 15;
+      score.consulting += 10;
+    } else if (a.experience === 'some') {
+      score.strateg += 10;
+    } else if (a.experience === 'confident') {
+      score.daily += 10;
+    }
 
     return score;
   }
 
-  function pickBestTariff(scores) {
-    var best = 'strateg';
-    var bestScore = -1;
-    Object.keys(scores).forEach(function (k) {
-      if (scores[k] > bestScore) {
-        bestScore = scores[k];
-        best = k;
-      }
-    });
-    return TARIFFS[best];
+  function pickTopTariffs(scores) {
+    var list = Object.keys(scores)
+      .map(function (k) {
+        return { id: k, score: scores[k] };
+      })
+      .sort(function (a, b) {
+        return b.score - a.score;
+      });
+
+    if (list.length === 0) return [];
+    var top = list[0];
+    var second = list[1];
+
+    // "Multiple match case": show 2 if close enough
+    var threshold = 12;
+    if (second && top.score - second.score <= threshold) return [top.id, second.id];
+    return [top.id];
   }
 
   function estimateMonthlyCost(answers, tariffId) {
@@ -339,58 +363,49 @@
     return (
       '' +
       ':host{all:initial}' +
-      /* Neutral corporate (Finam-like) defaults. You can override via CSS variables on the container:
-         --ftw-primary, --ftw-bg, --ftw-card, --ftw-text, --ftw-muted, --ftw-border, --ftw-radius, --ftw-shadow */
-      '.ftw{--ftw-bg:transparent;--ftw-card:#fff;--ftw-text:#0b1220;--ftw-muted:#5b667a;--ftw-border:#e6eaf2;--ftw-primary:#0b5fff;--ftw-danger:#d50000;--ftw-radius:16px;--ftw-shadow:0 12px 30px rgba(11,18,32,.10);--ftw-shadow-sm:0 6px 16px rgba(11,18,32,.08);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ftw-text)}' +
+      /* Spec defaults. Override via CSS variables on the container. */
+      '.ftw{--ftw-bg:#fff;--ftw-text:#0b1220;--ftw-muted:#5b667a;--ftw-border:#e6eaf2;--ftw-primary:#0b5fff;--ftw-accent:#ffd600;--ftw-radius:16px;--ftw-shadow:0 12px 30px rgba(11,18,32,.10);--ftw-shadow-sm:0 6px 16px rgba(11,18,32,.08);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ftw-text)}' +
       '.ftw *{box-sizing:border-box}' +
-      '.ftw .wrap{width:100%;max-width:980px;margin:0 auto;background:var(--ftw-bg);padding:0}' +
-      '.ftw .card{background:var(--ftw-card);border:1px solid var(--ftw-border);border-radius:var(--ftw-radius);box-shadow:var(--ftw-shadow);padding:20px}' +
-      '.ftw .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}' +
-      '.ftw .title{font-size:22px;line-height:1.25;font-weight:800;margin:0}' +
-      '.ftw .subtitle{margin-top:10px;color:var(--ftw-muted);font-size:14px;line-height:1.55;font-weight:500}' +
-      '.ftw .tabs{display:flex;gap:8px;margin-top:16px}' +
-      '.ftw .tab{border:1px solid var(--ftw-border);background:#f6f8fc;border-radius:999px;padding:10px 12px;font-weight:700;font-size:13px;cursor:pointer;color:var(--ftw-text)}' +
-      '.ftw .tab:hover{background:#eef3ff}' +
-      '.ftw .tab[aria-selected="true"]{background:rgba(11,95,255,.10);border-color:rgba(11,95,255,.25);color:var(--ftw-primary)}' +
-      '.ftw .progress{margin-top:16px;height:8px;border-radius:999px;overflow:hidden;background:#eef2f8}' +
-      '.ftw .bar{height:100%;background:var(--ftw-primary);width:0%}' +
-      '.ftw .qhead{margin-top:10px}' +
-      '.ftw .qtitle{font-weight:800;font-size:16px;line-height:1.35}' +
-      '.ftw .qdesc{margin-top:6px;color:var(--ftw-muted);font-size:13px;font-weight:500;line-height:1.55}' +
-      '.ftw .grid{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}' +
-      '@media (max-width:640px){.ftw .grid{grid-template-columns:1fr}}' +
-      '.ftw .opt{border:1px solid var(--ftw-border);background:#fff;border-radius:14px;padding:14px;cursor:pointer;box-shadow:var(--ftw-shadow-sm);transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease}' +
-      '.ftw .opt:hover{transform:translateY(-1px);border-color:rgba(11,95,255,.35);background:#fbfdff}' +
-      '.ftw .opt[aria-pressed="true"]{border-color:rgba(11,95,255,.45);box-shadow:0 10px 22px rgba(11,95,255,.12)}' +
-      '.ftw .optL{font-weight:800}' +
-      '.ftw .optD{margin-top:6px;color:var(--ftw-muted);font-weight:500;font-size:12px;line-height:1.45}' +
-      '.ftw .actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:16px;flex-wrap:wrap}' +
-      '.ftw .btn{border:1px solid var(--ftw-border);border-radius:12px;background:#fff;cursor:pointer;padding:10px 14px;font-weight:700;font-size:13px;transition:background .12s ease,border-color .12s ease,transform .12s ease}' +
+      '.ftw .wrap{width:100%;max-width:840px;margin:0 auto;background:var(--ftw-bg);border-radius:var(--ftw-radius);box-shadow:var(--ftw-shadow);padding:28px;border:1px solid var(--ftw-border)}' +
+      '@media (max-width:640px){.ftw .wrap{padding:20px}}' +
+      '.ftw h2{margin:0;font-size:22px;line-height:1.25;font-weight:800}' +
+      '.ftw h3{margin:0;font-size:18px;line-height:1.35;font-weight:800}' +
+      '.ftw p{margin:0;color:var(--ftw-muted);font-size:14px;line-height:1.55;font-weight:500}' +
+      '.ftw .space-12{height:12px}' +
+      '.ftw .space-16{height:16px}' +
+      '.ftw .space-20{height:20px}' +
+      '.ftw .progressLabel{font-size:12px;font-weight:600;color:var(--ftw-muted)}' +
+      '.ftw .progress{margin-top:10px;height:4px;border-radius:999px;overflow:hidden;background:#e9edf5}' +
+      '.ftw .bar{height:100%;background:var(--ftw-accent);width:0%}' +
+      '.ftw .radio{margin-top:16px;display:flex;flex-direction:column;gap:10px}' +
+      '.ftw .radioRow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;border:1px solid var(--ftw-border);background:#fff;border-radius:12px;padding:14px 14px;cursor:pointer;transition:background .12s ease,border-color .12s ease,box-shadow .12s ease}' +
+      '.ftw .radioRow:hover{background:#fbfdff;border-color:#d7deed}' +
+      '.ftw .radioRow[aria-checked=\"true\"]{background:rgba(255,214,0,.14);border-color:rgba(255,214,0,.55);box-shadow:var(--ftw-shadow-sm)}' +
+      '.ftw .radioText{font-size:14px;font-weight:600;color:var(--ftw-text);line-height:1.35}' +
+      '.ftw .check{width:20px;height:20px;flex:0 0 20px;border-radius:999px;border:2px solid #c9d2e6;display:flex;align-items:center;justify-content:center;background:#fff}' +
+      '.ftw .radioRow[aria-checked=\"true\"] .check{border-color:rgba(11,18,32,.15);background:var(--ftw-accent)}' +
+      '.ftw .check svg{display:block}' +
+      '.ftw .helper{margin-top:10px;font-size:12px;line-height:1.45;color:var(--ftw-muted)}' +
+      '.ftw .actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}' +
+      '.ftw .btn{border:1px solid var(--ftw-border);border-radius:12px;background:#fff;cursor:pointer;padding:12px 16px;font-weight:700;font-size:14px;transition:background .12s ease,border-color .12s ease}' +
       '.ftw .btn:hover{background:#f6f8fc}' +
       '.ftw .btn.primary{background:var(--ftw-primary);border-color:var(--ftw-primary);color:#fff}' +
       '.ftw .btn.primary:hover{background:#0a57e8}' +
       '.ftw .btn:disabled{opacity:.55;cursor:not-allowed}' +
-      '.ftw .result{margin-top:14px}' +
-      '.ftw .badge{display:inline-flex;gap:8px;align-items:center;background:rgba(11,95,255,.10);border:1px solid rgba(11,95,255,.20);border-radius:999px;padding:7px 10px;font-weight:700;font-size:12px;color:var(--ftw-primary)}' +
-      '.ftw .tariffName{margin-top:12px;font-size:18px;font-weight:800}' +
-      '.ftw .tariffDesc{margin-top:6px;color:var(--ftw-muted);font-weight:500;font-size:13px;line-height:1.55}' +
-      '.ftw .kpis{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}' +
-      '@media (max-width:640px){.ftw .kpis{grid-template-columns:1fr}}' +
-      '.ftw .kpi{border:1px solid var(--ftw-border);border-radius:14px;padding:14px;background:#fbfdff}' +
-      '.ftw .kpiT{font-weight:700;font-size:12px;color:var(--ftw-muted)}' +
-      '.ftw .kpiV{margin-top:8px;font-weight:800;font-size:18px}' +
-      '.ftw .list{margin-top:12px;padding-left:18px;color:var(--ftw-text)}' +
-      '.ftw .list li{margin:6px 0;color:var(--ftw-muted);font-weight:500;line-height:1.55}' +
-      '.ftw .warn{margin-top:12px;border:1px solid rgba(255,193,7,.45);border-radius:14px;padding:14px;background:rgba(255,193,7,.12)}' +
-      '.ftw .warnT{font-weight:800;font-size:12px}' +
-      '.ftw .calcHead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}' +
-      '.ftw .table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px}' +
-      '.ftw .table th,.ftw .table td{border-bottom:1px solid var(--ftw-border);padding:10px;font-weight:600;font-size:12px;background:transparent;vertical-align:top}' +
-      '.ftw .table th{font-weight:700;color:var(--ftw-muted)}' +
-      '.ftw .table tr:last-child td{border-bottom:none}' +
-      '.ftw select,.ftw input{border:1px solid var(--ftw-border);border-radius:12px;padding:9px 10px;font-weight:600;background:#fff;width:100%}' +
-      '.ftw select:focus,.ftw input:focus{outline:none;border-color:rgba(11,95,255,.45);box-shadow:0 0 0 4px rgba(11,95,255,.12)}' +
-      '.ftw .mini{font-size:11px;color:var(--ftw-muted);font-weight:500}' +
+      '.ftw a.link{color:var(--ftw-primary);text-decoration:none;font-size:14px;font-weight:600;cursor:pointer}' +
+      '.ftw a.link:hover{text-decoration:underline}' +
+      '.ftw .btn,.ftw .radioRow,.ftw a.link{cursor:pointer}' +
+      '.ftw .btn:disabled{cursor:not-allowed}' +
+      '.ftw .btn:focus-visible,.ftw .radioRow:focus-visible,.ftw a.link:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(11,95,255,.16)}' +
+      '.ftw .resultTitle{font-size:18px;font-weight:800;color:var(--ftw-text)}' +
+      '.ftw .pill{display:inline-flex;align-items:center;gap:8px;background:#f6f8fc;border:1px solid var(--ftw-border);border-radius:999px;padding:8px 10px;font-size:12px;font-weight:700;color:var(--ftw-muted)}' +
+      '.ftw .cards{margin-top:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}' +
+      '@media (max-width:640px){.ftw .cards{grid-template-columns:1fr}}' +
+      '.ftw .tariffCard{border:1px solid var(--ftw-border);border-radius:14px;padding:16px;background:#fff}' +
+      '.ftw .tariffName{font-size:16px;font-weight:800;color:var(--ftw-text)}' +
+      '.ftw .why{margin-top:8px;font-size:14px;line-height:1.55;color:var(--ftw-muted)}' +
+      '.ftw ul.benefits{margin:12px 0 0;padding-left:18px;color:var(--ftw-muted)}' +
+      '.ftw ul.benefits li{margin:6px 0;line-height:1.45;font-weight:500}' +
       ''
     );
   }
@@ -420,20 +435,25 @@
     this.mountPoint = target;
     this.dom = createRoot(target, this.options);
 
+    var initialStep = 0;
+    var initialView = this.options.initialView || 'intro';
+    if (initialView === 'intro') initialStep = -1;
+    if (initialView === 'questionnaire') initialStep = 0;
+
     this.state = {
-      view: this.options.initialView === 'calculator' ? 'calculator' : 'questionnaire',
-      step: 0,
+      view: initialView === 'calculator' ? 'calculator' : 'questionnaire',
+      step: initialStep, // -1 = intro, 0.. = questions, >= QUESTIONS.length = result
       answers: {
-        experience: null,
-        strategy: null,
+        goal: null,
         frequency: null,
-        volume: null,
-        operationBalance: null,
-        needConsulting: null,
+        instruments: null,
+        assistance: null,
+        experience: null,
       },
       deals: [],
     };
 
+    track(this, 'widget_init', {});
     this.render();
   }
 
@@ -444,6 +464,7 @@
 
   Widget.prototype.setAnswer = function (id, value) {
     this.state.answers[id] = value;
+    track(this, 'question_answered', { question_id: id, answer_id: String(value) });
     this.render();
   };
 
@@ -453,55 +474,52 @@
   };
 
   Widget.prototype.resetQuestionnaire = function () {
-    this.state.step = 0;
+    this.state.step = -1;
     this.state.answers = {
-      experience: null,
-      strategy: null,
+      goal: null,
       frequency: null,
-      volume: null,
-      operationBalance: null,
-      needConsulting: null,
+      instruments: null,
+      assistance: null,
+      experience: null,
     };
     this.render();
   };
 
-  Widget.prototype.renderHeader = function (container) {
+  Widget.prototype.renderIntro = function (container) {
     var self = this;
-    var head = el('div', { class: 'card' });
-    head.appendChild(
-      el('div', { class: 'title', text: 'Подбор тарифа и расчет комиссий' })
-    );
-    head.appendChild(
-      el('div', {
-        class: 'subtitle',
-        text: 'Пройдите короткий опрос или добавьте сделки в калькулятор — виджет подскажет, какой тариф может быть выгоднее.',
+    container.appendChild(el('h2', { text: 'Подберём подходящий тариф за 1 минуту' }));
+    container.appendChild(el('div', { class: 'space-12' }));
+    container.appendChild(
+      el('p', {
+        text: 'Ответьте на несколько вопросов — мы покажем тариф, который лучше всего подойдёт под ваши задачи',
       })
     );
+    container.appendChild(el('div', { class: 'space-20' }));
+    container.appendChild(
+      el(
+        'div',
+        { class: 'actions' },
+        el('span', { text: '' }),
+        el('button', {
+          class: 'btn primary',
+          onClick: function () {
+            track(self, 'widget_start', {});
+            self.setState({ step: 0 });
+          },
+          text: 'Начать подбор',
+        })
+      )
+    );
+  };
 
-    if (this.options.showTabs) {
-      var tabs = el('div', { class: 'tabs' });
-      var tabQ = el('button', {
-        class: 'tab',
-        'aria-selected': this.state.view === 'questionnaire' ? 'true' : 'false',
-        onClick: function () {
-          self.setState({ view: 'questionnaire' });
-        },
-        text: 'Опрос',
-      });
-      var tabC = el('button', {
-        class: 'tab',
-        'aria-selected': this.state.view === 'calculator' ? 'true' : 'false',
-        onClick: function () {
-          self.setState({ view: 'calculator' });
-        },
-        text: 'Калькулятор',
-      });
-      tabs.appendChild(tabQ);
-      tabs.appendChild(tabC);
-      head.appendChild(tabs);
-    }
-
-    container.appendChild(head);
+  Widget.prototype.renderProgress = function (container) {
+    var step = this.state.step;
+    var total = QUESTIONS.length;
+    var current = Math.min(total, Math.max(1, step + 1));
+    container.appendChild(el('div', { class: 'progressLabel', text: 'Вопрос ' + current + ' из ' + total }));
+    var progress = el('div', { class: 'progress' }, el('div', { class: 'bar' }));
+    progress.querySelector('.bar').style.width = Math.round((current / total) * 100) + '%';
+    container.appendChild(progress);
   };
 
   Widget.prototype.renderQuestionnaire = function (container) {
@@ -509,111 +527,215 @@
     var step = this.state.step;
     var q = QUESTIONS[step];
 
-    var card = el('div', { class: 'card', style: 'margin-top:14px' });
+    this.renderProgress(container);
+    container.appendChild(el('div', { class: 'space-16' }));
+    container.appendChild(el('h3', { text: q.title }));
 
-    var progress = el('div', { class: 'progress' }, el('div', { class: 'bar' }));
-    progress.querySelector('.bar').style.width = Math.round(((step + 1) / QUESTIONS.length) * 100) + '%';
-    card.appendChild(progress);
+    var group = el('div', { class: 'radio', role: 'radiogroup', 'aria-label': q.title });
+    var rows = [];
+    function onGroupKeydown(e) {
+      var key = e.key;
+      var idx = rows.indexOf(document.activeElement);
+      if (key === 'ArrowDown' || key === 'ArrowRight') {
+        e.preventDefault();
+        rows[(idx + 1 + rows.length) % rows.length].focus();
+      } else if (key === 'ArrowUp' || key === 'ArrowLeft') {
+        e.preventDefault();
+        rows[(idx - 1 + rows.length) % rows.length].focus();
+      }
+    }
+    group.addEventListener('keydown', onGroupKeydown);
 
-    var qhead = el('div', { class: 'qhead' });
-    qhead.appendChild(el('div', { class: 'qtitle', text: q.title }));
-    if (q.description) qhead.appendChild(el('div', { class: 'qdesc', text: q.description }));
-    card.appendChild(qhead);
-
-    var grid = el('div', { class: 'grid' });
     q.options.forEach(function (o) {
-      var pressed = self.state.answers[q.id] === o.value;
-      var b = el('button', {
-        class: 'opt',
-        'aria-pressed': pressed ? 'true' : 'false',
+      var checked = self.state.answers[q.id] === o.value;
+      var row = el('button', {
+        class: 'radioRow',
+        role: 'radio',
+        'aria-checked': checked ? 'true' : 'false',
         onClick: function () {
           self.setAnswer(q.id, o.value);
         },
       });
-      b.appendChild(el('div', { class: 'optL', text: o.label }));
-      if (o.description) b.appendChild(el('div', { class: 'optD', text: o.description }));
-      grid.appendChild(b);
+      row.appendChild(el('div', { class: 'radioText', text: o.label }));
+      row.appendChild(
+        el(
+          'div',
+          { class: 'check', 'aria-hidden': 'true' },
+          el('svg', { width: '14', height: '14', viewBox: '0 0 16 16', html: '<path d="M6.3 11.4 3 8.1l1.1-1.1 2.2 2.2 5.6-5.6L13 4.7z" fill="#0b1220"/>' })
+        )
+      );
+      row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          row.click();
+        }
+      });
+      if (checked) row.tabIndex = 0;
+      else row.tabIndex = -1;
+      rows.push(row);
+      group.appendChild(row);
     });
-    card.appendChild(grid);
 
-    var actions = el('div', { class: 'actions' });
+    container.appendChild(group);
 
-    var back = el('button', {
-      class: 'btn',
-      disabled: step === 0,
-      onClick: function () {
-        self.setState({ step: Math.max(0, step - 1) });
-      },
-      text: 'Назад',
-    });
+    if (q.id === 'frequency') {
+      container.appendChild(el('div', { class: 'helper', text: 'Это поможет учесть комиссии и доступные инструменты' }));
+    }
 
-    var nextText = step === QUESTIONS.length - 1 ? 'Показать результат' : 'Далее';
+    container.appendChild(el('div', { class: 'space-20' }));
+
+    var left = step > 0
+      ? el('button', {
+          class: 'btn',
+          onClick: function () {
+            self.setState({ step: Math.max(0, step - 1) });
+          },
+          text: 'Назад',
+        })
+      : el('span', { text: '' });
+
     var next = el('button', {
       class: 'btn primary',
       disabled: !self.canNext(),
       onClick: function () {
         if (step < QUESTIONS.length - 1) self.setState({ step: step + 1 });
-        else self.setState({ step: QUESTIONS.length });
+        else {
+          track(self, 'widget_completed', {});
+          self.setState({ step: QUESTIONS.length });
+        }
       },
-      text: nextText,
+      text: 'Далее',
     });
 
-    actions.appendChild(back);
-    actions.appendChild(next);
-    card.appendChild(actions);
+    var manual = el('a', {
+      class: 'link',
+      href: this.options.manualUrl || '#',
+      text: 'Я хочу выбрать тариф самостоятельно',
+      onClick: function (e) {
+        track(self, 'manual_tariff_selection', {});
+        // allow navigation
+      },
+    });
 
-    container.appendChild(card);
+    container.appendChild(el('div', { class: 'actions' }, left, next, manual));
   };
 
-  Widget.prototype.renderResult = function () {
+  function whyText(answers, tariffId) {
+    if (tariffId === 'consulting') return 'Вы указали, что вам важны подсказки и сопровождение — поэтому мы предлагаем вариант с поддержкой.';
+    if (tariffId === 'daily') return 'По вашим ответам видно, что вы планируете активную торговлю и частые сделки — для этого лучше подходит тариф для активных операций.';
+    if (tariffId === 'freetrade') return 'Вы хотите попробовать инвестиции и разобраться — этот вариант проще для старта и поможет спокойно освоиться.';
+    if (tariffId === 'longterm') return 'Вы ориентируетесь на спокойное инвестирование и нечастые операции — поэтому подходит тариф для инвестора.';
+    return 'Ваши ответы смешанные или вы пока не уверены — поэтому мы предлагаем универсальный вариант.';
+  }
+
+  function benefitsForTariff(tariffId) {
+    var t = TARIFFS[tariffId];
+    if (!t) return [];
+    return (t.features || []).slice(0, 3);
+  }
+
+  Widget.prototype.openTariff = function (tariffId) {
+    track(this, 'tariff_recommended', { tariff_id: tariffId });
+    var url = (this.options.tariffLinks && this.options.tariffLinks[tariffId]) || '#';
+    try {
+      window.location.href = url;
+    } catch (_) {}
+  };
+
+  Widget.prototype.renderResultScreen = function (container) {
+    var self = this;
     var answers = this.state.answers;
     var scores = computeScores(answers);
-    var tariff = pickBestTariff(scores);
-    var est = estimateMonthlyCost(answers, tariff.id);
+    var top = pickTopTariffs(scores);
 
-    var card = el('div', { class: 'card result' });
-    card.appendChild(el('div', { class: 'badge', text: 'Рекомендованный тариф' }));
-    card.appendChild(el('div', { class: 'tariffName', text: tariff.name }));
-    card.appendChild(el('div', { class: 'tariffDesc', text: tariff.description }));
+    if (top.length === 0) top = ['strateg'];
 
-    var kpis = el('div', { class: 'kpis' });
-    kpis.appendChild(
-      el(
-        'div',
-        { class: 'kpi' },
-        el('div', { class: 'kpiT', text: 'Оценка стоимости / мес' }),
-        el('div', { class: 'kpiV', text: formatRUB(est.monthlyCost) })
-      )
-    );
-    kpis.appendChild(
-      el(
-        'div',
-        { class: 'kpi' },
-        el('div', { class: 'kpiT', text: 'Потенциальная экономия' }),
-        el('div', { class: 'kpiV', text: formatRUB(est.savings) }),
-        el('div', { class: 'mini', text: 'по сравнению с: ' + est.comparedTo })
-      )
-    );
-    card.appendChild(kpis);
+    container.appendChild(el('div', { class: 'pill', text: 'Мы подобрали его на основе ваших ответов' }));
+    container.appendChild(el('div', { class: 'space-16' }));
 
-    var ul = el('ul', { class: 'list' });
-    tariff.features.forEach(function (f) {
-      ul.appendChild(el('li', { text: f }));
-    });
-    card.appendChild(ul);
+    // Multiple match: show 2 cards, do not force
+    if (top.length > 1) {
+      container.appendChild(el('div', { class: 'resultTitle', text: 'Вам могут подойти два тарифа' }));
+      container.appendChild(el('div', { class: 'space-12' }));
 
-    if (tariff.warnings && tariff.warnings.length) {
-      var warn = el('div', { class: 'warn' });
-      warn.appendChild(el('div', { class: 'warnT', text: 'Важно' }));
-      var wul = el('ul', { class: 'list', style: 'margin-top:8px' });
-      tariff.warnings.forEach(function (w) {
-        wul.appendChild(el('li', { text: w }));
+      var cards = el('div', { class: 'cards' });
+      top.slice(0, 2).forEach(function (tid) {
+        var card = el('div', { class: 'tariffCard' });
+        card.appendChild(el('div', { class: 'tariffName', text: '«' + TARIFFS[tid].name + '»' }));
+        var ul = el('ul', { class: 'benefits' });
+        benefitsForTariff(tid).slice(0, 2).forEach(function (b) {
+          ul.appendChild(el('li', { text: b }));
+        });
+        card.appendChild(ul);
+        card.appendChild(el('div', { class: 'space-16' }));
+        card.appendChild(
+          el('button', {
+            class: 'btn primary',
+            onClick: function () {
+              self.openTariff(tid);
+            },
+            text: 'Выбрать тариф',
+          })
+        );
+        cards.appendChild(card);
       });
-      warn.appendChild(wul);
-      card.appendChild(warn);
+      container.appendChild(cards);
+
+      container.appendChild(el('div', { class: 'space-20' }));
+      container.appendChild(
+        el(
+          'div',
+          { class: 'actions' },
+          el('button', {
+            class: 'btn',
+            onClick: function () {
+              self.resetQuestionnaire();
+            },
+            text: 'Пройти заново',
+          }),
+          el('a', { class: 'link', href: this.options.manualUrl || '#', text: 'Посмотреть другие тарифы' })
+        )
+      );
+
+      return;
     }
 
-    return card;
+    var tariffId = top[0];
+    container.appendChild(el('div', { class: 'resultTitle', text: 'Вам подойдёт тариф «' + TARIFFS[tariffId].name + '»' }));
+    container.appendChild(el('div', { class: 'space-12' }));
+    container.appendChild(el('div', { class: 'why', text: whyText(answers, tariffId) }));
+
+    var benefits = benefitsForTariff(tariffId);
+    if (benefits.length) {
+      var list = el('ul', { class: 'benefits' });
+      benefits.forEach(function (b) {
+        list.appendChild(el('li', { text: b }));
+      });
+      container.appendChild(list);
+    }
+
+    container.appendChild(el('div', { class: 'space-20' }));
+    container.appendChild(
+      el(
+        'div',
+        { class: 'actions' },
+        el('button', {
+          class: 'btn primary',
+          onClick: function () {
+            self.openTariff(tariffId);
+          },
+          text: 'Перейти к тарифу',
+        }),
+        el('a', { class: 'link', href: this.options.manualUrl || '#', text: 'Посмотреть другие тарифы' }),
+        el('button', {
+          class: 'btn',
+          onClick: function () {
+            self.resetQuestionnaire();
+          },
+          text: 'Пройти заново',
+        })
+      )
+    );
   };
 
   Widget.prototype.renderResultScreen = function (container) {
@@ -777,12 +899,13 @@
     while (host.firstChild) host.removeChild(host.firstChild);
 
     var wrap = el('div', { class: 'wrap' });
-    this.renderHeader(wrap);
 
     if (this.state.view === 'calculator') {
       this.renderCalculator(wrap);
     } else {
-      if (this.state.step >= QUESTIONS.length) {
+      if (this.state.step < 0) {
+        this.renderIntro(wrap);
+      } else if (this.state.step >= QUESTIONS.length) {
         this.renderResultScreen(wrap);
       } else {
         this.renderQuestionnaire(wrap);

@@ -21,17 +21,37 @@
 
 По умолчанию виджет сам найдет блок с атрибутом `data-finam-tariff-widget` и отрисуется внутри него.
 
-### 2.1) Быстрая подстройка под дизайн страницы (через CSS переменные)
+### 2.1) Подстройка под дизайн страницы (через CSS переменные)
 
 ```html
 <div
   data-finam-tariff-widget
   style="
     --ftw-primary: #0056b3;
+    --ftw-accent: #ffd600;
     --ftw-radius: 16px;
   "
 ></div>
 <script src="finam-tariff-widget.js"></script>
+```
+
+### 2.2) Ссылка “выбрать тариф вручную” и ссылки на тарифы
+
+```html
+<div data-finam-tariff-widget></div>
+<script src="finam-tariff-widget.js"></script>
+<script>
+  FinamTariffWidget.mount(document.querySelector('[data-finam-tariff-widget]'), {
+    manualUrl: '/landing/tariffs/', // куда вести “выбрать вручную”
+    tariffLinks: {
+      longterm: '/tariffs/investor',
+      strateg: '/tariffs/balanced',
+      daily: '/tariffs/active',
+      freetrade: '/tariffs/freetrade',
+      consulting: '/tariffs/with-support',
+    },
+  });
+</script>
 ```
 
 ### 3) Встраивание с настройками
