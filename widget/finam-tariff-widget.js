@@ -1,19 +1,18 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.3
+ * Version: 1.0.4
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.3';
+  var VERSION = '1.0.4';
 
   var DEFAULTS = {
     // 'form' | 'result'
     initialView: 'form',
     loadFonts: false, // no external dependencies by default
     shadowDom: true,
-    premiumVisualImageUrl: null, // optional URL for premium visual background
     analytics: true,
     onEvent: null, // (name: string, payload: object) => void
   };
@@ -311,20 +310,6 @@
     return { root: root, host: host, useShadow: useShadow };
   }
 
-  function applyPremiumVisualImage(node, imageUrl) {
-    if (!node || !imageUrl) return;
-    // Image is optional; keep abstract premium layers on top.
-    // Put image as the bottom-most layer.
-    var safe = String(imageUrl).replace(/"/g, '%22');
-    node.style.backgroundImage =
-      'url("' +
-      safe +
-      '"), var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge)';
-    node.style.backgroundSize = 'cover, auto, auto';
-    node.style.backgroundPosition = 'center, center, center';
-    node.style.backgroundRepeat = 'no-repeat, no-repeat, no-repeat';
-  }
-
   function Widget(target, opts) {
     this.options = {};
     for (var k in DEFAULTS) this.options[k] = DEFAULTS[k];
@@ -401,9 +386,7 @@
     );
     shell.appendChild(header);
 
-    var premium = el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' });
-    applyPremiumVisualImage(premium, this.options.premiumVisualImageUrl);
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), premium);
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
     var left = grid.querySelector('.tw-two-col > div');
 
     var card = el('div', { class: 'tw-card' });
@@ -449,9 +432,7 @@
     );
     shell.appendChild(header);
 
-    var premium = el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' });
-    applyPremiumVisualImage(premium, this.options.premiumVisualImageUrl);
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), premium);
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
     var left = grid.querySelector('.tw-two-col > div');
 
     var card = el('div', { class: 'tw-card' });
@@ -553,9 +534,7 @@
     );
     shell.appendChild(header);
 
-    var premium = el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' });
-    applyPremiumVisualImage(premium, this.options.premiumVisualImageUrl);
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), premium);
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' }));
     var left = grid.querySelector('.tw-two-col > div');
 
     var card = el('div', { class: 'tw-card' });
@@ -633,8 +612,7 @@
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].__finamTariffWidgetMounted) continue;
       nodes[i].__finamTariffWidgetMounted = true;
-      var img = nodes[i].getAttribute('data-finam-premium-image');
-      mount(nodes[i], { premiumVisualImageUrl: img || null });
+      mount(nodes[i], {});
     }
   }
 
