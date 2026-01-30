@@ -1,64 +1,102 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.2.2
+ * Version: 0.3.0
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.2.2';
+  var VERSION = '0.3.0';
 
   var DEFAULTS = {
-    // 'intro' | 'questionnaire' | 'calculator'
-    // (calculator is optional legacy mode; default flow follows the spec)
+    // 'intro' | 'questionnaire'
     initialView: 'intro',
     showTabs: false,
     loadFonts: true,
     shadowDom: true,
-    manualUrl: '#',
-    tariffLinks: {}, // { [tariffId]: url }
+    manualUrl: '#', // "выбрать самостоятельно" (настраивается снаружи)
     analytics: true,
     onEvent: null, // (name: string, payload: object) => void
   };
 
+  // STRICT WHITELIST (DO NOT CHANGE NAMES/URLS)
+  var TARIFF_CATALOG = [
+    {
+      id: 'n1_dolgosrochniy',
+      name: 'Долгосрочный портфель',
+      url: 'https://broker.finam.ru/landing/tariffs-n1-dolgosrochniy/',
+    },
+    {
+      id: 'n2_day',
+      name: 'Единый дневной',
+      url: 'https://broker.finam.ru/landing/tariffs-n2-day/',
+    },
+    {
+      id: 'n3_investor',
+      name: 'Инвестор',
+      url: 'https://broker.finam.ru/landing/tariffs-n3-investor/',
+    },
+    {
+      id: 'n4_strateg',
+      name: 'Стратег',
+      url: 'https://broker.finam.ru/landing/tariffs-n4-strateg/',
+    },
+    {
+      id: 'n5_consulting',
+      name: 'Единый консультационный',
+      url: 'https://broker.finam.ru/landing/tariffs-n5-consulting/',
+    },
+  ];
+
+  function tariffById(id) {
+    for (var i = 0; i < TARIFF_CATALOG.length; i++) if (TARIFF_CATALOG[i].id === id) return TARIFF_CATALOG[i];
+    return null;
+  }
+
+  function otherTariffs(id) {
+    var out = [];
+    for (var i = 0; i < TARIFF_CATALOG.length; i++) if (TARIFF_CATALOG[i].id !== id) out.push(TARIFF_CATALOG[i]);
+    return out;
+  }
+
   var TARIFFS = {
     longterm: {
       id: 'longterm',
-      name: 'Инвестор',
-      description: 'Для спокойного инвестирования и сделок без высокой частоты.',
-      features: ['Подходит для редких и средних по частоте сделок', 'Понятные условия без лишних опций', 'Хороший выбор для начала'],
+      name: 'Долгосрочный портфель',
+      description: '',
+      features: [],
       warnings: [],
       icon: null,
     },
     daily: {
       id: 'daily',
-      name: 'Активный трейдер',
-      description: 'Для частых операций и активной торговли.',
-      features: ['Оптимален при высокой частоте сделок', 'Подходит для активной торговли', 'Удобно, когда сделки — почти каждый день'],
+      name: 'Единый дневной',
+      description: '',
+      features: [],
       warnings: [],
       icon: null,
     },
     strateg: {
       id: 'strateg',
-      name: 'Сбалансированный',
-      description: 'Универсальный вариант, если частота сделок средняя или пока не уверены.',
-      features: ['Подходит для большинства сценариев', 'Комфортный “по умолчанию”', 'Хорош, если ответы смешанные'],
+      name: 'Стратег',
+      description: '',
+      features: [],
       warnings: [],
       icon: null,
     },
     freetrade: {
       id: 'freetrade',
-      name: 'Free Trade',
-      description: 'Для тех, кто хочет попробовать и разобраться.',
-      features: ['Подходит, чтобы “попробовать инвестиции”', 'Простой старт без лишних настроек', 'Можно понять механику на практике'],
+      name: 'Инвестор',
+      description: '',
+      features: [],
       warnings: [],
       icon: null,
     },
     consulting: {
       id: 'consulting',
-      name: 'С сопровождением',
-      description: 'Если хотите подсказки и поддержку при инвестировании.',
-      features: ['Подсказки и сопровождение', 'Помогает, когда важна уверенность', 'Хорошо для новичков и занятых'],
+      name: 'Единый консультационный',
+      description: '',
+      features: [],
       warnings: [],
       icon: null,
     },
@@ -66,42 +104,43 @@
 
   var QUESTIONS = [
     {
-      id: 'goal',
+      id: 'q1_goal',
       title: 'Для чего вы планируете инвестировать?',
       options: [
-        { value: 'preserve', label: 'Хочу сохранить деньги и понемногу приумножать' },
-        { value: 'active', label: 'Планирую активно торговать' },
-        { value: 'try', label: 'Хочу попробовать инвестиции и разобраться' },
-        { value: 'unsure', label: 'Пока не уверен(а), хочу посмотреть' },
+        { value: 'a1_save', label: 'Хочу сохранить деньги и понемногу приумножать' },
+        { value: 'a2_active', label: 'Планирую активно торговать' },
+        { value: 'a3_try', label: 'Хочу попробовать инвестиции и разобраться' },
+        { value: 'a4_unsure', label: 'Пока не уверен(а), хочу посмотреть' },
       ],
     },
     {
-      id: 'frequency',
+      id: 'q2_frequency',
       title: 'Как часто вы планируете покупать или продавать активы?',
+      helperText: 'Это поможет учесть комиссии и доступные инструменты',
       options: [
-        { value: 'year', label: 'Несколько раз в год' },
-        { value: 'month', label: 'Несколько раз в месяц' },
-        { value: 'day', label: 'Почти каждый день' },
-        { value: 'unknown', label: 'Пока не знаю' },
+        { value: 'b1_rare', label: 'Несколько раз в год' },
+        { value: 'b2_month', label: 'Несколько раз в месяц' },
+        { value: 'b3_daily', label: 'Почти каждый день' },
+        { value: 'b4_unknown', label: 'Пока не знаю' },
       ],
     },
     {
-      id: 'instruments',
+      id: 'q3_instruments',
       title: 'Чем вы планируете торговать?',
       options: [
-        { value: 'stocks', label: 'Акции и облигации' },
-        { value: 'futures', label: 'Фьючерсы / активная торговля' },
-        { value: 'currency', label: 'Валюта' },
-        { value: 'unknown', label: 'Пока не знаю' },
+        { value: 'c1_stocks', label: 'Акции и облигации' },
+        { value: 'c2_futures', label: 'Фьючерсы / активная торговля' },
+        { value: 'c3_currency', label: 'Валюта' },
+        { value: 'c4_unknown', label: 'Пока не знаю' },
       ],
     },
     {
-      id: 'assistance',
+      id: 'q4_assistance',
       title: 'Нужна ли вам помощь при инвестировании?',
       options: [
-        { value: 'yes', label: 'Да, хочу подсказки и сопровождение' },
-        { value: 'sometimes', label: 'Иногда, но в целом сам(а)' },
-        { value: 'no', label: 'Нет, всё делаю сам(а)' },
+        { value: 'd1_yes', label: 'Да, хочу подсказки и сопровождение' },
+        { value: 'd2_sometimes', label: 'Иногда, но в целом сам(а)' },
+        { value: 'd3_no', label: 'Нет, всё делаю сам(а)' },
       ],
     },
   ];
@@ -172,173 +211,69 @@
     } catch (_) {}
   }
 
-  function computeScores(a) {
-    // Scoring tuned for "guided questionnaire" flow, low jargon.
-    var score = { longterm: 0, daily: 0, strateg: 0, freetrade: 0, consulting: 0 };
+  // (scoring-based matching removed; we use strict conservative rules below)
 
-    // Q1 Goal
-    if (a.goal === 'preserve') {
-      score.longterm += 50;
-      score.strateg += 20;
-    } else if (a.goal === 'active') {
-      score.daily += 55;
-      score.strateg += 10;
-    } else if (a.goal === 'try') {
-      score.freetrade += 50;
-      score.consulting += 10;
-    } else if (a.goal === 'unsure') {
-      score.strateg += 35;
-      score.freetrade += 20;
-    }
-
-    // Q2 Frequency
-    if (a.frequency === 'year') score.longterm += 35;
-    else if (a.frequency === 'month') score.strateg += 35;
-    else if (a.frequency === 'day') score.daily += 45;
-    else if (a.frequency === 'unknown') score.strateg += 20;
-
-    // Q3 Instruments
-    if (a.instruments === 'stocks') {
-      score.longterm += 25;
-      score.strateg += 15;
-    } else if (a.instruments === 'futures') {
-      score.daily += 35;
-    } else if (a.instruments === 'currency') {
-      score.strateg += 20;
-      score.daily += 10;
-    } else if (a.instruments === 'unknown') {
-      score.strateg += 15;
-    }
-
-    // Q4 Assistance
-    if (a.assistance === 'yes') score.consulting += 70;
-    else if (a.assistance === 'sometimes') score.consulting += 20;
-
-    return score;
+  // Conservative mapping (STRICT). Returns exactly ONE tariff id from whitelist.
+  function recommendTariffId(answers) {
+    // Rule 1 — Consultation need
+    if (answers.q4_assistance === 'd1_yes') return 'n5_consulting';
+    // Rule 2 — Futures / active trading instrument
+    if (answers.q3_instruments === 'c2_futures') return 'n2_day';
+    // Rule 3 — Explicit active trading intent
+    if (answers.q1_goal === 'a2_active') return 'n2_day';
+    // Rule 4 — Long-term intent
+    if (answers.q1_goal === 'a1_save') return 'n1_dolgosrochniy';
+    // Rule 5 — Try & learn
+    if (answers.q1_goal === 'a3_try') return 'n3_investor';
+    // Rule 6 — Fallback
+    return 'n3_investor';
   }
 
-  function pickTopTariffs(scores) {
-    var list = Object.keys(scores)
-      .map(function (k) {
-        return { id: k, score: scores[k] };
-      })
-      .sort(function (a, b) {
-        return b.score - a.score;
-      });
+  // Result copy (STRICT, NO assumptions).
+  var RESULT_COPY = {
+    n1_dolgosrochniy: {
+      title: 'Вам подойдёт тариф «Долгосрочный портфель»',
+      benefits: [
+        'Подходит для спокойного долгосрочного подхода',
+        'Удобен, если вы реже совершаете сделки',
+        'Можно перейти и посмотреть условия тарифа',
+      ],
+    },
+    n2_day: {
+      title: 'Вам подойдёт тариф «Единый дневной»',
+      benefits: [
+        'Подходит, если вы планируете активные сделки',
+        'Удобен для динамичной торговли',
+        'Можно перейти и посмотреть условия тарифа',
+      ],
+    },
+    n3_investor: {
+      title: 'Вам подойдёт тариф «Инвестор»',
+      benefits: [
+        'Понятный старт без лишней сложности',
+        'Подходит, если вы пока определяетесь со стратегией',
+        'Можно перейти и посмотреть условия тарифа',
+      ],
+    },
+    n4_strateg: {
+      title: 'Вам подойдёт тариф «Стратег»',
+      benefits: [
+        'Подходит для более продвинутого подхода',
+        'Удобен, если вы уверенно ориентируетесь в инвестициях',
+        'Можно перейти и посмотреть условия тарифа',
+      ],
+    },
+    n5_consulting: {
+      title: 'Вам подойдёт тариф «Единый консультационный»',
+      benefits: [
+        'Подходит, если вам важны подсказки и сопровождение',
+        'Помогает инвестировать с поддержкой',
+        'Можно перейти и посмотреть условия тарифа',
+      ],
+    },
+  };
 
-    if (list.length === 0) return [];
-    var top = list[0];
-    var second = list[1];
-
-    // "Multiple match case": show 2 if close enough
-    var threshold = 12;
-    if (second && top.score - second.score <= threshold) return [top.id, second.id];
-    return [top.id];
-  }
-
-  function estimateMonthlyCost(answers, tariffId) {
-    // Логика повторяет xA из текущей реализации
-    var o = answers.volume || 0;
-    if (o === 0) o = 1000000; // "по среднему"
-
-    var monthly = 0;
-
-    if (tariffId === 'longterm') {
-      monthly = (answers.operationBalance === 'onlyBuy' ? 0 : o * 0.2) * 0.0028;
-    } else if (tariffId === 'freetrade') {
-      monthly = 177 + o * 0.000177;
-    } else if (tariffId === 'daily') {
-      var d = o > 1000000 ? 0.00029 : 0.0004;
-      monthly = 177 + o * d;
-    } else if (tariffId === 'strateg') {
-      monthly = 200 + o * 0.0004;
-    } else {
-      monthly = o * 0.0004;
-    }
-
-    var comparedTo = '';
-    var alt = 0;
-    if (tariffId === 'longterm') {
-      var d2 = o > 1000000 ? 0.00029 : 0.0004;
-      alt = o * d2;
-      comparedTo = 'Единый дневной';
-    } else {
-      alt = o * 0.5 * 0.0028;
-      comparedTo = 'Долгосрочный портфель';
-    }
-
-    return {
-      monthlyCost: Math.round(monthly),
-      savings: Math.round(Math.max(0, alt - monthly)),
-      comparedTo: comparedTo,
-    };
-  }
-
-  function ratesByInstrument(type) {
-    // Логика повторяет nb из текущей реализации
-    var rates = {
-      longterm: { buy: 0, sell: 0.0028, monthlyFee: 0 },
-      daily: { buy: 0.00035, sell: 0.00035, monthlyFee: 177 },
-      strateg: { buy: 0.00035, sell: 0.00035, monthlyFee: 200 },
-      freetrade: { buy: 0.000177, sell: 0.000177, monthlyFee: 177 },
-      consulting: { buy: 0.0005, sell: 0.0005, monthlyFee: 0 },
-    };
-
-    if (type === 'stocks_us') {
-      rates.longterm.buy = 0.001;
-      rates.longterm.sell = 0.001;
-      rates.daily.buy = 0.001;
-      rates.daily.sell = 0.001;
-      rates.strateg.buy = 0.001;
-      rates.strateg.sell = 0.001;
-    }
-
-    if (type === 'options' || type === 'futures') {
-      rates.longterm.buy = 0.0045;
-      rates.longterm.sell = 0.0045;
-      rates.daily.buy = 0.0045;
-      rates.daily.sell = 0.0045;
-    }
-
-    return rates;
-  }
-
-  function dealCommission(deal, tariffId) {
-    var rates = ratesByInstrument(deal.type);
-    var r = deal.isBuy ? rates[tariffId].buy : rates[tariffId].sell;
-    return deal.volume * r;
-  }
-
-  function totalForTariff(deals, tariffId) {
-    var sum = 0;
-    for (var i = 0; i < deals.length; i++) sum += dealCommission(deals[i], tariffId);
-    var type = deals[0] ? deals[0].type : 'stocks_rf';
-    var fee = ratesByInstrument(type)[tariffId].monthlyFee;
-    return sum + fee;
-  }
-
-  function totalsForAll(deals) {
-    return {
-      longterm: totalForTariff(deals, 'longterm'),
-      daily: totalForTariff(deals, 'daily'),
-      strateg: totalForTariff(deals, 'strateg'),
-      freetrade: totalForTariff(deals, 'freetrade'),
-      consulting: totalForTariff(deals, 'consulting'),
-    };
-  }
-
-  function cheapestTariff(deals) {
-    var totals = totalsForAll(deals);
-    var best = 'strateg';
-    var bestValue = totals.strateg;
-    Object.keys(totals).forEach(function (k) {
-      if (totals[k] < bestValue) {
-        bestValue = totals[k];
-        best = k;
-      }
-    });
-    return { tariff: best, commission: bestValue, totals: totals };
-  }
+  // (commission calculator removed; widget is questionnaire-only)
 
   function cssText() {
     return (
@@ -422,15 +357,15 @@
     if (initialView === 'questionnaire') initialStep = 0;
 
     this.state = {
-      view: initialView === 'calculator' ? 'calculator' : 'questionnaire',
+      view: 'questionnaire',
       step: initialStep, // -1 = intro, 0.. = questions, >= QUESTIONS.length = result
       answers: {
-        goal: null,
-        frequency: null,
-        instruments: null,
-        assistance: null,
+        q1_goal: null,
+        q2_frequency: null,
+        q3_instruments: null,
+        q4_assistance: null,
       },
-      deals: [],
+      showAlternatives: false,
     };
 
     track(this, 'widget_init', {});
@@ -456,11 +391,12 @@
   Widget.prototype.resetQuestionnaire = function () {
     this.state.step = -1;
     this.state.answers = {
-      goal: null,
-      frequency: null,
-      instruments: null,
-      assistance: null,
+      q1_goal: null,
+      q2_frequency: null,
+      q3_instruments: null,
+      q4_assistance: null,
     };
+    this.state.showAlternatives = false;
     this.render();
   };
 
@@ -557,9 +493,7 @@
 
     container.appendChild(group);
 
-    if (q.id === 'frequency') {
-      container.appendChild(el('div', { class: 'helper', text: 'Это поможет учесть комиссии и доступные инструменты' }));
-    }
+    if (q.helperText) container.appendChild(el('div', { class: 'helper', text: q.helperText }));
 
     container.appendChild(el('div', { class: 'space-20' }));
 
@@ -599,95 +533,35 @@
     container.appendChild(el('div', { class: 'actions' }, left, next, manual));
   };
 
-  function whyText(answers, tariffId) {
-    if (tariffId === 'consulting') return 'Вы указали, что вам важны подсказки и сопровождение — поэтому мы предлагаем вариант с поддержкой.';
-    if (tariffId === 'daily') return 'По вашим ответам видно, что вы планируете активную торговлю и частые сделки — для этого лучше подходит тариф для активных операций.';
-    if (tariffId === 'freetrade') return 'Вы хотите попробовать инвестиции и разобраться — этот вариант проще для старта и поможет спокойно освоиться.';
-    if (tariffId === 'longterm') return 'Вы ориентируетесь на спокойное инвестирование и нечастые операции — поэтому подходит тариф для инвестора.';
-    return 'Ваши ответы смешанные или вы пока не уверены — поэтому мы предлагаем универсальный вариант.';
-  }
-
-  function benefitsForTariff(tariffId) {
-    var t = TARIFFS[tariffId];
-    if (!t) return [];
-    return (t.features || []).slice(0, 3);
-  }
-
   Widget.prototype.openTariff = function (tariffId) {
+    // tariffId must be from STRICT WHITELIST
+    var t = tariffById(tariffId);
+    if (!t) return;
     track(this, 'tariff_recommended', { tariff_id: tariffId });
-    var url = (this.options.tariffLinks && this.options.tariffLinks[tariffId]) || '#';
     try {
-      window.location.href = url;
+      window.location.href = t.url;
     } catch (_) {}
   };
 
   Widget.prototype.renderResultScreen = function (container) {
     var self = this;
-    var answers = this.state.answers;
-    var scores = computeScores(answers);
-    var top = pickTopTariffs(scores);
+    var tariffId = recommendTariffId(this.state.answers);
+    var tariff = tariffById(tariffId);
+    var rc = RESULT_COPY[tariffId];
 
-    if (top.length === 0) top = ['strateg'];
-
-    container.appendChild(el('div', { class: 'pill', text: 'Мы подобрали его на основе ваших ответов' }));
-    container.appendChild(el('div', { class: 'space-16' }));
-
-    // Multiple match: show 2 cards, do not force
-    if (top.length > 1) {
-      container.appendChild(el('div', { class: 'resultTitle', text: 'Вам могут подойти два тарифа' }));
-      container.appendChild(el('div', { class: 'space-12' }));
-
-      var cards = el('div', { class: 'cards' });
-      top.slice(0, 2).forEach(function (tid) {
-        var card = el('div', { class: 'tariffCard' });
-        card.appendChild(el('div', { class: 'tariffName', text: '«' + TARIFFS[tid].name + '»' }));
-        var ul = el('ul', { class: 'benefits' });
-        benefitsForTariff(tid).slice(0, 2).forEach(function (b) {
-          ul.appendChild(el('li', { text: b }));
-        });
-        card.appendChild(ul);
-        card.appendChild(el('div', { class: 'space-16' }));
-        card.appendChild(
-          el('button', {
-            class: 'btn primary',
-            onClick: function () {
-              self.openTariff(tid);
-            },
-            text: 'Выбрать тариф',
-          })
-        );
-        cards.appendChild(card);
-      });
-      container.appendChild(cards);
-
-      container.appendChild(el('div', { class: 'space-20' }));
-      container.appendChild(
-        el(
-          'div',
-          { class: 'actions' },
-          el('button', {
-            class: 'btn',
-            onClick: function () {
-              self.resetQuestionnaire();
-            },
-            text: 'Пройти заново',
-          }),
-          el('a', { class: 'link', href: this.options.manualUrl || '#', text: 'Посмотреть другие тарифы' })
-        )
-      );
-
-      return;
+    if (!tariff || !rc) {
+      tariffId = 'n3_investor';
+      tariff = tariffById(tariffId);
+      rc = RESULT_COPY[tariffId];
     }
 
-    var tariffId = top[0];
-    container.appendChild(el('div', { class: 'resultTitle', text: 'Вам подойдёт тариф «' + TARIFFS[tariffId].name + '»' }));
+    container.appendChild(el('h2', { text: rc.title }));
     container.appendChild(el('div', { class: 'space-12' }));
-    container.appendChild(el('div', { class: 'why', text: whyText(answers, tariffId) }));
+    container.appendChild(el('p', { text: 'Мы подобрали его на основе ваших ответов' }));
 
-    var benefits = benefitsForTariff(tariffId);
-    if (benefits.length) {
+    if (rc && Array.isArray(rc.benefits)) {
       var list = el('ul', { class: 'benefits' });
-      benefits.forEach(function (b) {
+      rc.benefits.slice(0, 3).forEach(function (b) {
         list.appendChild(el('li', { text: b }));
       });
       container.appendChild(list);
@@ -698,6 +572,7 @@
       el(
         'div',
         { class: 'actions' },
+        el('span', { text: '' }),
         el('button', {
           class: 'btn primary',
           onClick: function () {
@@ -705,144 +580,39 @@
           },
           text: 'Перейти к тарифу',
         }),
-        el('a', { class: 'link', href: this.options.manualUrl || '#', text: 'Посмотреть другие тарифы' }),
         el('button', {
           class: 'btn',
           onClick: function () {
-            self.resetQuestionnaire();
+            self.setState({ showAlternatives: !self.state.showAlternatives });
           },
-          text: 'Пройти заново',
+          text: 'Посмотреть другие тарифы',
         })
       )
     );
-  };
 
-  Widget.prototype.renderCalculator = function (container) {
-    var self = this;
-    var card = el('div', { class: 'card', style: 'margin-top:14px' });
-
-    var head = el('div', { class: 'calcHead' });
-    head.appendChild(el('div', { class: 'qtitle', text: 'Калькулятор комиссий' }));
-    head.appendChild(
-      el('button', {
-        class: 'btn primary',
-        onClick: function () {
-          self.state.deals.push({ type: 'stocks_rf', isBuy: true, volume: 100000 });
-          self.render();
-        },
-        text: 'Добавить сделку',
-      })
-    );
-    card.appendChild(head);
-    card.appendChild(el('div', { class: 'qdesc', text: 'Добавьте сделки и сравните итоговую стоимость по тарифам.' }));
-
-    var table = el('table', { class: 'table' });
-    var thead = el('thead', null);
-    thead.appendChild(
-      el(
-        'tr',
-        null,
-        el('th', { text: 'Инструмент' }),
-        el('th', { text: 'Тип' }),
-        el('th', { text: 'Объем (₽)' }),
-        el('th', { text: '' })
-      )
-    );
-    table.appendChild(thead);
-
-    var tbody = el('tbody', null);
-    this.state.deals.forEach(function (d, idx) {
-      var tr = el('tr', null);
-
-      var selType = el(
-        'select',
-        {
-          onChange: function (e) {
-            d.type = e.target.value;
-            self.render();
-          },
-        },
-        el('option', { value: 'stocks_rf', text: 'Акции/облигации РФ' }),
-        el('option', { value: 'stocks_us', text: 'Акции США' }),
-        el('option', { value: 'options', text: 'Опционы' }),
-        el('option', { value: 'futures', text: 'Фьючерсы' })
-      );
-      selType.value = d.type;
-
-      var selSide = el(
-        'select',
-        {
-          onChange: function (e) {
-            d.isBuy = e.target.value === 'buy';
-            self.render();
-          },
-        },
-        el('option', { value: 'buy', text: 'Покупка' }),
-        el('option', { value: 'sell', text: 'Продажа' })
-      );
-      selSide.value = d.isBuy ? 'buy' : 'sell';
-
-      var inpVol = el('input', {
-        type: 'number',
-        value: String(d.volume || 0),
-        onInput: function (e) {
-          var v = Number(e.target.value || 0);
-          d.volume = isFinite(v) ? v : 0;
-          self.render();
-        },
-        min: '0',
-      });
-
-      tr.appendChild(el('td', null, selType));
-      tr.appendChild(el('td', null, selSide));
-      tr.appendChild(el('td', null, inpVol));
-      tr.appendChild(
-        el(
-          'td',
-          null,
-          el('button', {
-            class: 'btn',
-            onClick: function () {
-              self.state.deals.splice(idx, 1);
-              self.render();
-            },
-            text: 'Удалить',
-          })
-        )
-      );
-
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    card.appendChild(table);
-
-    if (this.state.deals.length === 0) {
-      card.appendChild(el('div', { class: 'qdesc', style: 'margin-top:12px', text: 'Добавьте сделки, чтобы увидеть сравнение комиссий.' }));
-    } else {
-      var best = cheapestTariff(this.state.deals);
-      var totals = best.totals;
-
-      var res = el('div', { class: 'result' });
-      res.appendChild(el('div', { class: 'badge', text: 'Самый выгодный по расчету' }));
-      res.appendChild(el('div', { class: 'tariffName', text: TARIFFS[best.tariff].name }));
-      res.appendChild(el('div', { class: 'tariffDesc', text: 'Итоговая оценка: ' + formatRUB(best.commission) + ' / мес' }));
-
-      var grid = el('div', { class: 'kpis' });
-      Object.keys(TARIFFS).forEach(function (tid) {
-        grid.appendChild(
-          el(
-            'div',
-            { class: 'kpi' },
-            el('div', { class: 'kpiT', text: TARIFFS[tid].name }),
-            el('div', { class: 'kpiV', text: formatRUB(Math.round(totals[tid])) })
-          )
-        );
-      });
-      res.appendChild(grid);
-      card.appendChild(res);
+    if (this.state.showAlternatives) {
+      container.appendChild(el('div', { class: 'space-16' }));
+      var others = otherTariffs(tariffId);
+      var cards = el('div', { class: 'cards' });
+      for (var i = 0; i < others.length; i++) {
+        (function (t) {
+          var card = el('div', { class: 'tariffCard' });
+          card.appendChild(el('div', { class: 'tariffName', text: t.name }));
+          card.appendChild(el('div', { class: 'space-12' }));
+          card.appendChild(
+            el('button', {
+              class: 'btn primary',
+              onClick: function () {
+                self.openTariff(t.id);
+              },
+              text: 'Перейти к тарифу',
+            })
+          );
+          cards.appendChild(card);
+        })(others[i]);
+      }
+      container.appendChild(cards);
     }
-
-    container.appendChild(card);
   };
 
   Widget.prototype.render = function () {
@@ -850,17 +620,12 @@
     while (host.firstChild) host.removeChild(host.firstChild);
 
     var wrap = el('div', { class: 'wrap' });
-
-    if (this.state.view === 'calculator') {
-      this.renderCalculator(wrap);
+    if (this.state.step < 0) {
+      this.renderIntro(wrap);
+    } else if (this.state.step >= QUESTIONS.length) {
+      this.renderResultScreen(wrap);
     } else {
-      if (this.state.step < 0) {
-        this.renderIntro(wrap);
-      } else if (this.state.step >= QUESTIONS.length) {
-        this.renderResultScreen(wrap);
-      } else {
-        this.renderQuestionnaire(wrap);
-      }
+      this.renderQuestionnaire(wrap);
     }
 
     host.appendChild(wrap);
