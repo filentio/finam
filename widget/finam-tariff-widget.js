@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 0.2.1
+ * Version: 0.2.2
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '0.2.1';
+  var VERSION = '0.2.2';
 
   var DEFAULTS = {
     // 'intro' | 'questionnaire' | 'calculator'
@@ -715,34 +715,6 @@
         })
       )
     );
-  };
-
-  Widget.prototype.renderResultScreen = function (container) {
-    var self = this;
-    var card = this.renderResult();
-
-    var actions = el('div', { class: 'actions' });
-    actions.appendChild(
-      el('button', {
-        class: 'btn',
-        onClick: function () {
-          self.setState({ step: Math.max(0, QUESTIONS.length - 1) });
-        },
-        text: 'Назад',
-      })
-    );
-    actions.appendChild(
-      el('button', {
-        class: 'btn primary',
-        onClick: function () {
-          self.resetQuestionnaire();
-        },
-        text: 'Пройти заново',
-      })
-    );
-    card.appendChild(actions);
-
-    container.appendChild(card);
   };
 
   Widget.prototype.renderCalculator = function (container) {
