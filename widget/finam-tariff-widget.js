@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.13
+ * Version: 1.0.14
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.13';
+  var VERSION = '1.0.14';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -165,29 +165,61 @@
     return 'web';
   }
 
-  function sleep(ms) {
-    return new Promise(function (res) {
-      setTimeout(res, ms);
-    });
-  }
-
-  function postJsonWithRetry(url, payload, attempts) {
+  function postJsonWithRetry(url, payload, attempts, cb) {
     var max = typeof attempts === 'number' ? attempts : 3;
-    return (async function () {
-      for (var i = 0; i < max; i++) {
-        try {
-          var r = await fetch(url, {
+    var attempt = 0;
+    function done(ok) {
+      try {
+        if (typeof cb === 'function') cb(!!ok);
+      } catch (_) {}
+    }
+    function once() {
+      attempt++;
+      try {
+        // Prefer fetch if available, but don't rely on it.
+        if (typeof fetch === 'function') {
+          fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
-            keepalive: true,
-          });
-          if (r && r.ok) return true;
-        } catch (_) {}
-        if (i < max - 1) await sleep(500 * Math.pow(2, i));
+          })
+            .then(function (r) {
+              if (r && r.ok) return done(true);
+              retry();
+            })
+            .catch(function () {
+              retry();
+            });
+          return;
+        }
+      } catch (_) {}
+
+      // XHR fallback (very compatible)
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState !== 4) return;
+          if (xhr.status >= 200 && xhr.status < 300) done(true);
+          else retry();
+        };
+        xhr.send(JSON.stringify(payload));
+        return;
+      } catch (_) {}
+
+      retry();
+    }
+    function retry() {
+      if (attempt >= max) return done(false);
+      var delay = 500 * Math.pow(2, attempt - 1);
+      try {
+        setTimeout(once, delay);
+      } catch (_) {
+        done(false);
       }
-      return false;
-    })();
+    }
+    once();
   }
 
   function guessRepoBaseFromScriptSrc(src) {
@@ -577,11 +609,9 @@
         flow_version: payload.flow_version,
       });
       if (!self.options.feedbackEndpoint) return;
-      postJsonWithRetry(self.options.feedbackEndpoint, payload, 3)
-        .then(function (ok) {
-          track(self, ok ? 'feedback_submit_success' : 'feedback_submit_fail', { tariff_id: payload.tariff_id });
-        })
-        .catch(function () {});
+      postJsonWithRetry(self.options.feedbackEndpoint, payload, 3, function (ok) {
+        track(self, ok ? 'feedback_submit_success' : 'feedback_submit_fail', { tariff_id: payload.tariff_id });
+      });
     }
 
     function setFb(next) {
@@ -736,12 +766,23 @@
     );
     shell.appendChild(header);
 
-    var grid = el(
-      'div',
-      { class: 'tw-two-col' },
-      el('div', null),
-      this.options.feedbackEnabled ? this.createFeedbackBlock(tariffId) : this.createPremiumVisual()
-    );
+    var right;
+    if (this.options.feedbackEnabled) {
+      try {
+        right = this.createFeedbackBlock(tariffId);
+      } catch (e) {
+        // If feedback fails, never block the main result.
+        try {
+          if (global.console && typeof global.console.error === 'function') {
+            global.console.error('[FinamTariffWidget] feedback render failed', e);
+          }
+        } catch (_) {}
+        right = this.createPremiumVisual();
+      }
+    } else {
+      right = this.createPremiumVisual();
+    }
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), right);
     var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card' });
