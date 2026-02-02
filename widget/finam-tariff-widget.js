@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.9
+ * Version: 1.0.10
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.9';
+  var VERSION = '1.0.10';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -985,7 +985,34 @@
     else document.addEventListener('DOMContentLoaded', fn);
   }
 
+  function setupAutoMountObserver() {
+    try {
+      if (!global.MutationObserver) return;
+      if (global.__finamTariffWidgetObserver) return;
+      var obs = new MutationObserver(function (mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          var m = mutations[i];
+          if (!m || !m.addedNodes || !m.addedNodes.length) continue;
+          // Any DOM addition may include the mount container; just attempt autoMount (it is idempotent).
+          autoMount();
+          break;
+        }
+      });
+      obs.observe(document.documentElement || document.body, { childList: true, subtree: true });
+      global.__finamTariffWidgetObserver = obs;
+    } catch (_) {}
+  }
+
   global.FinamTariffWidget = { mount: mount, autoMount: autoMount, version: VERSION };
-  onReady(autoMount);
+  onReady(function () {
+    autoMount();
+    setupAutoMountObserver();
+    // Extra attempts for page builders that inject blocks late.
+    try {
+      setTimeout(autoMount, 0);
+      setTimeout(autoMount, 500);
+      setTimeout(autoMount, 1500);
+    } catch (_) {}
+  });
 })(window);
 
