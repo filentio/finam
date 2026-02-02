@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.20
+ * Version: 1.0.21
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.20';
+  var VERSION = '1.0.21';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -585,6 +585,13 @@
 
     this.mountPoint = target;
     this.dom = createRoot(target, this.options);
+    try {
+      // Debugging aid: allow inspecting instance/options in console.
+      target.__finamTariffWidgetInstance = this;
+      global.__FinamTariffWidgetLast = this;
+      if (!global.__FinamTariffWidgetInstances) global.__FinamTariffWidgetInstances = [];
+      global.__FinamTariffWidgetInstances.push(this);
+    } catch (_) {}
 
     // Fixed height for question screens (avoids layout jumps).
     // Set when user enters questionnaire.
