@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.21
+ * Version: 1.0.22
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.21';
+  var VERSION = '1.0.22';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -204,6 +204,48 @@
         '&user_id=' + encodeURIComponent(s(p.user_id));
       return q;
     }
+    function sendFormGet(url, payload) {
+      // Uses form-action CSP instead of connect/img-src.
+      try {
+        var doc = document;
+        var iframeName = 'ftw_feedback_iframe_' + Math.random().toString(16).slice(2);
+        var iframe = doc.createElement('iframe');
+        iframe.name = iframeName;
+        iframe.style.display = 'none';
+        doc.body.appendChild(iframe);
+
+        var form = doc.createElement('form');
+        form.method = 'GET';
+        form.action = String(url);
+        form.target = iframeName;
+
+        var q = buildQuery(payload).split('&');
+        for (var i = 0; i < q.length; i++) {
+          var kv = q[i].split('=');
+          if (!kv.length) continue;
+          var input = doc.createElement('input');
+          input.type = 'hidden';
+          input.name = decodeURIComponent(kv[0] || '');
+          input.value = decodeURIComponent((kv[1] || '').replace(/\+/g, '%20'));
+          form.appendChild(input);
+        }
+
+        doc.body.appendChild(form);
+        form.submit();
+
+        // Cleanup later
+        setTimeout(function () {
+          try {
+            if (form && form.parentNode) form.parentNode.removeChild(form);
+            if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          } catch (_) {}
+        }, 1500);
+
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
     function sendImage(url, payload, onDone) {
       try {
         var img = new Image();
@@ -233,13 +275,51 @@
       // Cross-origin (e.g., Google Apps Script): use no-cors/beacon to avoid CORS blocking.
       var same = isSameOrigin(url);
       if (!same) {
-        // Google Apps Script is often blocked by CORS/CSP for fetch; image GET is most compatible.
+        // Google Apps Script: try multiple transports to bypass CORS/CSP restrictions.
         if (isGoogleAppsScript(url)) {
-          var okImg = sendImage(url, payload, function (ok) {
+          // 1) Beacon (POST JSON). No preflight.
+          try {
+            if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+              var blob0 = new Blob([body], { type: 'text/plain;charset=UTF-8' });
+              var ok0 = navigator.sendBeacon(url, blob0);
+              if (ok0) return done(true);
+            }
+          } catch (_) {}
+
+          // 2) fetch no-cors (POST JSON). Opaque response.
+          try {
+            if (typeof fetch === 'function') {
+              fetch(url, { method: 'POST', mode: 'no-cors', body: body })
+                .then(function () {
+                  done(true);
+                })
+                .catch(function () {
+                  // 3) Form GET (uses doGet)
+                  var okForm = sendFormGet(url, payload);
+                  if (okForm) done(true);
+                  else {
+                    // 4) Image GET as last resort
+                    var okImg = sendImage(url, payload, function (ok) {
+                      if (ok) done(true);
+                      else retry();
+                    });
+                    if (!okImg) retry();
+                  }
+                });
+              return;
+            }
+          } catch (_) {}
+
+          // 3) Form GET fallback if fetch is unavailable/blocked
+          var okForm2 = sendFormGet(url, payload);
+          if (okForm2) return done(true);
+
+          // 4) Image GET last resort
+          var okImg2 = sendImage(url, payload, function (ok) {
             if (ok) done(true);
             else retry();
           });
-          if (okImg) return;
+          if (okImg2) return;
         }
         try {
           if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
