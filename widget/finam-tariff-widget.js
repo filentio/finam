@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.19
+ * Version: 1.0.20
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.19';
+  var VERSION = '1.0.20';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -1108,6 +1108,40 @@
     return null;
   }
 
+  function readAutoOptions(doc, target) {
+    var opts = {};
+    // Global config hook
+    try {
+      var cfg = global.FinamTariffWidgetConfig;
+      if (cfg && typeof cfg === 'object') {
+        for (var k in cfg) opts[k] = cfg[k];
+      }
+    } catch (_) {}
+
+    // Container attributes
+    try {
+      if (target && target.getAttribute) {
+        var ep = target.getAttribute('data-feedback-endpoint') || target.getAttribute('data-ftw-feedback-endpoint');
+        if (ep) opts.feedbackEndpoint = ep;
+        var fe = target.getAttribute('data-feedback-enabled');
+        if (fe === 'false') opts.feedbackEnabled = false;
+      }
+    } catch (_) {}
+
+    // Script tag attributes (works even when container is auto-created)
+    try {
+      var s = findScriptElement(doc);
+      if (s && s.getAttribute) {
+        var sep = s.getAttribute('data-feedback-endpoint') || s.getAttribute('data-ftw-feedback-endpoint');
+        if (sep && !opts.feedbackEndpoint) opts.feedbackEndpoint = sep;
+        var sfe = s.getAttribute('data-feedback-enabled');
+        if (sfe === 'false') opts.feedbackEnabled = false;
+      }
+    } catch (_) {}
+
+    return opts;
+  }
+
   function queryAllDeep(root, selector) {
     var out = [];
     function walk(node) {
@@ -1166,7 +1200,7 @@
       nodes[i].__finamTariffWidgetMounted = true;
       try {
         // mount must run in the same document where target lives
-        new Widget(nodes[i], {});
+        new Widget(nodes[i], readAutoOptions(doc, nodes[i]));
         mountedAny = true;
       } catch (e) {
         try {
@@ -1188,7 +1222,7 @@
     if (byId && !byId.__finamTariffWidgetMounted) {
       byId.__finamTariffWidgetMounted = true;
       try {
-        new Widget(byId, {});
+        new Widget(byId, readAutoOptions(doc, byId));
         mountedAny = true;
       } catch (e2) {
         try {
@@ -1208,7 +1242,7 @@
       if (created && !created.__finamTariffWidgetMounted) {
         created.__finamTariffWidgetMounted = true;
         try {
-          new Widget(created, {});
+          new Widget(created, readAutoOptions(doc, created));
           mountedAny = true;
         } catch (e3) {
           try {
