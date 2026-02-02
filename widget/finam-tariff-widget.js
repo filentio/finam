@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.11
+ * Version: 1.0.12
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.11';
+  var VERSION = '1.0.12';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -971,15 +971,18 @@
     return new Widget(elTarget, options || {});
   }
 
-  function autoMount() {
-    var nodes = document.querySelectorAll('[data-finam-tariff-widget]');
+  function autoMountInDocument(doc) {
+    if (!doc || !doc.querySelectorAll) return;
+
+    // data-attribute mounting
+    var nodes = doc.querySelectorAll('[data-finam-tariff-widget]');
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].__finamTariffWidgetMounted) continue;
       nodes[i].__finamTariffWidgetMounted = true;
       try {
-        mount(nodes[i], {});
+        // mount must run in the same document where target lives
+        new Widget(nodes[i], {});
       } catch (e) {
-        // Don't leave the container stuck in "mounted" state.
         try {
           nodes[i].__finamTariffWidgetMounted = false;
         } catch (_) {}
@@ -990,6 +993,55 @@
         } catch (_) {}
       }
     }
+
+    // id mounting fallback (builders sometimes strip data-*)
+    var byId = null;
+    try {
+      byId = doc.getElementById && doc.getElementById('finam-tariff');
+    } catch (_) {}
+    if (byId && !byId.__finamTariffWidgetMounted) {
+      byId.__finamTariffWidgetMounted = true;
+      try {
+        new Widget(byId, {});
+      } catch (e2) {
+        try {
+          byId.__finamTariffWidgetMounted = false;
+        } catch (_) {}
+        try {
+          if (global.console && typeof global.console.error === 'function') {
+            global.console.error('[FinamTariffWidget] mount failed', e2);
+          }
+        } catch (_) {}
+      }
+    }
+  }
+
+  function autoMountDeep(rootDoc) {
+    var visited = new Set();
+    function walk(doc) {
+      if (!doc || visited.has(doc)) return;
+      visited.add(doc);
+      autoMountInDocument(doc);
+      // Try accessible same-origin iframes (cross-origin will throw)
+      var iframes = [];
+      try {
+        iframes = doc.querySelectorAll ? doc.querySelectorAll('iframe') : [];
+      } catch (_) {}
+      for (var i = 0; i < iframes.length; i++) {
+        var f = iframes[i];
+        try {
+          var childDoc = f && (f.contentDocument || (f.contentWindow && f.contentWindow.document));
+          if (childDoc) walk(childDoc);
+        } catch (_) {
+          // cross-origin iframe: ignore
+        }
+      }
+    }
+    walk(rootDoc || document);
+  }
+
+  function autoMount() {
+    autoMountDeep(document);
   }
 
   function onReady(fn) {
