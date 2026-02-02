@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.14
+ * Version: 1.0.15
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.14';
+  var VERSION = '1.0.15';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -766,23 +766,7 @@
     );
     shell.appendChild(header);
 
-    var right;
-    if (this.options.feedbackEnabled) {
-      try {
-        right = this.createFeedbackBlock(tariffId);
-      } catch (e) {
-        // If feedback fails, never block the main result.
-        try {
-          if (global.console && typeof global.console.error === 'function') {
-            global.console.error('[FinamTariffWidget] feedback render failed', e);
-          }
-        } catch (_) {}
-        right = this.createPremiumVisual();
-      }
-    } else {
-      right = this.createPremiumVisual();
-    }
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), right);
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
     var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card' });
@@ -939,7 +923,23 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    var right;
+    if (this.options.feedbackEnabled) {
+      try {
+        right = this.createFeedbackBlock(tariffId);
+      } catch (e) {
+        // If feedback fails, never block the main result.
+        try {
+          if (global.console && typeof global.console.error === 'function') {
+            global.console.error('[FinamTariffWidget] feedback render failed', e);
+          }
+        } catch (_) {}
+        right = this.createPremiumVisual();
+      }
+    } else {
+      right = this.createPremiumVisual();
+    }
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), right);
     var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card tw-cardSolid' });
