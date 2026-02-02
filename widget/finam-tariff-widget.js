@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.17
+ * Version: 1.0.18
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.17';
+  var VERSION = '1.0.18';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -168,6 +168,13 @@
   function postJsonWithRetry(url, payload, attempts, cb) {
     var max = typeof attempts === 'number' ? attempts : 3;
     var attempt = 0;
+    function isSameOrigin(u) {
+      try {
+        return new URL(String(u), global.location && global.location.href ? global.location.href : undefined).origin === global.location.origin;
+      } catch (_) {
+        return false;
+      }
+    }
     function done(ok) {
       try {
         if (typeof cb === 'function') cb(!!ok);
@@ -175,13 +182,48 @@
     }
     function once() {
       attempt++;
+      var body = '';
       try {
-        // Prefer fetch if available, but don't rely on it.
+        body = JSON.stringify(payload);
+      } catch (_) {
+        body = '{}';
+      }
+
+      // Cross-origin (e.g., Google Apps Script): use no-cors/beacon to avoid CORS blocking.
+      var same = isSameOrigin(url);
+      if (!same) {
+        try {
+          if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+            var blob = new Blob([body], { type: 'text/plain;charset=UTF-8' });
+            var ok = navigator.sendBeacon(url, blob);
+            // sendBeacon returns boolean "queued" — treat as success.
+            return done(!!ok);
+          }
+        } catch (_) {}
+        try {
+          if (typeof fetch === 'function') {
+            fetch(url, { method: 'POST', mode: 'no-cors', body: body })
+              .then(function () {
+                // Opaque response: we can't know status, but request was sent.
+                done(true);
+              })
+              .catch(function () {
+                retry();
+              });
+            return;
+          }
+        } catch (_) {}
+        // Last resort: can't send
+        return retry();
+      }
+
+      try {
+        // Same-origin: use fetch with JSON and status check.
         if (typeof fetch === 'function') {
           fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: body,
           })
             .then(function (r) {
               if (r && r.ok) return done(true);
@@ -204,7 +246,7 @@
           if (xhr.status >= 200 && xhr.status < 300) done(true);
           else retry();
         };
-        xhr.send(JSON.stringify(payload));
+        xhr.send(body);
         return;
       } catch (_) {}
 
