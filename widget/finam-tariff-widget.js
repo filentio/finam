@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.18
+ * Version: 1.0.19
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.18';
+  var VERSION = '1.0.19';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -175,6 +175,47 @@
         return false;
       }
     }
+    function isGoogleAppsScript(u) {
+      try {
+        return /https?:\/\/script\.google\.com\/macros\/s\//i.test(String(u));
+      } catch (_) {
+        return false;
+      }
+    }
+    function buildQuery(p) {
+      // Keep it short and robust.
+      function s(v) {
+        return v == null ? '' : String(v);
+      }
+      var reasons = '';
+      try {
+        reasons = Array.isArray(p.reasons) ? p.reasons.join(',') : '';
+      } catch (_) {}
+      if (reasons.length > 300) reasons = reasons.slice(0, 300);
+      var q =
+        'session_id=' + encodeURIComponent(s(p.session_id)) +
+        '&tariff_id=' + encodeURIComponent(s(p.tariff_id)) +
+        '&rating=' + encodeURIComponent(s(p.rating)) +
+        '&reasons=' + encodeURIComponent(reasons) +
+        '&flow_version=' + encodeURIComponent(s(p.flow_version)) +
+        '&timestamp=' + encodeURIComponent(s(p.timestamp)) +
+        '&platform=' + encodeURIComponent(s(p.platform)) +
+        '&ab_group=' + encodeURIComponent(s(p.ab_group)) +
+        '&user_id=' + encodeURIComponent(s(p.user_id));
+      return q;
+    }
+    function sendImage(url, payload, onDone) {
+      try {
+        var img = new Image();
+        var sep = String(url).indexOf('?') === -1 ? '?' : '&';
+        img.onload = function () { onDone(true); };
+        img.onerror = function () { onDone(false); };
+        img.src = String(url) + sep + buildQuery(payload);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
     function done(ok) {
       try {
         if (typeof cb === 'function') cb(!!ok);
@@ -192,6 +233,14 @@
       // Cross-origin (e.g., Google Apps Script): use no-cors/beacon to avoid CORS blocking.
       var same = isSameOrigin(url);
       if (!same) {
+        // Google Apps Script is often blocked by CORS/CSP for fetch; image GET is most compatible.
+        if (isGoogleAppsScript(url)) {
+          var okImg = sendImage(url, payload, function (ok) {
+            if (ok) done(true);
+            else retry();
+          });
+          if (okImg) return;
+        }
         try {
           if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
             var blob = new Blob([body], { type: 'text/plain;charset=UTF-8' });
