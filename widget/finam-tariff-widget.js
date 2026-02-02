@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.22
+ * Version: 1.0.23
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.22';
+  var VERSION = '1.0.23';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -555,6 +555,34 @@
       '.ftw .tw-h2{font-size:32px;line-height:38px;font-weight:700;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
       '.ftw .tw-heroTitle{font-size:36px;line-height:42px;font-weight:800;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
       '@media (max-width:860px){.ftw .tw-heroTitle{font-size:30px;line-height:36px}}' +
+      /* Mobile typography + spacing */
+      '@media (max-width:560px){' +
+      '.ftw .tw-header{padding:16px;gap:12px}' +
+      '.ftw .tw-h1{font-size:20px;line-height:24px}' +
+      '.ftw .tw-h2{font-size:24px;line-height:30px;letter-spacing:-0.24px}' +
+      '.ftw .tw-heroTitle{font-size:26px;line-height:32px;letter-spacing:-0.24px}' +
+      '.ftw .tw-secondaryText{font-size:14px;line-height:18px}' +
+      '.ftw .tw-two-col{padding:16px;gap:16px}' +
+      '.ftw .tw-one-col{padding:16px}' +
+      '.ftw .tw-card{padding:16px}' +
+      '.ftw .tw-questionTitle{font-size:18px;line-height:22px}' +
+      '.ftw .tw-options{gap:12px;margin:0 0 16px 0}' +
+      '.ftw .tw-option{padding:14px;grid-template-columns:1fr 24px}' +
+      '.ftw .tw-option-text{font-size:15px;line-height:19px}' +
+      '.ftw .tw-actions{flex-direction:column;align-items:stretch;gap:12px}' +
+      '.ftw .tw-actions-left{width:100%}' +
+      '.ftw .tw-actions-right{width:100%;justify-content:stretch}' +
+      '.ftw .tw-actions-right .tw-btn{width:100%}' +
+      '.ftw .tw-btn{width:100%}' +
+      '.ftw .tw-feedback{padding:16px;min-height:auto}' +
+      '.ftw .tw-feedbackTitle{font-size:16px;line-height:20px}' +
+      '.ftw .tw-feedbackSub{font-size:13px;line-height:17px}' +
+      '.ftw .tw-starBtn{width:40px;height:40px;border-radius:12px}' +
+      '.ftw .tw-star{font-size:20px}' +
+      '.ftw .tw-chip{height:34px;font-size:13px}' +
+      '.ftw .tw-feedbackActions{justify-content:stretch}' +
+      '.ftw .tw-feedbackBtn{width:100%}' +
+      '}' +
       '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
       '.ftw .tw-meta{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin:0 0 10px 0}' +
       /* One-column body (used for questions/results to avoid layout jumps) */
