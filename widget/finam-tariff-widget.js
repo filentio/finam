@@ -1,12 +1,13 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
-  * Version: 1.0.8
+ * Version: 1.0.9
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.8';
+  var VERSION = '1.0.9';
+  var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
     // 'form' | 'result'
@@ -19,6 +20,12 @@
     // - 'auto' tries to load /assets/premium-visual.svg next to the script host (jsDelivr/raw/local)
     // - empty/false disables the image and keeps abstract gradients
     premiumVisualImageUrl: 'auto',
+    // Feedback (right block on result screen)
+    feedbackEnabled: true,
+    feedbackEndpoint: '', // optional URL for POSTing feedback JSON
+    userId: null, // optional
+    abGroup: null, // optional
+    flowVersion: FLOW_VERSION, // analytics/feedback versioning
   };
 
   // STRICT WHITELIST (DO NOT CHANGE NAMES/URLS)
@@ -131,6 +138,56 @@
       }
     } catch (_) {}
     return '';
+  }
+
+  function getSessionId() {
+    try {
+      if (global.crypto && typeof global.crypto.randomUUID === 'function') return global.crypto.randomUUID();
+    } catch (_) {}
+    // Fallback UUIDv4-ish
+    var s = '';
+    for (var i = 0; i < 36; i++) {
+      if (i === 8 || i === 13 || i === 18 || i === 23) s += '-';
+      else {
+        var r = (Math.random() * 16) | 0;
+        if (i === 14) r = 4;
+        if (i === 19) r = (r & 0x3) | 0x8;
+        s += r.toString(16);
+      }
+    }
+    return s;
+  }
+
+  function getPlatformHint() {
+    try {
+      if (global.matchMedia && global.matchMedia('(max-width: 860px)').matches) return 'mobile';
+    } catch (_) {}
+    return 'web';
+  }
+
+  function sleep(ms) {
+    return new Promise(function (res) {
+      setTimeout(res, ms);
+    });
+  }
+
+  function postJsonWithRetry(url, payload, attempts) {
+    var max = typeof attempts === 'number' ? attempts : 3;
+    return (async function () {
+      for (var i = 0; i < max; i++) {
+        try {
+          var r = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            keepalive: true,
+          });
+          if (r && r.ok) return true;
+        } catch (_) {}
+        if (i < max - 1) await sleep(500 * Math.pow(2, i));
+      }
+      return false;
+    })();
   }
 
   function guessRepoBaseFromScriptSrc(src) {
@@ -316,6 +373,26 @@
       '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
       /* Solid card (questions/results) to keep readability over visuals */
       '.ftw .tw-cardSolid{background:rgba(21,21,25,0.92);border:1px solid rgba(255,255,255,0.14);box-shadow:var(--ui-shadow-cardDark)}' +
+      /* Feedback block (right side on result) */
+      '.ftw .tw-feedback{border-radius:var(--ui-radius-shell);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px;min-height:260px}' +
+      '.ftw .tw-feedbackTitle{font-size:18px;line-height:22px;font-weight:800;letter-spacing:-0.16px;color:var(--ui-text-inverse);margin:0}' +
+      '.ftw .tw-feedbackSub{font-size:14px;line-height:18px;font-weight:500;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
+      '.ftw .tw-stars{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}' +
+      '.ftw .tw-starBtn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease,transform .05s ease}' +
+      '.ftw .tw-starBtn:active{transform:translateY(1px)}' +
+      '.ftw .tw-star{font-size:22px;line-height:1;color:rgba(255,255,255,0.22)}' +
+      '.ftw .tw-starBtn.is-on .tw-star{color:var(--ui-brand)}' +
+      '.ftw .tw-starBtn:hover{background:rgba(255,255,255,0.10)}' +
+      '.ftw .tw-chipTitle{margin-top:16px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
+      '.ftw .tw-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}' +
+      '.ftw .tw-chip{height:36px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease}' +
+      '.ftw .tw-chip:hover{background:rgba(255,255,255,0.10)}' +
+      '.ftw .tw-chip.is-selected{background:rgba(255,199,89,0.12);border-color:rgba(255,186,48,0.45)}' +
+      '.ftw .tw-skip{margin-top:12px;font-size:13px;font-weight:700;color:var(--ui-text-inverse-secondary);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}' +
+      '.ftw .tw-skip:hover{color:var(--ui-text-inverse)}' +
+      '.ftw .tw-feedbackThanks{margin-top:14px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
+      '.ftw .tw-feedbackDone{display:flex;gap:10px;align-items:flex-start;margin-top:14px}' +
+      '.ftw .tw-doneIcon{width:28px;height:28px;border-radius:10px;background:rgba(255,199,89,0.12);border:1px solid rgba(255,186,48,0.35);display:flex;align-items:center;justify-content:center;color:var(--ui-brand);font-weight:900}' +
       '.ftw .tw-questionTitle{font-size:20px;line-height:24px;font-weight:700;color:var(--ui-text-inverse);margin:0 0 12px 0}' +
       '.ftw .tw-progress{height:4px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;margin:8px 0 18px 0}' +
       '.ftw .tw-progress > div{height:100%;width:var(--tw-progress,0%);background:var(--ui-brand);border-radius:999px}' +
@@ -386,6 +463,9 @@
     // Fixed height for question screens (avoids layout jumps).
     // Set when user enters questionnaire.
     this._fixedQuestionHeight = 0;
+    this._feedbackTimer = null;
+    this._feedbackShownOnce = false;
+    this.sessionId = getSessionId();
 
     this.state = {
       mode: 'intro', // 'intro' | 'question' | 'result' | 'error'
@@ -397,6 +477,7 @@
         q4_assistance: null,
       },
       resultTariffId: null,
+      feedback: { state: 'idle', rating: null, reasons: [] },
     };
 
     track(this, 'widget_init', {});
@@ -420,10 +501,16 @@
   };
 
   Widget.prototype.resetQuestionnaire = function () {
+    try {
+      if (this._feedbackTimer) clearTimeout(this._feedbackTimer);
+    } catch (_) {}
+    this._feedbackTimer = null;
+    this._feedbackShownOnce = false;
     this.state.mode = 'intro';
     this.state.step = 0;
     this.state.answers = { q1_goal: null, q2_frequency: null, q3_instruments: null, q4_assistance: null };
     this.state.resultTariffId = null;
+    this.state.feedback = { state: 'idle', rating: null, reasons: [] };
     this.render();
   };
 
@@ -455,6 +542,185 @@
     shell.style.setProperty('--tw-bg-img', 'url("' + safeCssUrl(this.options.premiumVisualImageUrl) + '")');
   };
 
+  Widget.prototype.createFeedbackBlock = function (tariffId) {
+    var self = this;
+    var fb = this.state.feedback || { state: 'idle', rating: null, reasons: [] };
+
+    var CHIPSET = [
+      { id: 'too_many_questions', label: 'Слишком много вопросов' },
+      { id: 'unclear_terms', label: 'Сложно понять термины' },
+      { id: 'unclear_recommendation', label: 'Не понял, почему предложили этот тариф' },
+      { id: 'missing_instruments', label: 'Не нашёл нужные инструменты' },
+      { id: 'takes_too_long', label: 'Долго проходить' },
+      { id: 'other', label: 'Другое' },
+    ];
+
+    function buildPayload(rating, reasons) {
+      return {
+        session_id: self.sessionId,
+        user_id: self.options.userId || undefined,
+        tariff_id: String(tariffId),
+        rating: rating,
+        reasons: rating <= 3 ? (reasons || []) : undefined,
+        flow_version: String(self.options.flowVersion || FLOW_VERSION),
+        timestamp: new Date().toISOString(),
+        platform: getPlatformHint(),
+        ab_group: self.options.abGroup || undefined,
+      };
+    }
+
+    function submit(payload) {
+      track(self, 'feedback_submit', {
+        tariff_id: payload.tariff_id,
+        rating: payload.rating,
+        reasons_count: Array.isArray(payload.reasons) ? payload.reasons.length : 0,
+        flow_version: payload.flow_version,
+      });
+      if (!self.options.feedbackEndpoint) return;
+      postJsonWithRetry(self.options.feedbackEndpoint, payload, 3)
+        .then(function (ok) {
+          track(self, ok ? 'feedback_submit_success' : 'feedback_submit_fail', { tariff_id: payload.tariff_id });
+        })
+        .catch(function () {});
+    }
+
+    function setFb(next) {
+      self.state.feedback = next;
+      self.render();
+    }
+
+    function completeNow(payload) {
+      // silent-fail submission
+      try {
+        submit(payload);
+      } catch (_) {}
+      setFb({ state: 'completed', rating: payload.rating, reasons: payload.reasons || [] });
+      track(self, 'feedback_completed', { tariff_id: String(tariffId), rating: payload.rating });
+    }
+
+    var wrap = el('div', { class: 'tw-feedback', 'aria-label': 'Оценка удобства подбора тарифа' });
+
+    if (fb.state === 'completed') {
+      wrap.appendChild(el('div', { class: 'tw-feedbackTitle', text: 'Спасибо!' }));
+      wrap.appendChild(
+        el(
+          'div',
+          { class: 'tw-feedbackDone' },
+          el('div', { class: 'tw-doneIcon', text: '✓', 'aria-hidden': 'true' }),
+          el('div', { class: 'tw-feedbackSub', text: 'Мы учтём ваш отзыв.' })
+        )
+      );
+      return wrap;
+    }
+
+    wrap.appendChild(el('div', { class: 'tw-feedbackTitle', text: 'Насколько удобным был подбор тарифа?' }));
+    wrap.appendChild(el('div', { class: 'tw-feedbackSub', text: 'Оценка займёт пару секунд' }));
+
+    var stars = el('div', { class: 'tw-stars', role: 'radiogroup', 'aria-label': 'Оценка 1–5' });
+    var hovered = 0;
+
+    function renderStars(active) {
+      while (stars.firstChild) stars.removeChild(stars.firstChild);
+      for (var i = 1; i <= 5; i++) {
+        (function (value) {
+          var on = value <= active;
+          var btn = el('button', {
+            class: on ? 'tw-starBtn is-on' : 'tw-starBtn',
+            type: 'button',
+            role: 'radio',
+            'aria-checked': fb.rating === value ? 'true' : 'false',
+            'aria-label': String(value),
+            onClick: function () {
+              // If already rated, ignore.
+              if (fb.rating != null && fb.state !== 'idle') return;
+              var rating = value;
+              track(self, 'feedback_rated', { tariff_id: String(tariffId), rating: rating });
+
+              if (rating >= 4) {
+                setFb({ state: 'rated_positive', rating: rating, reasons: [] });
+                // Inline confirmation + auto complete
+                try {
+                  if (self._feedbackTimer) clearTimeout(self._feedbackTimer);
+                } catch (_) {}
+                self._feedbackTimer = setTimeout(function () {
+                  completeNow(buildPayload(rating, []));
+                }, 1200);
+              } else {
+                setFb({ state: 'rated_negative', rating: rating, reasons: [] });
+              }
+            },
+          });
+          btn.addEventListener('mouseenter', function () {
+            if (fb.rating != null && fb.state !== 'idle') return;
+            hovered = value;
+            renderStars(hovered);
+          });
+          btn.addEventListener('mouseleave', function () {
+            if (fb.rating != null && fb.state !== 'idle') return;
+            hovered = 0;
+            renderStars(fb.rating || 0);
+          });
+          btn.appendChild(el('span', { class: 'tw-star', text: '★', 'aria-hidden': 'true' }));
+          stars.appendChild(btn);
+        })(i);
+      }
+    }
+
+    renderStars(fb.rating || 0);
+    wrap.appendChild(stars);
+
+    if (fb.state === 'rated_positive' && fb.rating != null) {
+      wrap.appendChild(el('div', { class: 'tw-feedbackThanks', text: 'Спасибо за оценку!' }));
+    }
+
+    if (fb.state === 'rated_negative' && fb.rating != null) {
+      wrap.appendChild(el('div', { class: 'tw-chipTitle', text: 'Что было неудобно?' }));
+      var chips = el('div', { class: 'tw-chips' });
+      CHIPSET.forEach(function (c) {
+        var selected = Array.isArray(fb.reasons) && fb.reasons.indexOf(c.id) !== -1;
+        var chip = el('button', {
+          class: selected ? 'tw-chip is-selected' : 'tw-chip',
+          type: 'button',
+          onClick: function () {
+            var nextReasons = Array.isArray(fb.reasons) ? fb.reasons.slice() : [];
+            var idx = nextReasons.indexOf(c.id);
+            if (idx === -1) nextReasons.push(c.id);
+            else nextReasons.splice(idx, 1);
+            track(self, 'feedback_reason_toggled', { tariff_id: String(tariffId), reason: c.id, selected: idx === -1 });
+            // Fast finish on first selection (≤ 10 seconds total)
+            if (idx === -1) {
+              completeNow(buildPayload(fb.rating, nextReasons));
+            } else {
+              setFb({ state: 'rated_negative', rating: fb.rating, reasons: nextReasons });
+            }
+          },
+        });
+        chip.textContent = c.label;
+        chips.appendChild(chip);
+      });
+      wrap.appendChild(chips);
+      wrap.appendChild(
+        el('button', {
+          class: 'tw-skip',
+          type: 'button',
+          onClick: function () {
+            completeNow(buildPayload(fb.rating, []));
+          },
+          text: 'Пропустить',
+        })
+      );
+    }
+
+    try {
+      if (!self._feedbackShownOnce) {
+        self._feedbackShownOnce = true;
+        track(self, 'feedback_shown', { tariff_id: String(tariffId) });
+      }
+    } catch (_) {}
+
+    return wrap;
+  };
+
   Widget.prototype.renderIntroScreen = function (container) {
     var self = this;
     var shell = el('div', { class: 'tw-shell tw-widgetShell' });
@@ -470,7 +736,12 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    var grid = el(
+      'div',
+      { class: 'tw-two-col' },
+      el('div', null),
+      this.options.feedbackEnabled ? this.createFeedbackBlock(tariffId) : this.createPremiumVisual()
+    );
     var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card' });
