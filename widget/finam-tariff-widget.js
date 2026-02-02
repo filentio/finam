@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.16
+ * Version: 1.0.17
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.16';
+  var VERSION = '1.0.17';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -420,9 +420,7 @@
       '.ftw .tw-chip{height:36px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease}' +
       '.ftw .tw-chip:hover{background:rgba(255,255,255,0.10)}' +
       '.ftw .tw-chip.is-selected{background:rgba(255,199,89,0.12);border-color:rgba(255,186,48,0.45)}' +
-      '.ftw .tw-skip{margin-top:12px;font-size:13px;font-weight:700;color:var(--ui-text-inverse-secondary);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}' +
-      '.ftw .tw-skip:hover{color:var(--ui-text-inverse)}' +
-      '.ftw .tw-feedbackActions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;flex-wrap:wrap}' +
+      '.ftw .tw-feedbackActions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:16px;flex-wrap:wrap}' +
       '.ftw .tw-feedbackBtn{height:40px;padding:0 16px;border-radius:12px;font-family:var(--ui-font);font-size:14px;line-height:18px;font-weight:800;background:rgba(255,255,255,0.08);color:var(--ui-text-inverse);border:1px solid rgba(255,255,255,0.14);cursor:pointer;transition:background .15s ease,transform .05s ease}' +
       '.ftw .tw-feedbackBtn:hover{background:rgba(255,255,255,0.12)}' +
       '.ftw .tw-feedbackBtn:active{transform:translateY(1px)}' +
@@ -652,52 +650,52 @@
     wrap.appendChild(el('div', { class: 'tw-feedbackSub', text: 'Оценка займёт пару секунд' }));
 
     var stars = el('div', { class: 'tw-stars', role: 'radiogroup', 'aria-label': 'Оценка 1–5' });
-    var hovered = 0;
+    var starButtons = [];
 
-    function renderStars(active) {
-      while (stars.firstChild) stars.removeChild(stars.firstChild);
-      for (var i = 1; i <= 5; i++) {
-        (function (value) {
-          var on = value <= active;
-          var btn = el('button', {
-            class: on ? 'tw-starBtn is-on' : 'tw-starBtn',
-            type: 'button',
-            role: 'radio',
-            'aria-checked': fb.rating === value ? 'true' : 'false',
-            'aria-label': String(value),
-            onClick: function () {
-              var rating = value;
-              track(self, 'feedback_rated', { tariff_id: String(tariffId), rating: rating });
-
-              if (rating >= 4) {
-                setFb({ state: 'rated_positive', rating: rating, reasons: [] });
-              } else {
-                setFb({ state: 'rated_negative', rating: rating, reasons: Array.isArray(fb.reasons) ? fb.reasons : [] });
-              }
-            },
-          });
-          btn.addEventListener('mouseenter', function () {
-            hovered = value;
-            renderStars(hovered);
-          });
-          btn.addEventListener('mouseleave', function () {
-            hovered = 0;
-            renderStars(fb.rating || 0);
-          });
-          btn.appendChild(el('span', { class: 'tw-star', text: '★', 'aria-hidden': 'true' }));
-          stars.appendChild(btn);
-        })(i);
+    function updateStars(active) {
+      for (var i = 0; i < starButtons.length; i++) {
+        var btn = starButtons[i];
+        var value = i + 1;
+        if (!btn) continue;
+        if (value <= active) btn.classList.add('is-on');
+        else btn.classList.remove('is-on');
+        try {
+          btn.setAttribute('aria-checked', fb.rating === value ? 'true' : 'false');
+        } catch (_) {}
       }
     }
 
-    renderStars(fb.rating || 0);
+    for (var i = 1; i <= 5; i++) {
+      (function (value) {
+        var btn = el('button', {
+          class: 'tw-starBtn',
+          type: 'button',
+          role: 'radio',
+          'aria-checked': fb.rating === value ? 'true' : 'false',
+          'aria-label': String(value),
+          onClick: function () {
+            var rating = value;
+            track(self, 'feedback_rated', { tariff_id: String(tariffId), rating: rating });
+            var nextState = rating >= 4 ? 'rated_positive' : 'rated_negative';
+            setFb({ state: nextState, rating: rating, reasons: Array.isArray(fb.reasons) ? fb.reasons : [] });
+          },
+        });
+        btn.addEventListener('mouseenter', function () {
+          // lightweight hover highlight (no re-render)
+          updateStars(value);
+        });
+        starButtons.push(btn);
+        btn.appendChild(el('span', { class: 'tw-star', text: '★', 'aria-hidden': 'true' }));
+        stars.appendChild(btn);
+      })(i);
+    }
+    stars.addEventListener('mouseleave', function () {
+      updateStars(fb.rating || 0);
+    });
+    updateStars(fb.rating || 0);
     wrap.appendChild(stars);
 
-    if (fb.state === 'rated_positive' && fb.rating != null) {
-      wrap.appendChild(el('div', { class: 'tw-feedbackThanks', text: 'Спасибо за оценку!' }));
-    }
-
-    if (fb.state === 'rated_negative' && fb.rating != null) {
+    if (fb.rating != null && fb.rating <= 3) {
       wrap.appendChild(el('div', { class: 'tw-chipTitle', text: 'Что было неудобно?' }));
       var chips = el('div', { class: 'tw-chips' });
       CHIPSET.forEach(function (c) {
@@ -720,19 +718,8 @@
       wrap.appendChild(chips);
     }
 
-    // Actions: submit + optional skip (never blocks main CTA)
+    // Actions: explicit submit (non-competing with main CTA)
     var actions = el('div', { class: 'tw-feedbackActions' });
-    actions.appendChild(
-      el('button', {
-        class: 'tw-skip',
-        type: 'button',
-        onClick: function () {
-          track(self, 'feedback_skipped', { tariff_id: String(tariffId) });
-          setFb({ state: 'completed', rating: null, reasons: [] });
-        },
-        text: 'Пропустить',
-      })
-    );
     actions.appendChild(
       el('button', {
         class: 'tw-feedbackBtn',
