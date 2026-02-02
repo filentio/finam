@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.12
+ * Version: 1.0.13
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.12';
+  var VERSION = '1.0.13';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -971,17 +971,78 @@
     return new Widget(elTarget, options || {});
   }
 
+  function findScriptElement(doc) {
+    try {
+      var scripts = doc.getElementsByTagName ? doc.getElementsByTagName('script') : [];
+      for (var i = scripts.length - 1; i >= 0; i--) {
+        var s = scripts[i];
+        var src = s && s.src ? String(s.src) : '';
+        if (src && src.indexOf('finam-tariff-widget.js') !== -1) return s;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function queryAllDeep(root, selector) {
+    var out = [];
+    function walk(node) {
+      if (!node) return;
+      // node can be Document or ShadowRoot
+      try {
+        if (node.querySelectorAll) {
+          var list = node.querySelectorAll(selector);
+          for (var i = 0; i < list.length; i++) out.push(list[i]);
+        }
+      } catch (_) {}
+      // Walk shadow roots
+      try {
+        var tree = node.querySelectorAll ? node.querySelectorAll('*') : [];
+        for (var j = 0; j < tree.length; j++) {
+          var el = tree[j];
+          if (el && el.shadowRoot) walk(el.shadowRoot);
+        }
+      } catch (_) {}
+    }
+    walk(root);
+    return out;
+  }
+
+  function ensureContainerNearScript(doc) {
+    try {
+      var script = findScriptElement(doc);
+      if (!script || !script.parentNode) return null;
+      // Avoid duplicates
+      var existing = null;
+      try {
+        existing = script.parentNode.querySelector && script.parentNode.querySelector('[data-finam-tariff-widget],#finam-tariff');
+      } catch (_) {}
+      if (existing) return existing;
+
+      var d = doc;
+      var div = d.createElement('div');
+      div.setAttribute('data-finam-tariff-widget', '');
+      div.style.width = '100%';
+      // insert after script
+      if (script.nextSibling) script.parentNode.insertBefore(div, script.nextSibling);
+      else script.parentNode.appendChild(div);
+      return div;
+    } catch (_) {}
+    return null;
+  }
+
   function autoMountInDocument(doc) {
     if (!doc || !doc.querySelectorAll) return;
+    var mountedAny = false;
 
     // data-attribute mounting
-    var nodes = doc.querySelectorAll('[data-finam-tariff-widget]');
+    var nodes = queryAllDeep(doc, '[data-finam-tariff-widget]');
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].__finamTariffWidgetMounted) continue;
       nodes[i].__finamTariffWidgetMounted = true;
       try {
         // mount must run in the same document where target lives
         new Widget(nodes[i], {});
+        mountedAny = true;
       } catch (e) {
         try {
           nodes[i].__finamTariffWidgetMounted = false;
@@ -1003,6 +1064,7 @@
       byId.__finamTariffWidgetMounted = true;
       try {
         new Widget(byId, {});
+        mountedAny = true;
       } catch (e2) {
         try {
           byId.__finamTariffWidgetMounted = false;
@@ -1012,6 +1074,27 @@
             global.console.error('[FinamTariffWidget] mount failed', e2);
           }
         } catch (_) {}
+      }
+    }
+
+    // If nothing found/mounted, create a container next to the script tag and mount there.
+    if (!mountedAny) {
+      var created = ensureContainerNearScript(doc);
+      if (created && !created.__finamTariffWidgetMounted) {
+        created.__finamTariffWidgetMounted = true;
+        try {
+          new Widget(created, {});
+          mountedAny = true;
+        } catch (e3) {
+          try {
+            created.__finamTariffWidgetMounted = false;
+          } catch (_) {}
+          try {
+            if (global.console && typeof global.console.error === 'function') {
+              global.console.error('[FinamTariffWidget] mount failed', e3);
+            }
+          } catch (_) {}
+        }
       }
     }
   }
