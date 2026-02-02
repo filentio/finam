@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.10
+ * Version: 1.0.11
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.10';
+  var VERSION = '1.0.11';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -320,7 +320,7 @@
   function cssText() {
     return (
       '' +
-      ':host{all:initial}' +
+      ':host{all:initial;display:block;width:100%}' +
       /* Tokens (Finam premium dark + gold). */
       '.ftw{' +
       '--ui-font: \"Inter var\", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;' +
@@ -976,7 +976,19 @@
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].__finamTariffWidgetMounted) continue;
       nodes[i].__finamTariffWidgetMounted = true;
-      mount(nodes[i], {});
+      try {
+        mount(nodes[i], {});
+      } catch (e) {
+        // Don't leave the container stuck in "mounted" state.
+        try {
+          nodes[i].__finamTariffWidgetMounted = false;
+        } catch (_) {}
+        try {
+          if (global.console && typeof global.console.error === 'function') {
+            global.console.error('[FinamTariffWidget] mount failed', e);
+          }
+        } catch (_) {}
+      }
     }
   }
 
