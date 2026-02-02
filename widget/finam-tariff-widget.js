@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.15
+ * Version: 1.0.16
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.15';
+  var VERSION = '1.0.16';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -422,6 +422,11 @@
       '.ftw .tw-chip.is-selected{background:rgba(255,199,89,0.12);border-color:rgba(255,186,48,0.45)}' +
       '.ftw .tw-skip{margin-top:12px;font-size:13px;font-weight:700;color:var(--ui-text-inverse-secondary);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}' +
       '.ftw .tw-skip:hover{color:var(--ui-text-inverse)}' +
+      '.ftw .tw-feedbackActions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;flex-wrap:wrap}' +
+      '.ftw .tw-feedbackBtn{height:40px;padding:0 16px;border-radius:12px;font-family:var(--ui-font);font-size:14px;line-height:18px;font-weight:800;background:rgba(255,255,255,0.08);color:var(--ui-text-inverse);border:1px solid rgba(255,255,255,0.14);cursor:pointer;transition:background .15s ease,transform .05s ease}' +
+      '.ftw .tw-feedbackBtn:hover{background:rgba(255,255,255,0.12)}' +
+      '.ftw .tw-feedbackBtn:active{transform:translateY(1px)}' +
+      '.ftw .tw-feedbackBtn[disabled]{opacity:0.55;cursor:not-allowed;transform:none}' +
       '.ftw .tw-feedbackThanks{margin-top:14px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
       '.ftw .tw-feedbackDone{display:flex;gap:10px;align-items:flex-start;margin-top:14px}' +
       '.ftw .tw-doneIcon{width:28px;height:28px;border-radius:10px;background:rgba(255,199,89,0.12);border:1px solid rgba(255,186,48,0.35);display:flex;align-items:center;justify-content:center;color:var(--ui-brand);font-weight:900}' +
@@ -661,32 +666,21 @@
             'aria-checked': fb.rating === value ? 'true' : 'false',
             'aria-label': String(value),
             onClick: function () {
-              // If already rated, ignore.
-              if (fb.rating != null && fb.state !== 'idle') return;
               var rating = value;
               track(self, 'feedback_rated', { tariff_id: String(tariffId), rating: rating });
 
               if (rating >= 4) {
                 setFb({ state: 'rated_positive', rating: rating, reasons: [] });
-                // Inline confirmation + auto complete
-                try {
-                  if (self._feedbackTimer) clearTimeout(self._feedbackTimer);
-                } catch (_) {}
-                self._feedbackTimer = setTimeout(function () {
-                  completeNow(buildPayload(rating, []));
-                }, 1200);
               } else {
-                setFb({ state: 'rated_negative', rating: rating, reasons: [] });
+                setFb({ state: 'rated_negative', rating: rating, reasons: Array.isArray(fb.reasons) ? fb.reasons : [] });
               }
             },
           });
           btn.addEventListener('mouseenter', function () {
-            if (fb.rating != null && fb.state !== 'idle') return;
             hovered = value;
             renderStars(hovered);
           });
           btn.addEventListener('mouseleave', function () {
-            if (fb.rating != null && fb.state !== 'idle') return;
             hovered = 0;
             renderStars(fb.rating || 0);
           });
@@ -717,29 +711,41 @@
             if (idx === -1) nextReasons.push(c.id);
             else nextReasons.splice(idx, 1);
             track(self, 'feedback_reason_toggled', { tariff_id: String(tariffId), reason: c.id, selected: idx === -1 });
-            // Fast finish on first selection (≤ 10 seconds total)
-            if (idx === -1) {
-              completeNow(buildPayload(fb.rating, nextReasons));
-            } else {
-              setFb({ state: 'rated_negative', rating: fb.rating, reasons: nextReasons });
-            }
+            setFb({ state: 'rated_negative', rating: fb.rating, reasons: nextReasons });
           },
         });
         chip.textContent = c.label;
         chips.appendChild(chip);
       });
       wrap.appendChild(chips);
-      wrap.appendChild(
-        el('button', {
-          class: 'tw-skip',
-          type: 'button',
-          onClick: function () {
-            completeNow(buildPayload(fb.rating, []));
-          },
-          text: 'Пропустить',
-        })
-      );
     }
+
+    // Actions: submit + optional skip (never blocks main CTA)
+    var actions = el('div', { class: 'tw-feedbackActions' });
+    actions.appendChild(
+      el('button', {
+        class: 'tw-skip',
+        type: 'button',
+        onClick: function () {
+          track(self, 'feedback_skipped', { tariff_id: String(tariffId) });
+          setFb({ state: 'completed', rating: null, reasons: [] });
+        },
+        text: 'Пропустить',
+      })
+    );
+    actions.appendChild(
+      el('button', {
+        class: 'tw-feedbackBtn',
+        type: 'button',
+        disabled: fb.rating == null,
+        onClick: function () {
+          if (fb.rating == null) return;
+          completeNow(buildPayload(fb.rating, Array.isArray(fb.reasons) ? fb.reasons : []));
+        },
+        text: 'Отправить',
+      })
+    );
+    wrap.appendChild(actions);
 
     try {
       if (!self._feedbackShownOnce) {
