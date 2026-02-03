@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.23
+ * Version: 1.0.24
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.23';
+  var VERSION = '1.0.24';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -707,6 +707,16 @@
     this._feedbackTimer = null;
     this._feedbackShownOnce = false;
     this.sessionId = getSessionId();
+    this._analyticsState = {
+      started: false,
+      completed: false,
+      resultShown: false,
+      abandonedReported: false,
+      feedbackSubmitted: false,
+      feedbackMissingReported: false,
+      lastQuestionViewedStep: null,
+    };
+    this._bindAnalyticsLifecycle();
 
     this.state = {
       mode: 'intro', // 'intro' | 'question' | 'result' | 'error'
@@ -725,6 +735,70 @@
     this.render();
   }
 
+  Widget.prototype.answersSnapshot = function () {
+    var a = this.state && this.state.answers ? this.state.answers : {};
+    return {
+      q1_goal: a.q1_goal || null,
+      q2_frequency: a.q2_frequency || null,
+      q3_instruments: a.q3_instruments || null,
+      q4_assistance: a.q4_assistance || null,
+    };
+  };
+
+  Widget.prototype._bindAnalyticsLifecycle = function () {
+    var self = this;
+    if (this._analyticsLifecycleBound) return;
+    this._analyticsLifecycleBound = true;
+
+    function maybeReport(reason) {
+      try {
+        // Abandon: started but not completed
+        if (self._analyticsState.started && !self._analyticsState.completed && !self._analyticsState.abandonedReported) {
+          self._analyticsState.abandonedReported = true;
+          var step = self.state && typeof self.state.step === 'number' ? self.state.step : 0;
+          var q = QUESTIONS[step];
+          track(self, 'widget_abandoned', {
+            reason: reason,
+            step: step + 1,
+            total: QUESTIONS.length,
+            question_id: q ? q.id : null,
+            answers: self.answersSnapshot(),
+            session_id: self.sessionId,
+            flow_version: self.options.flowVersion || FLOW_VERSION,
+          });
+        }
+
+        // Feedback missing: completed (result shown) but user left without submitting
+        if (
+          self._analyticsState.completed &&
+          self._analyticsState.resultShown &&
+          self.options &&
+          self.options.feedbackEnabled &&
+          !self._analyticsState.feedbackSubmitted &&
+          !self._analyticsState.feedbackMissingReported
+        ) {
+          self._analyticsState.feedbackMissingReported = true;
+          track(self, 'feedback_not_left', {
+            reason: reason,
+            tariff_id: String(self.state && self.state.resultTariffId ? self.state.resultTariffId : self.recommendTariffId()),
+            answers: self.answersSnapshot(),
+            session_id: self.sessionId,
+            flow_version: self.options.flowVersion || FLOW_VERSION,
+          });
+        }
+      } catch (_) {}
+    }
+
+    try {
+      window.addEventListener('pagehide', function () {
+        maybeReport('pagehide');
+      });
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') maybeReport('visibility_hidden');
+      });
+    } catch (_) {}
+  };
+
   Widget.prototype.setState = function (patch) {
     for (var k in patch) this.state[k] = patch[k];
     this.render();
@@ -732,7 +806,14 @@
 
   Widget.prototype.setAnswer = function (id, value) {
     this.state.answers[id] = value;
-    track(this, 'question_answered', { question_id: id, answer_id: String(value) });
+    track(this, 'question_answered', {
+      question_id: id,
+      answer_id: String(value),
+      step: (this.state.step || 0) + 1,
+      total: QUESTIONS.length,
+      session_id: this.sessionId,
+      flow_version: this.options.flowVersion || FLOW_VERSION,
+    });
     this.render();
   };
 
@@ -832,6 +913,9 @@
       // silent-fail submission
       try {
         submit(payload);
+      } catch (_) {}
+      try {
+        self._analyticsState.feedbackSubmitted = true;
       } catch (_) {}
       setFb({ state: 'completed', rating: payload.rating, reasons: payload.reasons || [] });
       track(self, 'feedback_completed', { tariff_id: String(tariffId), rating: payload.rating });
@@ -978,7 +1062,8 @@
           el('button', {
             class: 'tw-btn tw-btn-primary',
             onClick: function () {
-              track(self, 'widget_start', {});
+              self._analyticsState.started = true;
+              track(self, 'widget_start', { session_id: self.sessionId, flow_version: self.options.flowVersion || FLOW_VERSION });
               // Fix questionnaire height to prevent layout jumps between questions.
               // Value chosen to comfortably fit longest question on desktop.
               self._fixedQuestionHeight = 620;
@@ -1000,6 +1085,21 @@
     var q = QUESTIONS[this.state.step];
     var total = QUESTIONS.length;
     var current = this.state.step + 1;
+
+    // Question view analytics (once per step)
+    try {
+      if (this._analyticsState.lastQuestionViewedStep !== this.state.step) {
+        this._analyticsState.lastQuestionViewedStep = this.state.step;
+        track(this, 'question_viewed', {
+          question_id: q ? q.id : null,
+          step: current,
+          total: total,
+          answers: this.answersSnapshot(),
+          session_id: this.sessionId,
+          flow_version: this.options.flowVersion || FLOW_VERSION,
+        });
+      }
+    } catch (_) {}
 
     var shell = el('div', { class: 'tw-shell tw-widgetShell' });
     if (this._fixedQuestionHeight) shell.style.minHeight = this._fixedQuestionHeight + 'px';
@@ -1066,7 +1166,12 @@
         } catch (_) {}
         if (!isLast) self.setState({ step: self.state.step + 1 });
         else {
-          track(self, 'widget_completed', {});
+          self._analyticsState.completed = true;
+          track(self, 'widget_completed', {
+            session_id: self.sessionId,
+            flow_version: self.options.flowVersion || FLOW_VERSION,
+            answers: self.answersSnapshot(),
+          });
           var id = self.recommendTariffId();
           assertValidTariff(id);
           self.setState({ mode: 'result', resultTariffId: id });
@@ -1092,6 +1197,12 @@
     assertValidTariff(tariffId);
     var t = tariffById(tariffId);
     if (!t) return;
+    track(this, 'tariff_cta_clicked', {
+      tariff_id: tariffId,
+      session_id: this.sessionId,
+      flow_version: this.options.flowVersion || FLOW_VERSION,
+      answers: this.answersSnapshot(),
+    });
     track(this, 'tariff_recommended', { tariff_id: tariffId });
     try {
       var w = window.open(t.url, '_blank', 'noopener,noreferrer');
@@ -1108,6 +1219,18 @@
       this.setState({ mode: 'error' });
       return;
     }
+
+    try {
+      if (!this._analyticsState.resultShown) {
+        this._analyticsState.resultShown = true;
+        track(this, 'result_shown', {
+          tariff_id: String(tariffId),
+          answers: this.answersSnapshot(),
+          session_id: this.sessionId,
+          flow_version: this.options.flowVersion || FLOW_VERSION,
+        });
+      }
+    } catch (_) {}
 
     var shell = el('div', { class: 'tw-shell tw-widgetShell' });
     var header = el(
