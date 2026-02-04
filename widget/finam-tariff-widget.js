@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.24
+ * Version: 1.0.25
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.24';
+  var VERSION = '1.0.25';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -26,6 +26,11 @@
     userId: null, // optional
     abGroup: null, // optional
     flowVersion: FLOW_VERSION, // analytics/feedback versioning
+    // Optional: additional CTA on result screen (kept secondary, not competing with tariff CTA)
+    openAccountUrl: '', // e.g. https://broker.finam.ru/...
+    openAccountText: 'Открыть счёт',
+    // Optional: social proof line on result screen (shown under title)
+    socialProofText: '',
   };
 
   // STRICT WHITELIST (DO NOT CHANGE NAMES/URLS)
@@ -485,35 +490,35 @@
       benefits: [
         'Подходит для спокойного долгосрочного подхода',
         'Удобен, если вы реже совершаете сделки',
-        'Можно перейти и посмотреть условия тарифа',
+        'Хороший выбор, если важна понятная стратегия на годы',
       ],
     },
     n2_day: {
       benefits: [
         'Подходит, если вы планируете активные сделки',
         'Удобен для динамичной торговли',
-        'Можно перейти и посмотреть условия тарифа',
+        'Подходит, если важна скорость и гибкость в сделках',
       ],
     },
     n3_investor: {
       benefits: [
         'Понятный старт без лишней сложности',
         'Подходит, если вы пока определяетесь со стратегией',
-        'Можно перейти и посмотреть условия тарифа',
+        'Удобен, чтобы начать и разобраться в процессе',
       ],
     },
     n4_strateg: {
       benefits: [
-        'Можно перейти и посмотреть условия тарифа',
         'Подходит, если вам ближе готовые подходы',
         'Помогает действовать более системно',
+        'Удобен для последовательного подхода к решениям',
       ],
     },
     n5_consulting: {
       benefits: [
         'Подходит, если вам важны подсказки и сопровождение',
         'Помогает инвестировать с поддержкой',
-        'Можно перейти и посмотреть условия тарифа',
+        'Удобен, если хотите больше уверенности в действиях',
       ],
     },
   };
@@ -582,6 +587,8 @@
       '.ftw .tw-chip{height:34px;font-size:13px}' +
       '.ftw .tw-feedbackActions{justify-content:stretch}' +
       '.ftw .tw-feedbackBtn{width:100%}' +
+      '.ftw .tw-premium-card{padding:12px;border-radius:14px}' +
+      '.ftw .tw-premium-text{font-size:13px;line-height:17px}' +
       '}' +
       '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
       '.ftw .tw-meta{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin:0 0 10px 0}' +
@@ -600,6 +607,10 @@
       '.ftw .tw-premium-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:right center;background-repeat:no-repeat;opacity:0.92;filter:saturate(1.05) contrast(1.05);transform:scale(1.03)}' +
       '.ftw .tw-premium-overlay{position:absolute;inset:0;z-index:1;background-image:var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge);pointer-events:none}' +
       '.ftw .tw-premium-visual::after{content:\"\";position:absolute;z-index:2;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8;pointer-events:none}' +
+      '.ftw .tw-premium-content{position:absolute;z-index:3;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;padding:18px;pointer-events:none}' +
+      '.ftw .tw-premium-card{pointer-events:none;max-width:92%;border-radius:16px;background:rgba(21,21,25,0.62);border:1px solid rgba(255,255,255,0.12);box-shadow:0 8px 20px rgba(0,0,0,0.25);padding:14px}' +
+      '.ftw .tw-premium-kicker{font-size:12px;line-height:16px;font-weight:800;color:rgba(255,199,89,0.95);letter-spacing:0.02em;margin:0 0 6px 0}' +
+      '.ftw .tw-premium-text{font-size:14px;line-height:18px;font-weight:700;color:var(--ui-text-inverse);margin:0}' +
       /* Inner card */
       '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
       /* Solid card (questions/results) to keep readability over visuals */
@@ -858,6 +869,27 @@
     return wrap;
   };
 
+  Widget.prototype.createPromoRightPanel = function (step) {
+    // Right panel for question screens: keeps visual, adds non-interactive promo copy.
+    var PROMOS = [
+      { kicker: 'Финам Бонус', text: 'Сервис с бонусами и привилегиями для клиентов' },
+      { kicker: 'Обучение', text: 'Курсы и материалы для начинающих инвесторов' },
+      { kicker: 'Партнёры', text: 'Полезные сервисы и предложения для клиентов' },
+      { kicker: 'Надёжность', text: 'Узнайте, почему нам доверяют инвесторы' },
+    ];
+    var idx = typeof step === 'number' ? step % PROMOS.length : 0;
+    var p = PROMOS[idx];
+
+    var panel = this.createPremiumVisual();
+    var content = el(
+      'div',
+      { class: 'tw-premium-content' },
+      el('div', { class: 'tw-premium-card' }, el('div', { class: 'tw-premium-kicker', text: p.kicker }), el('div', { class: 'tw-premium-text', text: p.text }))
+    );
+    panel.appendChild(content);
+    return panel;
+  };
+
   Widget.prototype.applyBackgroundImage = function (shell) {
     if (!shell) return;
     if (!this.options.premiumVisualImageUrl) return;
@@ -1043,8 +1075,8 @@
       el(
         'div',
         null,
-        el('div', { class: 'tw-h1', text: 'Поможем подобрать тариф' }),
-        el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — покажем подходящий тариф.' })
+        el('div', { class: 'tw-h1', text: 'Подбор тарифа' }),
+        el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — покажем подходящий тариф' })
       )
     );
     shell.appendChild(header);
@@ -1054,7 +1086,7 @@
 
     var card = el('div', { class: 'tw-card' });
     card.appendChild(el('div', { class: 'tw-heroTitle', text: 'Выберите тариф, который подойдёт именно вам' }));
-    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Предложим оптимальный тариф без лишних сложностей.' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Предложим оптимальный тариф без лишних сложностей' }));
     card.appendChild(
       el('div', { class: 'tw-actions' },
         el('div', { class: 'tw-actions-left' }),
@@ -1109,14 +1141,14 @@
       el(
         'div',
         null,
-        el('div', { class: 'tw-h1', text: 'Поможем подобрать тариф' }),
-        el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — покажем подходящий тариф.' })
+        el('div', { class: 'tw-h1', text: 'Подбор тарифа' }),
+        el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — покажем подходящий тариф' })
       )
     );
     shell.appendChild(header);
 
-    // Two columns on questions: stable card width, visual on the right.
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    // Two columns on questions: stable card width, promo/visual on the right.
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPromoRightPanel(this.state.step));
     var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card tw-cardSolid' });
@@ -1126,6 +1158,8 @@
     card.appendChild(pb);
 
     card.appendChild(el('div', { class: 'tw-questionTitle', text: q.title }));
+    // Helper text should be above options (more likely to be read)
+    if (q.helperText) card.appendChild(el('div', { class: 'tw-secondaryText', text: q.helperText }));
     var group = el('div', { class: 'tw-options', role: 'radiogroup', 'aria-label': q.title });
     q.options.forEach(function (o) {
       var checked = self.state.answers[q.id] === o.value;
@@ -1142,7 +1176,6 @@
       group.appendChild(row);
     });
     card.appendChild(group);
-    if (q.helperText) card.appendChild(el('div', { class: 'tw-secondaryText', text: q.helperText }));
 
     var back = el('button', {
       class: 'tw-btn tw-btn-secondary',
@@ -1266,6 +1299,7 @@
 
     var card = el('div', { class: 'tw-card tw-cardSolid' });
     card.appendChild(el('div', { class: 'tw-h2', text: 'Вам подходит тариф: ' + tariff.name }));
+    if (this.options.socialProofText) card.appendChild(el('div', { class: 'tw-secondaryText', text: String(this.options.socialProofText) }));
     card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Мы подобрали его на основе ваших ответов.' }));
     card.appendChild(el('div', { class: 'tw-divider' }));
 
@@ -1283,6 +1317,27 @@
           el('button', { class: 'tw-btn tw-btn-secondary', onClick: function () { self.resetQuestionnaire(); }, text: 'Пройти заново' })
         ),
         el('div', { class: 'tw-actions-right' },
+          (function () {
+            if (!self.options.openAccountUrl) return null;
+            return el('button', {
+              class: 'tw-btn tw-btn-secondary',
+              onClick: function () {
+                try {
+                  track(self, 'account_open_clicked', {
+                    session_id: self.sessionId,
+                    flow_version: self.options.flowVersion || FLOW_VERSION,
+                    tariff_id: String(tariffId),
+                    answers: self.answersSnapshot(),
+                  });
+                } catch (_) {}
+                try {
+                  var w2 = window.open(self.options.openAccountUrl, '_blank', 'noopener,noreferrer');
+                  if (!w2) window.location.href = self.options.openAccountUrl;
+                } catch (_) {}
+              },
+              text: self.options.openAccountText || 'Открыть счёт',
+            });
+          })(),
           el('button', { class: 'tw-btn tw-btn-primary', onClick: function () { self.openTariff(tariffId); }, text: 'Перейти к тарифу' })
         )
       )
