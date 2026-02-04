@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.25
+ * Version: 1.0.26
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.25';
+  var VERSION = '1.0.26';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -31,6 +31,13 @@
     openAccountText: 'Открыть счёт',
     // Optional: social proof line on result screen (shown under title)
     socialProofText: '',
+    // Optional: tariff metrics shown on result screen (recommended to keep numbers outside code)
+    // Shape:
+    // {
+    //   n1_dolgosrochniy: [{ value: '0%', label: 'Покупка ценных бумаг РФ' }, ...],
+    //   ...
+    // }
+    tariffMetrics: null,
   };
 
   // STRICT WHITELIST (DO NOT CHANGE NAMES/URLS)
@@ -603,7 +610,8 @@
       '.ftw .tw-shell-bg > *{position:relative;z-index:1}' +
       '@media (max-width:860px){.ftw .tw-shell-bg::before{background-size:680px auto}}' +
       /* Premium visual */
-      '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background-color:var(--ui-bg-dark);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);position:relative;min-height:260px;overflow:hidden}' +
+      /* Make the right visual look like part of the shell (no separate frame) */
+      '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background:transparent;box-shadow:none;position:relative;min-height:260px;overflow:hidden}' +
       '.ftw .tw-premium-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:right center;background-repeat:no-repeat;opacity:0.92;filter:saturate(1.05) contrast(1.05);transform:scale(1.03)}' +
       '.ftw .tw-premium-overlay{position:absolute;inset:0;z-index:1;background-image:var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge);pointer-events:none}' +
       '.ftw .tw-premium-visual::after{content:\"\";position:absolute;z-index:2;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8;pointer-events:none}' +
@@ -656,6 +664,11 @@
       '.ftw .tw-bullets{list-style:none;padding:0;margin:16px 0;display:flex;flex-direction:column;gap:10px}' +
       '.ftw .tw-bullets li{display:grid;grid-template-columns:12px 1fr;gap:10px;align-items:start;color:var(--ui-text-inverse);font-weight:700;font-size:14px;line-height:20px}' +
       '.ftw .tw-bullets li::before{content:\"\";width:8px;height:8px;margin-top:6px;border-radius:999px;background:var(--ui-brand)}' +
+      /* Tariff metrics (result screen) */
+      '.ftw .tw-metrics{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:18px;margin:16px 0 6px 0}' +
+      '@media (max-width:860px){.ftw .tw-metrics{grid-template-columns:repeat(2, minmax(0, 1fr))}}' +
+      '.ftw .tw-metricVal{font-size:20px;line-height:24px;font-weight:900;color:var(--ui-text-inverse);margin:0}' +
+      '.ftw .tw-metricLbl{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin-top:6px}' +
       /* Actions */
       '.ftw .tw-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;flex-wrap:wrap}' +
       '.ftw .tw-actions-left{display:flex;gap:10px;flex-wrap:wrap}' +
@@ -754,6 +767,27 @@
       q3_instruments: a.q3_instruments || null,
       q4_assistance: a.q4_assistance || null,
     };
+  };
+
+  Widget.prototype.getTariffMetrics = function (tariffId) {
+    try {
+      var tm = this.options && this.options.tariffMetrics ? this.options.tariffMetrics : null;
+      if (!tm || !tm[tariffId] || !Array.isArray(tm[tariffId])) return null;
+      var arr = tm[tariffId].slice(0, 6);
+      // normalize
+      var out = [];
+      for (var i = 0; i < arr.length; i++) {
+        var it = arr[i];
+        if (!it) continue;
+        var v = it.value != null ? String(it.value) : '';
+        var l = it.label != null ? String(it.label) : '';
+        if (!v || !l) continue;
+        out.push({ value: v, label: l });
+      }
+      return out.length ? out : null;
+    } catch (_) {
+      return null;
+    }
   };
 
   Widget.prototype._bindAnalyticsLifecycle = function () {
@@ -1303,11 +1337,29 @@
     card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Мы подобрали его на основе ваших ответов.' }));
     card.appendChild(el('div', { class: 'tw-divider' }));
 
-    var bullets = el('ul', { class: 'tw-bullets' });
-    var rc = RESULT_COPY[tariffId];
-    var items = rc && rc.benefits ? rc.benefits : [];
-    for (var i = 0; i < items.length && i < 3; i++) bullets.appendChild(el('li', { text: items[i] }));
-    card.appendChild(bullets);
+    // Show tariff metrics (like Finam tariff cards) when provided via config.
+    // Fallback to short benefits if metrics were not configured.
+    var metrics = this.getTariffMetrics(tariffId);
+    if (metrics && metrics.length) {
+      var gridM = el('div', { class: 'tw-metrics' });
+      for (var i = 0; i < metrics.length; i++) {
+        gridM.appendChild(
+          el(
+            'div',
+            null,
+            el('div', { class: 'tw-metricVal', text: metrics[i].value }),
+            el('div', { class: 'tw-metricLbl', text: metrics[i].label })
+          )
+        );
+      }
+      card.appendChild(gridM);
+    } else {
+      var bullets = el('ul', { class: 'tw-bullets' });
+      var rc = RESULT_COPY[tariffId];
+      var items = rc && rc.benefits ? rc.benefits : [];
+      for (var j = 0; j < items.length && j < 3; j++) bullets.appendChild(el('li', { text: items[j] }));
+      card.appendChild(bullets);
+    }
 
     card.appendChild(
       el(
