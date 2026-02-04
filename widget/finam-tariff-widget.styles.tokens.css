@@ -1,0 +1,68 @@
+/*
+  Finam Tariff Widget — style tokens (editable)
+
+  Цель: дать коллегам “один файл со стилями”, который можно править под стилистику.
+  Важно: виджет рисуется в Shadow DOM, но CSS-переменные наследуются от контейнера.
+
+  Как применять без правки JS:
+  - добавьте эти переменные inline-стилем контейнера:
+
+    <div data-finam-tariff-widget style="--ui-brand:#ffc759; --ui-bg-dark:#151519;"></div>
+
+  Или глобально (если вы НЕ в Shadow DOM / shadowDom:false):
+    [data-finam-tariff-widget]{ ... }
+
+  Если нужно менять не только переменные, а классы/верстку — правки надо перенести в
+  widget/finam-tariff-widget.js (функция cssText()).
+*/
+
+/* Recommended: set on the widget container */
+[data-finam-tariff-widget],
+#finam-tariff {
+  /* Typography */
+  --ui-font: "Inter var", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* Colors */
+  --ui-bg-dark: #151519;
+  --ui-border-on-dark: hsla(0, 0%, 100%, 0.12);
+  --ui-text-inverse: #ebebf2;
+  --ui-text-inverse-secondary: rgb(164, 164, 178);
+
+  /* Brand (accent) */
+  --ui-brand: #ffc759;
+  --ui-brand-hover: #ffba30;
+  --ui-brand-pressed: #f9a605;
+
+  /* Background gradients */
+  --ui-gradient-premium: linear-gradient(
+      225deg,
+      rgba(192, 192, 204, 0.24) -0.21%,
+      rgba(0, 0, 0, 0.2) 45.81%,
+      rgba(0, 0, 0, 0.4) 96.67%
+    ),
+    #151519;
+  --ui-gradient-gold-soft: radial-gradient(
+    90% 120% at 20% 10%,
+    rgba(255, 199, 89, 0.22) 0%,
+    rgba(255, 199, 89, 0) 55%
+  );
+  --ui-gradient-gold-edge: radial-gradient(
+    70% 120% at 100% 0%,
+    rgba(255, 186, 48, 0.18) 0%,
+    rgba(255, 186, 48, 0) 60%
+  );
+
+  /* Shadows */
+  --ui-shadow-cardDark: 0px 5px 10px 0px rgba(57, 57, 66, 0.16),
+    0px 15px 20px 0px rgba(57, 57, 66, 0.16),
+    0px 25px 50px 0px rgba(57, 57, 66, 0.16);
+  --ui-shadow-cardMid: 0px 2px 6px 0px rgba(57, 57, 66, 0.06),
+    0px 10px 20px 0px rgba(57, 57, 66, 0.06);
+
+  /* Radii */
+  --ui-radius-shell: 24px;
+  --ui-radius-card: 16px;
+  --ui-radius-item: 12px;
+  --ui-radius-btn: 10px;
+}
+
