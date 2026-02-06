@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.26
+ * Version: 1.0.27
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.26';
+  var VERSION = '1.0.27';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -424,7 +424,8 @@
   function defaultPremiumVisualUrl() {
     var base = guessRepoBaseFromScriptSrc(getCurrentScriptSrc());
     if (!base) return '';
-    return base + 'assets/premium-visual.svg';
+    // Prefer the newer PNG illustration; keep SVG fallback in repo.
+    return base + 'assets/tariff_widget_illustration_v3_7a119d5146.png';
   }
 
   function safeCssUrl(u) {
