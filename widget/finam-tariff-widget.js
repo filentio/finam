@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.28
+ * Version: 1.0.29
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.28';
+  var VERSION = '1.0.29';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -608,9 +608,9 @@
       /* Background image mode (question/result): image is part of whole module background */
       '.ftw .tw-shell-bg{position:relative}' +
       /* Illustration as part of section background (no separate card on the right) */
-      '.ftw .tw-shell-bg::before{content:\"\";position:absolute;inset:0;z-index:0;background-image:var(--tw-bg-img, none);background-repeat:no-repeat;background-position:right 24px center;background-size:var(--tw-bg-size, 520px auto);opacity:0.96;filter:saturate(1.04) contrast(1.04);pointer-events:none}' +
+      '.ftw .tw-shell-bg::before{content:\"\";position:absolute;inset:0;z-index:0;background-image:var(--tw-bg-img, none);background-repeat:no-repeat;background-position:right 24px center;background-size:var(--tw-bg-size, 420px auto);opacity:0.96;filter:saturate(1.04) contrast(1.04);pointer-events:none}' +
       '.ftw .tw-shell-bg > *{position:relative;z-index:1}' +
-      '@media (max-width:1100px){.ftw .tw-shell-bg::before{background-position:right 16px center;background-size:460px auto}}' +
+      '@media (max-width:1100px){.ftw .tw-shell-bg::before{background-position:right 16px center;background-size:360px auto}}' +
       '@media (max-width:860px){.ftw .tw-shell-bg::before{display:none}}' +
       /* Premium visual */
       /* Make the right visual look like part of the shell (no separate frame) */
@@ -1136,8 +1136,8 @@
               self._analyticsState.started = true;
               track(self, 'widget_start', { session_id: self.sessionId, flow_version: self.options.flowVersion || FLOW_VERSION });
               // Fix questionnaire height to prevent layout jumps between questions.
-              // Value chosen to comfortably fit longest question on desktop.
-              self._fixedQuestionHeight = 620;
+              // Slightly taller now that the header is hidden on question steps.
+              self._fixedQuestionHeight = 680;
               self.setState({ mode: 'question', step: 0 });
             },
             text: 'Начать подбор',
@@ -1175,17 +1175,6 @@
     var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
     this.applyBackgroundImage(shell);
     if (this._fixedQuestionHeight) shell.style.minHeight = this._fixedQuestionHeight + 'px';
-    var header = el(
-      'div',
-      { class: 'tw-header tw-widgetHeader' },
-      el(
-        'div',
-        null,
-        el('div', { class: 'tw-h1', text: 'Подбор тарифа' }),
-        el('div', { class: 'tw-secondaryText', text: 'Ответьте на несколько вопросов — покажем подходящий тариф' })
-      )
-    );
-    shell.appendChild(header);
 
     // Right column exists only to keep layout width; illustration is drawn as section background.
     var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { 'aria-hidden': 'true' }));
@@ -1305,18 +1294,8 @@
       }
     } catch (_) {}
 
-    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
-    var header = el(
-      'div',
-      { class: 'tw-header tw-widgetHeader' },
-      el(
-        'div',
-        null,
-        el('div', { class: 'tw-h1', text: 'Поможем подобрать тариф' }),
-        el('div', { class: 'tw-secondaryText', text: 'Результат подбора' })
-      )
-    );
-    shell.appendChild(header);
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
 
     var right;
     if (this.options.feedbackEnabled) {
