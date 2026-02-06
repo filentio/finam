@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.27
+ * Version: 1.0.28
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.27';
+  var VERSION = '1.0.28';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -607,9 +607,11 @@
       '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}.ftw .tw-premium-visual{display:none}}' +
       /* Background image mode (question/result): image is part of whole module background */
       '.ftw .tw-shell-bg{position:relative}' +
-      '.ftw .tw-shell-bg::before{content:\"\";position:absolute;inset:0;z-index:0;background-image:var(--tw-bg-img, none);background-repeat:no-repeat;background-position:center;background-size:var(--tw-bg-size, 820px auto);opacity:0.92;filter:saturate(1.06) contrast(1.06);pointer-events:none}' +
+      /* Illustration as part of section background (no separate card on the right) */
+      '.ftw .tw-shell-bg::before{content:\"\";position:absolute;inset:0;z-index:0;background-image:var(--tw-bg-img, none);background-repeat:no-repeat;background-position:right 24px center;background-size:var(--tw-bg-size, 520px auto);opacity:0.96;filter:saturate(1.04) contrast(1.04);pointer-events:none}' +
       '.ftw .tw-shell-bg > *{position:relative;z-index:1}' +
-      '@media (max-width:860px){.ftw .tw-shell-bg::before{background-size:680px auto}}' +
+      '@media (max-width:1100px){.ftw .tw-shell-bg::before{background-position:right 16px center;background-size:460px auto}}' +
+      '@media (max-width:860px){.ftw .tw-shell-bg::before{display:none}}' +
       /* Premium visual */
       /* Make the right visual look like part of the shell (no separate frame) */
       '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background:transparent;box-shadow:none;position:relative;min-height:260px;overflow:hidden}' +
@@ -1103,7 +1105,8 @@
 
   Widget.prototype.renderIntroScreen = function (container) {
     var self = this;
-    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
     var header = el(
       'div',
       { class: 'tw-header tw-widgetHeader' },
@@ -1116,7 +1119,8 @@
     );
     shell.appendChild(header);
 
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPremiumVisual());
+    // Right column exists only to keep layout width; illustration is drawn as section background.
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { 'aria-hidden': 'true' }));
     var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card' });
@@ -1168,7 +1172,8 @@
       }
     } catch (_) {}
 
-    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
     if (this._fixedQuestionHeight) shell.style.minHeight = this._fixedQuestionHeight + 'px';
     var header = el(
       'div',
@@ -1182,8 +1187,8 @@
     );
     shell.appendChild(header);
 
-    // Two columns on questions: stable card width, promo/visual on the right.
-    var grid = el('div', { class: 'tw-two-col' }, el('div', null), this.createPromoRightPanel(this.state.step));
+    // Right column exists only to keep layout width; illustration is drawn as section background.
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { 'aria-hidden': 'true' }));
     var left = grid.firstChild;
 
     var card = el('div', { class: 'tw-card tw-cardSolid' });
