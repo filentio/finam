@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.32
+ * Version: 1.0.33
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.32';
+  var VERSION = '1.0.33';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -118,7 +118,18 @@
       required: true,
     },
     {
-      id: 'q4_support',
+      id: 'q4_volume',
+      title: 'Какой объём инвестиций вы планируете?',
+      options: [
+        { value: 'd1_small', label: 'До 100 000 ₽' },
+        { value: 'd2_mid', label: 'От 100 000 до 1 000 000 ₽' },
+        { value: 'd3_large', label: 'Более 1 000 000 ₽' },
+        { value: 'd4_unknown', label: 'Пока не определился(лась)' },
+      ],
+      required: true,
+    },
+    {
+      id: 'q5_support',
       title: 'Понадобится ли вам экспертная поддержка?',
       options: [
         { value: 'e1_yes', label: 'Да, хочу получать подсказки и сопровождение' },
@@ -752,7 +763,8 @@
         q1_goal: null,
         q2_frequency: null,
         q3_instruments: null,
-        q4_support: null,
+        q4_volume: null,
+        q5_support: null,
       },
       resultTariffId: null,
       feedback: { state: 'idle', rating: null, reasons: [] },
@@ -768,7 +780,8 @@
       q1_goal: a.q1_goal || null,
       q2_frequency: a.q2_frequency || null,
       q3_instruments: a.q3_instruments || null,
-      q4_support: a.q4_support || null,
+      q4_volume: a.q4_volume || null,
+      q5_support: a.q5_support || null,
     };
   };
 
@@ -878,7 +891,7 @@
     this._feedbackShownOnce = false;
     this.state.mode = 'intro';
     this.state.step = 0;
-    this.state.answers = { q1_goal: null, q2_frequency: null, q3_instruments: null, q4_support: null };
+    this.state.answers = { q1_goal: null, q2_frequency: null, q3_instruments: null, q4_volume: null, q5_support: null };
     this.state.resultTariffId = null;
     this.state.feedback = { state: 'idle', rating: null, reasons: [] };
     this.render();
@@ -887,9 +900,10 @@
   Widget.prototype.recommendTariffId = function () {
     // Conservative mapping for restored questions
     var a = this.state.answers;
-    if (a.q4_support === 'e1_yes') return 'n5_consulting';
+    if (a.q5_support === 'e1_yes') return 'n5_consulting';
     if (a.q3_instruments === 'c2_futures') return 'n2_day';
     if (a.q1_goal === 'a2_active') return 'n2_day';
+    if (a.q4_volume === 'd3_large') return 'n4_strateg';
     if (a.q1_goal === 'a1_save') return 'n1_dolgosrochniy';
     if (a.q1_goal === 'a3_try') return 'n3_investor';
     return 'n3_investor';
@@ -1113,7 +1127,7 @@
 
     var card = el('div', { class: 'tw-card' });
     card.appendChild(el('div', { class: 'tw-heroTitle', text: 'Какой тариф выбрать?' }));
-    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Ответьте на 4 вопроса — подберём подходящий тариф' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Ответьте на 5 вопросов — подберём подходящий тариф' }));
     card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Расскажите о целях инвестирования и инструментах, которые планируете использовать.' }));
     card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Опрос займёт около 3 минут.' }));
     card.appendChild(
