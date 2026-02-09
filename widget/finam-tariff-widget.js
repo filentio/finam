@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.30
+ * Version: 1.0.31
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.30';
+  var VERSION = '1.0.31';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -87,17 +87,17 @@
       id: 'q1_goal',
       title: 'Для чего вы планируете инвестировать?',
       options: [
-        { value: 'a1_save', label: 'Хочу сохранить деньги и понемногу приумножать' },
+        { value: 'a1_save', label: 'Сохранить деньги и постепенно приумножать' },
         { value: 'a2_active', label: 'Планирую активно торговать' },
-        { value: 'a3_try', label: 'Хочу попробовать инвестиции и разобраться' },
-        { value: 'a4_unsure', label: 'Пока не уверен(а), хочу посмотреть' },
+        { value: 'a3_try', label: 'Хочу попробовать и разобраться' },
+        { value: 'a4_unsure', label: 'Пока не определился(лась)' },
       ],
       required: true,
     },
     {
       id: 'q2_frequency',
-      title: 'Как часто вы планируете покупать или продавать активы?',
-      helperText: 'Это поможет учесть комиссии и доступные инструменты',
+      title: 'Как часто вы планируете совершать сделки?',
+      helperText: 'Это поможет подобрать тариф с подходящими комиссиями',
       options: [
         { value: 'b1_rare', label: 'Несколько раз в год' },
         { value: 'b2_month', label: 'Несколько раз в месяц' },
@@ -108,22 +108,33 @@
     },
     {
       id: 'q3_instruments',
-      title: 'Чем вы планируете торговать?',
+      title: 'С какими инструментами вы планируете работать?',
       options: [
         { value: 'c1_stocks', label: 'Акции и облигации' },
-        { value: 'c2_futures', label: 'Фьючерсы / активная торговля' },
+        { value: 'c2_futures', label: 'Фьючерсы и опционы' },
         { value: 'c3_currency', label: 'Валюта' },
         { value: 'c4_unknown', label: 'Пока не знаю' },
       ],
       required: true,
     },
     {
-      id: 'q4_assistance',
-      title: 'Нужна ли вам помощь при инвестировании?',
+      id: 'q4_volume',
+      title: 'Какой объём инвестиций вы планируете?',
       options: [
-        { value: 'd1_yes', label: 'Да, хочу подсказки и сопровождение' },
-        { value: 'd2_sometimes', label: 'Иногда, но в целом сам(а)' },
-        { value: 'd3_no', label: 'Нет, всё делаю сам(а)' },
+        { value: 'd1_small', label: 'До 100 000 ₽' },
+        { value: 'd2_mid', label: 'От 100 000 до 1 000 000 ₽' },
+        { value: 'd3_large', label: 'Более 1 000 000 ₽' },
+        { value: 'd4_unknown', label: 'Пока не определился(лась)' },
+      ],
+      required: true,
+    },
+    {
+      id: 'q5_support',
+      title: 'Понадобится ли вам экспертная поддержка?',
+      options: [
+        { value: 'e1_yes', label: 'Да, хочу получать подсказки и сопровождение' },
+        { value: 'e2_maybe', label: 'Возможно, но не обязательно' },
+        { value: 'e3_no', label: 'Нет, справлюсь самостоятельно' },
       ],
       required: true,
     },
@@ -752,7 +763,8 @@
         q1_goal: null,
         q2_frequency: null,
         q3_instruments: null,
-        q4_assistance: null,
+        q4_volume: null,
+        q5_support: null,
       },
       resultTariffId: null,
       feedback: { state: 'idle', rating: null, reasons: [] },
@@ -768,7 +780,8 @@
       q1_goal: a.q1_goal || null,
       q2_frequency: a.q2_frequency || null,
       q3_instruments: a.q3_instruments || null,
-      q4_assistance: a.q4_assistance || null,
+      q4_volume: a.q4_volume || null,
+      q5_support: a.q5_support || null,
     };
   };
 
@@ -878,7 +891,7 @@
     this._feedbackShownOnce = false;
     this.state.mode = 'intro';
     this.state.step = 0;
-    this.state.answers = { q1_goal: null, q2_frequency: null, q3_instruments: null, q4_assistance: null };
+    this.state.answers = { q1_goal: null, q2_frequency: null, q3_instruments: null, q4_volume: null, q5_support: null };
     this.state.resultTariffId = null;
     this.state.feedback = { state: 'idle', rating: null, reasons: [] };
     this.render();
@@ -887,9 +900,10 @@
   Widget.prototype.recommendTariffId = function () {
     // Conservative mapping for restored questions
     var a = this.state.answers;
-    if (a.q4_assistance === 'd1_yes') return 'n5_consulting';
+    if (a.q5_support === 'e1_yes') return 'n5_consulting';
     if (a.q3_instruments === 'c2_futures') return 'n2_day';
     if (a.q1_goal === 'a2_active') return 'n2_day';
+    if (a.q4_volume === 'd3_large') return 'n4_strateg';
     if (a.q1_goal === 'a1_save') return 'n1_dolgosrochniy';
     if (a.q1_goal === 'a3_try') return 'n3_investor';
     return 'n3_investor';
