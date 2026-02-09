@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.41
+ * Version: 1.0.42
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.41';
+  var VERSION = '1.0.42';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -38,6 +38,8 @@
     //   ...
     // }
     tariffMetrics: null,
+    // Optional: send quiz answers/clicks to your endpoint (e.g. Google Apps Script /exec)
+    statsEndpoint: '', // if set, widget will POST events as JSON (silent-fail)
   };
 
   // STRICT WHITELIST (DO NOT CHANGE NAMES/URLS)
@@ -450,6 +452,20 @@
     } catch (_) {
       return Math.round(n) + ' ₽';
     }
+  }
+
+  function sendStats(widget, name, payload) {
+    try {
+      if (!widget || !widget.options || !widget.options.statsEndpoint) return;
+      var out = payload || {};
+      out.event_name = name;
+      out.widget = 'tariff_selection_widget';
+      out.version = VERSION;
+      out.flow_version = widget.options.flowVersion || FLOW_VERSION;
+      out.session_id = widget.sessionId;
+      out.timestamp = new Date().toISOString();
+      postJsonWithRetry(widget.options.statsEndpoint, out, 3, function () {});
+    } catch (_) {}
   }
 
   function el(tag, attrs) {
@@ -901,13 +917,22 @@
 
   Widget.prototype.setAnswer = function (id, value) {
     this.state.answers[id] = value;
+    var snapshot = this.answersSnapshot();
     track(this, 'question_answered', {
       question_id: id,
       answer_id: String(value),
       step: (this.state.step || 0) + 1,
       total: QUESTIONS.length,
+      answers: snapshot,
       session_id: this.sessionId,
       flow_version: this.options.flowVersion || FLOW_VERSION,
+    });
+    sendStats(this, 'question_answered', {
+      question_id: id,
+      answer_id: String(value),
+      step: (this.state.step || 0) + 1,
+      total: QUESTIONS.length,
+      answers: snapshot,
     });
     this.render();
   };
@@ -1347,6 +1372,17 @@
       tariff_id: tariffId,
       session_id: this.sessionId,
       flow_version: this.options.flowVersion || FLOW_VERSION,
+      answers: this.answersSnapshot(),
+    });
+    // Alias for clarity in downstream analytics
+    track(this, 'tariff_details_clicked', {
+      tariff_id: tariffId,
+      session_id: this.sessionId,
+      flow_version: this.options.flowVersion || FLOW_VERSION,
+      answers: this.answersSnapshot(),
+    });
+    sendStats(this, 'tariff_details_clicked', {
+      tariff_id: tariffId,
       answers: this.answersSnapshot(),
     });
     track(this, 'tariff_recommended', { tariff_id: tariffId });
