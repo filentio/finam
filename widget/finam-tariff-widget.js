@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.37
+ * Version: 1.0.38
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.37';
+  var VERSION = '1.0.38';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -1012,11 +1012,10 @@
     var fb = this.state.feedback || { state: 'idle', rating: null, reasons: [] };
 
     var CHIPSET = [
-      { id: 'too_many_questions', label: 'Слишком много вопросов' },
-      { id: 'unclear_terms', label: 'Сложно понять термины' },
+      { id: 'too_many_questions', label: 'Много вопросов' },
+      { id: 'unclear_terms', label: 'Сложные термины' },
       { id: 'unclear_recommendation', label: 'Не понял, почему предложили этот тариф' },
       { id: 'missing_instruments', label: 'Не нашёл нужные инструменты' },
-      { id: 'takes_too_long', label: 'Долго проходить' },
       { id: 'other', label: 'Другое' },
     ];
 
@@ -1038,8 +1037,10 @@
       track(self, 'feedback_submit', {
         tariff_id: payload.tariff_id,
         rating: payload.rating,
+        reasons: Array.isArray(payload.reasons) ? payload.reasons.slice(0, 12) : [],
         reasons_count: Array.isArray(payload.reasons) ? payload.reasons.length : 0,
         flow_version: payload.flow_version,
+        session_id: self.sessionId,
       });
       if (!self.options.feedbackEndpoint) return;
       postJsonWithRetry(self.options.feedbackEndpoint, payload, 3, function (ok) {
@@ -1061,7 +1062,13 @@
         self._analyticsState.feedbackSubmitted = true;
       } catch (_) {}
       setFb({ state: 'completed', rating: payload.rating, reasons: payload.reasons || [] });
-      track(self, 'feedback_completed', { tariff_id: String(tariffId), rating: payload.rating });
+      track(self, 'feedback_completed', {
+        tariff_id: String(tariffId),
+        rating: payload.rating,
+        reasons: Array.isArray(payload.reasons) ? payload.reasons.slice(0, 12) : [],
+        session_id: self.sessionId,
+        flow_version: self.options.flowVersion || FLOW_VERSION,
+      });
     }
 
     var wrap = el('div', { class: 'tw-feedback', 'aria-label': 'Оценка удобства подбора тарифа' });

@@ -108,11 +108,10 @@
     "subtitle": "Оценка займёт пару секунд",
     "chipQuestion": "Что было неудобно?",
     "chips": [
-      { "id": "too_many_questions", "label": "Слишком много вопросов" },
-      { "id": "unclear_terms", "label": "Сложно понять термины" },
+      { "id": "too_many_questions", "label": "Много вопросов" },
+      { "id": "unclear_terms", "label": "Сложные термины" },
       { "id": "unclear_recommendation", "label": "Не понял, почему предложили этот тариф" },
       { "id": "missing_instruments", "label": "Не нашёл нужные инструменты" },
-      { "id": "takes_too_long", "label": "Долго проходить" },
       { "id": "other", "label": "Другое" }
     ],
     "submit": "Отправить",
