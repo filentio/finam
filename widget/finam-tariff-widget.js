@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.36
+ * Version: 1.0.37
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.36';
+  var VERSION = '1.0.37';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -710,7 +710,10 @@
       /* Tariff metrics (result screen) */
       '.ftw .tw-metrics{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:18px;margin:16px 0 6px 0}' +
       '@media (max-width:860px){.ftw .tw-metrics{grid-template-columns:repeat(2, minmax(0, 1fr))}}' +
-      '.ftw .tw-metricVal{font-size:20px;line-height:24px;font-weight:900;color:var(--ui-text-inverse);margin:0}' +
+      /* Metric value: consistent weight; prefix (до/от) is lighter and kept on same line */
+      '.ftw .tw-metricVal{font-size:18px;line-height:22px;font-weight:700;letter-spacing:-0.16px;color:var(--ui-text-inverse);margin:0;display:flex;gap:6px;align-items:baseline;white-space:nowrap}' +
+      '.ftw .tw-metricPrefix{font-size:12px;line-height:16px;font-weight:600;color:var(--ui-text-inverse-secondary)}' +
+      '.ftw .tw-metricNumber{font-size:18px;line-height:22px;font-weight:700;color:var(--ui-text-inverse)}' +
       '.ftw .tw-metricLbl{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin-top:6px}' +
       /* Actions */
       '.ftw .tw-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;flex-wrap:wrap}' +
@@ -1404,11 +1407,25 @@
     if (metrics.length) {
       var gridM = el('div', { class: 'tw-metrics' });
       for (var i = 0; i < metrics.length && i < 4; i++) {
+        var rawVal = metrics[i].value;
+        var valStr = rawVal == null ? '' : String(rawVal);
+        var m = valStr.match(/^(до|от)\s+(.+)$/i);
+        var valNode;
+        if (m) {
+          valNode = el(
+            'div',
+            { class: 'tw-metricVal' },
+            el('span', { class: 'tw-metricPrefix', text: m[1].toLowerCase() }),
+            el('span', { class: 'tw-metricNumber', text: m[2] })
+          );
+        } else {
+          valNode = el('div', { class: 'tw-metricVal' }, el('span', { class: 'tw-metricNumber', text: valStr }));
+        }
         gridM.appendChild(
           el(
             'div',
             null,
-            el('div', { class: 'tw-metricVal', text: metrics[i].value }),
+            valNode,
             el('div', { class: 'tw-metricLbl', text: metrics[i].label })
           )
         );
