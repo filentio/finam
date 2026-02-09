@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.38
+ * Version: 1.0.39
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.38';
+  var VERSION = '1.0.39';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -677,8 +677,10 @@
       '.ftw .tw-starBtn.is-on .tw-star{color:var(--ui-brand)}' +
       '.ftw .tw-starBtn:hover{background:rgba(255,255,255,0.10)}' +
       '.ftw .tw-chipTitle{margin-top:16px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
-      '.ftw .tw-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}' +
-      '.ftw .tw-chip{height:36px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease}' +
+      /* Chips: even grid (2 cols desktop, 1 col mobile) */
+      '.ftw .tw-chips{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;margin-top:10px}' +
+      '@media (max-width:560px){.ftw .tw-chips{grid-template-columns:1fr}}' +
+      '.ftw .tw-chip{width:100%;min-height:44px;height:auto;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:16px}' +
       '.ftw .tw-chip:hover{background:rgba(255,255,255,0.10)}' +
       '.ftw .tw-chip.is-selected{background:rgba(255,199,89,0.12);border-color:rgba(255,186,48,0.45)}' +
       '.ftw .tw-feedbackActions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:16px;flex-wrap:wrap}' +
