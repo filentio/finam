@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.35
+ * Version: 1.0.36
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.35';
+  var VERSION = '1.0.36';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -929,33 +929,41 @@
   Widget.prototype.recommendTariffId = function () {
     var a = this.state.answers;
 
-    // 1. Поддержка — осознанный выбор
-    if (a.q5_support === 'e1_yes') {
-      return 'n5_consulting';
-    }
+    a = a || {};
 
-    // 2. Активная торговля (комбинация)
-    if (a.q1_goal === 'a2_active' || a.q3_instruments === 'c2_futures') {
-      return 'n2_day';
-    }
+    // Normalization for "don't know / unsure" (defensive)
+    var isUnknownGoal = a.q1_goal === 'a4_unsure';
+    var isTryGoal = a.q1_goal === 'a3_try';
+    var isSaveGoal = a.q1_goal === 'a1_save';
+    var isActiveGoal = a.q1_goal === 'a2_active';
 
-    // 3. Долгосрочное инвестирование
-    if (a.q1_goal === 'a1_save') {
-      return 'n1_dolgosrochniy';
-    }
+    var isUnknownFreq =
+      a.q2_frequency === 'b4_unknown' || a.q2_frequency === 'b4_dontknow' || a.q2_frequency === 'b4_unsure';
+    var isUnknownInstr =
+      a.q3_instruments === 'c4_unknown' || a.q3_instruments === 'c4_dontknow' || a.q3_instruments === 'c4_unsure';
 
-    // 4. Неопределившиеся и пробующие
-    if (a.q1_goal === 'a3_try' || a.q1_goal === 'a4_unsure') {
-      return 'n3_investor';
-    }
+    var wantsSupport = a.q5_support === 'e1_yes';
+    var tradesFutures = a.q3_instruments === 'c2_futures';
 
-    // 5. Большой объём — только если нет других сигналов
-    if (a.q4_volume === 'd3_large') {
-      return 'n4_strateg';
-    }
+    // 1) Support request → consulting
+    if (wantsSupport) return 'n5_consulting';
 
-    // fallback
-    return 'n3_investor';
+    // 2) Active trading or futures/options → day
+    if (isActiveGoal || tradesFutures) return 'n2_day';
+
+    // 3) Clear long-term saving goal → long-term portfolio
+    if (isSaveGoal) return 'n1_dolgosrochniy';
+
+    // 4) Try/unsure or "unknowns" → long-term portfolio (conservative default)
+    if (isTryGoal || isUnknownGoal) return 'n1_dolgosrochniy';
+    if (isUnknownFreq && isUnknownInstr) return 'n1_dolgosrochniy';
+
+    // 5) Investor — only when there is at least some clarity
+    var hasAnyClarity = !isUnknownFreq || !isUnknownInstr || !!a.q4_volume;
+    if (hasAnyClarity) return 'n3_investor';
+
+    // 6) Safe fallback
+    return 'n1_dolgosrochniy';
   };
 
   Widget.prototype.createPremiumVisual = function () {
