@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.29
+ * Version: 1.0.30
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.29';
+  var VERSION = '1.0.30';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -626,8 +626,8 @@
       '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
       /* Solid card (questions/results) to keep readability over visuals */
       '.ftw .tw-cardSolid{background:rgba(21,21,25,0.92);border:1px solid rgba(255,255,255,0.14);box-shadow:var(--ui-shadow-cardDark)}' +
-      /* Feedback block (right side on result) */
-      '.ftw .tw-feedback{border-radius:var(--ui-radius-shell);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px;min-height:260px}' +
+      /* Feedback block (right side on result): denser for readability */
+      '.ftw .tw-feedback{border-radius:var(--ui-radius-shell);background:rgba(21,21,25,0.88);border:1px solid rgba(255,255,255,0.16);box-shadow:var(--ui-shadow-cardDark);padding:24px;min-height:260px;backdrop-filter:blur(10px)}' +
       '.ftw .tw-feedbackTitle{font-size:18px;line-height:22px;font-weight:800;letter-spacing:-0.16px;color:var(--ui-text-inverse);margin:0}' +
       '.ftw .tw-feedbackSub{font-size:14px;line-height:18px;font-weight:500;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
       '.ftw .tw-stars{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}' +
@@ -1136,8 +1136,8 @@
               self._analyticsState.started = true;
               track(self, 'widget_start', { session_id: self.sessionId, flow_version: self.options.flowVersion || FLOW_VERSION });
               // Fix questionnaire height to prevent layout jumps between questions.
-              // Slightly taller now that the header is hidden on question steps.
-              self._fixedQuestionHeight = 680;
+              // Will be measured on first render to avoid empty space.
+              self._fixedQuestionHeight = 0;
               self.setState({ mode: 'question', step: 0 });
             },
             text: 'Начать подбор',
@@ -1252,6 +1252,16 @@
     left.appendChild(card);
     shell.appendChild(grid);
     container.appendChild(shell);
+
+    // Measure after mount to avoid excessive empty space at the bottom.
+    try {
+      var realH = Math.ceil(shell.getBoundingClientRect().height || 0);
+      if (realH) {
+        if (!this._fixedQuestionHeight) this._fixedQuestionHeight = realH;
+        else if (realH > this._fixedQuestionHeight) this._fixedQuestionHeight = realH;
+        shell.style.minHeight = this._fixedQuestionHeight + 'px';
+      }
+    } catch (_) {}
   };
 
   Widget.prototype.openTariff = function (tariffId) {
