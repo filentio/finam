@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.39
+ * Version: 1.0.40
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.39';
+  var VERSION = '1.0.40';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -631,7 +631,7 @@
       '.ftw .tw-feedbackSub{font-size:13px;line-height:17px}' +
       '.ftw .tw-starBtn{width:40px;height:40px;border-radius:12px}' +
       '.ftw .tw-star{font-size:20px}' +
-      '.ftw .tw-chip{height:34px;font-size:13px}' +
+      '.ftw .tw-chip{flex:0 0 100%;height:44px;font-size:13px}' +
       '.ftw .tw-feedbackActions{justify-content:stretch}' +
       '.ftw .tw-feedbackBtn{width:100%}' +
       '.ftw .tw-metrics{grid-template-columns:1fr}' +
@@ -677,10 +677,9 @@
       '.ftw .tw-starBtn.is-on .tw-star{color:var(--ui-brand)}' +
       '.ftw .tw-starBtn:hover{background:rgba(255,255,255,0.10)}' +
       '.ftw .tw-chipTitle{margin-top:16px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
-      /* Chips: even grid (2 cols desktop, 1 col mobile) */
-      '.ftw .tw-chips{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;margin-top:10px}' +
-      '@media (max-width:560px){.ftw .tw-chips{grid-template-columns:1fr}}' +
-      '.ftw .tw-chip{width:100%;min-height:44px;height:auto;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:16px}' +
+      /* Chips: compact tags with flex-wrap */
+      '.ftw .tw-chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}' +
+      '.ftw .tw-chip{flex:0 0 240px;height:44px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
       '.ftw .tw-chip:hover{background:rgba(255,255,255,0.10)}' +
       '.ftw .tw-chip.is-selected{background:rgba(255,199,89,0.12);border-color:rgba(255,186,48,0.45)}' +
       '.ftw .tw-feedbackActions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:16px;flex-wrap:wrap}' +
@@ -1145,6 +1144,7 @@
         var chip = el('button', {
           class: selected ? 'tw-chip is-selected' : 'tw-chip',
           type: 'button',
+          title: c.label,
           onClick: function () {
             var nextReasons = Array.isArray(fb.reasons) ? fb.reasons.slice() : [];
             var idx = nextReasons.indexOf(c.id);
