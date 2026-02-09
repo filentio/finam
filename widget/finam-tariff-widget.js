@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.42
+ * Version: 1.0.43
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.42';
+  var VERSION = '1.0.43';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -468,6 +468,20 @@
     } catch (_) {}
   }
 
+  function questionById(id) {
+    for (var i = 0; i < QUESTIONS.length; i++) if (QUESTIONS[i].id === id) return QUESTIONS[i];
+    return null;
+  }
+
+  function answerLabelFor(questionId, answerId) {
+    try {
+      var q = questionById(questionId);
+      if (!q || !q.options) return '';
+      for (var i = 0; i < q.options.length; i++) if (q.options[i].value === answerId) return String(q.options[i].label || '');
+    } catch (_) {}
+    return '';
+  }
+
   function el(tag, attrs) {
     var node = document.createElement(tag);
     // Prevent unexpected form submits when widget is embedded inside a <form>.
@@ -835,6 +849,17 @@
     };
   };
 
+  Widget.prototype.answersLabelSnapshot = function () {
+    var a = this.state && this.state.answers ? this.state.answers : {};
+    return {
+      q1_goal: a.q1_goal ? answerLabelFor('q1_goal', a.q1_goal) : null,
+      q2_frequency: a.q2_frequency ? answerLabelFor('q2_frequency', a.q2_frequency) : null,
+      q3_instruments: a.q3_instruments ? answerLabelFor('q3_instruments', a.q3_instruments) : null,
+      q4_volume: a.q4_volume ? answerLabelFor('q4_volume', a.q4_volume) : null,
+      q5_support: a.q5_support ? answerLabelFor('q5_support', a.q5_support) : null,
+    };
+  };
+
   Widget.prototype.getTariffMetrics = function (tariffId) {
     try {
       var tm = this.options && this.options.tariffMetrics ? this.options.tariffMetrics : TARIFF_METRICS;
@@ -918,21 +943,27 @@
   Widget.prototype.setAnswer = function (id, value) {
     this.state.answers[id] = value;
     var snapshot = this.answersSnapshot();
+    var snapshotLabels = this.answersLabelSnapshot();
+    var ansLabel = answerLabelFor(id, value);
     track(this, 'question_answered', {
       question_id: id,
       answer_id: String(value),
+      answer_label: ansLabel,
       step: (this.state.step || 0) + 1,
       total: QUESTIONS.length,
       answers: snapshot,
+      answers_labels: snapshotLabels,
       session_id: this.sessionId,
       flow_version: this.options.flowVersion || FLOW_VERSION,
     });
     sendStats(this, 'question_answered', {
       question_id: id,
       answer_id: String(value),
+      answer_label: ansLabel,
       step: (this.state.step || 0) + 1,
       total: QUESTIONS.length,
       answers: snapshot,
+      answers_labels: snapshotLabels,
     });
     this.render();
   };
@@ -1095,6 +1126,13 @@
         reasons: Array.isArray(payload.reasons) ? payload.reasons.slice(0, 12) : [],
         session_id: self.sessionId,
         flow_version: self.options.flowVersion || FLOW_VERSION,
+      });
+      sendStats(self, 'feedback_completed', {
+        tariff_id: String(tariffId),
+        rating: payload.rating,
+        reasons: Array.isArray(payload.reasons) ? payload.reasons.slice(0, 12) : [],
+        answers: self.answersSnapshot(),
+        answers_labels: self.answersLabelSnapshot(),
       });
     }
 
@@ -1383,7 +1421,9 @@
     });
     sendStats(this, 'tariff_details_clicked', {
       tariff_id: tariffId,
+      tariff_name: (t && t.name) ? String(t.name) : '',
       answers: this.answersSnapshot(),
+      answers_labels: this.answersLabelSnapshot(),
     });
     track(this, 'tariff_recommended', { tariff_id: tariffId });
     try {
@@ -1410,6 +1450,12 @@
           answers: this.answersSnapshot(),
           session_id: this.sessionId,
           flow_version: this.options.flowVersion || FLOW_VERSION,
+        });
+        sendStats(this, 'result_shown', {
+          tariff_id: String(tariffId),
+          tariff_name: tariff && tariff.name ? String(tariff.name) : '',
+          answers: this.answersSnapshot(),
+          answers_labels: this.answersLabelSnapshot(),
         });
       }
     } catch (_) {}
