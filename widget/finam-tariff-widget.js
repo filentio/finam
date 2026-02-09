@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.34
+ * Version: 1.0.35
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.34';
+  var VERSION = '1.0.35';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -538,6 +538,38 @@
     },
   };
 
+  // Tariff metrics (value + label). Rendered on result screen under the single bullet.
+  // Kept as a separate config object (not hardcoded in render markup).
+  var TARIFF_METRICS = {
+    n1_dolgosrochniy: [
+      { value: '0%', label: 'Ценные бумаги РФ' },
+      { value: '0,1%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '0 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n2_day: [
+      { value: 'до 0,0354%', label: 'Ценные бумаги РФ' },
+      { value: 'от 0,06%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '177 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n3_investor: [
+      { value: '0,035%', label: 'Ценные бумаги РФ' },
+      { value: '0,1%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '200 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n4_strateg: [
+      { value: '0,05%', label: 'Ценные бумаги РФ' },
+      { value: 'от 0,1%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,9 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '0 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n5_consulting: [
+      { value: '177 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+  };
+
   // (commission calculator removed; widget is questionnaire-only)
 
   function cssText() {
@@ -602,6 +634,7 @@
       '.ftw .tw-chip{height:34px;font-size:13px}' +
       '.ftw .tw-feedbackActions{justify-content:stretch}' +
       '.ftw .tw-feedbackBtn{width:100%}' +
+      '.ftw .tw-metrics{grid-template-columns:1fr}' +
       '.ftw .tw-premium-card{padding:12px;border-radius:14px}' +
       '.ftw .tw-premium-text{font-size:13px;line-height:17px}' +
       '}' +
@@ -783,7 +816,7 @@
 
   Widget.prototype.getTariffMetrics = function (tariffId) {
     try {
-      var tm = this.options && this.options.tariffMetrics ? this.options.tariffMetrics : null;
+      var tm = this.options && this.options.tariffMetrics ? this.options.tariffMetrics : TARIFF_METRICS;
       if (!tm || !tm[tariffId] || !Array.isArray(tm[tariffId])) return null;
       var arr = tm[tariffId].slice(0, 6);
       // normalize
@@ -894,15 +927,34 @@
   };
 
   Widget.prototype.recommendTariffId = function () {
-    // Conservative mapping for restored questions
     var a = this.state.answers;
-    if (a.q5_support === 'e1_yes') return 'n5_consulting';
-    if (a.q3_instruments === 'c2_futures') return 'n2_day';
-    if (a.q1_goal === 'a2_active') return 'n2_day';
-    if (a.q4_volume === 'd3_large') return 'n4_strateg';
-    if (a.q1_goal === 'a4_unsure') return 'n4_strateg';
-    if (a.q1_goal === 'a1_save') return 'n1_dolgosrochniy';
-    if (a.q1_goal === 'a3_try') return 'n3_investor';
+
+    // 1. Поддержка — осознанный выбор
+    if (a.q5_support === 'e1_yes') {
+      return 'n5_consulting';
+    }
+
+    // 2. Активная торговля (комбинация)
+    if (a.q1_goal === 'a2_active' || a.q3_instruments === 'c2_futures') {
+      return 'n2_day';
+    }
+
+    // 3. Долгосрочное инвестирование
+    if (a.q1_goal === 'a1_save') {
+      return 'n1_dolgosrochniy';
+    }
+
+    // 4. Неопределившиеся и пробующие
+    if (a.q1_goal === 'a3_try' || a.q1_goal === 'a4_unsure') {
+      return 'n3_investor';
+    }
+
+    // 5. Большой объём — только если нет других сигналов
+    if (a.q4_volume === 'd3_large') {
+      return 'n4_strateg';
+    }
+
+    // fallback
     return 'n3_investor';
   };
 
@@ -1332,12 +1384,18 @@
     if (this.options.socialProofText) card.appendChild(el('div', { class: 'tw-secondaryText', text: String(this.options.socialProofText) }));
     card.appendChild(el('div', { class: 'tw-divider' }));
 
-    // Show tariff metrics (like Finam tariff cards) when provided via config.
-    // Fallback to short benefits if metrics were not configured.
-    var metrics = this.getTariffMetrics(tariffId);
-    if (metrics && metrics.length) {
+    // Exactly one bullet (no extra descriptions)
+    var bullets = el('ul', { class: 'tw-bullets' });
+    var rc = RESULT_COPY[tariffId];
+    var items = rc && rc.benefits ? rc.benefits : [];
+    if (items && items.length) bullets.appendChild(el('li', { text: items[0] }));
+    card.appendChild(bullets);
+
+    // Metrics under the bullet (max 4). Only for the recommended tariff.
+    var metrics = this.getTariffMetrics(tariffId) || [];
+    if (metrics.length) {
       var gridM = el('div', { class: 'tw-metrics' });
-      for (var i = 0; i < metrics.length; i++) {
+      for (var i = 0; i < metrics.length && i < 4; i++) {
         gridM.appendChild(
           el(
             'div',
@@ -1348,12 +1406,6 @@
         );
       }
       card.appendChild(gridM);
-    } else {
-      var bullets = el('ul', { class: 'tw-bullets' });
-      var rc = RESULT_COPY[tariffId];
-      var items = rc && rc.benefits ? rc.benefits : [];
-      for (var j = 0; j < items.length && j < 3; j++) bullets.appendChild(el('li', { text: items[j] }));
-      card.appendChild(bullets);
     }
 
     card.appendChild(
