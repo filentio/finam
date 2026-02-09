@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.40
+ * Version: 1.0.41
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.40';
+  var VERSION = '1.0.41';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -631,7 +631,7 @@
       '.ftw .tw-feedbackSub{font-size:13px;line-height:17px}' +
       '.ftw .tw-starBtn{width:40px;height:40px;border-radius:12px}' +
       '.ftw .tw-star{font-size:20px}' +
-      '.ftw .tw-chip{flex:0 0 100%;height:44px;font-size:13px}' +
+      '.ftw .tw-chip{max-width:100%;font-size:13px}' +
       '.ftw .tw-feedbackActions{justify-content:stretch}' +
       '.ftw .tw-feedbackBtn{width:100%}' +
       '.ftw .tw-metrics{grid-template-columns:1fr}' +
@@ -677,9 +677,10 @@
       '.ftw .tw-starBtn.is-on .tw-star{color:var(--ui-brand)}' +
       '.ftw .tw-starBtn:hover{background:rgba(255,255,255,0.10)}' +
       '.ftw .tw-chipTitle{margin-top:16px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
-      /* Chips: compact tags with flex-wrap */
-      '.ftw .tw-chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}' +
-      '.ftw .tw-chip{flex:0 0 240px;height:44px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+      /* Chips: flex-wrap, show full text (1–2 lines) */
+      '.ftw .tw-chips{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:10px}' +
+      '.ftw .tw-chip{flex:0 1 auto;max-width:calc(50% - 6px);padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease;display:inline-flex;align-items:center;justify-content:center;white-space:normal;overflow:visible;text-overflow:clip;text-align:center;word-break:break-word;line-height:16px}' +
+      '@media (max-width:640px){.ftw .tw-chip{max-width:100%}}' +
       '.ftw .tw-chip:hover{background:rgba(255,255,255,0.10)}' +
       '.ftw .tw-chip.is-selected{background:rgba(255,199,89,0.12);border-color:rgba(255,186,48,0.45)}' +
       '.ftw .tw-feedbackActions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:16px;flex-wrap:wrap}' +
