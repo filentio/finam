@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.33
+ * Version: 1.0.34
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.33';
+  var VERSION = '1.0.34';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -454,6 +454,12 @@
 
   function el(tag, attrs) {
     var node = document.createElement(tag);
+    // Prevent unexpected form submits when widget is embedded inside a <form>.
+    if (tag === 'button' && (!attrs || typeof attrs.type === 'undefined')) {
+      try {
+        node.type = 'button';
+      } catch (_) {}
+    }
     if (attrs) {
       Object.keys(attrs).forEach(function (k) {
         var v = attrs[k];
@@ -507,37 +513,27 @@
   var RESULT_COPY = {
     n1_dolgosrochniy: {
       benefits: [
-        'Подходит для спокойного долгосрочного подхода',
-        'Удобен, если вы реже совершаете сделки',
-        'Хороший выбор, если важна понятная стратегия на годы',
+        'Для спокойных долгосрочных инвестиций',
       ],
     },
     n2_day: {
       benefits: [
-        'Подходит, если вы планируете активные сделки',
-        'Удобен для динамичной торговли',
-        'Подходит, если важна скорость и гибкость в сделках',
+        'Для активной ежедневной торговли',
       ],
     },
     n3_investor: {
       benefits: [
-        'Понятный старт без лишней сложности',
-        'Подходит, если вы пока определяетесь со стратегией',
-        'Удобен, чтобы начать и разобраться в процессе',
+        'Для старта и выбора стратегии',
       ],
     },
     n4_strateg: {
       benefits: [
-        'Подходит, если вам ближе готовые подходы',
-        'Помогает действовать более системно',
-        'Удобен для последовательного подхода к решениям',
+        'Для инвестирования по готовым стратегиям',
       ],
     },
     n5_consulting: {
       benefits: [
-        'Подходит, если вам важны подсказки и сопровождение',
-        'Помогает инвестировать с поддержкой',
-        'Удобен, если хотите больше уверенности в действиях',
+        'Для инвестирования с экспертной поддержкой',
       ],
     },
   };
@@ -904,6 +900,7 @@
     if (a.q3_instruments === 'c2_futures') return 'n2_day';
     if (a.q1_goal === 'a2_active') return 'n2_day';
     if (a.q4_volume === 'd3_large') return 'n4_strateg';
+    if (a.q1_goal === 'a4_unsure') return 'n4_strateg';
     if (a.q1_goal === 'a1_save') return 'n1_dolgosrochniy';
     if (a.q1_goal === 'a3_try') return 'n3_investor';
     return 'n3_investor';
@@ -1281,8 +1278,8 @@
     });
     track(this, 'tariff_recommended', { tariff_id: tariffId });
     try {
-      var w = window.open(t.url, '_blank', 'noopener,noreferrer');
-      if (!w) window.location.href = t.url;
+      // Open in a new tab/window only. Do NOT navigate the current page.
+      window.open(t.url, '_blank', 'noopener,noreferrer');
     } catch (_) {}
   };
 
@@ -1382,7 +1379,6 @@
                 } catch (_) {}
                 try {
                   var w2 = window.open(self.options.openAccountUrl, '_blank', 'noopener,noreferrer');
-                  if (!w2) window.location.href = self.options.openAccountUrl;
                 } catch (_) {}
               },
               text: self.options.openAccountText || 'Открыть счёт',
