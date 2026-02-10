@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.44
+ * Version: 1.0.45
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.44';
+  var VERSION = '1.0.45';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -208,26 +208,59 @@
       }
     }
     function buildQuery(p) {
-      // Keep it short and robust.
-      function s(v) {
-        return v == null ? '' : String(v);
+      // Keep it short and robust (also used for stats events in restricted environments).
+      function s(v, maxLen) {
+        if (v == null) return '';
+        var str = String(v);
+        if (typeof maxLen === 'number' && str.length > maxLen) return str.slice(0, maxLen);
+        return str;
       }
+      function add(arr, k, v, maxLen) {
+        var val = s(v, maxLen);
+        if (!val) return;
+        arr.push(encodeURIComponent(k) + '=' + encodeURIComponent(val));
+      }
+
+      var parts = [];
+
+      // Core identifiers
+      add(parts, 'event_name', p.event_name || p.event, 64);
+      add(parts, 'session_id', p.session_id, 64);
+      add(parts, 'timestamp', p.timestamp, 64);
+      add(parts, 'flow_version', p.flow_version, 64);
+
+      // Tariff + feedback
+      add(parts, 'tariff_id', p.tariff_id, 64);
+      add(parts, 'tariff_name', p.tariff_name || p.tariff, 80);
+      add(parts, 'rating', p.rating, 16);
+
       var reasons = '';
       try {
-        reasons = Array.isArray(p.reasons) ? p.reasons.join(',') : '';
+        reasons = Array.isArray(p.reasons) ? p.reasons.join(',') : s(p.reasons, 300);
       } catch (_) {}
-      if (reasons.length > 300) reasons = reasons.slice(0, 300);
-      var q =
-        'session_id=' + encodeURIComponent(s(p.session_id)) +
-        '&tariff_id=' + encodeURIComponent(s(p.tariff_id)) +
-        '&rating=' + encodeURIComponent(s(p.rating)) +
-        '&reasons=' + encodeURIComponent(reasons) +
-        '&flow_version=' + encodeURIComponent(s(p.flow_version)) +
-        '&timestamp=' + encodeURIComponent(s(p.timestamp)) +
-        '&platform=' + encodeURIComponent(s(p.platform)) +
-        '&ab_group=' + encodeURIComponent(s(p.ab_group)) +
-        '&user_id=' + encodeURIComponent(s(p.user_id));
-      return q;
+      add(parts, 'reasons', reasons, 300);
+
+      // Question event
+      add(parts, 'question_id', p.question_id, 32);
+      add(parts, 'answer_id', p.answer_id, 32);
+      add(parts, 'answer_label', p.answer_label, 140);
+
+      // Flattened answers for upsert-by-columns scripts
+      add(parts, 'q1', p.q1, 140);
+      add(parts, 'q2', p.q2, 140);
+      add(parts, 'q3', p.q3, 140);
+      add(parts, 'q4', p.q4, 140);
+      add(parts, 'q5', p.q5, 140);
+
+      // Click flag
+      add(parts, 'tariff_click', p.tariff_click, 8);
+
+      // Optional
+      add(parts, 'platform', p.platform, 16);
+      add(parts, 'ab_group', p.ab_group, 32);
+      add(parts, 'user_id', p.user_id, 64);
+
+      return parts.join('&');
     }
     function sendFormGet(url, payload) {
       // Uses form-action CSP instead of connect/img-src.
@@ -456,7 +489,9 @@
 
   function sendStats(widget, name, payload) {
     try {
-      if (!widget || !widget.options || !widget.options.statsEndpoint) return;
+      if (!widget || !widget.options) return;
+      var endpoint = widget.options.statsEndpoint || widget.options.feedbackEndpoint;
+      if (!endpoint) return;
       var out = payload || {};
       out.event_name = name;
       out.widget = 'tariff_selection_widget';
@@ -464,7 +499,20 @@
       out.flow_version = widget.options.flowVersion || FLOW_VERSION;
       out.session_id = widget.sessionId;
       out.timestamp = new Date().toISOString();
-      postJsonWithRetry(widget.options.statsEndpoint, out, 3, function () {});
+      // Also send flattened answers for scripts that store per-column
+      try {
+        if (typeof widget.answersLabelSnapshot === 'function') {
+          var al = widget.answersLabelSnapshot();
+          if (al) {
+            out.q1 = al.q1_goal || '';
+            out.q2 = al.q2_frequency || '';
+            out.q3 = al.q3_instruments || '';
+            out.q4 = al.q4_volume || '';
+            out.q5 = al.q5_support || '';
+          }
+        }
+      } catch (_) {}
+      postJsonWithRetry(endpoint, out, 3, function () {});
     } catch (_) {}
   }
 
@@ -902,6 +950,14 @@
             session_id: self.sessionId,
             flow_version: self.options.flowVersion || FLOW_VERSION,
           });
+          sendStats(self, 'widget_abandoned', {
+            reason: reason,
+            step: step + 1,
+            total: QUESTIONS.length,
+            question_id: q ? q.id : null,
+            answers: self.answersSnapshot(),
+            answers_labels: self.answersLabelSnapshot ? self.answersLabelSnapshot() : undefined,
+          });
         }
 
         // Feedback missing: completed (result shown) but user left without submitting
@@ -920,6 +976,12 @@
             answers: self.answersSnapshot(),
             session_id: self.sessionId,
             flow_version: self.options.flowVersion || FLOW_VERSION,
+          });
+          sendStats(self, 'feedback_not_left', {
+            reason: reason,
+            tariff_id: String(self.state && self.state.resultTariffId ? self.state.resultTariffId : self.recommendTariffId()),
+            answers: self.answersSnapshot(),
+            answers_labels: self.answersLabelSnapshot ? self.answersLabelSnapshot() : undefined,
           });
         }
       } catch (_) {}
@@ -1272,6 +1334,7 @@
             onClick: function () {
               self._analyticsState.started = true;
               track(self, 'widget_start', { session_id: self.sessionId, flow_version: self.options.flowVersion || FLOW_VERSION });
+              sendStats(self, 'widget_start', {});
               // Fix questionnaire height to prevent layout jumps between questions.
               // Will be measured on first render to avoid empty space.
               self._fixedQuestionHeight = 0;
