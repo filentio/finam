@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.43
+ * Version: 1.0.44
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.43';
+  var VERSION = '1.0.44';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -572,25 +572,25 @@
   // Kept as a separate config object (not hardcoded in render markup).
   var TARIFF_METRICS = {
     n1_dolgosrochniy: [
-      { value: '0%', label: 'Ценные бумаги РФ' },
+      { value: '0%', label: 'Покупка ценных бумаг РФ' },
       { value: '0,1%', label: 'NASDAQ, HKEX, NYSE' },
       { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
       { value: '0 ₽', label: 'Обслуживание счета в месяц' },
     ],
     n2_day: [
-      { value: 'до 0,0354%', label: 'Ценные бумаги РФ' },
+      { value: 'до 0,0354%', label: 'Покупка ценных бумаг РФ' },
       { value: 'от 0,06%', label: 'NASDAQ, HKEX, NYSE' },
       { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
       { value: '177 ₽', label: 'Обслуживание счета в месяц' },
     ],
     n3_investor: [
-      { value: '0,035%', label: 'Ценные бумаги РФ' },
+      { value: '0,035%', label: 'Покупка ценных бумаг РФ' },
       { value: '0,1%', label: 'NASDAQ, HKEX, NYSE' },
       { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
       { value: '200 ₽', label: 'Обслуживание счета в месяц' },
     ],
     n4_strateg: [
-      { value: '0,05%', label: 'Ценные бумаги РФ' },
+      { value: '0,05%', label: 'Покупка ценных бумаг РФ' },
       { value: 'от 0,1%', label: 'NASDAQ, HKEX, NYSE' },
       { value: '0,9 ₽', label: 'Фьючерсы и опционы РФ' },
       { value: '0 ₽', label: 'Обслуживание счета в месяц' },
