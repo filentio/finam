@@ -1,1 +1,38 @@
+# Segmentation Form (DOC → Segment Engine)
 
+Standalone React + TypeScript implementation of a client segmentation questionnaire.
+
+## Run
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+## Implemented requirements
+
+- Component architecture:
+  - `SegmentationForm`
+    - `QualifiedBlock`
+    - `ExperienceBlock`
+    - `AmountBlock`
+    - `GoalBlock`
+    - `InstrumentsBlock`
+    - `ResultPreview`
+- Segmentation algorithm in `src/engine/calculateSegment.ts`
+- Amount tiers for onboarding personalization
+- JSON payload generation after submit
+- UX states and validation rules for Continue button
+- `navigateToOnboarding(segment, amountTier)` with segment-based route map
+- Event tracking stubs in `src/analytics/trackEvent.ts`:
+  - `segmentation_started`
+  - `segmentation_completed`
+  - `segment_novice` / `segment_advanced` / `segment_expert`
+  - `amount_selected`
+  - `goal_selected`
