@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.47
+ * Version: 1.0.48
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.47';
+  var VERSION = '1.0.48';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -644,8 +644,8 @@
       { value: '0 ₽', label: 'Обслуживание счета в месяц' },
     ],
     n5_consulting: [
-      { value: '0,05 %', label: 'Ценные бумаги РФ' },
-      { value: 'от 0,1 %', label: 'NASDAQ, NYSE' },
+      { value: '0,0833 %', label: 'Ценные бумаги РФ' },
+      { value: '0,17 %', label: 'NYSE, NASDAQ' },
       { value: '0,9 ₽', label: 'Фьючерсы и опционы РФ' },
       { value: '177 ₽', label: 'Обслуживание счета в месяц' },
     ],
