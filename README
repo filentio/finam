@@ -70,3 +70,41 @@ If your constructor has separate fields, use:
 
 The JS file auto-initializes widgets on page load and also exposes
 `window.initAllSegmentationWidgets()` for manual re-init after dynamic rendering.
+
+## Single-script CDN widget (no HTML/CSS in constructor)
+
+If you want the same integration style as tariff widget, use one script:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/filentio/finam@<COMMIT_SHA>/widget/finam-segmentation-widget.js?v=1"></script>
+```
+
+The script injects widget HTML + CSS automatically and mounts where the script tag is placed.
+
+Optional target mount:
+
+```html
+<script
+  src="https://cdn.jsdelivr.net/gh/filentio/finam@<COMMIT_SHA>/widget/finam-segmentation-widget.js?v=1"
+  data-target="#segmentation-widget-container"
+></script>
+```
+
+Public API:
+
+- `window.FinamSegmentationWidget.mount(target, { replace?: boolean })`
+- `window.FinamSegmentationWidget.initAll()`
+
+Optional callbacks:
+
+```html
+<script>
+  window.navigateToOnboarding = function (segment, amountTier) {
+    // your app routing logic
+  };
+
+  window.onSegmentationComplete = function (payload) {
+    // send payload to CRM/API
+  };
+</script>
+```
