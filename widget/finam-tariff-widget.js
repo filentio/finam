@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.49
+ * Version: 1.0.50
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.49';
+  var VERSION = '1.0.50';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -1755,9 +1755,21 @@
       var div = d.createElement('div');
       div.setAttribute('data-finam-tariff-widget', '');
       div.style.width = '100%';
-      // insert after script
-      if (script.nextSibling) script.parentNode.insertBefore(div, script.nextSibling);
-      else script.parentNode.appendChild(div);
+      // Insert after script, but never into <head> (it won't render there).
+      var parent = script.parentNode;
+      try {
+        var tag = parent && parent.tagName ? String(parent.tagName).toUpperCase() : '';
+        if (tag === 'HEAD') parent = d.body || parent;
+      } catch (_) {}
+      if (!parent) parent = d.body || script.parentNode;
+      if (!parent) return null;
+      if (parent === script.parentNode) {
+        if (script.nextSibling) parent.insertBefore(div, script.nextSibling);
+        else parent.appendChild(div);
+      } else {
+        // Fallback: append to body (end)
+        parent.appendChild(div);
+      }
       return div;
     } catch (_) {}
     return null;
