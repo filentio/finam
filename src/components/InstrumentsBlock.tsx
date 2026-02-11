@@ -18,7 +18,7 @@ const INSTRUMENT_OPTIONS: Array<{ value: Instrument; label: string }> = [
 export function InstrumentsBlock({
   value,
   onToggle,
-}: InstrumentsBlockProps): JSX.Element {
+}: InstrumentsBlockProps) {
   return (
     <section className="form-block">
       <h2 className="form-block__title">Какие инструменты вам интересны?</h2>

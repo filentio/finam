@@ -5,7 +5,7 @@ interface QualifiedBlockProps {
   onChange: (value: boolean) => void;
 }
 
-export function QualifiedBlock({ value, onChange }: QualifiedBlockProps): JSX.Element {
+export function QualifiedBlock({ value, onChange }: QualifiedBlockProps) {
   return (
     <section className="form-block">
       <h2 className="form-block__title">

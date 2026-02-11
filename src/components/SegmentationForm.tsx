@@ -67,7 +67,7 @@ function buildPayload(state: SegmentationState): SegmentationPayload | null {
   };
 }
 
-export function SegmentationForm({ onComplete }: SegmentationFormProps): JSX.Element {
+export function SegmentationForm({ onComplete }: SegmentationFormProps) {
   const [state, setState] = useState<SegmentationState>(INITIAL_STATE);
   const [submittedPayload, setSubmittedPayload] = useState<SegmentationPayload | null>(
     null,

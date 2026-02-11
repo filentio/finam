@@ -12,7 +12,7 @@ export function OptionCard({
   selected,
   onClick,
   inputType,
-}: OptionCardProps): JSX.Element {
+}: OptionCardProps) {
   const ariaRole = inputType === "radio" ? "radio" : "checkbox";
   const controlSymbol = selected
     ? inputType === "checkbox"

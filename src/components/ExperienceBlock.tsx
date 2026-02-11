@@ -19,7 +19,7 @@ export function ExperienceBlock({
   value,
   visible,
   onChange,
-}: ExperienceBlockProps): JSX.Element {
+}: ExperienceBlockProps) {
   return (
     <section
       className={`form-block collapsible ${visible ? "collapsible--open" : "collapsible--closed"}`}

@@ -13,7 +13,7 @@ const AMOUNT_OPTIONS: Array<{ value: AmountTier; label: string }> = [
   { value: "more_5m", label: "Более 5 млн ₽" },
 ];
 
-export function AmountBlock({ value, onChange }: AmountBlockProps): JSX.Element {
+export function AmountBlock({ value, onChange }: AmountBlockProps) {
   return (
     <section className="form-block">
       <h2 className="form-block__title">Какую сумму вы планируете инвестировать?</h2>

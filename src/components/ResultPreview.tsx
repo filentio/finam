@@ -10,7 +10,7 @@ export function ResultPreview({
   state,
   payload,
   navigationTarget,
-}: ResultPreviewProps): JSX.Element {
+}: ResultPreviewProps) {
   const draft = {
     qualified_investor: state.qualifiedInvestor,
     experience: state.experience,

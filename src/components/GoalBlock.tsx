@@ -13,7 +13,7 @@ const GOAL_OPTIONS: Array<{ value: InvestmentGoal; label: string }> = [
   { value: "preservation", label: "Сохранение" },
 ];
 
-export function GoalBlock({ value, onChange }: GoalBlockProps): JSX.Element {
+export function GoalBlock({ value, onChange }: GoalBlockProps) {
   return (
     <section className="form-block">
       <h2 className="form-block__title">Ваша главная цель инвестирования</h2>

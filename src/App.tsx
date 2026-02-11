@@ -1,6 +1,6 @@
 import { SegmentationForm } from "./components/SegmentationForm";
 
-function App(): JSX.Element {
+function App() {
   return (
     <main className="app-shell">
       <SegmentationForm />
