@@ -36,3 +36,26 @@ npm run build
   - `segment_novice` / `segment_advanced` / `segment_expert`
   - `amount_selected`
   - `goal_selected`
+
+## Embed into page constructor (HTML block)
+
+If you need to mount the segmentation form directly inside a constructor widget
+(like on your screenshot), use:
+
+- `embed/segmentation-widget.html`
+
+Copy the full snippet into your HTML block.
+
+Optional callbacks for integration:
+
+```html
+<script>
+  window.navigateToOnboarding = function (segment, amountTier) {
+    // your project router
+  };
+
+  window.onSegmentationComplete = function (payload) {
+    // send payload to backend / CRM
+  };
+</script>
+```
