@@ -1,0 +1,1910 @@
+/*!
+ * Finam Tariff Widget
+ * Self-contained embed widget (no build step).
+ * Version: 1.0.50
+ */
+(function (global) {
+  'use strict';
+
+  var VERSION = '1.0.50';
+  var FLOW_VERSION = 'tariff_picker_v1';
+
+  var DEFAULTS = {
+    // 'form' | 'result'
+    initialView: 'form',
+    loadFonts: false, // no external dependencies by default
+    shadowDom: true,
+    analytics: true,
+    onEvent: null, // (name: string, payload: object) => void
+    // 'auto' | '' | null | false | string (URL)
+    // - 'auto' tries to load /assets/premium-visual.svg next to the script host (jsDelivr/raw/local)
+    // - empty/false disables the image and keeps abstract gradients
+    premiumVisualImageUrl: 'auto',
+    // Feedback (right block on result screen)
+    feedbackEnabled: true,
+    feedbackEndpoint: '', // optional URL for POSTing feedback JSON
+    userId: null, // optional
+    abGroup: null, // optional
+    flowVersion: FLOW_VERSION, // analytics/feedback versioning
+    // Optional: additional CTA on result screen (kept secondary, not competing with tariff CTA)
+    openAccountUrl: '', // e.g. https://broker.finam.ru/...
+    openAccountText: 'Открыть счёт',
+    // Optional: social proof line on result screen (shown under title)
+    socialProofText: '',
+    // Optional: tariff metrics shown on result screen (recommended to keep numbers outside code)
+    // Shape:
+    // {
+    //   n1_dolgosrochniy: [{ value: '0%', label: 'Покупка ценных бумаг РФ' }, ...],
+    //   ...
+    // }
+    tariffMetrics: null,
+    // Optional: send quiz answers/clicks to your endpoint (e.g. Google Apps Script /exec)
+    statsEndpoint: '', // if set, widget will POST events as JSON (silent-fail)
+  };
+
+  // STRICT WHITELIST (DO NOT CHANGE NAMES/URLS)
+  var TARIFF_CATALOG = [
+    {
+      id: 'n1_dolgosrochniy',
+      name: 'Долгосрочный портфель',
+      url: 'https://broker.finam.ru/landing/tariffs-n1-dolgosrochniy/',
+    },
+    {
+      id: 'n2_day',
+      name: 'Единый дневной',
+      url: 'https://broker.finam.ru/landing/tariffs-n2-day/',
+    },
+    {
+      id: 'n3_investor',
+      name: 'Инвестор',
+      url: 'https://broker.finam.ru/landing/tariffs-n3-investor/',
+    },
+    {
+      id: 'n4_strateg',
+      name: 'Стратег',
+      url: 'https://broker.finam.ru/landing/tariffs-n4-strateg/',
+    },
+    {
+      id: 'n5_consulting',
+      name: 'Единый консультационный',
+      url: 'https://broker.finam.ru/landing/tariffs-n5-consulting/',
+    },
+  ];
+
+  // Runtime safety guard: only these IDs are allowed.
+  var ALLOWED = new Set(['n1_dolgosrochniy', 'n2_day', 'n3_investor', 'n4_strateg', 'n5_consulting']);
+  function assertValidTariff(tariffId) {
+    if (!ALLOWED.has(tariffId)) throw new Error('Invalid tariff id');
+  }
+
+  function tariffById(id) {
+    assertValidTariff(id);
+    for (var i = 0; i < TARIFF_CATALOG.length; i++) if (TARIFF_CATALOG[i].id === id) return TARIFF_CATALOG[i];
+    return null;
+  }
+
+  // Questions (step-by-step flow)
+  var QUESTIONS = [
+    {
+      id: 'q1_goal',
+      title: 'Для чего вы планируете инвестировать?',
+      options: [
+        { value: 'a1_save', label: 'Сохранить деньги и постепенно приумножать' },
+        { value: 'a2_active', label: 'Планирую активно торговать' },
+        { value: 'a3_try', label: 'Хочу попробовать и разобраться' },
+        { value: 'a4_unsure', label: 'Пока не определился(лась)' },
+      ],
+      required: true,
+    },
+    {
+      id: 'q2_frequency',
+      title: 'Как часто вы планируете совершать сделки?',
+      helperText: 'Это поможет подобрать тариф с подходящими комиссиями',
+      options: [
+        { value: 'b1_rare', label: 'Несколько раз в год' },
+        { value: 'b2_month', label: 'Несколько раз в месяц' },
+        { value: 'b3_daily', label: 'Почти каждый день' },
+        { value: 'b4_unknown', label: 'Пока не знаю' },
+      ],
+      required: true,
+    },
+    {
+      id: 'q3_instruments',
+      title: 'С какими инструментами вы планируете работать?',
+      options: [
+        { value: 'c1_stocks', label: 'Акции и облигации' },
+        { value: 'c2_futures', label: 'Фьючерсы и опционы' },
+        { value: 'c3_currency', label: 'Валюта' },
+        { value: 'c4_unknown', label: 'Пока не знаю' },
+      ],
+      required: true,
+    },
+    {
+      id: 'q4_volume',
+      title: 'Какую сумму вы планируете инвестировать на старте?',
+      options: [
+        { value: 'd1_small', label: 'До 100 000 ₽' },
+        { value: 'd2_mid', label: 'От 100 000 до 1 000 000 ₽' },
+        { value: 'd3_large', label: 'Более 1 000 000 ₽' },
+        { value: 'd4_unknown', label: 'Пока не определился(лась)' },
+      ],
+      required: true,
+    },
+    {
+      id: 'q5_support',
+      title: 'Понадобится ли вам экспертная поддержка?',
+      options: [
+        { value: 'e1_yes', label: 'Да, хочу получать подсказки и сопровождение' },
+        { value: 'e2_maybe', label: 'Возможно, но не обязательно' },
+        { value: 'e3_no', label: 'Нет, справлюсь самостоятельно' },
+      ],
+      required: true,
+    },
+  ];
+
+  function ensureFonts() {
+    if (document.getElementById('finam-tariff-widget-fonts')) return;
+    var link = document.createElement('link');
+    link.id = 'finam-tariff-widget-fonts';
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
+    document.head.appendChild(link);
+  }
+
+  function getCurrentScriptSrc() {
+    try {
+      if (document.currentScript && document.currentScript.src) return document.currentScript.src;
+    } catch (_) {}
+    try {
+      var scripts = document.getElementsByTagName('script');
+      for (var i = scripts.length - 1; i >= 0; i--) {
+        var src = scripts[i] && scripts[i].src ? String(scripts[i].src) : '';
+        if (src && src.indexOf('finam-tariff-widget.js') !== -1) return src;
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  function getSessionId() {
+    try {
+      if (global.crypto && typeof global.crypto.randomUUID === 'function') return global.crypto.randomUUID();
+    } catch (_) {}
+    // Fallback UUIDv4-ish
+    var s = '';
+    for (var i = 0; i < 36; i++) {
+      if (i === 8 || i === 13 || i === 18 || i === 23) s += '-';
+      else {
+        var r = (Math.random() * 16) | 0;
+        if (i === 14) r = 4;
+        if (i === 19) r = (r & 0x3) | 0x8;
+        s += r.toString(16);
+      }
+    }
+    return s;
+  }
+
+  function getPlatformHint() {
+    try {
+      if (global.matchMedia && global.matchMedia('(max-width: 860px)').matches) return 'mobile';
+    } catch (_) {}
+    return 'web';
+  }
+
+  function postJsonWithRetry(url, payload, attempts, cb) {
+    var max = typeof attempts === 'number' ? attempts : 3;
+    var attempt = 0;
+    function isSameOrigin(u) {
+      try {
+        return new URL(String(u), global.location && global.location.href ? global.location.href : undefined).origin === global.location.origin;
+      } catch (_) {
+        return false;
+      }
+    }
+    function isGoogleAppsScript(u) {
+      try {
+        return /https?:\/\/script\.google\.com\/macros\/s\//i.test(String(u));
+      } catch (_) {
+        return false;
+      }
+    }
+    function buildQuery(p) {
+      // Keep it short and robust (also used for stats events in restricted environments).
+      function s(v, maxLen) {
+        if (v == null) return '';
+        var str = String(v);
+        if (typeof maxLen === 'number' && str.length > maxLen) return str.slice(0, maxLen);
+        return str;
+      }
+      function add(arr, k, v, maxLen) {
+        var val = s(v, maxLen);
+        if (!val) return;
+        arr.push(encodeURIComponent(k) + '=' + encodeURIComponent(val));
+      }
+
+      var parts = [];
+
+      // Core identifiers
+      add(parts, 'event_name', p.event_name || p.event, 64);
+      add(parts, 'session_id', p.session_id, 64);
+      add(parts, 'timestamp', p.timestamp, 64);
+      add(parts, 'flow_version', p.flow_version, 64);
+
+      // Tariff + feedback
+      add(parts, 'tariff_id', p.tariff_id, 64);
+      add(parts, 'tariff_name', p.tariff_name || p.tariff, 80);
+      add(parts, 'rating', p.rating, 16);
+
+      var reasons = '';
+      try {
+        reasons = Array.isArray(p.reasons) ? p.reasons.join(',') : s(p.reasons, 300);
+      } catch (_) {}
+      add(parts, 'reasons', reasons, 300);
+
+      // Question event
+      add(parts, 'question_id', p.question_id, 32);
+      add(parts, 'answer_id', p.answer_id, 32);
+      add(parts, 'answer_label', p.answer_label, 140);
+
+      // Flattened answers for upsert-by-columns scripts
+      add(parts, 'q1', p.q1, 140);
+      add(parts, 'q2', p.q2, 140);
+      add(parts, 'q3', p.q3, 140);
+      add(parts, 'q4', p.q4, 140);
+      add(parts, 'q5', p.q5, 140);
+
+      // Click flag
+      add(parts, 'tariff_click', p.tariff_click, 8);
+
+      // Optional
+      add(parts, 'platform', p.platform, 16);
+      add(parts, 'ab_group', p.ab_group, 32);
+      add(parts, 'user_id', p.user_id, 64);
+
+      return parts.join('&');
+    }
+    function sendFormGet(url, payload) {
+      // Uses form-action CSP instead of connect/img-src.
+      try {
+        var doc = document;
+        var iframeName = 'ftw_feedback_iframe_' + Math.random().toString(16).slice(2);
+        var iframe = doc.createElement('iframe');
+        iframe.name = iframeName;
+        iframe.style.display = 'none';
+        doc.body.appendChild(iframe);
+
+        var form = doc.createElement('form');
+        form.method = 'GET';
+        form.action = String(url);
+        form.target = iframeName;
+
+        var q = buildQuery(payload).split('&');
+        for (var i = 0; i < q.length; i++) {
+          var kv = q[i].split('=');
+          if (!kv.length) continue;
+          var input = doc.createElement('input');
+          input.type = 'hidden';
+          input.name = decodeURIComponent(kv[0] || '');
+          input.value = decodeURIComponent((kv[1] || '').replace(/\+/g, '%20'));
+          form.appendChild(input);
+        }
+
+        doc.body.appendChild(form);
+        form.submit();
+
+        // Cleanup later
+        setTimeout(function () {
+          try {
+            if (form && form.parentNode) form.parentNode.removeChild(form);
+            if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          } catch (_) {}
+        }, 1500);
+
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    function sendImage(url, payload, onDone) {
+      try {
+        var img = new Image();
+        var sep = String(url).indexOf('?') === -1 ? '?' : '&';
+        img.onload = function () { onDone(true); };
+        img.onerror = function () { onDone(false); };
+        img.src = String(url) + sep + buildQuery(payload);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    function done(ok) {
+      try {
+        if (typeof cb === 'function') cb(!!ok);
+      } catch (_) {}
+    }
+    function once() {
+      attempt++;
+      var body = '';
+      try {
+        body = JSON.stringify(payload);
+      } catch (_) {
+        body = '{}';
+      }
+
+      // Cross-origin (e.g., Google Apps Script): use no-cors/beacon to avoid CORS blocking.
+      var same = isSameOrigin(url);
+      if (!same) {
+        // Google Apps Script: try multiple transports to bypass CORS/CSP restrictions.
+        if (isGoogleAppsScript(url)) {
+          // 1) Beacon (POST JSON). No preflight.
+          try {
+            if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+              var blob0 = new Blob([body], { type: 'text/plain;charset=UTF-8' });
+              var ok0 = navigator.sendBeacon(url, blob0);
+              if (ok0) return done(true);
+            }
+          } catch (_) {}
+
+          // 2) fetch no-cors (POST JSON). Opaque response.
+          try {
+            if (typeof fetch === 'function') {
+              fetch(url, { method: 'POST', mode: 'no-cors', body: body })
+                .then(function () {
+                  done(true);
+                })
+                .catch(function () {
+                  // 3) Form GET (uses doGet)
+                  var okForm = sendFormGet(url, payload);
+                  if (okForm) done(true);
+                  else {
+                    // 4) Image GET as last resort
+                    var okImg = sendImage(url, payload, function (ok) {
+                      if (ok) done(true);
+                      else retry();
+                    });
+                    if (!okImg) retry();
+                  }
+                });
+              return;
+            }
+          } catch (_) {}
+
+          // 3) Form GET fallback if fetch is unavailable/blocked
+          var okForm2 = sendFormGet(url, payload);
+          if (okForm2) return done(true);
+
+          // 4) Image GET last resort
+          var okImg2 = sendImage(url, payload, function (ok) {
+            if (ok) done(true);
+            else retry();
+          });
+          if (okImg2) return;
+        }
+        try {
+          if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+            var blob = new Blob([body], { type: 'text/plain;charset=UTF-8' });
+            var ok = navigator.sendBeacon(url, blob);
+            // sendBeacon returns boolean "queued" — treat as success.
+            return done(!!ok);
+          }
+        } catch (_) {}
+        try {
+          if (typeof fetch === 'function') {
+            fetch(url, { method: 'POST', mode: 'no-cors', body: body })
+              .then(function () {
+                // Opaque response: we can't know status, but request was sent.
+                done(true);
+              })
+              .catch(function () {
+                retry();
+              });
+            return;
+          }
+        } catch (_) {}
+        // Last resort: can't send
+        return retry();
+      }
+
+      try {
+        // Same-origin: use fetch with JSON and status check.
+        if (typeof fetch === 'function') {
+          fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body,
+          })
+            .then(function (r) {
+              if (r && r.ok) return done(true);
+              retry();
+            })
+            .catch(function () {
+              retry();
+            });
+          return;
+        }
+      } catch (_) {}
+
+      // XHR fallback (very compatible)
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState !== 4) return;
+          if (xhr.status >= 200 && xhr.status < 300) done(true);
+          else retry();
+        };
+        xhr.send(body);
+        return;
+      } catch (_) {}
+
+      retry();
+    }
+    function retry() {
+      if (attempt >= max) return done(false);
+      var delay = 500 * Math.pow(2, attempt - 1);
+      try {
+        setTimeout(once, delay);
+      } catch (_) {
+        done(false);
+      }
+    }
+    once();
+  }
+
+  function guessRepoBaseFromScriptSrc(src) {
+    if (!src) return '';
+    var clean = String(src).split('#')[0].split('?')[0];
+
+    // jsDelivr: https://cdn.jsdelivr.net/gh/<user>/<repo>@<ref>/widget/finam-tariff-widget.js
+    var m = clean.match(/^(https?:\/\/cdn\.jsdelivr\.net\/gh\/[^\/]+\/[^@\/]+@[^\/]+)\/.+$/i);
+    if (m && m[1]) return m[1] + '/';
+
+    // Raw GitHub: https://raw.githubusercontent.com/<user>/<repo>/<ref>/widget/finam-tariff-widget.js
+    var m2 = clean.match(/^(https?:\/\/raw\.githubusercontent\.com\/[^\/]+\/[^\/]+\/[^\/]+)\/.+$/i);
+    if (m2 && m2[1]) return m2[1] + '/';
+
+    // Local or other host: strip /widget/finam-tariff-widget.js
+    return clean.replace(/\/widget\/finam-tariff-widget\.js$/i, '/');
+  }
+
+  function defaultPremiumVisualUrl() {
+    var base = guessRepoBaseFromScriptSrc(getCurrentScriptSrc());
+    if (!base) return '';
+    // Prefer the newer PNG illustration; keep SVG fallback in repo.
+    return base + 'assets/tariff_widget_illustration_v3_7a119d5146.png';
+  }
+
+  function safeCssUrl(u) {
+    // Avoid breaking out of url("...") context.
+    return String(u).replace(/"/g, '%22');
+  }
+
+  function formatRUB(n) {
+    try {
+      return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(n);
+    } catch (_) {
+      return Math.round(n) + ' ₽';
+    }
+  }
+
+  function sendStats(widget, name, payload) {
+    try {
+      if (!widget || !widget.options) return;
+      var endpoint = widget.options.statsEndpoint || widget.options.feedbackEndpoint;
+      if (!endpoint) return;
+      var out = payload || {};
+      out.event_name = name;
+      out.widget = 'tariff_selection_widget';
+      out.version = VERSION;
+      out.flow_version = widget.options.flowVersion || FLOW_VERSION;
+      out.session_id = widget.sessionId;
+      out.timestamp = new Date().toISOString();
+      // Also send flattened answers for scripts that store per-column
+      try {
+        if (typeof widget.answersLabelSnapshot === 'function') {
+          var al = widget.answersLabelSnapshot();
+          if (al) {
+            out.q1 = al.q1_goal || '';
+            out.q2 = al.q2_frequency || '';
+            out.q3 = al.q3_instruments || '';
+            out.q4 = al.q4_volume || '';
+            out.q5 = al.q5_support || '';
+          }
+        }
+      } catch (_) {}
+      postJsonWithRetry(endpoint, out, 3, function () {});
+    } catch (_) {}
+  }
+
+  function questionById(id) {
+    for (var i = 0; i < QUESTIONS.length; i++) if (QUESTIONS[i].id === id) return QUESTIONS[i];
+    return null;
+  }
+
+  function answerLabelFor(questionId, answerId) {
+    try {
+      var q = questionById(questionId);
+      if (!q || !q.options) return '';
+      for (var i = 0; i < q.options.length; i++) if (q.options[i].value === answerId) return String(q.options[i].label || '');
+    } catch (_) {}
+    return '';
+  }
+
+  function el(tag, attrs) {
+    var node = document.createElement(tag);
+    // Prevent unexpected form submits when widget is embedded inside a <form>.
+    if (tag === 'button' && (!attrs || typeof attrs.type === 'undefined')) {
+      try {
+        node.type = 'button';
+      } catch (_) {}
+    }
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        var v = attrs[k];
+        if (k === 'class') node.className = v;
+        else if (k === 'text') node.textContent = v;
+        else if (k === 'html') node.innerHTML = v;
+        else if (k === 'type') node.type = v;
+        else if (k === 'value') node.value = v;
+        else if (k === 'disabled') node.disabled = !!v;
+        else if (k.indexOf('data-') === 0) node.setAttribute(k, v);
+        else if (k === 'onClick') node.addEventListener('click', v);
+        else if (k === 'onChange') node.addEventListener('change', v);
+        else if (k === 'onInput') node.addEventListener('input', v);
+        else node.setAttribute(k, v);
+      });
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null) continue;
+      if (typeof c === 'string') node.appendChild(document.createTextNode(c));
+      else node.appendChild(c);
+    }
+    return node;
+  }
+
+  function track(widget, name, payload) {
+    if (!widget || !widget.options || widget.options.analytics === false) return;
+    var detail = payload || {};
+    detail.event = name;
+    detail.widget = 'tariff_selection_widget';
+    detail.version = VERSION;
+
+    try {
+      if (typeof widget.options.onEvent === 'function') widget.options.onEvent(name, detail);
+    } catch (_) {}
+
+    try {
+      var ev = new CustomEvent('finamTariffWidget', { detail: detail });
+      (widget.mountPoint || document).dispatchEvent(ev);
+      window.dispatchEvent(ev);
+    } catch (_) {}
+
+    try {
+      if (Array.isArray(window.dataLayer)) window.dataLayer.push(detail);
+    } catch (_) {}
+  }
+
+  // (scoring-based matching removed; we use strict conservative rules below)
+
+  // Result copy (STRICT, NO assumptions).
+  var RESULT_COPY = {
+    n1_dolgosrochniy: {
+      benefits: [
+        'Для спокойных долгосрочных инвестиций',
+      ],
+    },
+    n2_day: {
+      benefits: [
+        'Для активной ежедневной торговли',
+      ],
+    },
+    n3_investor: {
+      benefits: [
+        'Для старта и выбора стратегии',
+      ],
+    },
+    n4_strateg: {
+      benefits: [
+        'Для инвестирования по готовым стратегиям',
+      ],
+    },
+    n5_consulting: {
+      benefits: [
+        'Для инвестирования с экспертной поддержкой',
+      ],
+    },
+  };
+
+  // Tariff metrics (value + label). Rendered on result screen under the single bullet.
+  // Kept as a separate config object (not hardcoded in render markup).
+  var TARIFF_METRICS = {
+    n1_dolgosrochniy: [
+      { value: '0%', label: 'Покупка ценных бумаг РФ' },
+      { value: '0,1%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '0 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n2_day: [
+      { value: 'до 0,0354%', label: 'Покупка ценных бумаг РФ' },
+      { value: 'от 0,06%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '177 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n3_investor: [
+      { value: '0,035%', label: 'Покупка ценных бумаг РФ' },
+      { value: '0,1%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,45 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '200 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n4_strateg: [
+      { value: '0,05%', label: 'Покупка ценных бумаг РФ' },
+      { value: 'от 0,1%', label: 'NASDAQ, HKEX, NYSE' },
+      { value: '0,9 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '0 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+    n5_consulting: [
+      { value: '0,108324 %', label: 'Ценные бумаги РФ' },
+      { value: '0,17 %', label: 'NYSE, NASDAQ' },
+      { value: '4,65 ₽', label: 'Фьючерсы и опционы РФ' },
+      { value: '177 ₽', label: 'Обслуживание счета в месяц' },
+    ],
+  };
+
+  // (commission calculator removed; widget is questionnaire-only)
+
+  function cssText() {
+    return (
+      '' +
+      ':host{all:initial;display:block;width:100%}' +
+      /* Tokens (Finam premium dark + gold). */
+      '.ftw{' +
+      '--ui-font: \"Inter var\", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;' +
+      '--ui-bg-dark:#151519;' +
+      '--ui-border-on-dark:hsla(0,0%,100%,.12);' +
+      '--ui-text-inverse:#ebebf2;' +
+      '--ui-text-inverse-secondary:rgb(164,164,178);' +
+      '--ui-brand:#ffc759;' +
+      '--ui-brand-hover:#ffba30;' +
+      '--ui-brand-pressed:#f9a605;' +
+      '--ui-gradient-premium:linear-gradient(225deg, rgba(192,192,204,.24) -0.21%, rgba(0,0,0,.2) 45.81%, rgba(0,0,0,.4) 96.67%), #151519;' +
+      '--ui-gradient-gold-soft:radial-gradient(90% 120% at 20% 10%, rgba(255,199,89,.22) 0%, rgba(255,199,89,0) 55%);' +
+      '--ui-gradient-gold-edge:radial-gradient(70% 120% at 100% 0%, rgba(255,186,48,.18) 0%, rgba(255,186,48,0) 60%);' +
+      '--ui-shadow-cardDark:0px 5px 10px 0px rgba(57,57,66,.16), 0px 15px 20px 0px rgba(57,57,66,.16), 0px 25px 50px 0px rgba(57,57,66,.16);' +
+      '--ui-shadow-cardMid:0px 2px 6px 0px rgba(57,57,66,.06), 0px 10px 20px 0px rgba(57,57,66,.06);' +
+      /* Slightly smaller rounding (per request) */
+      '--ui-radius-shell:24px;' +
+      '--ui-radius-card:16px;' +
+      '--ui-radius-item:12px;' +
+      '--ui-radius-btn:10px;' +
+      '}' +
+      '.ftw *{box-sizing:border-box}' +
+      '.ftw .wrap{width:100%}' +
+      /* Shell */
+      '.ftw .tw-shell{font-family:var(--ui-font);border-radius:var(--ui-radius-shell);background:var(--ui-gradient-premium);box-shadow:var(--ui-shadow-cardDark);border:1px solid var(--ui-border-on-dark);color:var(--ui-text-inverse);overflow:hidden}' +
+      '.ftw .tw-header{padding:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;background-image:var(--ui-gradient-gold-edge)}' +
+      '.ftw .tw-h1{font-size:24px;line-height:28px;font-weight:700;color:var(--ui-text-inverse);margin:0}' +
+      /* Card H2 (match tariff card): 40/48/700/-0.384 */
+      '.ftw .tw-h2{font-size:32px;line-height:38px;font-weight:700;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
+      '.ftw .tw-heroTitle{font-size:36px;line-height:42px;font-weight:800;letter-spacing:-0.384px;color:rgb(235, 235, 242);margin:0}' +
+      '@media (max-width:860px){.ftw .tw-heroTitle{font-size:30px;line-height:36px}}' +
+      /* Mobile typography + spacing */
+      '@media (max-width:560px){' +
+      '.ftw .tw-header{padding:16px;gap:12px}' +
+      '.ftw .tw-h1{font-size:20px;line-height:24px}' +
+      '.ftw .tw-h2{font-size:24px;line-height:30px;letter-spacing:-0.24px}' +
+      '.ftw .tw-heroTitle{font-size:26px;line-height:32px;letter-spacing:-0.24px}' +
+      '.ftw .tw-secondaryText{font-size:14px;line-height:18px}' +
+      '.ftw .tw-two-col{padding:16px;gap:16px}' +
+      '.ftw .tw-one-col{padding:16px}' +
+      '.ftw .tw-card{padding:16px}' +
+      '.ftw .tw-questionTitle{font-size:18px;line-height:22px}' +
+      '.ftw .tw-options{gap:12px;margin:0 0 16px 0}' +
+      '.ftw .tw-option{padding:14px;grid-template-columns:1fr 24px}' +
+      '.ftw .tw-option-text{font-size:15px;line-height:19px}' +
+      '.ftw .tw-actions{flex-direction:column;align-items:stretch;gap:12px}' +
+      '.ftw .tw-actions-left{width:100%}' +
+      '.ftw .tw-actions-right{width:100%;justify-content:stretch}' +
+      '.ftw .tw-actions-right .tw-btn{width:100%}' +
+      '.ftw .tw-btn{width:100%}' +
+      '.ftw .tw-feedback{padding:16px;min-height:auto}' +
+      '.ftw .tw-feedbackTitle{font-size:16px;line-height:20px}' +
+      '.ftw .tw-feedbackSub{font-size:13px;line-height:17px}' +
+      '.ftw .tw-starBtn{width:40px;height:40px;border-radius:12px}' +
+      '.ftw .tw-star{font-size:20px}' +
+      '.ftw .tw-chip{max-width:100%;font-size:13px}' +
+      '.ftw .tw-feedbackActions{justify-content:stretch}' +
+      '.ftw .tw-feedbackBtn{width:100%}' +
+      '.ftw .tw-metrics{grid-template-columns:1fr}' +
+      '.ftw .tw-premium-card{padding:12px;border-radius:14px}' +
+      '.ftw .tw-premium-text{font-size:13px;line-height:17px}' +
+      '}' +
+      '.ftw .tw-secondaryText{font-size:16px;line-height:20px;font-weight:400;letter-spacing:-0.096px;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
+      '.ftw .tw-meta{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin:0 0 10px 0}' +
+      /* One-column body (used for questions/results to avoid layout jumps) */
+      '.ftw .tw-one-col{padding:24px}' +
+      /* Body grid */
+      '.ftw .tw-two-col{display:grid;grid-template-columns:1.05fr 0.95fr;gap:24px;align-items:stretch;padding:24px}' +
+      '@media (max-width:860px){.ftw .tw-two-col{grid-template-columns:1fr}.ftw .tw-premium-visual{display:none}}' +
+      /* Background image mode (question/result): image is part of whole module background */
+      '.ftw .tw-shell-bg{position:relative}' +
+      /* Illustration as part of section background (no separate card on the right) */
+      '.ftw .tw-shell-bg::before{content:\"\";position:absolute;inset:0;z-index:0;background-image:var(--tw-bg-img, none);background-repeat:no-repeat;background-position:right 24px center;background-size:var(--tw-bg-size, 420px auto);opacity:0.96;filter:saturate(1.04) contrast(1.04);pointer-events:none}' +
+      '.ftw .tw-shell-bg > *{position:relative;z-index:1}' +
+      '@media (max-width:1100px){.ftw .tw-shell-bg::before{background-position:right 16px center;background-size:360px auto}}' +
+      '@media (max-width:860px){.ftw .tw-shell-bg::before{display:none}}' +
+      /* Premium visual */
+      /* Make the right visual look like part of the shell (no separate frame) */
+      '.ftw .tw-premium-visual{border-radius:var(--ui-radius-shell);background:transparent;box-shadow:none;position:relative;min-height:260px;overflow:hidden}' +
+      '.ftw .tw-premium-img{position:absolute;inset:0;z-index:0;background-size:cover;background-position:right center;background-repeat:no-repeat;opacity:0.92;filter:saturate(1.05) contrast(1.05);transform:scale(1.03)}' +
+      '.ftw .tw-premium-overlay{position:absolute;inset:0;z-index:1;background-image:var(--ui-gradient-gold-soft), var(--ui-gradient-gold-edge);pointer-events:none}' +
+      '.ftw .tw-premium-visual::after{content:\"\";position:absolute;z-index:2;inset:-40% -20%;transform:rotate(12deg);background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 45%,transparent 70%);opacity:0.8;pointer-events:none}' +
+      '.ftw .tw-premium-content{position:absolute;z-index:3;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;padding:18px;pointer-events:none}' +
+      '.ftw .tw-premium-card{pointer-events:none;max-width:92%;border-radius:16px;background:rgba(21,21,25,0.62);border:1px solid rgba(255,255,255,0.12);box-shadow:0 8px 20px rgba(0,0,0,0.25);padding:14px}' +
+      '.ftw .tw-premium-kicker{font-size:12px;line-height:16px;font-weight:800;color:rgba(255,199,89,0.95);letter-spacing:0.02em;margin:0 0 6px 0}' +
+      '.ftw .tw-premium-text{font-size:14px;line-height:18px;font-weight:700;color:var(--ui-text-inverse);margin:0}' +
+      /* Inner card */
+      '.ftw .tw-card{border-radius:var(--ui-radius-card);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);box-shadow:var(--ui-shadow-cardMid);padding:24px}' +
+      /* Solid card (questions/results) to keep readability over visuals */
+      '.ftw .tw-cardSolid{background:rgba(21,21,25,0.92);border:1px solid rgba(255,255,255,0.14);box-shadow:var(--ui-shadow-cardDark)}' +
+      /* Feedback block (right side on result): denser for readability */
+      '.ftw .tw-feedback{border-radius:var(--ui-radius-shell);background:rgba(21,21,25,0.88);border:1px solid rgba(255,255,255,0.16);box-shadow:var(--ui-shadow-cardDark);padding:24px;min-height:260px;backdrop-filter:blur(10px)}' +
+      '.ftw .tw-feedbackTitle{font-size:18px;line-height:22px;font-weight:800;letter-spacing:-0.16px;color:var(--ui-text-inverse);margin:0}' +
+      '.ftw .tw-feedbackSub{font-size:14px;line-height:18px;font-weight:500;color:var(--ui-text-inverse-secondary);margin-top:8px}' +
+      '.ftw .tw-stars{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}' +
+      '.ftw .tw-starBtn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease,transform .05s ease}' +
+      '.ftw .tw-starBtn:active{transform:translateY(1px)}' +
+      '.ftw .tw-star{font-size:22px;line-height:1;color:rgba(255,255,255,0.22)}' +
+      '.ftw .tw-starBtn.is-on .tw-star{color:var(--ui-brand)}' +
+      '.ftw .tw-starBtn:hover{background:rgba(255,255,255,0.10)}' +
+      '.ftw .tw-chipTitle{margin-top:16px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
+      /* Chips: flex-wrap, show full text (1–2 lines) */
+      '.ftw .tw-chips{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:10px}' +
+      '.ftw .tw-chip{flex:0 1 auto;max-width:calc(50% - 6px);padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ui-text-inverse);font-weight:700;font-size:13px;cursor:pointer;transition:background .15s ease,border-color .15s ease;display:inline-flex;align-items:center;justify-content:center;white-space:normal;overflow:visible;text-overflow:clip;text-align:center;word-break:break-word;line-height:16px}' +
+      '@media (max-width:640px){.ftw .tw-chip{max-width:100%}}' +
+      '.ftw .tw-chip:hover{background:rgba(255,255,255,0.10)}' +
+      '.ftw .tw-chip.is-selected{background:rgba(255,199,89,0.12);border-color:rgba(255,186,48,0.45)}' +
+      '.ftw .tw-feedbackActions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:16px;flex-wrap:wrap}' +
+      '.ftw .tw-feedbackBtn{height:40px;padding:0 16px;border-radius:12px;font-family:var(--ui-font);font-size:14px;line-height:18px;font-weight:800;background:rgba(255,255,255,0.08);color:var(--ui-text-inverse);border:1px solid rgba(255,255,255,0.14);cursor:pointer;transition:background .15s ease,transform .05s ease}' +
+      '.ftw .tw-feedbackBtn:hover{background:rgba(255,255,255,0.12)}' +
+      '.ftw .tw-feedbackBtn:active{transform:translateY(1px)}' +
+      '.ftw .tw-feedbackBtn[disabled]{opacity:0.55;cursor:not-allowed;transform:none}' +
+      '.ftw .tw-feedbackThanks{margin-top:14px;font-size:14px;line-height:18px;font-weight:800;color:var(--ui-text-inverse)}' +
+      '.ftw .tw-feedbackDone{display:flex;gap:10px;align-items:flex-start;margin-top:14px}' +
+      '.ftw .tw-doneIcon{width:28px;height:28px;border-radius:10px;background:rgba(255,199,89,0.12);border:1px solid rgba(255,186,48,0.35);display:flex;align-items:center;justify-content:center;color:var(--ui-brand);font-weight:900}' +
+      '.ftw .tw-questionTitle{font-size:20px;line-height:24px;font-weight:700;color:var(--ui-text-inverse);margin:0 0 12px 0}' +
+      '.ftw .tw-progress{height:4px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;margin:8px 0 18px 0}' +
+      '.ftw .tw-progress > div{height:100%;width:var(--tw-progress,0%);background:var(--ui-brand);border-radius:999px}' +
+      /* Options */
+      '.ftw .tw-options{display:flex;flex-direction:column;gap:16px;margin:0 0 20px 0}' +
+      '.ftw .tw-option{border-radius:var(--ui-radius-item);background:rgba(255,255,255,0.04);border:1px solid var(--ui-border-on-dark);padding:16px;cursor:pointer;display:grid;grid-template-columns:1fr 28px;align-items:center;transition:background .15s ease,border-color .15s ease}' +
+      '.ftw .tw-option:hover{background:rgba(255,255,255,0.06)}' +
+      '.ftw .tw-option.is-selected{background:rgba(255,199,89,0.10);border-color:rgba(255,186,48,0.45)}' +
+      '.ftw .tw-option-text{font-size:16px;line-height:20px;font-weight:500;color:var(--ui-text-inverse)}' +
+      '.ftw .tw-option-check{width:18px;height:18px;border-radius:999px;border:2px solid rgba(255,255,255,0.25);justify-self:end;display:flex;align-items:center;justify-content:center}' +
+      '.ftw .tw-option.is-selected .tw-option-check{border-color:var(--ui-brand);background:var(--ui-brand)}' +
+      '.ftw .tw-option.is-selected .tw-option-check::after{content:\"✓\";color:#000;font-size:12px;font-weight:900}' +
+      /* Divider */
+      '.ftw .tw-divider{height:1px;background:hsla(0,0%,100%,.12);margin:16px 0}' +
+      /* Bullets */
+      '.ftw .tw-bullets{list-style:none;padding:0;margin:16px 0;display:flex;flex-direction:column;gap:10px}' +
+      '.ftw .tw-bullets li{display:grid;grid-template-columns:12px 1fr;gap:10px;align-items:start;color:var(--ui-text-inverse);font-weight:700;font-size:14px;line-height:20px}' +
+      '.ftw .tw-bullets li::before{content:\"\";width:8px;height:8px;margin-top:6px;border-radius:999px;background:var(--ui-brand)}' +
+      /* Tariff metrics (result screen) */
+      '.ftw .tw-metrics{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:18px;margin:16px 0 6px 0}' +
+      '@media (max-width:860px){.ftw .tw-metrics{grid-template-columns:repeat(2, minmax(0, 1fr))}}' +
+      /* Metric value: consistent weight; prefix (до/от) is lighter and kept on same line */
+      '.ftw .tw-metricVal{font-size:18px;line-height:22px;font-weight:700;letter-spacing:-0.16px;color:var(--ui-text-inverse);margin:0;display:flex;gap:6px;align-items:baseline;white-space:nowrap}' +
+      '.ftw .tw-metricPrefix{font-size:12px;line-height:16px;font-weight:600;color:var(--ui-text-inverse-secondary)}' +
+      '.ftw .tw-metricNumber{font-size:18px;line-height:22px;font-weight:700;color:var(--ui-text-inverse)}' +
+      '.ftw .tw-metricLbl{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-text-inverse-secondary);margin-top:6px}' +
+      /* Actions */
+      '.ftw .tw-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;flex-wrap:wrap}' +
+      '.ftw .tw-actions-left{display:flex;gap:10px;flex-wrap:wrap}' +
+      '.ftw .tw-actions-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}' +
+      /* Buttons */
+      /* Buttons (match tariff card paddings + SemiBold) */
+      '.ftw .tw-btn{height:48px;padding:0 24px;border-radius:var(--ui-radius-btn);font-family:var(--ui-font);font-size:16px;line-height:20px;font-weight:600;border:none;cursor:pointer;transition:background .15s ease, transform .05s ease}' +
+      '.ftw .tw-btn:active{transform:translateY(1px)}' +
+      '.ftw .tw-btn-primary{background:var(--ui-brand);color:#000}' +
+      '.ftw .tw-btn-primary:hover{background:var(--ui-brand-hover)}' +
+      '.ftw .tw-btn-secondary{background:rgba(255,255,255,0.08);color:var(--ui-text-inverse);border:1px solid var(--ui-border-on-dark)}' +
+      '.ftw .tw-btn-secondary:hover{background:rgba(255,255,255,0.12)}' +
+      '.ftw .tw-btn[disabled]{opacity:0.6;cursor:not-allowed;transform:none}' +
+      /* Focus */
+      '.ftw .tw-btn:focus-visible,.ftw .tw-option:focus-visible{outline:2px solid var(--ui-brand);outline-offset:2px}' +
+      ''
+    );
+  }
+
+  function createRoot(target, options) {
+    var useShadow = !!(options.shadowDom && target.attachShadow);
+    var root = useShadow ? target.attachShadow({ mode: 'open' }) : target;
+    var host = el('div', { class: 'ftw' });
+    var style = el('style', { html: cssText() });
+    if (useShadow) {
+      root.appendChild(style);
+      root.appendChild(host);
+    } else {
+      target.appendChild(style);
+      target.appendChild(host);
+    }
+    return { root: root, host: host, useShadow: useShadow };
+  }
+
+  function Widget(target, opts) {
+    this.options = {};
+    for (var k in DEFAULTS) this.options[k] = DEFAULTS[k];
+    for (var k2 in (opts || {})) this.options[k2] = opts[k2];
+
+    if (this.options.loadFonts) ensureFonts();
+
+    if (this.options.premiumVisualImageUrl === 'auto') {
+      this.options.premiumVisualImageUrl = defaultPremiumVisualUrl();
+    }
+    if (!this.options.premiumVisualImageUrl) this.options.premiumVisualImageUrl = '';
+
+    this.mountPoint = target;
+    this.dom = createRoot(target, this.options);
+    try {
+      // Debugging aid: allow inspecting instance/options in console.
+      target.__finamTariffWidgetInstance = this;
+      global.__FinamTariffWidgetLast = this;
+      if (!global.__FinamTariffWidgetInstances) global.__FinamTariffWidgetInstances = [];
+      global.__FinamTariffWidgetInstances.push(this);
+    } catch (_) {}
+
+    // Fixed height for question screens (avoids layout jumps).
+    // Set when user enters questionnaire.
+    this._fixedQuestionHeight = 0;
+    this._feedbackTimer = null;
+    this._feedbackShownOnce = false;
+    this.sessionId = getSessionId();
+    this._analyticsState = {
+      started: false,
+      completed: false,
+      resultShown: false,
+      abandonedReported: false,
+      feedbackSubmitted: false,
+      feedbackMissingReported: false,
+      lastQuestionViewedStep: null,
+    };
+    this._bindAnalyticsLifecycle();
+
+    this.state = {
+      mode: 'intro', // 'intro' | 'question' | 'result' | 'error'
+      step: 0,
+      answers: {
+        q1_goal: null,
+        q2_frequency: null,
+        q3_instruments: null,
+        q4_volume: null,
+        q5_support: null,
+      },
+      resultTariffId: null,
+      feedback: { state: 'idle', rating: null, reasons: [] },
+    };
+
+    track(this, 'widget_init', {});
+    this.render();
+  }
+
+  Widget.prototype.answersSnapshot = function () {
+    var a = this.state && this.state.answers ? this.state.answers : {};
+    return {
+      q1_goal: a.q1_goal || null,
+      q2_frequency: a.q2_frequency || null,
+      q3_instruments: a.q3_instruments || null,
+      q4_volume: a.q4_volume || null,
+      q5_support: a.q5_support || null,
+    };
+  };
+
+  Widget.prototype.answersLabelSnapshot = function () {
+    var a = this.state && this.state.answers ? this.state.answers : {};
+    return {
+      q1_goal: a.q1_goal ? answerLabelFor('q1_goal', a.q1_goal) : null,
+      q2_frequency: a.q2_frequency ? answerLabelFor('q2_frequency', a.q2_frequency) : null,
+      q3_instruments: a.q3_instruments ? answerLabelFor('q3_instruments', a.q3_instruments) : null,
+      q4_volume: a.q4_volume ? answerLabelFor('q4_volume', a.q4_volume) : null,
+      q5_support: a.q5_support ? answerLabelFor('q5_support', a.q5_support) : null,
+    };
+  };
+
+  Widget.prototype.getTariffMetrics = function (tariffId) {
+    try {
+      var tm = this.options && this.options.tariffMetrics ? this.options.tariffMetrics : TARIFF_METRICS;
+      if (!tm || !tm[tariffId] || !Array.isArray(tm[tariffId])) return null;
+      var arr = tm[tariffId].slice(0, 6);
+      // normalize
+      var out = [];
+      for (var i = 0; i < arr.length; i++) {
+        var it = arr[i];
+        if (!it) continue;
+        var v = it.value != null ? String(it.value) : '';
+        var l = it.label != null ? String(it.label) : '';
+        if (!v || !l) continue;
+        out.push({ value: v, label: l });
+      }
+      return out.length ? out : null;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  Widget.prototype._bindAnalyticsLifecycle = function () {
+    var self = this;
+    if (this._analyticsLifecycleBound) return;
+    this._analyticsLifecycleBound = true;
+
+    function maybeReport(reason) {
+      try {
+        // Abandon: started but not completed
+        if (self._analyticsState.started && !self._analyticsState.completed && !self._analyticsState.abandonedReported) {
+          self._analyticsState.abandonedReported = true;
+          var step = self.state && typeof self.state.step === 'number' ? self.state.step : 0;
+          var q = QUESTIONS[step];
+          track(self, 'widget_abandoned', {
+            reason: reason,
+            step: step + 1,
+            total: QUESTIONS.length,
+            question_id: q ? q.id : null,
+            answers: self.answersSnapshot(),
+            session_id: self.sessionId,
+            flow_version: self.options.flowVersion || FLOW_VERSION,
+          });
+          sendStats(self, 'widget_abandoned', {
+            reason: reason,
+            step: step + 1,
+            total: QUESTIONS.length,
+            question_id: q ? q.id : null,
+            answers: self.answersSnapshot(),
+            answers_labels: self.answersLabelSnapshot ? self.answersLabelSnapshot() : undefined,
+          });
+        }
+
+        // Feedback missing: completed (result shown) but user left without submitting
+        if (
+          self._analyticsState.completed &&
+          self._analyticsState.resultShown &&
+          self.options &&
+          self.options.feedbackEnabled &&
+          !self._analyticsState.feedbackSubmitted &&
+          !self._analyticsState.feedbackMissingReported
+        ) {
+          self._analyticsState.feedbackMissingReported = true;
+          track(self, 'feedback_not_left', {
+            reason: reason,
+            tariff_id: String(self.state && self.state.resultTariffId ? self.state.resultTariffId : self.recommendTariffId()),
+            answers: self.answersSnapshot(),
+            session_id: self.sessionId,
+            flow_version: self.options.flowVersion || FLOW_VERSION,
+          });
+          sendStats(self, 'feedback_not_left', {
+            reason: reason,
+            tariff_id: String(self.state && self.state.resultTariffId ? self.state.resultTariffId : self.recommendTariffId()),
+            answers: self.answersSnapshot(),
+            answers_labels: self.answersLabelSnapshot ? self.answersLabelSnapshot() : undefined,
+          });
+        }
+      } catch (_) {}
+    }
+
+    try {
+      window.addEventListener('pagehide', function () {
+        maybeReport('pagehide');
+      });
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') maybeReport('visibility_hidden');
+      });
+    } catch (_) {}
+  };
+
+  Widget.prototype.setState = function (patch) {
+    for (var k in patch) this.state[k] = patch[k];
+    this.render();
+  };
+
+  Widget.prototype.setAnswer = function (id, value) {
+    this.state.answers[id] = value;
+    var snapshot = this.answersSnapshot();
+    var snapshotLabels = this.answersLabelSnapshot();
+    var ansLabel = answerLabelFor(id, value);
+    track(this, 'question_answered', {
+      question_id: id,
+      answer_id: String(value),
+      answer_label: ansLabel,
+      step: (this.state.step || 0) + 1,
+      total: QUESTIONS.length,
+      answers: snapshot,
+      answers_labels: snapshotLabels,
+      session_id: this.sessionId,
+      flow_version: this.options.flowVersion || FLOW_VERSION,
+    });
+    sendStats(this, 'question_answered', {
+      question_id: id,
+      answer_id: String(value),
+      answer_label: ansLabel,
+      step: (this.state.step || 0) + 1,
+      total: QUESTIONS.length,
+      answers: snapshot,
+      answers_labels: snapshotLabels,
+    });
+    this.render();
+  };
+
+  Widget.prototype.canNext = function () {
+    var q = QUESTIONS[this.state.step];
+    return q && this.state.answers[q.id] != null;
+  };
+
+  Widget.prototype.resetQuestionnaire = function () {
+    try {
+      if (this._feedbackTimer) clearTimeout(this._feedbackTimer);
+    } catch (_) {}
+    this._feedbackTimer = null;
+    this._feedbackShownOnce = false;
+    this.state.mode = 'intro';
+    this.state.step = 0;
+    this.state.answers = { q1_goal: null, q2_frequency: null, q3_instruments: null, q4_volume: null, q5_support: null };
+    this.state.resultTariffId = null;
+    this.state.feedback = { state: 'idle', rating: null, reasons: [] };
+    this.render();
+  };
+
+  Widget.prototype.recommendTariffId = function () {
+    var a = this.state.answers;
+
+    a = a || {};
+
+    // Normalization for "don't know / unsure" (defensive)
+    var isUnknownGoal = a.q1_goal === 'a4_unsure';
+    var isTryGoal = a.q1_goal === 'a3_try';
+    var isSaveGoal = a.q1_goal === 'a1_save';
+    var isActiveGoal = a.q1_goal === 'a2_active';
+
+    var isUnknownFreq =
+      a.q2_frequency === 'b4_unknown' || a.q2_frequency === 'b4_dontknow' || a.q2_frequency === 'b4_unsure';
+    var isUnknownInstr =
+      a.q3_instruments === 'c4_unknown' || a.q3_instruments === 'c4_dontknow' || a.q3_instruments === 'c4_unsure';
+
+    var wantsSupport = a.q5_support === 'e1_yes';
+    var tradesFutures = a.q3_instruments === 'c2_futures';
+
+    // 1) Support request → consulting
+    if (wantsSupport) return 'n5_consulting';
+
+    // 2) Active trading or futures/options → day
+    if (isActiveGoal || tradesFutures) return 'n2_day';
+
+    // 3) Clear long-term saving goal → long-term portfolio
+    if (isSaveGoal) return 'n1_dolgosrochniy';
+
+    // 4) Try/unsure or "unknowns" → long-term portfolio (conservative default)
+    if (isTryGoal || isUnknownGoal) return 'n1_dolgosrochniy';
+    if (isUnknownFreq && isUnknownInstr) return 'n1_dolgosrochniy';
+
+    // 5) Investor — only when there is at least some clarity
+    var hasAnyClarity = !isUnknownFreq || !isUnknownInstr || !!a.q4_volume;
+    if (hasAnyClarity) return 'n3_investor';
+
+    // 6) Safe fallback
+    return 'n1_dolgosrochniy';
+  };
+
+  Widget.prototype.createPremiumVisual = function () {
+    var wrap = el('div', { class: 'tw-premium-visual', 'aria-hidden': 'true' });
+    if (this.options.premiumVisualImageUrl) {
+      var img = el('div', { class: 'tw-premium-img' });
+      img.style.backgroundImage = 'url("' + safeCssUrl(this.options.premiumVisualImageUrl) + '")';
+      wrap.appendChild(img);
+    }
+    wrap.appendChild(el('div', { class: 'tw-premium-overlay' }));
+    return wrap;
+  };
+
+  Widget.prototype.createPromoRightPanel = function (step) {
+    // Right panel for question screens: keeps visual, adds non-interactive promo copy.
+    var PROMOS = [
+      { kicker: 'Финам Бонус', text: 'Сервис с бонусами и привилегиями для клиентов' },
+      { kicker: 'Обучение', text: 'Курсы и материалы для начинающих инвесторов' },
+      { kicker: 'Партнёры', text: 'Полезные сервисы и предложения для клиентов' },
+      { kicker: 'Надёжность', text: 'Узнайте, почему нам доверяют инвесторы' },
+    ];
+    var idx = typeof step === 'number' ? step % PROMOS.length : 0;
+    var p = PROMOS[idx];
+
+    var panel = this.createPremiumVisual();
+    var content = el(
+      'div',
+      { class: 'tw-premium-content' },
+      el('div', { class: 'tw-premium-card' }, el('div', { class: 'tw-premium-kicker', text: p.kicker }), el('div', { class: 'tw-premium-text', text: p.text }))
+    );
+    panel.appendChild(content);
+    return panel;
+  };
+
+  Widget.prototype.applyBackgroundImage = function (shell) {
+    if (!shell) return;
+    if (!this.options.premiumVisualImageUrl) return;
+    shell.style.setProperty('--tw-bg-img', 'url("' + safeCssUrl(this.options.premiumVisualImageUrl) + '")');
+  };
+
+  Widget.prototype.createFeedbackBlock = function (tariffId) {
+    var self = this;
+    var fb = this.state.feedback || { state: 'idle', rating: null, reasons: [] };
+
+    var CHIPSET = [
+      { id: 'too_many_questions', label: 'Много вопросов' },
+      { id: 'unclear_terms', label: 'Сложные термины' },
+      { id: 'unclear_recommendation', label: 'Не понял, почему предложили этот тариф' },
+      { id: 'missing_instruments', label: 'Не нашёл нужные инструменты' },
+      { id: 'other', label: 'Другое' },
+    ];
+
+    function buildPayload(rating, reasons) {
+      return {
+        session_id: self.sessionId,
+        user_id: self.options.userId || undefined,
+        tariff_id: String(tariffId),
+        rating: rating,
+        reasons: rating <= 3 ? (reasons || []) : undefined,
+        flow_version: String(self.options.flowVersion || FLOW_VERSION),
+        timestamp: new Date().toISOString(),
+        platform: getPlatformHint(),
+        ab_group: self.options.abGroup || undefined,
+      };
+    }
+
+    function submit(payload) {
+      track(self, 'feedback_submit', {
+        tariff_id: payload.tariff_id,
+        rating: payload.rating,
+        reasons: Array.isArray(payload.reasons) ? payload.reasons.slice(0, 12) : [],
+        reasons_count: Array.isArray(payload.reasons) ? payload.reasons.length : 0,
+        flow_version: payload.flow_version,
+        session_id: self.sessionId,
+      });
+      if (!self.options.feedbackEndpoint) return;
+      postJsonWithRetry(self.options.feedbackEndpoint, payload, 3, function (ok) {
+        track(self, ok ? 'feedback_submit_success' : 'feedback_submit_fail', { tariff_id: payload.tariff_id });
+      });
+    }
+
+    function setFb(next) {
+      self.state.feedback = next;
+      self.render();
+    }
+
+    function completeNow(payload) {
+      // silent-fail submission
+      try {
+        submit(payload);
+      } catch (_) {}
+      try {
+        self._analyticsState.feedbackSubmitted = true;
+      } catch (_) {}
+      setFb({ state: 'completed', rating: payload.rating, reasons: payload.reasons || [] });
+      track(self, 'feedback_completed', {
+        tariff_id: String(tariffId),
+        rating: payload.rating,
+        reasons: Array.isArray(payload.reasons) ? payload.reasons.slice(0, 12) : [],
+        session_id: self.sessionId,
+        flow_version: self.options.flowVersion || FLOW_VERSION,
+      });
+      sendStats(self, 'feedback_completed', {
+        tariff_id: String(tariffId),
+        rating: payload.rating,
+        reasons: Array.isArray(payload.reasons) ? payload.reasons.slice(0, 12) : [],
+        answers: self.answersSnapshot(),
+        answers_labels: self.answersLabelSnapshot(),
+      });
+    }
+
+    var wrap = el('div', { class: 'tw-feedback', 'aria-label': 'Оценка удобства подбора тарифа' });
+
+    if (fb.state === 'completed') {
+      wrap.appendChild(el('div', { class: 'tw-feedbackTitle', text: 'Спасибо!' }));
+      wrap.appendChild(
+        el(
+          'div',
+          { class: 'tw-feedbackDone' },
+          el('div', { class: 'tw-doneIcon', text: '✓', 'aria-hidden': 'true' }),
+          el('div', { class: 'tw-feedbackSub', text: 'Спасибо за оценку.' })
+        )
+      );
+      return wrap;
+    }
+
+    wrap.appendChild(el('div', { class: 'tw-feedbackTitle', text: 'Насколько удобным был подбор тарифа?' }));
+    // subtitle removed by request
+
+    var stars = el('div', { class: 'tw-stars', role: 'radiogroup', 'aria-label': 'Оценка 1–5' });
+    var starButtons = [];
+
+    function updateStars(active) {
+      for (var i = 0; i < starButtons.length; i++) {
+        var btn = starButtons[i];
+        var value = i + 1;
+        if (!btn) continue;
+        if (value <= active) btn.classList.add('is-on');
+        else btn.classList.remove('is-on');
+        try {
+          btn.setAttribute('aria-checked', fb.rating === value ? 'true' : 'false');
+        } catch (_) {}
+      }
+    }
+
+    for (var i = 1; i <= 5; i++) {
+      (function (value) {
+        var btn = el('button', {
+          class: 'tw-starBtn',
+          type: 'button',
+          role: 'radio',
+          'aria-checked': fb.rating === value ? 'true' : 'false',
+          'aria-label': String(value),
+          onClick: function () {
+            var rating = value;
+            track(self, 'feedback_rated', { tariff_id: String(tariffId), rating: rating });
+            var nextState = rating >= 4 ? 'rated_positive' : 'rated_negative';
+            setFb({ state: nextState, rating: rating, reasons: Array.isArray(fb.reasons) ? fb.reasons : [] });
+          },
+        });
+        btn.addEventListener('mouseenter', function () {
+          // lightweight hover highlight (no re-render)
+          updateStars(value);
+        });
+        starButtons.push(btn);
+        btn.appendChild(el('span', { class: 'tw-star', text: '★', 'aria-hidden': 'true' }));
+        stars.appendChild(btn);
+      })(i);
+    }
+    stars.addEventListener('mouseleave', function () {
+      updateStars(fb.rating || 0);
+    });
+    updateStars(fb.rating || 0);
+    wrap.appendChild(stars);
+
+    if (fb.rating != null && fb.rating <= 3) {
+      wrap.appendChild(el('div', { class: 'tw-chipTitle', text: 'Что было неудобно?' }));
+      var chips = el('div', { class: 'tw-chips' });
+      CHIPSET.forEach(function (c) {
+        var selected = Array.isArray(fb.reasons) && fb.reasons.indexOf(c.id) !== -1;
+        var chip = el('button', {
+          class: selected ? 'tw-chip is-selected' : 'tw-chip',
+          type: 'button',
+          title: c.label,
+          onClick: function () {
+            var nextReasons = Array.isArray(fb.reasons) ? fb.reasons.slice() : [];
+            var idx = nextReasons.indexOf(c.id);
+            if (idx === -1) nextReasons.push(c.id);
+            else nextReasons.splice(idx, 1);
+            track(self, 'feedback_reason_toggled', { tariff_id: String(tariffId), reason: c.id, selected: idx === -1 });
+            setFb({ state: 'rated_negative', rating: fb.rating, reasons: nextReasons });
+          },
+        });
+        chip.textContent = c.label;
+        chips.appendChild(chip);
+      });
+      wrap.appendChild(chips);
+    }
+
+    // Actions: explicit submit (non-competing with main CTA)
+    var actions = el('div', { class: 'tw-feedbackActions' });
+    actions.appendChild(
+      el('button', {
+        class: 'tw-feedbackBtn',
+        type: 'button',
+        disabled: fb.rating == null,
+        onClick: function () {
+          if (fb.rating == null) return;
+          completeNow(buildPayload(fb.rating, Array.isArray(fb.reasons) ? fb.reasons : []));
+        },
+        text: 'Отправить',
+      })
+    );
+    wrap.appendChild(actions);
+
+    try {
+      if (!self._feedbackShownOnce) {
+        self._feedbackShownOnce = true;
+        track(self, 'feedback_shown', { tariff_id: String(tariffId) });
+      }
+    } catch (_) {}
+
+    return wrap;
+  };
+
+  Widget.prototype.renderIntroScreen = function (container) {
+    var self = this;
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
+    // Right column exists only to keep layout width; illustration is drawn as section background.
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { 'aria-hidden': 'true' }));
+    var left = grid.firstChild;
+
+    var card = el('div', { class: 'tw-card' });
+    card.appendChild(el('div', { class: 'tw-heroTitle', text: 'Какой тариф выбрать?' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Ответьте на 5 вопросов — подберём подходящий тариф' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Расскажите о целях инвестирования и инструментах, которые планируете использовать.' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Опрос займёт не более 2 минут.' }));
+    card.appendChild(
+      el('div', { class: 'tw-actions' },
+        el('div', { class: 'tw-actions-left' }),
+        el('div', { class: 'tw-actions-right' },
+          el('button', {
+            class: 'tw-btn tw-btn-primary',
+            onClick: function () {
+              self._analyticsState.started = true;
+              track(self, 'widget_start', { session_id: self.sessionId, flow_version: self.options.flowVersion || FLOW_VERSION });
+              sendStats(self, 'widget_start', {});
+              // Fix questionnaire height to prevent layout jumps between questions.
+              // Will be measured on first render to avoid empty space.
+              self._fixedQuestionHeight = 0;
+              self.setState({ mode: 'question', step: 0 });
+            },
+            text: 'Начать подбор',
+          })
+        )
+      )
+    );
+
+    left.appendChild(card);
+    shell.appendChild(grid);
+    container.appendChild(shell);
+  };
+
+  Widget.prototype.renderQuestionScreen = function (container) {
+    var self = this;
+    var q = QUESTIONS[this.state.step];
+    var total = QUESTIONS.length;
+    var current = this.state.step + 1;
+
+    // Question view analytics (once per step)
+    try {
+      if (this._analyticsState.lastQuestionViewedStep !== this.state.step) {
+        this._analyticsState.lastQuestionViewedStep = this.state.step;
+        track(this, 'question_viewed', {
+          question_id: q ? q.id : null,
+          step: current,
+          total: total,
+          answers: this.answersSnapshot(),
+          session_id: this.sessionId,
+          flow_version: this.options.flowVersion || FLOW_VERSION,
+        });
+      }
+    } catch (_) {}
+
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
+    if (this._fixedQuestionHeight) shell.style.minHeight = this._fixedQuestionHeight + 'px';
+
+    // Right column exists only to keep layout width; illustration is drawn as section background.
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), el('div', { 'aria-hidden': 'true' }));
+    var left = grid.firstChild;
+
+    var card = el('div', { class: 'tw-card tw-cardSolid' });
+    card.appendChild(el('div', { class: 'tw-meta', text: 'Вопрос ' + current + ' из ' + total }));
+    var pb = el('div', { class: 'tw-progress' }, el('div', {}));
+    pb.style.setProperty('--tw-progress', Math.round((current / total) * 100) + '%');
+    card.appendChild(pb);
+
+    card.appendChild(el('div', { class: 'tw-questionTitle', text: q.title }));
+    // Helper text should be above options (more likely to be read)
+    if (q.helperText) card.appendChild(el('div', { class: 'tw-secondaryText', text: q.helperText }));
+    var group = el('div', { class: 'tw-options', role: 'radiogroup', 'aria-label': q.title });
+    q.options.forEach(function (o) {
+      var checked = self.state.answers[q.id] === o.value;
+      var row = el('button', {
+        class: checked ? 'tw-option is-selected' : 'tw-option',
+        role: 'radio',
+        'aria-checked': checked ? 'true' : 'false',
+        onClick: function () {
+          self.setAnswer(q.id, o.value);
+        },
+      });
+      row.appendChild(el('div', { class: 'tw-option-text', text: o.label }));
+      row.appendChild(el('div', { class: 'tw-option-check', 'aria-hidden': 'true' }));
+      group.appendChild(row);
+    });
+    card.appendChild(group);
+
+    var back = el('button', {
+      class: 'tw-btn tw-btn-secondary',
+      disabled: this.state.step === 0,
+      onClick: function () {
+        if (self.state.step === 0) return;
+        self.setState({ step: Math.max(0, self.state.step - 1) });
+      },
+      text: 'Назад',
+    });
+
+    var isLast = this.state.step === total - 1;
+    var next = el('button', {
+      class: 'tw-btn tw-btn-primary',
+      disabled: !this.canNext(),
+      onClick: function () {
+        if (!self.canNext()) return;
+        try {
+          var h = Math.ceil(shell.getBoundingClientRect().height || 0);
+          if (h) self._fixedQuestionHeight = Math.max(self._fixedQuestionHeight || 0, h);
+        } catch (_) {}
+        if (!isLast) self.setState({ step: self.state.step + 1 });
+        else {
+          self._analyticsState.completed = true;
+          track(self, 'widget_completed', {
+            session_id: self.sessionId,
+            flow_version: self.options.flowVersion || FLOW_VERSION,
+            answers: self.answersSnapshot(),
+          });
+          var id = self.recommendTariffId();
+          assertValidTariff(id);
+          self.setState({ mode: 'result', resultTariffId: id });
+        }
+      },
+      text: isLast ? 'Показать тариф' : 'Далее',
+    });
+
+    card.appendChild(
+      el('div', { class: 'tw-actions' },
+        el('div', { class: 'tw-actions-left' }),
+        el('div', { class: 'tw-actions-right' }, back, next)
+      )
+    );
+
+    left.appendChild(card);
+    shell.appendChild(grid);
+    container.appendChild(shell);
+
+    // Measure after mount to avoid excessive empty space at the bottom.
+    try {
+      var realH = Math.ceil(shell.getBoundingClientRect().height || 0);
+      if (realH) {
+        if (!this._fixedQuestionHeight) this._fixedQuestionHeight = realH;
+        else if (realH > this._fixedQuestionHeight) this._fixedQuestionHeight = realH;
+        shell.style.minHeight = this._fixedQuestionHeight + 'px';
+      }
+    } catch (_) {}
+  };
+
+  Widget.prototype.openTariff = function (tariffId) {
+    // tariffId must be from STRICT WHITELIST
+    assertValidTariff(tariffId);
+    var t = tariffById(tariffId);
+    if (!t) return;
+    track(this, 'tariff_cta_clicked', {
+      tariff_id: tariffId,
+      session_id: this.sessionId,
+      flow_version: this.options.flowVersion || FLOW_VERSION,
+      answers: this.answersSnapshot(),
+    });
+    // Alias for clarity in downstream analytics
+    track(this, 'tariff_details_clicked', {
+      tariff_id: tariffId,
+      session_id: this.sessionId,
+      flow_version: this.options.flowVersion || FLOW_VERSION,
+      answers: this.answersSnapshot(),
+    });
+    sendStats(this, 'tariff_details_clicked', {
+      tariff_id: tariffId,
+      tariff_name: (t && t.name) ? String(t.name) : '',
+      answers: this.answersSnapshot(),
+      answers_labels: this.answersLabelSnapshot(),
+    });
+    track(this, 'tariff_recommended', { tariff_id: tariffId });
+    try {
+      // Open in a new tab/window only. Do NOT navigate the current page.
+      window.open(t.url, '_blank', 'noopener,noreferrer');
+    } catch (_) {}
+  };
+
+  Widget.prototype.renderResultScreen = function (container) {
+    var self = this;
+    var tariffId = this.state.resultTariffId || this.recommendTariffId();
+    assertValidTariff(tariffId);
+    var tariff = tariffById(tariffId);
+    if (!tariff) {
+      this.setState({ mode: 'error' });
+      return;
+    }
+
+    try {
+      if (!this._analyticsState.resultShown) {
+        this._analyticsState.resultShown = true;
+        track(this, 'result_shown', {
+          tariff_id: String(tariffId),
+          answers: this.answersSnapshot(),
+          session_id: this.sessionId,
+          flow_version: this.options.flowVersion || FLOW_VERSION,
+        });
+        sendStats(this, 'result_shown', {
+          tariff_id: String(tariffId),
+          tariff_name: tariff && tariff.name ? String(tariff.name) : '',
+          answers: this.answersSnapshot(),
+          answers_labels: this.answersLabelSnapshot(),
+        });
+      }
+    } catch (_) {}
+
+    var shell = el('div', { class: 'tw-shell tw-widgetShell tw-shell-bg' });
+    this.applyBackgroundImage(shell);
+
+    var right;
+    if (this.options.feedbackEnabled) {
+      try {
+        right = this.createFeedbackBlock(tariffId);
+      } catch (e) {
+        // If feedback fails, never block the main result.
+        try {
+          if (global.console && typeof global.console.error === 'function') {
+            global.console.error('[FinamTariffWidget] feedback render failed', e);
+          }
+        } catch (_) {}
+        right = this.createPremiumVisual();
+      }
+    } else {
+      right = this.createPremiumVisual();
+    }
+    var grid = el('div', { class: 'tw-two-col' }, el('div', null), right);
+    var left = grid.firstChild;
+
+    var card = el('div', { class: 'tw-card tw-cardSolid' });
+    card.appendChild(el('div', { class: 'tw-h2', text: 'Вам подходит тариф «' + tariff.name + '»' }));
+    if (this.options.socialProofText) card.appendChild(el('div', { class: 'tw-secondaryText', text: String(this.options.socialProofText) }));
+    card.appendChild(el('div', { class: 'tw-divider' }));
+
+    // Exactly one bullet (no extra descriptions)
+    var bullets = el('ul', { class: 'tw-bullets' });
+    var rc = RESULT_COPY[tariffId];
+    var items = rc && rc.benefits ? rc.benefits : [];
+    if (items && items.length) bullets.appendChild(el('li', { text: items[0] }));
+    card.appendChild(bullets);
+
+    // Metrics under the bullet (max 4). Only for the recommended tariff.
+    var metrics = this.getTariffMetrics(tariffId) || [];
+    if (metrics.length) {
+      var gridM = el('div', { class: 'tw-metrics' });
+      for (var i = 0; i < metrics.length && i < 4; i++) {
+        var rawVal = metrics[i].value;
+        var valStr = rawVal == null ? '' : String(rawVal);
+        var m = valStr.match(/^(до|от)\s+(.+)$/i);
+        var valNode;
+        if (m) {
+          valNode = el(
+            'div',
+            { class: 'tw-metricVal' },
+            el('span', { class: 'tw-metricPrefix', text: m[1].toLowerCase() }),
+            el('span', { class: 'tw-metricNumber', text: m[2] })
+          );
+        } else {
+          valNode = el('div', { class: 'tw-metricVal' }, el('span', { class: 'tw-metricNumber', text: valStr }));
+        }
+        gridM.appendChild(
+          el(
+            'div',
+            null,
+            valNode,
+            el('div', { class: 'tw-metricLbl', text: metrics[i].label })
+          )
+        );
+      }
+      card.appendChild(gridM);
+    }
+
+    card.appendChild(
+      el(
+        'div',
+        { class: 'tw-actions' },
+        el('div', { class: 'tw-actions-left' },
+          el('button', { class: 'tw-btn tw-btn-secondary', onClick: function () { self.resetQuestionnaire(); }, text: 'Пройти заново' })
+        ),
+        el('div', { class: 'tw-actions-right' },
+          (function () {
+            if (!self.options.openAccountUrl) return null;
+            return el('button', {
+              class: 'tw-btn tw-btn-secondary',
+              onClick: function () {
+                try {
+                  track(self, 'account_open_clicked', {
+                    session_id: self.sessionId,
+                    flow_version: self.options.flowVersion || FLOW_VERSION,
+                    tariff_id: String(tariffId),
+                    answers: self.answersSnapshot(),
+                  });
+                } catch (_) {}
+                try {
+                  var w2 = window.open(self.options.openAccountUrl, '_blank', 'noopener,noreferrer');
+                } catch (_) {}
+              },
+              text: self.options.openAccountText || 'Открыть счёт',
+            });
+          })(),
+          el('button', { class: 'tw-btn tw-btn-primary', onClick: function () { self.openTariff(tariffId); }, text: 'Перейти к тарифу' })
+        )
+      )
+    );
+
+    left.appendChild(card);
+    shell.appendChild(grid);
+    container.appendChild(shell);
+  };
+
+  Widget.prototype.renderErrorScreen = function (container) {
+    var self = this;
+    var shell = el('div', { class: 'tw-shell tw-widgetShell' });
+    var card = el('div', { class: 'tw-card' });
+    card.appendChild(el('div', { class: 'tw-h2', text: 'Не удалось подобрать тариф' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Попробуйте выбрать варианты ещё раз.' }));
+    card.appendChild(el('div', { class: 'tw-actions' },
+      el('div', { class: 'tw-actions-left' }),
+      el('div', { class: 'tw-actions-right' },
+        el('button', { class: 'tw-btn tw-btn-primary', onClick: function () { self.resetQuestionnaire(); }, text: 'Вернуться к вопросам' })
+      )
+    ));
+    shell.appendChild(card);
+    container.appendChild(shell);
+  };
+
+  Widget.prototype.render = function () {
+    var host = this.dom.host;
+    while (host.firstChild) host.removeChild(host.firstChild);
+
+    var wrap = el('div', { class: 'wrap' });
+    if (this.state.mode === 'result') this.renderResultScreen(wrap);
+    else if (this.state.mode === 'error') this.renderErrorScreen(wrap);
+    else if (this.state.mode === 'question') this.renderQuestionScreen(wrap);
+    else this.renderIntroScreen(wrap);
+
+    host.appendChild(wrap);
+  };
+
+  function normalizeTarget(t) {
+    if (!t) return null;
+    if (typeof t === 'string') return document.querySelector(t);
+    return t;
+  }
+
+  function mount(target, options) {
+    var elTarget = normalizeTarget(target);
+    if (!elTarget) throw new Error('FinamTariffWidget.mount: target not found');
+    return new Widget(elTarget, options || {});
+  }
+
+  function findScriptElement(doc) {
+    try {
+      var scripts = doc.getElementsByTagName ? doc.getElementsByTagName('script') : [];
+      for (var i = scripts.length - 1; i >= 0; i--) {
+        var s = scripts[i];
+        var src = s && s.src ? String(s.src) : '';
+        if (src && src.indexOf('finam-tariff-widget.js') !== -1) return s;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function readAutoOptions(doc, target) {
+    var opts = {};
+    // Global config hook
+    try {
+      var cfg = global.FinamTariffWidgetConfig;
+      if (cfg && typeof cfg === 'object') {
+        for (var k in cfg) opts[k] = cfg[k];
+      }
+    } catch (_) {}
+
+    // Container attributes
+    try {
+      if (target && target.getAttribute) {
+        var ep = target.getAttribute('data-feedback-endpoint') || target.getAttribute('data-ftw-feedback-endpoint');
+        if (ep) opts.feedbackEndpoint = ep;
+        var fe = target.getAttribute('data-feedback-enabled');
+        if (fe === 'false') opts.feedbackEnabled = false;
+      }
+    } catch (_) {}
+
+    // Script tag attributes (works even when container is auto-created)
+    try {
+      var s = findScriptElement(doc);
+      if (s && s.getAttribute) {
+        var sep = s.getAttribute('data-feedback-endpoint') || s.getAttribute('data-ftw-feedback-endpoint');
+        if (sep && !opts.feedbackEndpoint) opts.feedbackEndpoint = sep;
+        var sfe = s.getAttribute('data-feedback-enabled');
+        if (sfe === 'false') opts.feedbackEnabled = false;
+      }
+    } catch (_) {}
+
+    return opts;
+  }
+
+  function queryAllDeep(root, selector) {
+    var out = [];
+    function walk(node) {
+      if (!node) return;
+      // node can be Document or ShadowRoot
+      try {
+        if (node.querySelectorAll) {
+          var list = node.querySelectorAll(selector);
+          for (var i = 0; i < list.length; i++) out.push(list[i]);
+        }
+      } catch (_) {}
+      // Walk shadow roots
+      try {
+        var tree = node.querySelectorAll ? node.querySelectorAll('*') : [];
+        for (var j = 0; j < tree.length; j++) {
+          var el = tree[j];
+          if (el && el.shadowRoot) walk(el.shadowRoot);
+        }
+      } catch (_) {}
+    }
+    walk(root);
+    return out;
+  }
+
+  function ensureContainerNearScript(doc) {
+    try {
+      var script = findScriptElement(doc);
+      if (!script || !script.parentNode) return null;
+      // Avoid duplicates
+      var existing = null;
+      try {
+        existing = script.parentNode.querySelector && script.parentNode.querySelector('[data-finam-tariff-widget],#finam-tariff');
+      } catch (_) {}
+      if (existing) return existing;
+
+      var d = doc;
+      var div = d.createElement('div');
+      div.setAttribute('data-finam-tariff-widget', '');
+      div.style.width = '100%';
+      // Insert after script, but never into <head> (it won't render there).
+      var parent = script.parentNode;
+      try {
+        var tag = parent && parent.tagName ? String(parent.tagName).toUpperCase() : '';
+        if (tag === 'HEAD') parent = d.body || parent;
+      } catch (_) {}
+      if (!parent) parent = d.body || script.parentNode;
+      if (!parent) return null;
+      if (parent === script.parentNode) {
+        if (script.nextSibling) parent.insertBefore(div, script.nextSibling);
+        else parent.appendChild(div);
+      } else {
+        // Fallback: append to body (end)
+        parent.appendChild(div);
+      }
+      return div;
+    } catch (_) {}
+    return null;
+  }
+
+  function autoMountInDocument(doc) {
+    if (!doc || !doc.querySelectorAll) return;
+    var mountedAny = false;
+
+    // data-attribute mounting
+    var nodes = queryAllDeep(doc, '[data-finam-tariff-widget]');
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].__finamTariffWidgetMounted) continue;
+      nodes[i].__finamTariffWidgetMounted = true;
+      try {
+        // mount must run in the same document where target lives
+        new Widget(nodes[i], readAutoOptions(doc, nodes[i]));
+        mountedAny = true;
+      } catch (e) {
+        try {
+          nodes[i].__finamTariffWidgetMounted = false;
+        } catch (_) {}
+        try {
+          if (global.console && typeof global.console.error === 'function') {
+            global.console.error('[FinamTariffWidget] mount failed', e);
+          }
+        } catch (_) {}
+      }
+    }
+
+    // id mounting fallback (builders sometimes strip data-*)
+    var byId = null;
+    try {
+      byId = doc.getElementById && doc.getElementById('finam-tariff');
+    } catch (_) {}
+    if (byId && !byId.__finamTariffWidgetMounted) {
+      byId.__finamTariffWidgetMounted = true;
+      try {
+        new Widget(byId, readAutoOptions(doc, byId));
+        mountedAny = true;
+      } catch (e2) {
+        try {
+          byId.__finamTariffWidgetMounted = false;
+        } catch (_) {}
+        try {
+          if (global.console && typeof global.console.error === 'function') {
+            global.console.error('[FinamTariffWidget] mount failed', e2);
+          }
+        } catch (_) {}
+      }
+    }
+
+    // If nothing found/mounted, create a container next to the script tag and mount there.
+    if (!mountedAny) {
+      var created = ensureContainerNearScript(doc);
+      if (created && !created.__finamTariffWidgetMounted) {
+        created.__finamTariffWidgetMounted = true;
+        try {
+          new Widget(created, readAutoOptions(doc, created));
+          mountedAny = true;
+        } catch (e3) {
+          try {
+            created.__finamTariffWidgetMounted = false;
+          } catch (_) {}
+          try {
+            if (global.console && typeof global.console.error === 'function') {
+              global.console.error('[FinamTariffWidget] mount failed', e3);
+            }
+          } catch (_) {}
+        }
+      }
+    }
+  }
+
+  function autoMountDeep(rootDoc) {
+    var visited = new Set();
+    function walk(doc) {
+      if (!doc || visited.has(doc)) return;
+      visited.add(doc);
+      autoMountInDocument(doc);
+      // Try accessible same-origin iframes (cross-origin will throw)
+      var iframes = [];
+      try {
+        iframes = doc.querySelectorAll ? doc.querySelectorAll('iframe') : [];
+      } catch (_) {}
+      for (var i = 0; i < iframes.length; i++) {
+        var f = iframes[i];
+        try {
+          var childDoc = f && (f.contentDocument || (f.contentWindow && f.contentWindow.document));
+          if (childDoc) walk(childDoc);
+        } catch (_) {
+          // cross-origin iframe: ignore
+        }
+      }
+    }
+    walk(rootDoc || document);
+  }
+
+  function autoMount() {
+    autoMountDeep(document);
+  }
+
+  function onReady(fn) {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') fn();
+    else document.addEventListener('DOMContentLoaded', fn);
+  }
+
+  function setupAutoMountObserver() {
+    try {
+      if (!global.MutationObserver) return;
+      if (global.__finamTariffWidgetObserver) return;
+      var obs = new MutationObserver(function (mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          var m = mutations[i];
+          if (!m || !m.addedNodes || !m.addedNodes.length) continue;
+          // Any DOM addition may include the mount container; just attempt autoMount (it is idempotent).
+          autoMount();
+          break;
+        }
+      });
+      obs.observe(document.documentElement || document.body, { childList: true, subtree: true });
+      global.__finamTariffWidgetObserver = obs;
+    } catch (_) {}
+  }
+
+  global.FinamTariffWidget = { mount: mount, autoMount: autoMount, version: VERSION };
+  onReady(function () {
+    autoMount();
+    setupAutoMountObserver();
+    // Extra attempts for page builders that inject blocks late.
+    try {
+      setTimeout(autoMount, 0);
+      setTimeout(autoMount, 500);
+      setTimeout(autoMount, 1500);
+    } catch (_) {}
+  });
+})(window);
+

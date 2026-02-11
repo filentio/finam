@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "widget": "Finam Tariff Widget",
+    "language": "ru",
+    "notes": "Файл для редактуры текстов. Изменения не применяются автоматически — их нужно перенести в widget/finam-tariff-widget.js (константы QUESTIONS/RESULT_COPY/тексты экранов/Feedback)."
+  },
+  "header": {
+    "title": "Подбор тарифа",
+    "subtitle_intro": "Ответьте на несколько вопросов — покажем подходящий тариф",
+    "subtitle_result": "Результат подбора"
+  },
+  "intro": {
+    "heroTitle": "Какой тариф выбрать?",
+    "subtitle": "Ответьте на 5 вопросов — подберём подходящий тариф",
+    "description": [
+      "Расскажите о целях инвестирования и инструментах, которые планируете использовать.",
+      "Опрос займёт не более 2 минут."
+    ],
+    "primaryCta": "Начать подбор"
+  },
+  "questions": [
+    {
+      "id": "q1_goal",
+      "title": "Для чего вы планируете инвестировать?",
+      "helperText": "",
+      "options": [
+        { "value": "a1_save", "label": "Сохранить деньги и постепенно приумножать" },
+        { "value": "a2_active", "label": "Планирую активно торговать" },
+        { "value": "a3_try", "label": "Хочу попробовать и разобраться" },
+        { "value": "a4_unsure", "label": "Пока не определился(лась)" }
+      ]
+    },
+    {
+      "id": "q2_frequency",
+      "title": "Как часто вы планируете совершать сделки?",
+      "helperText": "Это поможет подобрать тариф с подходящими комиссиями",
+      "options": [
+        { "value": "b1_rare", "label": "Несколько раз в год" },
+        { "value": "b2_month", "label": "Несколько раз в месяц" },
+        { "value": "b3_daily", "label": "Почти каждый день" },
+        { "value": "b4_unknown", "label": "Пока не знаю" }
+      ]
+    },
+    {
+      "id": "q3_instruments",
+      "title": "С какими инструментами вы планируете работать?",
+      "helperText": "",
+      "options": [
+        { "value": "c1_stocks", "label": "Акции и облигации" },
+        { "value": "c2_futures", "label": "Фьючерсы и опционы" },
+        { "value": "c3_currency", "label": "Валюта" },
+        { "value": "c4_unknown", "label": "Пока не знаю" }
+      ]
+    },
+    {
+      "id": "q4_volume",
+      "title": "Какую сумму вы планируете инвестировать на старте?",
+      "helperText": "",
+      "options": [
+        { "value": "d1_small", "label": "До 100 000 ₽" },
+        { "value": "d2_mid", "label": "От 100 000 до 1 000 000 ₽" },
+        { "value": "d3_large", "label": "Более 1 000 000 ₽" },
+        { "value": "d4_unknown", "label": "Пока не определился(лась)" }
+      ]
+    },
+    {
+      "id": "q5_support",
+      "title": "Понадобится ли вам экспертная поддержка?",
+      "helperText": "",
+      "options": [
+        { "value": "e1_yes", "label": "Да, хочу получать подсказки и сопровождение" },
+        { "value": "e2_maybe", "label": "Возможно, но не обязательно" },
+        { "value": "e3_no", "label": "Нет, справлюсь самостоятельно" }
+      ]
+    }
+  ],
+  "questionNav": {
+    "back": "Назад",
+    "next": "Далее",
+    "showTariff": "Показать тариф",
+    "metaPrefix": "Вопрос"
+  },
+  "result": {
+    "titlePrefix": "Вам подходит тариф «НАЗВАНИЕ»",
+    "ctaTariff": "Перейти к тарифу",
+    "ctaRestart": "Пройти заново",
+    "ctaOpenAccountDefault": "Открыть счёт",
+    "fallbackBenefits": {
+      "n1_dolgosrochniy": [
+        "Для спокойных долгосрочных инвестиций"
+      ],
+      "n2_day": [
+        "Для активной ежедневной торговли"
+      ],
+      "n3_investor": [
+        "Для старта и выбора стратегии"
+      ],
+      "n4_strateg": [
+        "Для инвестирования по готовым стратегиям"
+      ],
+      "n5_consulting": [
+        "Для инвестирования с экспертной поддержкой"
+      ]
+    }
+  },
+  "feedback": {
+    "title": "Насколько удобным был подбор тарифа?",
+    "subtitle": "",
+    "chipQuestion": "Что было неудобно?",
+    "chips": [
+      { "id": "too_many_questions", "label": "Много вопросов" },
+      { "id": "unclear_terms", "label": "Сложные термины" },
+      { "id": "unclear_recommendation", "label": "Не понял, почему предложили этот тариф" },
+      { "id": "missing_instruments", "label": "Не нашёл нужные инструменты" },
+      { "id": "other", "label": "Другое" }
+    ],
+    "submit": "Отправить",
+    "thanksTitle": "Спасибо!",
+    "thanksText": "Спасибо за оценку."
+  },
+  "promoRightPanel": [
+    { "kicker": "Финам Бонус", "text": "Сервис с бонусами и привилегиями для клиентов" },
+    { "kicker": "Обучение", "text": "Курсы и материалы для начинающих инвесторов" },
+    { "kicker": "Партнёры", "text": "Полезные сервисы и предложения для клиентов" },
+    { "kicker": "Надёжность", "text": "Узнайте, почему нам доверяют инвесторы" }
+  ],
+  "tariffCatalog": [
+    { "id": "n1_dolgosrochniy", "name": "Долгосрочный портфель", "url": "https://broker.finam.ru/landing/tariffs-n1-dolgosrochniy/" },
+    { "id": "n2_day", "name": "Единый дневной", "url": "https://broker.finam.ru/landing/tariffs-n2-day/" },
+    { "id": "n3_investor", "name": "Инвестор", "url": "https://broker.finam.ru/landing/tariffs-n3-investor/" },
+    { "id": "n4_strateg", "name": "Стратег", "url": "https://broker.finam.ru/landing/tariffs-n4-strateg/" },
+    { "id": "n5_consulting", "name": "Единый консультационный", "url": "https://broker.finam.ru/landing/tariffs-n5-consulting/" }
+  ]
+}
+

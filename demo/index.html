@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finam Tariff Widget — Demo</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #ffffff;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: #111;
+      }
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 20px;
+        align-items: start;
+      }
+      @media (max-width: 920px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note {
+        border: 2px solid #111;
+        border-radius: 16px;
+        padding: 14px;
+        background: #f8f8f7;
+      }
+      .note h2 {
+        margin: 0 0 10px;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .note p,
+      .note li {
+        margin: 6px 0;
+        color: #333;
+        font-weight: 600;
+        line-height: 1.45;
+        font-size: 13px;
+      }
+      code {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 2px 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="hero">
+        <div class="note">
+          <h2>Что вы видите</h2>
+          <p>Справа — виджет, который можно встроить на лендинг.</p>
+          <p>Встраивание:</p>
+          <ul>
+            <li><code>&lt;div data-finam-tariff-widget&gt;&lt;/div&gt;</code></li>
+            <li><code>&lt;script src="finam-tariff-widget.js"&gt;&lt;/script&gt;</code></li>
+          </ul>
+          <p>
+            Для демо здесь скрипт подключается локально из <code>../widget/finam-tariff-widget.js</code>.
+          </p>
+        </div>
+
+        <div
+          data-finam-tariff-widget
+          style="
+            --ftw-primary: #0056b3;
+            --ftw-accent: #ffd600;
+            --ftw-radius: 16px;
+          "></div>
+      </div>
+    </div>
+
+    <script src="../widget/finam-tariff-widget.js"></script>
+  </body>
+</html>
+
