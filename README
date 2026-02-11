@@ -59,3 +59,14 @@ Optional callbacks for integration:
   };
 </script>
 ```
+
+### Split by constructor fields (HTML / CSS / JS)
+
+If your constructor has separate fields, use:
+
+- HTML field: `embed/segmentation-widget.snippet.html`
+- CSS field: `embed/segmentation-widget.snippet.css`
+- JS field: `embed/segmentation-widget.snippet.js`
+
+The JS file auto-initializes widgets on page load and also exposes
+`window.initAllSegmentationWidgets()` for manual re-init after dynamic rendering.
