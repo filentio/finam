@@ -1,12 +1,12 @@
 /*!
  * Finam Tariff Widget
  * Self-contained embed widget (no build step).
- * Version: 1.0.46
+ * Version: 1.0.47
  */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.46';
+  var VERSION = '1.0.47';
   var FLOW_VERSION = 'tariff_picker_v1';
 
   var DEFAULTS = {
@@ -121,7 +121,7 @@
     },
     {
       id: 'q4_volume',
-      title: 'Какой объём инвестиций вы планируете?',
+      title: 'Какую сумму вы планируете инвестировать на старте?',
       options: [
         { value: 'd1_small', label: 'До 100 000 ₽' },
         { value: 'd2_mid', label: 'От 100 000 до 1 000 000 ₽' },
@@ -1210,14 +1210,14 @@
           'div',
           { class: 'tw-feedbackDone' },
           el('div', { class: 'tw-doneIcon', text: '✓', 'aria-hidden': 'true' }),
-          el('div', { class: 'tw-feedbackSub', text: 'Мы учтём ваш отзыв.' })
+          el('div', { class: 'tw-feedbackSub', text: 'Спасибо за оценку.' })
         )
       );
       return wrap;
     }
 
     wrap.appendChild(el('div', { class: 'tw-feedbackTitle', text: 'Насколько удобным был подбор тарифа?' }));
-    wrap.appendChild(el('div', { class: 'tw-feedbackSub', text: 'Оценка займёт пару секунд' }));
+    // subtitle removed by request
 
     var stars = el('div', { class: 'tw-stars', role: 'radiogroup', 'aria-label': 'Оценка 1–5' });
     var starButtons = [];
@@ -1327,7 +1327,7 @@
     card.appendChild(el('div', { class: 'tw-heroTitle', text: 'Какой тариф выбрать?' }));
     card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Ответьте на 5 вопросов — подберём подходящий тариф' }));
     card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Расскажите о целях инвестирования и инструментах, которые планируете использовать.' }));
-    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Опрос займёт около 3 минут.' }));
+    card.appendChild(el('div', { class: 'tw-secondaryText', text: 'Опрос займёт не более 2 минут.' }));
     card.appendChild(
       el('div', { class: 'tw-actions' },
         el('div', { class: 'tw-actions-left' }),
