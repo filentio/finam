@@ -323,10 +323,6 @@
 
 .segw__onboarding {
   margin-top: 16px;
-  border: 1px solid var(--segw-line);
-  border-radius: 14px;
-  background: #fff;
-  padding: 16px;
 }
 
 .segw__onboarding.is-hidden {
@@ -334,55 +330,183 @@
 }
 
 .segw__onboarding-kicker {
-  margin: 0 0 6px;
-  font-size: 0.76rem;
+  margin: 0;
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--segw-primary);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 600;
 }
 
-.segw__onboarding-title {
-  margin: 0 0 6px;
-  font-size: 1.14rem;
+.segw__story-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f0f0f0;
+  padding: 12px;
+  border-radius: 16px;
 }
 
-.segw__onboarding-meta {
-  margin: 0 0 12px;
-  color: var(--segw-muted);
-  font-size: 0.88rem;
+.segw__story-frame {
+  width: 100%;
+  max-width: 430px;
+  height: min(100dvh, 932px);
+  min-height: 560px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  color: #fff;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #1a56db 0%, #0f3a8e 100%);
 }
 
-.segw__onboarding-card {
-  border: 1px solid #e8edf7;
-  border-radius: 12px;
-  background: #f8faff;
-  padding: 14px;
+.segw__story-progress {
+  display: flex;
+  gap: 4px;
+  padding: 10px 10px 0;
+  position: relative;
+  z-index: 5;
+}
+
+.segw__story-progress-segment {
+  flex: 1 1 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.segw__story-progress-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #fff;
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+
+.segw__story-progress-segment.is-done .segw__story-progress-fill,
+.segw__story-progress-segment.is-active .segw__story-progress-fill {
+  width: 100%;
+}
+
+.segw__story-header {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px 0;
+}
+
+.segw__story-close {
+  border: 0;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.segw__story-content {
+  position: relative;
+  z-index: 3;
+  min-height: calc(100% - 176px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 20px 0;
+}
+
+.segw__story-emoji {
+  font-size: 68px;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 4px;
 }
 
 .segw__onboarding-step-title {
-  margin: 0 0 6px;
-  font-size: 1rem;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(26px, 5.1vw, 32px);
+  line-height: 1.2;
+  font-weight: 700;
 }
 
 .segw__onboarding-step-text {
   margin: 0;
-  color: #36465b;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 16px;
+  line-height: 1.45;
 }
 
 .segw__onboarding-points {
-  margin: 12px 0 0;
+  margin: 4px 0 0;
   padding-left: 18px;
   display: grid;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: #2e3a4d;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.94);
 }
 
-.segw__onboarding-controls {
+.segw__onboarding-points li {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.segw__onboarding-meta {
+  position: relative;
+  z-index: 6;
+  margin: 0;
+  padding: 8px 20px 0;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+  font-size: 13px;
+}
+
+.segw__story-hint {
+  position: relative;
+  z-index: 6;
+  margin: 0;
+  padding: 4px 20px 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+}
+
+.segw__story-tapzones {
+  position: absolute;
+  z-index: 2;
+  inset: 46px 0 0;
   display: flex;
-  gap: 10px;
-  margin-top: 14px;
+}
+
+.segw__story-tap {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.segw__story-tap--prev {
+  width: 30%;
+}
+
+.segw__story-tap--next {
+  width: 70%;
 }
 
 .segw__btn {
@@ -407,7 +531,7 @@
 }
 
 .segw__onboarding-done {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   color: #1f6f44;
   background: #ecf8f0;
   border: 1px solid #bfe4cb;
@@ -423,6 +547,12 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+}
+
+.segw__onboarding-footer .segw__route--ghost {
+  border-color: rgba(25, 65, 153, 0.3);
+  color: #194199;
+  background: #fff;
 }
 
 .segw__is-hidden {
@@ -466,7 +596,20 @@
     width: 100%;
   }
 
-  .segw__onboarding-controls,
+  .segw__story-wrapper {
+    min-height: auto;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .segw__story-frame {
+    max-width: none;
+    border-radius: 0;
+    min-height: 640px;
+    height: 100dvh;
+  }
+
   .segw__onboarding-footer {
     flex-direction: column;
     align-items: stretch;
@@ -627,23 +770,43 @@
   </section>
 
   <section class="segw__onboarding is-hidden" data-role="onboarding">
-    <p class="segw__onboarding-kicker">Персональный онбординг</p>
-    <h3 class="segw__onboarding-title" data-role="onboarding-title">План обучения</h3>
-    <p class="segw__onboarding-meta" data-role="onboarding-counter">Шаг 1 из 3</p>
+    <div class="segw__story-wrapper">
+      <article class="segw__story-frame" data-role="story-frame">
+        <div class="segw__story-progress" data-role="story-progress"></div>
+        <div class="segw__story-header">
+          <p class="segw__onboarding-kicker" data-role="onboarding-title">Персональный онбординг</p>
+          <button type="button" class="segw__story-close" data-action="restart-segmentation" aria-label="Закрыть онбординг">
+            ×
+          </button>
+        </div>
 
-    <div class="segw__onboarding-card">
-      <h4 class="segw__onboarding-step-title" data-role="onboarding-step-title">—</h4>
-      <p class="segw__onboarding-step-text" data-role="onboarding-step-text"></p>
-      <ul class="segw__onboarding-points" data-role="onboarding-step-points"></ul>
-    </div>
+        <div class="segw__story-content">
+          <div class="segw__story-emoji" data-role="onboarding-emoji">🚀</div>
+          <h3 class="segw__onboarding-step-title" data-role="onboarding-step-title">—</h3>
+          <p class="segw__onboarding-step-text" data-role="onboarding-step-text"></p>
+          <ul class="segw__onboarding-points" data-role="onboarding-step-points"></ul>
+        </div>
 
-    <div class="segw__onboarding-controls">
-      <button type="button" class="segw__btn segw__btn--secondary" data-action="onboarding-prev">
-        Назад
-      </button>
-      <button type="button" class="segw__btn" data-action="onboarding-next">
-        Далее
-      </button>
+        <p class="segw__onboarding-meta" data-role="onboarding-counter">Шаг 1 из 3</p>
+        <p class="segw__story-hint" data-role="onboarding-hint">
+          Тап по правой части — следующий экран, по левой — предыдущий.
+        </p>
+
+        <div class="segw__story-tapzones">
+          <button
+            type="button"
+            class="segw__story-tap segw__story-tap--prev"
+            data-action="onboarding-prev"
+            aria-label="Предыдущий экран"
+          ></button>
+          <button
+            type="button"
+            class="segw__story-tap segw__story-tap--next"
+            data-action="onboarding-next"
+            aria-label="Следующий экран"
+          ></button>
+        </div>
+      </article>
     </div>
 
     <p class="segw__onboarding-done segw__is-hidden" data-role="onboarding-done">
@@ -995,6 +1158,30 @@
       .join(", ");
   }
 
+  function getStoryGradient(segment, stepIndex) {
+    var paletteBySegment = {
+      novice: [
+        "linear-gradient(180deg, #1a56db 0%, #0f3a8e 100%)",
+        "linear-gradient(180deg, #dc2626 0%, #991b1b 100%)",
+        "linear-gradient(180deg, #059669 0%, #065f46 100%)",
+      ],
+      advanced: [
+        "linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%)",
+        "linear-gradient(180deg, #1a56db 0%, #1e40af 100%)",
+        "linear-gradient(180deg, #0891b2 0%, #155e75 100%)",
+      ],
+      expert: [
+        "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
+        "linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%)",
+        "linear-gradient(180deg, #d97706 0%, #92400e 100%)",
+      ],
+    };
+
+    var fallbackPalette = paletteBySegment.novice;
+    var palette = paletteBySegment[segment] || fallbackPalette;
+    return palette[stepIndex] || fallbackPalette[stepIndex] || fallbackPalette[0];
+  }
+
   function buildInlineOnboardingSteps(payload) {
     var goalLabel = GOAL_LABELS[payload.investment_goal] || payload.investment_goal;
     var amountLabel = AMOUNT_LABELS[payload.amount_tier] || payload.amount_tier;
@@ -1007,35 +1194,36 @@
     if (payload.segment === "novice") {
       return [
         {
-          title: "Урок 1. База и безопасность старта",
-          text:
-            "Соберем понятную стартовую систему под цель \"" +
-            goalLabel +
-            "\" и бюджет " +
-            amountLabel +
-            ".",
+          emoji: "🚀",
+          title: "С чего начать инвестировать?",
+          text: "Спокойный старт под цель \"" + goalLabel + "\" и бюджет " + amountLabel + ".",
+          hint: "Экран 1: база без перегруза",
+          gradient: getStoryGradient(payload.segment, 0),
           points: [
-            "Разберем, как работают брокерский счет и ИИС.",
-            "Покажем, как выбрать первый набор инструментов без перегруза.",
-            "Сформируем чек-лист ошибок, которых стоит избегать на старте.",
+            "Открываем счет и определяем стартовую стратегию.",
+            "Избегаем частых ошибок первого месяца.",
           ],
         },
         {
-          title: "Урок 2. Первый портфель под вашу цель",
-          text: "Соберем простой портфель вокруг " + primaryInstrument + " и добавим баланс риска.",
+          emoji: "🧩",
+          title: "Собираем первый портфель",
+          text: "Фокус на " + primaryInstrument + " и балансе риска.",
+          hint: "Экран 2: готовая схема входа",
+          gradient: getStoryGradient(payload.segment, 1),
           points: [
-            "Определим доли активов под вашу цель и горизонт.",
-            "Покажем, как распределять покупки во времени.",
-            "Подготовим минимальный план ребалансировки.",
+            "Фиксируем доли активов под ваш горизонт.",
+            "Планируем пошаговые покупки вместо одной точки входа.",
           ],
         },
         {
-          title: "Урок 3. Дисциплина и контроль результата",
-          text: "Закрепим рабочую рутину инвестора для инструментов: " + instrumentList + ".",
+          emoji: "✅",
+          title: "Дисциплина и контроль",
+          text: "Рабочий ритм для инструментов: " + instrumentList + ".",
+          hint: "Экран 3: завершаем модуль",
+          gradient: getStoryGradient(payload.segment, 2),
           points: [
-            "Настроим периодический контроль портфеля.",
-            "Подготовим триггеры действий при просадках и росте.",
-            "Сформируем персональный план следующего шага в сервисе.",
+            "Чек-лист регулярной проверки портфеля.",
+            "Понятный следующий шаг в онбординге.",
           ],
         },
       ];
@@ -1044,30 +1232,36 @@
     if (payload.segment === "advanced") {
       return [
         {
-          title: "Урок 1. Структура капитала и риск-контроль",
-          text: "Уточним аллокацию под цель \"" + goalLabel + "\" и объем " + amountLabel + ".",
+          emoji: "📊",
+          title: "Капитал и риск-контроль",
+          text: "Актуализируем структуру портфеля под \"" + goalLabel + "\" и " + amountLabel + ".",
+          hint: "Экран 1: ревизия стратегии",
+          gradient: getStoryGradient(payload.segment, 0),
           points: [
-            "Проверим текущую долю риска в портфеле.",
-            "Добавим сценарии действий для волатильного рынка.",
-            "Обновим лимиты по классам активов.",
+            "Проверяем перекосы по риску и долям активов.",
+            "Фиксируем лимиты до начала сделок.",
           ],
         },
         {
-          title: "Урок 2. Продвинутая работа с инструментами",
-          text: "Оптимизируем набор инструментов: " + instrumentList + ".",
+          emoji: "🎯",
+          title: "Оптимизация инструментов",
+          text: "Настраиваем набор: " + instrumentList + ".",
+          hint: "Экран 2: точечные улучшения",
+          gradient: getStoryGradient(payload.segment, 1),
           points: [
-            "Разберем сильные и слабые стороны каждого выбранного инструмента.",
-            "Соберем схему входа по этапам вместо одной точки входа.",
-            "Добавим правила фиксации прибыли и ограничения убытков.",
+            "Сценарии входа/выхода под волатильность.",
+            "Правила фиксации прибыли и ограничений убытков.",
           ],
         },
         {
-          title: "Урок 3. Личный инвестиционный регламент",
-          text: "Соберем компактный регламент, который можно применять сразу после анкеты.",
+          emoji: "🏁",
+          title: "Личный регламент действий",
+          text: "Финализируем короткий операционный план инвестора.",
+          hint: "Экран 3: готово к внедрению",
+          gradient: getStoryGradient(payload.segment, 2),
           points: [
-            "Настроим частоту ревизии портфеля.",
-            "Зафиксируем KPI и допустимые отклонения.",
-            "Подготовим план перехода к следующему уровню стратегии.",
+            "Ритм ревизии портфеля и KPI эффективности.",
+            "Подготовка к следующему уровню онбординга.",
           ],
         },
       ];
@@ -1075,30 +1269,36 @@
 
     return [
       {
-        title: "Урок 1. Экспресс-аудит стратегии",
-        text: "Проверим соответствие текущей стратегии вашей цели \"" + goalLabel + "\".",
+        emoji: "🧠",
+        title: "Экспресс-аудит стратегии",
+        text: "Проверяем, насколько текущий подход соответствует цели \"" + goalLabel + "\".",
+        hint: "Экран 1: диагностика",
+        gradient: getStoryGradient(payload.segment, 0),
         points: [
-          "Сверим структуру активов с допустимым риском.",
-          "Определим узкие места в управлении позицией.",
-          "Подготовим фокусные зоны для точечной доработки.",
+          "Сверяем структуру активов и риск-профиль.",
+          "Выявляем узкие места в текущей системе.",
         ],
       },
       {
-        title: "Урок 2. Риск-профиль и управление позицией",
-        text: "Уточним риск-параметры для объема " + amountLabel + " и профиля эксперта.",
+        emoji: "🛡️",
+        title: "Управление риском",
+        text: "Корректируем параметры под объем " + amountLabel + ".",
+        hint: "Экран 2: риск-правила",
+        gradient: getStoryGradient(payload.segment, 1),
         points: [
-          "Проверим текущие ограничения по drawdown и концентрации.",
-          "Соберем обновленные условия входа/выхода.",
-          "Синхронизируем риск-профиль с операционными правилами.",
+          "Ограничения по просадке и концентрации.",
+          "Понятные условия входа и выхода из позиций.",
         ],
       },
       {
-        title: "Урок 3. Персональный план внедрения",
-        text: "Финализируем дорожную карту по инструментам: " + instrumentList + ".",
+        emoji: "📌",
+        title: "План внедрения",
+        text: "Финальный маршрут по инструментам: " + instrumentList + ".",
+        hint: "Экран 3: завершение",
+        gradient: getStoryGradient(payload.segment, 2),
         points: [
-          "Зафиксируем последовательность внедрения изменений.",
-          "Определим метрики контроля эффективности.",
-          "Подготовим следующий блок онбординга в рабочем режиме.",
+          "Последовательность внедрения без потери темпа.",
+          "Переход к следующему блоку обучения.",
         ],
       },
     ];
@@ -1120,6 +1320,30 @@
     state.inlineOnboarding.completed = false;
     state.inlineOnboarding.payload = payload;
     state.inlineOnboarding.targetRoute = targetRoute || "";
+  }
+
+  function renderStoryProgress(progressRoot, stepsCount, activeStepIndex) {
+    if (!progressRoot) {
+      return;
+    }
+
+    progressRoot.innerHTML = "";
+
+    for (var i = 0; i < stepsCount; i += 1) {
+      var segment = document.createElement("span");
+      segment.className = "segw__story-progress-segment";
+
+      if (i < activeStepIndex) {
+        segment.classList.add("is-done");
+      } else if (i === activeStepIndex) {
+        segment.classList.add("is-active");
+      }
+
+      var fill = document.createElement("span");
+      fill.className = "segw__story-progress-fill";
+      segment.appendChild(fill);
+      progressRoot.appendChild(segment);
+    }
   }
 
   function renderInlineOnboarding(refs, state) {
@@ -1146,6 +1370,16 @@
     var isLastStep = inlineState.activeStepIndex === maxStepIndex;
     var hasExternalLink = hasConfiguredExternalOnboarding() && Boolean(inlineState.targetRoute);
 
+    renderStoryProgress(
+      refs.storyProgress,
+      inlineState.steps.length,
+      inlineState.activeStepIndex,
+    );
+
+    if (refs.storyFrame && activeStep.gradient) {
+      refs.storyFrame.style.background = activeStep.gradient;
+    }
+
     if (refs.onboardingTitle && inlineState.payload) {
       refs.onboardingTitle.textContent = ONBOARDING_PLAN_LABELS[inlineState.payload.segment];
     }
@@ -1163,10 +1397,21 @@
       refs.onboardingStepText.textContent = activeStep.text;
     }
 
+    if (refs.onboardingEmoji) {
+      refs.onboardingEmoji.textContent = activeStep.emoji || "📘";
+    }
+
+    if (refs.onboardingHint) {
+      refs.onboardingHint.textContent =
+        activeStep.hint ||
+        "Тап по правой части — следующий экран, по левой — предыдущий.";
+    }
+
     if (refs.onboardingStepPoints) {
       refs.onboardingStepPoints.innerHTML = "";
       for (var i = 0; i < activeStep.points.length; i += 1) {
         var point = document.createElement("li");
+        point.className = "segw__story-point";
         point.textContent = activeStep.points[i];
         refs.onboardingStepPoints.appendChild(point);
       }
@@ -1178,10 +1423,8 @@
 
     if (refs.onboardingNext) {
       if (inlineState.completed) {
-        refs.onboardingNext.textContent = "Пройдено";
         refs.onboardingNext.disabled = true;
       } else {
-        refs.onboardingNext.textContent = isLastStep ? "Завершить модуль" : "Далее";
         refs.onboardingNext.disabled = false;
       }
     }
@@ -1375,11 +1618,15 @@
       routeLink: root.querySelector('[data-role="route-link"]'),
       json: root.querySelector('[data-role="json"]'),
       onboarding: root.querySelector('[data-role="onboarding"]'),
+      storyFrame: root.querySelector('[data-role="story-frame"]'),
+      storyProgress: root.querySelector('[data-role="story-progress"]'),
       onboardingTitle: root.querySelector('[data-role="onboarding-title"]'),
       onboardingCounter: root.querySelector('[data-role="onboarding-counter"]'),
+      onboardingEmoji: root.querySelector('[data-role="onboarding-emoji"]'),
       onboardingStepTitle: root.querySelector('[data-role="onboarding-step-title"]'),
       onboardingStepText: root.querySelector('[data-role="onboarding-step-text"]'),
       onboardingStepPoints: root.querySelector('[data-role="onboarding-step-points"]'),
+      onboardingHint: root.querySelector('[data-role="onboarding-hint"]'),
       onboardingPrev: root.querySelector('[data-action="onboarding-prev"]'),
       onboardingNext: root.querySelector('[data-action="onboarding-next"]'),
       onboardingDone: root.querySelector('[data-role="onboarding-done"]'),
@@ -1722,7 +1969,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.9";
+  window.FinamSegmentationWidget.version = "1.0.10";
 
   ensureStyles();
   initExistingWidgets();
