@@ -8,6 +8,8 @@
   var WIDGET_OPTIONS = {
     useLegacyGlobalNavigate:
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-use-global-navigate") === "true",
+    disableTracking:
+      SCRIPT_REF && SCRIPT_REF.getAttribute("data-disable-tracking") === "true",
     onboardingUrlMap: {
       novice: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-novice-url") : null,
       advanced: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-advanced-url") : null,
@@ -579,26 +581,123 @@
   }
 
   function trackEvent(eventName, payload) {
+    if (WIDGET_OPTIONS.disableTracking) {
+      return;
+    }
+
     var safePayload = payload || {};
 
-    if (Array.isArray(window.dataLayer)) {
-      window.dataLayer.push(
-        Object.assign(
-          {
-            event: eventName,
-          },
-          safePayload,
-        ),
+    try {
+      if (Array.isArray(window.dataLayer)) {
+        window.dataLayer.push(
+          Object.assign(
+            {
+              event: eventName,
+            },
+            safePayload,
+          ),
+        );
+      }
+    } catch (error) {
+      if (window.console && typeof window.console.warn === "function") {
+        window.console.warn("[segmentation] dataLayer push failed", error);
+      }
+    }
+
+    try {
+      if (typeof window.gtag === "function") {
+        window.gtag("event", eventName, safePayload);
+      }
+    } catch (error) {
+      if (window.console && typeof window.console.warn === "function") {
+        window.console.warn("[segmentation] gtag failed", error);
+      }
+    }
+
+    try {
+      if (window.console && typeof window.console.info === "function") {
+        window.console.info("[segmentation]", eventName, safePayload);
+      }
+    } catch (error) {
+      // no-op
+    }
+  }
+
+  function safeInvokeNavigate(fn, segment, amountTier, target, fallbackTarget) {
+    try {
+      var result = fn(segment, amountTier, target, fallbackTarget);
+      return typeof result === "string" && result ? result : fallbackTarget;
+    } catch (error) {
+      if (window.console && typeof window.console.warn === "function") {
+        window.console.warn("[segmentation] custom navigate callback failed", error);
+      }
+      return fallbackTarget;
+    }
+  }
+
+  function safeInvokeComplete(payload) {
+    if (typeof window.onSegmentationComplete !== "function") {
+      return;
+    }
+
+    try {
+      window.onSegmentationComplete(payload);
+    } catch (error) {
+      if (window.console && typeof window.console.warn === "function") {
+        window.console.warn("[segmentation] onSegmentationComplete failed", error);
+      }
+    }
+  }
+
+  function navigateToOnboarding(segment, amountTier) {
+    var baseRoute = ONBOARDING_ROUTE_BY_SEGMENT[segment];
+    var target = baseRoute + "?amountTier=" + encodeURIComponent(amountTier);
+    var customSegmentUrl = WIDGET_OPTIONS.onboardingUrlMap[segment];
+    var fallbackHashTarget = buildFallbackHashTarget(segment, amountTier);
+
+    if (customSegmentUrl) {
+      var separator = customSegmentUrl.indexOf("?") === -1 ? "?" : "&";
+      var customTarget =
+        customSegmentUrl + separator + "amountTier=" + encodeURIComponent(amountTier);
+      window.location.href = customTarget;
+      return customTarget;
+    }
+
+    if (
+      window.FinamSegmentationWidget &&
+      typeof window.FinamSegmentationWidget.navigateToOnboarding === "function"
+    ) {
+      return safeInvokeNavigate(
+        window.FinamSegmentationWidget.navigateToOnboarding,
+        segment,
+        amountTier,
+        target,
+        fallbackHashTarget,
       );
     }
 
-    if (typeof window.gtag === "function") {
-      window.gtag("event", eventName, safePayload);
+    if (typeof window.__finamSegmentationNavigate === "function") {
+      return safeInvokeNavigate(
+        window.__finamSegmentationNavigate,
+        segment,
+        amountTier,
+        target,
+        fallbackHashTarget,
+      );
     }
 
-    if (window.console && typeof window.console.info === "function") {
-      window.console.info("[segmentation]", eventName, safePayload);
+    if (WIDGET_OPTIONS.useLegacyGlobalNavigate && typeof window.navigateToOnboarding === "function") {
+      return safeInvokeNavigate(
+        window.navigateToOnboarding,
+        segment,
+        amountTier,
+        target,
+        fallbackHashTarget,
+      );
     }
+
+    window.location.hash = fallbackHashTarget.replace(/^#/, "");
+    return fallbackHashTarget;
   }
 
   function canContinue(state) {
@@ -636,60 +735,6 @@
     };
   }
 
-  function navigateToOnboarding(segment, amountTier) {
-    var baseRoute = ONBOARDING_ROUTE_BY_SEGMENT[segment];
-    var target = baseRoute + "?amountTier=" + encodeURIComponent(amountTier);
-    var customSegmentUrl = WIDGET_OPTIONS.onboardingUrlMap[segment];
-    var fallbackHashTarget = buildFallbackHashTarget(segment, amountTier);
-
-    if (customSegmentUrl) {
-      var separator = customSegmentUrl.indexOf("?") === -1 ? "?" : "&";
-      var customTarget =
-        customSegmentUrl + separator + "amountTier=" + encodeURIComponent(amountTier);
-      window.location.href = customTarget;
-      return customTarget;
-    }
-
-    if (
-      window.FinamSegmentationWidget &&
-      typeof window.FinamSegmentationWidget.navigateToOnboarding === "function"
-    ) {
-      var namespacedTarget = window.FinamSegmentationWidget.navigateToOnboarding(
-        segment,
-        amountTier,
-        target,
-        fallbackHashTarget,
-      );
-      return typeof namespacedTarget === "string" && namespacedTarget
-        ? namespacedTarget
-        : fallbackHashTarget;
-    }
-
-    if (typeof window.__finamSegmentationNavigate === "function") {
-      var customNavigateTarget = window.__finamSegmentationNavigate(
-        segment,
-        amountTier,
-        target,
-        fallbackHashTarget,
-      );
-      return typeof customNavigateTarget === "string" && customNavigateTarget
-        ? customNavigateTarget
-        : fallbackHashTarget;
-    }
-
-    if (WIDGET_OPTIONS.useLegacyGlobalNavigate && typeof window.navigateToOnboarding === "function") {
-      var legacyTarget = window.navigateToOnboarding(
-        segment,
-        amountTier,
-        target,
-        fallbackHashTarget,
-      );
-      return typeof legacyTarget === "string" && legacyTarget ? legacyTarget : fallbackHashTarget;
-    }
-
-    window.location.hash = fallbackHashTarget.replace(/^#/, "");
-    return fallbackHashTarget;
-  }
 
   function updateOptionStates(root, state) {
     var buttons = root.querySelectorAll("button[data-action][data-value]");
@@ -870,9 +915,7 @@
         var targetRoute = navigateToOnboarding(payload.segment, payload.amount_tier);
         showTariffCard(refs, payload, targetRoute);
 
-        if (typeof window.onSegmentationComplete === "function") {
-          window.onSegmentationComplete(payload);
-        }
+        safeInvokeComplete(payload);
 
         root.dispatchEvent(
           new CustomEvent("segmentation:completed", {
@@ -1092,7 +1135,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.6";
+  window.FinamSegmentationWidget.version = "1.0.7";
 
   ensureStyles();
   initExistingWidgets();

@@ -108,6 +108,8 @@ Notes:
   (`#finam-segmentation-onboarding?segment=...&amountTier=...`) to avoid hard redirects and route conflicts.
 - Legacy global `window.navigateToOnboarding(...)` is disabled by default to prevent accidental conflicts.
 - To enable legacy callback explicitly: `data-use-global-navigate="true"`.
+- If third-party analytics scripts throw runtime/CORS errors, you can disable widget tracking hooks:
+  `data-disable-tracking="true"`.
 
 Public API:
 
