@@ -108,6 +108,8 @@ Notes:
   анкета -> карточка результата -> встроенные шаги онбординга (без перехода на другую страницу).
 - Inline онбординг отображается в формате stories: мобильный фрейм, сегментный прогресс-бар,
   навигация по тап-зонам (левая/правая части экрана).
+- В stories добавлен sticky footer с CTA-кнопкой (всегда видна внизу) и
+  градиентной подложкой для читаемости.
 - To force external redirect mode, set `data-onboarding-mode="external"`.
 - If `data-onboarding-mode="auto"`, widget switches to external only when onboarding URLs are configured.
 - In external mode fallback uses a safe hash navigation

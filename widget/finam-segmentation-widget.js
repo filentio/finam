@@ -340,19 +340,19 @@
 
 .segw__story-wrapper {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f0f0f0;
-  padding: 12px;
-  border-radius: 16px;
+  background: #000;
+  padding: 20px;
+  border-radius: 20px;
 }
 
 .segw__story-frame {
   width: 100%;
   max-width: 430px;
-  height: min(100dvh, 932px);
-  min-height: 560px;
+  height: min(90vh, 932px);
+  min-height: 640px;
   margin: 0 auto;
   position: relative;
   overflow: hidden;
@@ -360,6 +360,7 @@
   color: #fff;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   background: linear-gradient(180deg, #1a56db 0%, #0f3a8e 100%);
+  transition: background 0.3s ease;
 }
 
 .segw__story-progress {
@@ -384,12 +385,24 @@
   width: 0;
   background: #fff;
   border-radius: inherit;
-  transition: width 0.25s ease;
+  transition: width 0.2s ease-out;
 }
 
-.segw__story-progress-segment.is-done .segw__story-progress-fill,
-.segw__story-progress-segment.is-active .segw__story-progress-fill {
+.segw__story-progress-segment.is-done .segw__story-progress-fill {
   width: 100%;
+}
+
+.segw__story-progress-segment.is-active .segw__story-progress-fill {
+  animation: segwStoryProgressFill 0.3s ease-out forwards;
+}
+
+@keyframes segwStoryProgressFill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 .segw__story-header {
@@ -419,26 +432,57 @@
 
 .segw__story-content {
   position: relative;
-  z-index: 3;
-  min-height: calc(100% - 176px);
+  z-index: 5;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
-  padding: 10px 20px 0;
+  gap: 8px;
+  padding: 10px 20px 112px;
+}
+
+.segw__story-content.is-enter-next {
+  animation: segwStorySlideNext 0.2s ease-out;
+}
+
+.segw__story-content.is-enter-prev {
+  animation: segwStorySlidePrev 0.2s ease-out;
+}
+
+@keyframes segwStorySlideNext {
+  from {
+    opacity: 0;
+    transform: translateX(36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes segwStorySlidePrev {
+  from {
+    opacity: 0;
+    transform: translateX(-36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .segw__story-emoji {
-  font-size: 68px;
+  font-size: 64px;
   line-height: 1;
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .segw__onboarding-step-title {
   margin: 0;
   text-align: center;
-  font-size: clamp(26px, 5.1vw, 32px);
+  font-size: clamp(22px, 4.3vw, 28px);
   line-height: 1.2;
   font-weight: 700;
 }
@@ -452,16 +496,16 @@
 }
 
 .segw__onboarding-points {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   padding-left: 18px;
   display: grid;
-  gap: 10px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.94);
 }
 
 .segw__onboarding-points li {
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -489,8 +533,11 @@
 
 .segw__story-tapzones {
   position: absolute;
-  z-index: 2;
-  inset: 46px 0 0;
+  z-index: 4;
+  top: 46px;
+  left: 0;
+  right: 0;
+  bottom: 102px;
   display: flex;
 }
 
@@ -507,6 +554,34 @@
 
 .segw__story-tap--next {
   width: 70%;
+}
+
+.segw__story-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  padding: 16px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.86), rgba(0, 0, 0, 0));
+}
+
+.segw__story-next {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  min-height: 52px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.segw__story-next:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .segw__btn {
@@ -600,13 +675,13 @@
     min-height: auto;
     padding: 0;
     border-radius: 0;
-    background: transparent;
+    background: #000;
   }
 
   .segw__story-frame {
     max-width: none;
     border-radius: 0;
-    min-height: 640px;
+    min-height: 100dvh;
     height: 100dvh;
   }
 
@@ -780,7 +855,7 @@
           </button>
         </div>
 
-        <div class="segw__story-content">
+        <div class="segw__story-content" data-role="story-content">
           <div class="segw__story-emoji" data-role="onboarding-emoji">🚀</div>
           <h3 class="segw__onboarding-step-title" data-role="onboarding-step-title">—</h3>
           <p class="segw__onboarding-step-text" data-role="onboarding-step-text"></p>
@@ -805,6 +880,12 @@
             data-action="onboarding-next"
             aria-label="Следующий экран"
           ></button>
+        </div>
+
+        <div class="segw__story-footer">
+          <button type="button" class="segw__story-next" data-action="onboarding-next" data-role="onboarding-next-label">
+            Далее
+          </button>
         </div>
       </article>
     </div>
@@ -1158,28 +1239,14 @@
       .join(", ");
   }
 
-  function getStoryGradient(segment, stepIndex) {
-    var paletteBySegment = {
-      novice: [
-        "linear-gradient(180deg, #1a56db 0%, #0f3a8e 100%)",
-        "linear-gradient(180deg, #dc2626 0%, #991b1b 100%)",
-        "linear-gradient(180deg, #059669 0%, #065f46 100%)",
-      ],
-      advanced: [
-        "linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%)",
-        "linear-gradient(180deg, #1a56db 0%, #1e40af 100%)",
-        "linear-gradient(180deg, #0891b2 0%, #155e75 100%)",
-      ],
-      expert: [
-        "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
-        "linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%)",
-        "linear-gradient(180deg, #d97706 0%, #92400e 100%)",
-      ],
+  function getStoryGradient(segment) {
+    var bySegment = {
+      novice: "linear-gradient(180deg, rgba(26, 86, 219, 0.95) 0%, #1a1a1a 100%)",
+      advanced: "linear-gradient(180deg, rgba(124, 58, 237, 0.95) 0%, #1a1a1a 100%)",
+      expert: "linear-gradient(180deg, rgba(8, 145, 178, 0.95) 0%, #1a1a1a 100%)",
     };
 
-    var fallbackPalette = paletteBySegment.novice;
-    var palette = paletteBySegment[segment] || fallbackPalette;
-    return palette[stepIndex] || fallbackPalette[stepIndex] || fallbackPalette[0];
+    return bySegment[segment] || bySegment.novice;
   }
 
   function buildInlineOnboardingSteps(payload) {
@@ -1308,6 +1375,7 @@
     state.inlineOnboarding.isActive = false;
     state.inlineOnboarding.steps = [];
     state.inlineOnboarding.activeStepIndex = 0;
+    state.inlineOnboarding.direction = 1;
     state.inlineOnboarding.completed = false;
     state.inlineOnboarding.payload = null;
     state.inlineOnboarding.targetRoute = "";
@@ -1317,6 +1385,7 @@
     state.inlineOnboarding.isActive = true;
     state.inlineOnboarding.steps = buildInlineOnboardingSteps(payload);
     state.inlineOnboarding.activeStepIndex = 0;
+    state.inlineOnboarding.direction = 1;
     state.inlineOnboarding.completed = false;
     state.inlineOnboarding.payload = payload;
     state.inlineOnboarding.targetRoute = targetRoute || "";
@@ -1380,6 +1449,14 @@
       refs.storyFrame.style.background = activeStep.gradient;
     }
 
+    if (refs.storyContent) {
+      refs.storyContent.classList.remove("is-enter-next", "is-enter-prev");
+      void refs.storyContent.offsetWidth;
+      refs.storyContent.classList.add(
+        inlineState.direction < 0 ? "is-enter-prev" : "is-enter-next",
+      );
+    }
+
     if (refs.onboardingTitle && inlineState.payload) {
       refs.onboardingTitle.textContent = ONBOARDING_PLAN_LABELS[inlineState.payload.segment];
     }
@@ -1426,6 +1503,19 @@
         refs.onboardingNext.disabled = true;
       } else {
         refs.onboardingNext.disabled = false;
+      }
+    }
+
+    if (refs.onboardingNextButton) {
+      if (inlineState.completed) {
+        refs.onboardingNextButton.textContent = "Пройдено";
+        refs.onboardingNextButton.disabled = true;
+      } else if (isLastStep) {
+        refs.onboardingNextButton.textContent = "Завершить урок";
+        refs.onboardingNextButton.disabled = false;
+      } else {
+        refs.onboardingNextButton.textContent = "Далее";
+        refs.onboardingNextButton.disabled = false;
       }
     }
 
@@ -1598,6 +1688,7 @@
         isActive: false,
         steps: [],
         activeStepIndex: 0,
+        direction: 1,
         completed: false,
         payload: null,
         targetRoute: "",
@@ -1620,6 +1711,7 @@
       onboarding: root.querySelector('[data-role="onboarding"]'),
       storyFrame: root.querySelector('[data-role="story-frame"]'),
       storyProgress: root.querySelector('[data-role="story-progress"]'),
+      storyContent: root.querySelector('[data-role="story-content"]'),
       onboardingTitle: root.querySelector('[data-role="onboarding-title"]'),
       onboardingCounter: root.querySelector('[data-role="onboarding-counter"]'),
       onboardingEmoji: root.querySelector('[data-role="onboarding-emoji"]'),
@@ -1629,6 +1721,7 @@
       onboardingHint: root.querySelector('[data-role="onboarding-hint"]'),
       onboardingPrev: root.querySelector('[data-action="onboarding-prev"]'),
       onboardingNext: root.querySelector('[data-action="onboarding-next"]'),
+      onboardingNextButton: root.querySelector('[data-role="onboarding-next-label"]'),
       onboardingDone: root.querySelector('[data-role="onboarding-done"]'),
       onboardingRouteLink: root.querySelector('[data-role="onboarding-route-link"]'),
     };
@@ -1652,6 +1745,7 @@
           return;
         }
 
+        state.inlineOnboarding.direction = -1;
         if (state.inlineOnboarding.completed) {
           state.inlineOnboarding.completed = false;
         }
@@ -1666,6 +1760,7 @@
           return;
         }
 
+        state.inlineOnboarding.direction = 1;
         var lastIndex = state.inlineOnboarding.steps.length - 1;
         if (state.inlineOnboarding.activeStepIndex < lastIndex) {
           state.inlineOnboarding.activeStepIndex += 1;
@@ -1969,7 +2064,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.10";
+  window.FinamSegmentationWidget.version = "1.0.11";
 
   ensureStyles();
   initExistingWidgets();
