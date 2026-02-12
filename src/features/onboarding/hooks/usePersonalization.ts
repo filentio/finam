@@ -83,12 +83,14 @@ export function usePersonalization(): {
       return base;
     }
 
-    if (context.riskProfile && variants[context.riskProfile]) {
-      return variants[context.riskProfile];
+    const byRisk = context.riskProfile ? variants[context.riskProfile] : undefined;
+    if (byRisk) {
+      return byRisk;
     }
 
-    if (variants[context.amountTier]) {
-      return variants[context.amountTier];
+    const byAmount = variants[context.amountTier];
+    if (byAmount) {
+      return byAmount;
     }
 
     return base;

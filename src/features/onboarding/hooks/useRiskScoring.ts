@@ -114,7 +114,7 @@ function selfAssessmentToProfile(score: SelfAssessment): RiskProfile {
 function capProfile(raw: RiskProfile, cap: RiskProfile): RiskProfile {
   const rawIndex = PROFILE_ORDER.indexOf(raw);
   const capIndex = PROFILE_ORDER.indexOf(cap);
-  return PROFILE_ORDER[Math.min(rawIndex, capIndex)];
+  return PROFILE_ORDER[Math.min(rawIndex, capIndex)] ?? "conservative";
 }
 
 export function calculateRiskProfile(

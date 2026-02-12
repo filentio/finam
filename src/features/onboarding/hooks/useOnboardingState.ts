@@ -157,6 +157,16 @@ export function calculateProgress(state: OnboardingState): ProgressInfo {
   }
 
   const currentStep = state.track[state.current_step_index];
+  if (!currentStep) {
+    return {
+      totalSteps,
+      completedSteps: state.completed_steps.length,
+      currentStepIndex: 0,
+      currentStepProgress: 0,
+      overallProgress: 0,
+      currentStepLabel: "Онбординг",
+    };
+  }
   const totalScreens = getScreenCount(currentStep, state);
   const currentStepProgress =
     totalScreens > 0 ? (state.current_screen_index + 1) / totalScreens : 1;

@@ -45,9 +45,9 @@ export function useAnalytics(baseContext?: AnalyticsBaseContext): {
         },
       };
 
-      if (Array.isArray((window as Window & { dataLayer?: unknown[] }).dataLayer)) {
-        const dataLayerWindow = window as Window & { dataLayer: unknown[] };
-        dataLayerWindow.dataLayer.push({
+      const dataLayer = (window as Window & { dataLayer?: unknown[] }).dataLayer;
+      if (Array.isArray(dataLayer)) {
+        dataLayer.push({
           event: event.event_name,
           ...event.params,
         });
