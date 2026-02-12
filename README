@@ -110,6 +110,9 @@ Notes:
 - To enable legacy callback explicitly: `data-use-global-navigate="true"`.
 - If third-party analytics scripts throw runtime/CORS errors, you can disable widget tracking hooks:
   `data-disable-tracking="true"`.
+- You can define a common onboarding page URL via `data-onboarding-url="https://..."`.
+  Widget will append `segment` and `amountTier` query params automatically.
+- To open onboarding in a new tab, set `data-open-in-new-tab="true"`.
 
 Public API:
 

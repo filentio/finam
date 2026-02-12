@@ -10,6 +10,12 @@
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-use-global-navigate") === "true",
     disableTracking:
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-disable-tracking") === "true",
+    openInNewTab:
+      SCRIPT_REF && SCRIPT_REF.getAttribute("data-open-in-new-tab") === "true",
+    onboardingBaseUrl: SCRIPT_REF
+      ? SCRIPT_REF.getAttribute("data-onboarding-url") ||
+        SCRIPT_REF.getAttribute("data-onboarding-base-url")
+      : null,
     onboardingUrlMap: {
       novice: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-novice-url") : null,
       advanced: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-advanced-url") : null,
@@ -540,6 +546,24 @@
     );
   }
 
+  function appendQueryParams(baseUrl, params) {
+    var separator = baseUrl.indexOf("?") === -1 ? "?" : "&";
+    return baseUrl + separator + params;
+  }
+
+  function redirectToTarget(targetUrl) {
+    if (WIDGET_OPTIONS.openInNewTab) {
+      var openedWindow = window.open(targetUrl, "_blank", "noopener,noreferrer");
+      if (openedWindow) {
+        return targetUrl;
+      }
+      // Popup blockers can prevent window.open; fallback to same-tab navigation.
+    }
+
+    window.location.href = targetUrl;
+    return targetUrl;
+  }
+
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) {
       return;
@@ -654,13 +678,20 @@
     var target = baseRoute + "?amountTier=" + encodeURIComponent(amountTier);
     var customSegmentUrl = WIDGET_OPTIONS.onboardingUrlMap[segment];
     var fallbackHashTarget = buildFallbackHashTarget(segment, amountTier);
+    var queryParams =
+      "segment=" + encodeURIComponent(segment) + "&amountTier=" + encodeURIComponent(amountTier);
 
     if (customSegmentUrl) {
-      var separator = customSegmentUrl.indexOf("?") === -1 ? "?" : "&";
-      var customTarget =
-        customSegmentUrl + separator + "amountTier=" + encodeURIComponent(amountTier);
-      window.location.href = customTarget;
-      return customTarget;
+      return redirectToTarget(
+        appendQueryParams(
+          customSegmentUrl,
+          "amountTier=" + encodeURIComponent(amountTier) + "&segment=" + encodeURIComponent(segment),
+        ),
+      );
+    }
+
+    if (WIDGET_OPTIONS.onboardingBaseUrl) {
+      return redirectToTarget(appendQueryParams(WIDGET_OPTIONS.onboardingBaseUrl, queryParams));
     }
 
     if (
@@ -694,6 +725,11 @@
         target,
         fallbackHashTarget,
       );
+    }
+
+    if (WIDGET_OPTIONS.openInNewTab) {
+      var currentPageWithoutHash = window.location.href.split("#")[0];
+      return redirectToTarget(currentPageWithoutHash + fallbackHashTarget);
     }
 
     window.location.hash = fallbackHashTarget.replace(/^#/, "");
@@ -1135,7 +1171,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.7";
+  window.FinamSegmentationWidget.version = "1.0.8";
 
   ensureStyles();
   initExistingWidgets();
