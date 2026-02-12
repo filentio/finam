@@ -529,6 +529,15 @@
     expert: "/onboarding/minimal-risk-form",
   };
 
+  function buildFallbackHashTarget(segment, amountTier) {
+    return (
+      "#finam-segmentation-onboarding?segment=" +
+      encodeURIComponent(segment) +
+      "&amountTier=" +
+      encodeURIComponent(amountTier)
+    );
+  }
+
   function ensureStyles() {
     if (document.getElementById(STYLE_ID)) {
       return;
@@ -631,6 +640,7 @@
     var baseRoute = ONBOARDING_ROUTE_BY_SEGMENT[segment];
     var target = baseRoute + "?amountTier=" + encodeURIComponent(amountTier);
     var customSegmentUrl = WIDGET_OPTIONS.onboardingUrlMap[segment];
+    var fallbackHashTarget = buildFallbackHashTarget(segment, amountTier);
 
     if (customSegmentUrl) {
       var separator = customSegmentUrl.indexOf("?") === -1 ? "?" : "&";
@@ -648,10 +658,11 @@
         segment,
         amountTier,
         target,
+        fallbackHashTarget,
       );
       return typeof namespacedTarget === "string" && namespacedTarget
         ? namespacedTarget
-        : target;
+        : fallbackHashTarget;
     }
 
     if (typeof window.__finamSegmentationNavigate === "function") {
@@ -659,19 +670,25 @@
         segment,
         amountTier,
         target,
+        fallbackHashTarget,
       );
       return typeof customNavigateTarget === "string" && customNavigateTarget
         ? customNavigateTarget
-        : target;
+        : fallbackHashTarget;
     }
 
     if (WIDGET_OPTIONS.useLegacyGlobalNavigate && typeof window.navigateToOnboarding === "function") {
-      var legacyTarget = window.navigateToOnboarding(segment, amountTier, target);
-      return typeof legacyTarget === "string" && legacyTarget ? legacyTarget : target;
+      var legacyTarget = window.navigateToOnboarding(
+        segment,
+        amountTier,
+        target,
+        fallbackHashTarget,
+      );
+      return typeof legacyTarget === "string" && legacyTarget ? legacyTarget : fallbackHashTarget;
     }
 
-    window.location.hash = target;
-    return "#" + target;
+    window.location.hash = fallbackHashTarget.replace(/^#/, "");
+    return fallbackHashTarget;
   }
 
   function updateOptionStates(root, state) {
@@ -1075,7 +1092,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.5";
+  window.FinamSegmentationWidget.version = "1.0.6";
 
   ensureStyles();
   initExistingWidgets();
