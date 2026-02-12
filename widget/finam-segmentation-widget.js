@@ -862,18 +862,12 @@
     }
 
     var targetSelector = scriptTag.getAttribute("data-target");
-    var targetElement = null;
     var root = null;
 
     if (targetSelector) {
-      try {
-        targetElement = document.querySelector(targetSelector);
-      } catch (error) {
-        targetElement = null;
-      }
-      if (targetElement) {
-        root = mountInto(targetElement, true);
-      }
+      root = mount(targetSelector, { replace: true, wait: true });
+      scriptTag.setAttribute(SCRIPT_MOUNTED_ATTR, "true");
+      return root;
     }
 
     if (!root && scriptTag.parentElement && scriptTag.parentElement.tagName.toLowerCase() !== "head") {
@@ -898,6 +892,52 @@
     return root;
   }
 
+  function querySelectorSafely(selector) {
+    if (typeof selector !== "string") {
+      return null;
+    }
+
+    try {
+      return document.querySelector(selector);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function mountWithRetry(selector, replaceContent, options) {
+    var waitMs = options && typeof options.waitMs === "number" ? options.waitMs : 10000;
+    var intervalMs =
+      options && typeof options.intervalMs === "number" ? options.intervalMs : 200;
+    var elapsed = 0;
+
+    var timer = setInterval(function () {
+      var targetElement = querySelectorSafely(selector);
+      if (targetElement) {
+        clearInterval(timer);
+        mountInto(targetElement, replaceContent);
+        return;
+      }
+
+      elapsed += intervalMs;
+      if (elapsed >= waitMs) {
+        clearInterval(timer);
+      }
+    }, intervalMs);
+  }
+
+  function mountDefaultHostIfPresent() {
+    var defaultHost = document.getElementById("finam-segmentation-widget");
+    if (!defaultHost) {
+      return null;
+    }
+
+    if (defaultHost.querySelector("[" + WIDGET_ROOT_ATTR + "]")) {
+      return defaultHost;
+    }
+
+    return mountInto(defaultHost, true);
+  }
+
   function initExistingWidgets() {
     var existingRoots = document.querySelectorAll("[" + WIDGET_ROOT_ATTR + "]");
     for (var i = 0; i < existingRoots.length; i += 1) {
@@ -906,13 +946,22 @@
   }
 
   function mount(targetOrSelector, options) {
-    var targetElement = targetOrSelector;
-    if (typeof targetOrSelector === "string") {
-      targetElement = document.querySelector(targetOrSelector);
-    }
     var replaceContent = !options || options.replace !== false;
     ensureStyles();
-    return mountInto(targetElement, replaceContent);
+
+    if (typeof targetOrSelector === "string") {
+      var targetElement = querySelectorSafely(targetOrSelector);
+      if (targetElement) {
+        return mountInto(targetElement, replaceContent);
+      }
+
+      if (!options || options.wait !== false) {
+        mountWithRetry(targetOrSelector, replaceContent, options);
+      }
+      return null;
+    }
+
+    return mountInto(targetOrSelector, replaceContent);
   }
 
   window.FinamSegmentationWidget = window.FinamSegmentationWidget || {};
@@ -920,16 +969,19 @@
   window.FinamSegmentationWidget.initAll = function () {
     ensureStyles();
     initExistingWidgets();
+    mountDefaultHostIfPresent();
   };
-  window.FinamSegmentationWidget.version = "1.0.0";
+  window.FinamSegmentationWidget.version = "1.0.1";
 
   ensureStyles();
   initExistingWidgets();
+  mountDefaultHostIfPresent();
 
   var mounted = mountFromScript(SCRIPT_REF);
   if (!mounted && SCRIPT_REF && document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       mountFromScript(SCRIPT_REF);
+      mountDefaultHostIfPresent();
     });
   }
 })();
