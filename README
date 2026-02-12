@@ -104,7 +104,11 @@ Optional segment URL mapping (recommended for production routing):
 
 Notes:
 
-- By default widget uses a safe hash navigation
+- By default widget runs a single in-widget flow:
+  анкета -> карточка результата -> встроенные шаги онбординга (без перехода на другую страницу).
+- To force external redirect mode, set `data-onboarding-mode="external"`.
+- If `data-onboarding-mode="auto"`, widget switches to external only when onboarding URLs are configured.
+- In external mode fallback uses a safe hash navigation
   (`#finam-segmentation-onboarding?segment=...&amountTier=...`) to avoid hard redirects and route conflicts.
 - Legacy global `window.navigateToOnboarding(...)` is disabled by default to prevent accidental conflicts.
 - To enable legacy callback explicitly: `data-use-global-navigate="true"`.

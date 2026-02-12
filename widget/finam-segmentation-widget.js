@@ -10,6 +10,7 @@
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-use-global-navigate") === "true",
     disableTracking:
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-disable-tracking") === "true",
+    onboardingMode: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-mode") : null,
     openInNewTab:
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-open-in-new-tab") === "true",
     onboardingBaseUrl: SCRIPT_REF
@@ -246,6 +247,10 @@
   filter: grayscale(0.15);
 }
 
+.segw__questionnaire.is-hidden {
+  display: none;
+}
+
 .segw__result {
   margin-top: 24px;
 }
@@ -311,6 +316,119 @@
   font-weight: 600;
 }
 
+.segw__route--ghost {
+  background: transparent;
+  border: 1px solid rgba(25, 65, 153, 0.25);
+}
+
+.segw__onboarding {
+  margin-top: 16px;
+  border: 1px solid var(--segw-line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 16px;
+}
+
+.segw__onboarding.is-hidden {
+  display: none;
+}
+
+.segw__onboarding-kicker {
+  margin: 0 0 6px;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--segw-primary);
+  font-weight: 600;
+}
+
+.segw__onboarding-title {
+  margin: 0 0 6px;
+  font-size: 1.14rem;
+}
+
+.segw__onboarding-meta {
+  margin: 0 0 12px;
+  color: var(--segw-muted);
+  font-size: 0.88rem;
+}
+
+.segw__onboarding-card {
+  border: 1px solid #e8edf7;
+  border-radius: 12px;
+  background: #f8faff;
+  padding: 14px;
+}
+
+.segw__onboarding-step-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.segw__onboarding-step-text {
+  margin: 0;
+  color: #36465b;
+}
+
+.segw__onboarding-points {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #2e3a4d;
+}
+
+.segw__onboarding-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.segw__btn {
+  border: 0;
+  background: var(--segw-primary);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segw__btn--secondary {
+  background: #fff;
+  color: #2a3b52;
+  border: 1px solid #d7e0ee;
+}
+
+.segw__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.segw__onboarding-done {
+  margin: 10px 0 0;
+  color: #1f6f44;
+  background: #ecf8f0;
+  border: 1px solid #bfe4cb;
+  border-radius: 10px;
+  padding: 9px 10px;
+  font-size: 0.87rem;
+}
+
+.segw__onboarding-footer {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.segw__is-hidden {
+  display: none !important;
+}
+
 .segw__json {
   margin: 10px 0 0;
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -347,6 +465,18 @@
   .segw__continue {
     width: 100%;
   }
+
+  .segw__onboarding-controls,
+  .segw__onboarding-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .segw__btn,
+  .segw__route {
+    width: 100%;
+    justify-content: center;
+  }
 }
 `;
 
@@ -360,6 +490,7 @@
     </p>
   </header>
 
+  <div class="segw__questionnaire" data-role="questionnaire">
   <section class="segw__section">
     <h3 class="segw__title">Являетесь ли вы квалифицированным инвестором?</h3>
     <div class="segw__grid">
@@ -463,6 +594,7 @@
       Получить персональный маршрут
     </button>
   </section>
+  </div>
 
   <section class="segw__result is-hidden" data-role="result">
     <div class="segw__tariff">
@@ -491,6 +623,40 @@
         <summary>Показать JSON payload</summary>
         <pre data-role="json"></pre>
       </details>
+    </div>
+  </section>
+
+  <section class="segw__onboarding is-hidden" data-role="onboarding">
+    <p class="segw__onboarding-kicker">Персональный онбординг</p>
+    <h3 class="segw__onboarding-title" data-role="onboarding-title">План обучения</h3>
+    <p class="segw__onboarding-meta" data-role="onboarding-counter">Шаг 1 из 3</p>
+
+    <div class="segw__onboarding-card">
+      <h4 class="segw__onboarding-step-title" data-role="onboarding-step-title">—</h4>
+      <p class="segw__onboarding-step-text" data-role="onboarding-step-text"></p>
+      <ul class="segw__onboarding-points" data-role="onboarding-step-points"></ul>
+    </div>
+
+    <div class="segw__onboarding-controls">
+      <button type="button" class="segw__btn segw__btn--secondary" data-action="onboarding-prev">
+        Назад
+      </button>
+      <button type="button" class="segw__btn" data-action="onboarding-next">
+        Далее
+      </button>
+    </div>
+
+    <p class="segw__onboarding-done segw__is-hidden" data-role="onboarding-done">
+      Модуль завершен. Можно перейти к следующему шагу оформления.
+    </p>
+
+    <div class="segw__onboarding-footer">
+      <button type="button" class="segw__btn segw__btn--secondary" data-action="restart-segmentation">
+        Изменить ответы анкеты
+      </button>
+      <a href="#" class="segw__route segw__route--ghost segw__is-hidden" data-role="onboarding-route-link">
+        Открыть полную версию на отдельной странице
+      </a>
     </div>
   </section>
 </div>
@@ -537,6 +703,39 @@
     expert: "/onboarding/minimal-risk-form",
   };
 
+  function hasConfiguredExternalOnboarding() {
+    return Boolean(
+      WIDGET_OPTIONS.onboardingBaseUrl ||
+        WIDGET_OPTIONS.onboardingUrlMap.novice ||
+        WIDGET_OPTIONS.onboardingUrlMap.advanced ||
+        WIDGET_OPTIONS.onboardingUrlMap.expert,
+    );
+  }
+
+  function getOnboardingMode() {
+    var rawMode = (WIDGET_OPTIONS.onboardingMode || "inline").toLowerCase();
+
+    if (rawMode === "external" || rawMode === "inline" || rawMode === "auto") {
+      return rawMode;
+    }
+
+    return "inline";
+  }
+
+  function shouldUseInlineOnboarding() {
+    var mode = getOnboardingMode();
+
+    if (mode === "external") {
+      return false;
+    }
+
+    if (mode === "inline") {
+      return true;
+    }
+
+    return !hasConfiguredExternalOnboarding();
+  }
+
   function buildFallbackHashTarget(segment, amountTier) {
     return (
       "#finam-segmentation-onboarding?segment=" +
@@ -551,7 +750,11 @@
     return baseUrl + separator + params;
   }
 
-  function redirectToTarget(targetUrl) {
+  function redirectToTarget(targetUrl, skipNavigation) {
+    if (skipNavigation) {
+      return targetUrl;
+    }
+
     if (WIDGET_OPTIONS.openInNewTab) {
       var openedWindow = window.open(targetUrl, "_blank", "noopener,noreferrer");
       if (openedWindow) {
@@ -673,7 +876,8 @@
     }
   }
 
-  function navigateToOnboarding(segment, amountTier) {
+  function navigateToOnboarding(segment, amountTier, options) {
+    var skipNavigation = options && options.skipNavigation === true;
     var baseRoute = ONBOARDING_ROUTE_BY_SEGMENT[segment];
     var target = baseRoute + "?amountTier=" + encodeURIComponent(amountTier);
     var customSegmentUrl = WIDGET_OPTIONS.onboardingUrlMap[segment];
@@ -687,11 +891,19 @@
           customSegmentUrl,
           "amountTier=" + encodeURIComponent(amountTier) + "&segment=" + encodeURIComponent(segment),
         ),
+        skipNavigation,
       );
     }
 
     if (WIDGET_OPTIONS.onboardingBaseUrl) {
-      return redirectToTarget(appendQueryParams(WIDGET_OPTIONS.onboardingBaseUrl, queryParams));
+      return redirectToTarget(
+        appendQueryParams(WIDGET_OPTIONS.onboardingBaseUrl, queryParams),
+        skipNavigation,
+      );
+    }
+
+    if (skipNavigation) {
+      return fallbackHashTarget;
     }
 
     if (
@@ -729,7 +941,7 @@
 
     if (WIDGET_OPTIONS.openInNewTab) {
       var currentPageWithoutHash = window.location.href.split("#")[0];
-      return redirectToTarget(currentPageWithoutHash + fallbackHashTarget);
+      return redirectToTarget(currentPageWithoutHash + fallbackHashTarget, false);
     }
 
     window.location.hash = fallbackHashTarget.replace(/^#/, "");
@@ -769,6 +981,237 @@
       investment_goal: state.goal,
       instruments: state.instruments.slice(),
     };
+  }
+
+  function getInstrumentLabelList(instruments) {
+    if (!Array.isArray(instruments) || !instruments.length) {
+      return "базовые инструменты";
+    }
+
+    return instruments
+      .map(function (instrument) {
+        return INSTRUMENT_LABELS[instrument] || instrument;
+      })
+      .join(", ");
+  }
+
+  function buildInlineOnboardingSteps(payload) {
+    var goalLabel = GOAL_LABELS[payload.investment_goal] || payload.investment_goal;
+    var amountLabel = AMOUNT_LABELS[payload.amount_tier] || payload.amount_tier;
+    var instrumentList = getInstrumentLabelList(payload.instruments);
+    var primaryInstrument =
+      payload.instruments && payload.instruments.length
+        ? INSTRUMENT_LABELS[payload.instruments[0]] || payload.instruments[0]
+        : "инструменты с низким порогом входа";
+
+    if (payload.segment === "novice") {
+      return [
+        {
+          title: "Урок 1. База и безопасность старта",
+          text:
+            "Соберем понятную стартовую систему под цель \"" +
+            goalLabel +
+            "\" и бюджет " +
+            amountLabel +
+            ".",
+          points: [
+            "Разберем, как работают брокерский счет и ИИС.",
+            "Покажем, как выбрать первый набор инструментов без перегруза.",
+            "Сформируем чек-лист ошибок, которых стоит избегать на старте.",
+          ],
+        },
+        {
+          title: "Урок 2. Первый портфель под вашу цель",
+          text: "Соберем простой портфель вокруг " + primaryInstrument + " и добавим баланс риска.",
+          points: [
+            "Определим доли активов под вашу цель и горизонт.",
+            "Покажем, как распределять покупки во времени.",
+            "Подготовим минимальный план ребалансировки.",
+          ],
+        },
+        {
+          title: "Урок 3. Дисциплина и контроль результата",
+          text: "Закрепим рабочую рутину инвестора для инструментов: " + instrumentList + ".",
+          points: [
+            "Настроим периодический контроль портфеля.",
+            "Подготовим триггеры действий при просадках и росте.",
+            "Сформируем персональный план следующего шага в сервисе.",
+          ],
+        },
+      ];
+    }
+
+    if (payload.segment === "advanced") {
+      return [
+        {
+          title: "Урок 1. Структура капитала и риск-контроль",
+          text: "Уточним аллокацию под цель \"" + goalLabel + "\" и объем " + amountLabel + ".",
+          points: [
+            "Проверим текущую долю риска в портфеле.",
+            "Добавим сценарии действий для волатильного рынка.",
+            "Обновим лимиты по классам активов.",
+          ],
+        },
+        {
+          title: "Урок 2. Продвинутая работа с инструментами",
+          text: "Оптимизируем набор инструментов: " + instrumentList + ".",
+          points: [
+            "Разберем сильные и слабые стороны каждого выбранного инструмента.",
+            "Соберем схему входа по этапам вместо одной точки входа.",
+            "Добавим правила фиксации прибыли и ограничения убытков.",
+          ],
+        },
+        {
+          title: "Урок 3. Личный инвестиционный регламент",
+          text: "Соберем компактный регламент, который можно применять сразу после анкеты.",
+          points: [
+            "Настроим частоту ревизии портфеля.",
+            "Зафиксируем KPI и допустимые отклонения.",
+            "Подготовим план перехода к следующему уровню стратегии.",
+          ],
+        },
+      ];
+    }
+
+    return [
+      {
+        title: "Урок 1. Экспресс-аудит стратегии",
+        text: "Проверим соответствие текущей стратегии вашей цели \"" + goalLabel + "\".",
+        points: [
+          "Сверим структуру активов с допустимым риском.",
+          "Определим узкие места в управлении позицией.",
+          "Подготовим фокусные зоны для точечной доработки.",
+        ],
+      },
+      {
+        title: "Урок 2. Риск-профиль и управление позицией",
+        text: "Уточним риск-параметры для объема " + amountLabel + " и профиля эксперта.",
+        points: [
+          "Проверим текущие ограничения по drawdown и концентрации.",
+          "Соберем обновленные условия входа/выхода.",
+          "Синхронизируем риск-профиль с операционными правилами.",
+        ],
+      },
+      {
+        title: "Урок 3. Персональный план внедрения",
+        text: "Финализируем дорожную карту по инструментам: " + instrumentList + ".",
+        points: [
+          "Зафиксируем последовательность внедрения изменений.",
+          "Определим метрики контроля эффективности.",
+          "Подготовим следующий блок онбординга в рабочем режиме.",
+        ],
+      },
+    ];
+  }
+
+  function resetInlineOnboardingState(state) {
+    state.inlineOnboarding.isActive = false;
+    state.inlineOnboarding.steps = [];
+    state.inlineOnboarding.activeStepIndex = 0;
+    state.inlineOnboarding.completed = false;
+    state.inlineOnboarding.payload = null;
+    state.inlineOnboarding.targetRoute = "";
+  }
+
+  function startInlineOnboardingFlow(state, payload, targetRoute) {
+    state.inlineOnboarding.isActive = true;
+    state.inlineOnboarding.steps = buildInlineOnboardingSteps(payload);
+    state.inlineOnboarding.activeStepIndex = 0;
+    state.inlineOnboarding.completed = false;
+    state.inlineOnboarding.payload = payload;
+    state.inlineOnboarding.targetRoute = targetRoute || "";
+  }
+
+  function renderInlineOnboarding(refs, state) {
+    if (!refs.onboarding) {
+      return;
+    }
+
+    var inlineState = state.inlineOnboarding;
+    if (!inlineState.isActive || !inlineState.steps.length) {
+      refs.onboarding.classList.add("is-hidden");
+      return;
+    }
+
+    refs.onboarding.classList.remove("is-hidden");
+    var maxStepIndex = inlineState.steps.length - 1;
+
+    if (inlineState.activeStepIndex < 0) {
+      inlineState.activeStepIndex = 0;
+    } else if (inlineState.activeStepIndex > maxStepIndex) {
+      inlineState.activeStepIndex = maxStepIndex;
+    }
+
+    var activeStep = inlineState.steps[inlineState.activeStepIndex];
+    var isLastStep = inlineState.activeStepIndex === maxStepIndex;
+    var hasExternalLink = hasConfiguredExternalOnboarding() && Boolean(inlineState.targetRoute);
+
+    if (refs.onboardingTitle && inlineState.payload) {
+      refs.onboardingTitle.textContent = ONBOARDING_PLAN_LABELS[inlineState.payload.segment];
+    }
+
+    if (refs.onboardingCounter) {
+      refs.onboardingCounter.textContent =
+        "Шаг " + String(inlineState.activeStepIndex + 1) + " из " + String(inlineState.steps.length);
+    }
+
+    if (refs.onboardingStepTitle) {
+      refs.onboardingStepTitle.textContent = activeStep.title;
+    }
+
+    if (refs.onboardingStepText) {
+      refs.onboardingStepText.textContent = activeStep.text;
+    }
+
+    if (refs.onboardingStepPoints) {
+      refs.onboardingStepPoints.innerHTML = "";
+      for (var i = 0; i < activeStep.points.length; i += 1) {
+        var point = document.createElement("li");
+        point.textContent = activeStep.points[i];
+        refs.onboardingStepPoints.appendChild(point);
+      }
+    }
+
+    if (refs.onboardingPrev) {
+      refs.onboardingPrev.disabled = inlineState.activeStepIndex === 0;
+    }
+
+    if (refs.onboardingNext) {
+      if (inlineState.completed) {
+        refs.onboardingNext.textContent = "Пройдено";
+        refs.onboardingNext.disabled = true;
+      } else {
+        refs.onboardingNext.textContent = isLastStep ? "Завершить модуль" : "Далее";
+        refs.onboardingNext.disabled = false;
+      }
+    }
+
+    if (refs.onboardingDone) {
+      if (inlineState.completed) {
+        refs.onboardingDone.classList.remove("segw__is-hidden");
+      } else {
+        refs.onboardingDone.classList.add("segw__is-hidden");
+      }
+    }
+
+    if (refs.onboardingRouteLink) {
+      if (hasExternalLink) {
+        refs.onboardingRouteLink.classList.remove("segw__is-hidden");
+        refs.onboardingRouteLink.href = inlineState.targetRoute;
+        if (WIDGET_OPTIONS.openInNewTab) {
+          refs.onboardingRouteLink.target = "_blank";
+          refs.onboardingRouteLink.rel = "noopener noreferrer";
+        } else {
+          refs.onboardingRouteLink.removeAttribute("target");
+          refs.onboardingRouteLink.removeAttribute("rel");
+        }
+      } else {
+        refs.onboardingRouteLink.classList.add("segw__is-hidden");
+        refs.onboardingRouteLink.removeAttribute("href");
+        refs.onboardingRouteLink.removeAttribute("target");
+        refs.onboardingRouteLink.removeAttribute("rel");
+      }
+    }
   }
 
 
@@ -835,10 +1278,22 @@
       refs.continueButton.disabled = !canContinue(state);
     }
 
+    if (refs.questionnaire) {
+      if (state.inlineOnboarding.isActive) {
+        refs.questionnaire.classList.add("is-hidden");
+      } else {
+        refs.questionnaire.classList.remove("is-hidden");
+      }
+    }
+
+    renderInlineOnboarding(refs, state);
     updateOptionStates(root, state);
   }
 
-  function showTariffCard(refs, payload, targetRoute) {
+  function showTariffCard(refs, payload, targetRoute, options) {
+    var inlineMode = options && options.inlineMode === true;
+    var hasExternalLink = hasConfiguredExternalOnboarding() && Boolean(targetRoute);
+
     if (refs.result) {
       refs.result.classList.remove("is-hidden");
     }
@@ -855,15 +1310,28 @@
       refs.goalValue.textContent = GOAL_LABELS[payload.investment_goal];
     }
     if (refs.instrumentsValue) {
-      refs.instrumentsValue.textContent = payload.instruments
-        .map(function (instrument) {
-          return INSTRUMENT_LABELS[instrument] || instrument;
-        })
-        .join(", ");
+      refs.instrumentsValue.textContent = getInstrumentLabelList(payload.instruments);
     }
     if (refs.routeLink) {
-      refs.routeLink.href = targetRoute;
-      refs.routeLink.textContent = "Перейти к онбордингу";
+      if (hasExternalLink) {
+        refs.routeLink.classList.remove("segw__is-hidden");
+        refs.routeLink.href = targetRoute;
+        refs.routeLink.textContent = inlineMode
+          ? "Открыть полную версию на отдельной странице"
+          : "Перейти к онбордингу";
+        if (WIDGET_OPTIONS.openInNewTab) {
+          refs.routeLink.target = "_blank";
+          refs.routeLink.rel = "noopener noreferrer";
+        } else {
+          refs.routeLink.removeAttribute("target");
+          refs.routeLink.removeAttribute("rel");
+        }
+      } else {
+        refs.routeLink.classList.add("segw__is-hidden");
+        refs.routeLink.removeAttribute("href");
+        refs.routeLink.removeAttribute("target");
+        refs.routeLink.removeAttribute("rel");
+      }
     }
     if (refs.json) {
       refs.json.textContent = JSON.stringify(payload, null, 2);
@@ -883,9 +1351,18 @@
       goal: null,
       instruments: [],
       segment: null,
+      inlineOnboarding: {
+        isActive: false,
+        steps: [],
+        activeStepIndex: 0,
+        completed: false,
+        payload: null,
+        targetRoute: "",
+      },
     };
 
     var refs = {
+      questionnaire: root.querySelector('[data-role="questionnaire"]'),
       experienceSection: root.querySelector('[data-role="experience-section"]'),
       segmentChip: root.querySelector('[data-role="segment-chip"]'),
       continueButton: root.querySelector('[data-action="continue"]'),
@@ -897,6 +1374,16 @@
       instrumentsValue: root.querySelector('[data-role="instruments-value"]'),
       routeLink: root.querySelector('[data-role="route-link"]'),
       json: root.querySelector('[data-role="json"]'),
+      onboarding: root.querySelector('[data-role="onboarding"]'),
+      onboardingTitle: root.querySelector('[data-role="onboarding-title"]'),
+      onboardingCounter: root.querySelector('[data-role="onboarding-counter"]'),
+      onboardingStepTitle: root.querySelector('[data-role="onboarding-step-title"]'),
+      onboardingStepText: root.querySelector('[data-role="onboarding-step-text"]'),
+      onboardingStepPoints: root.querySelector('[data-role="onboarding-step-points"]'),
+      onboardingPrev: root.querySelector('[data-action="onboarding-prev"]'),
+      onboardingNext: root.querySelector('[data-action="onboarding-next"]'),
+      onboardingDone: root.querySelector('[data-role="onboarding-done"]'),
+      onboardingRouteLink: root.querySelector('[data-role="onboarding-route-link"]'),
     };
 
     root.addEventListener("click", function (event) {
@@ -913,7 +1400,51 @@
       var action = button.getAttribute("data-action");
       var value = button.getAttribute("data-value");
 
-      if (action === "qualified") {
+      if (action === "onboarding-prev") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+
+        if (state.inlineOnboarding.completed) {
+          state.inlineOnboarding.completed = false;
+        }
+        if (state.inlineOnboarding.activeStepIndex > 0) {
+          state.inlineOnboarding.activeStepIndex -= 1;
+        }
+
+        render(root, refs, state);
+        return;
+      } else if (action === "onboarding-next") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+
+        var lastIndex = state.inlineOnboarding.steps.length - 1;
+        if (state.inlineOnboarding.activeStepIndex < lastIndex) {
+          state.inlineOnboarding.activeStepIndex += 1;
+        } else if (!state.inlineOnboarding.completed) {
+          state.inlineOnboarding.completed = true;
+          if (state.inlineOnboarding.payload) {
+            trackEvent("inline_onboarding_completed", {
+              segment: state.inlineOnboarding.payload.segment,
+              amount_tier: state.inlineOnboarding.payload.amount_tier,
+            });
+          }
+        }
+
+        render(root, refs, state);
+        return;
+      } else if (action === "restart-segmentation") {
+        resetInlineOnboardingState(state);
+        if (refs.result) {
+          refs.result.classList.add("is-hidden");
+        }
+        trackEvent("segmentation_edit_started");
+
+        state.segment = calculateSegment(state.qualifiedInvestor, state.experience);
+        render(root, refs, state);
+        return;
+      } else if (action === "qualified") {
         var qualified = value === "true";
         state.qualifiedInvestor = qualified;
         if (qualified) {
@@ -948,8 +1479,28 @@
           amount_tier: payload.amount_tier,
         });
 
-        var targetRoute = navigateToOnboarding(payload.segment, payload.amount_tier);
-        showTariffCard(refs, payload, targetRoute);
+        var inlineMode = shouldUseInlineOnboarding();
+        var targetRoute = navigateToOnboarding(payload.segment, payload.amount_tier, {
+          skipNavigation: inlineMode,
+        });
+
+        showTariffCard(refs, payload, targetRoute, { inlineMode: inlineMode });
+
+        if (inlineMode) {
+          startInlineOnboardingFlow(state, payload, targetRoute);
+          trackEvent("inline_onboarding_started", {
+            segment: payload.segment,
+            amount_tier: payload.amount_tier,
+          });
+
+          if (refs.onboarding && typeof refs.onboarding.scrollIntoView === "function") {
+            setTimeout(function () {
+              refs.onboarding.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 30);
+          }
+        } else {
+          resetInlineOnboardingState(state);
+        }
 
         safeInvokeComplete(payload);
 
@@ -1171,7 +1722,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.8";
+  window.FinamSegmentationWidget.version = "1.0.9";
 
   ensureStyles();
   initExistingWidgets();
