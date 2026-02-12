@@ -905,29 +905,67 @@
   }
 
   function mountWithRetry(selector, replaceContent, options) {
-    var waitMs = options && typeof options.waitMs === "number" ? options.waitMs : 10000;
+    var waitMs = options && typeof options.waitMs === "number" ? options.waitMs : 60000;
     var intervalMs =
       options && typeof options.intervalMs === "number" ? options.intervalMs : 200;
     var elapsed = 0;
+    var mounted = false;
+    var observer = null;
+
+    function attemptMount() {
+      if (mounted) {
+        return true;
+      }
+
+      var targetElement = querySelectorSafely(selector);
+      if (!targetElement) {
+        return false;
+      }
+
+      mountInto(targetElement, replaceContent);
+      mounted = true;
+      return true;
+    }
+
+    if (attemptMount()) {
+      return;
+    }
 
     var timer = setInterval(function () {
-      var targetElement = querySelectorSafely(selector);
-      if (targetElement) {
+      if (attemptMount()) {
         clearInterval(timer);
-        mountInto(targetElement, replaceContent);
+        if (observer) {
+          observer.disconnect();
+        }
         return;
       }
 
       elapsed += intervalMs;
       if (elapsed >= waitMs) {
         clearInterval(timer);
+        if (observer) {
+          observer.disconnect();
+        }
       }
     }, intervalMs);
+
+    if (typeof MutationObserver !== "undefined" && document.body) {
+      observer = new MutationObserver(function () {
+        if (!attemptMount()) {
+          return;
+        }
+        clearInterval(timer);
+        observer.disconnect();
+      });
+
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
   }
 
   function mountDefaultHostIfPresent() {
     var defaultHost = document.getElementById("finam-segmentation-widget");
     if (!defaultHost) {
+      mount("#finam-segmentation-widget", { replace: true, wait: true, waitMs: 60000 });
       return null;
     }
 
@@ -971,7 +1009,7 @@
     initExistingWidgets();
     mountDefaultHostIfPresent();
   };
-  window.FinamSegmentationWidget.version = "1.0.1";
+  window.FinamSegmentationWidget.version = "1.0.2";
 
   ensureStyles();
   initExistingWidgets();
