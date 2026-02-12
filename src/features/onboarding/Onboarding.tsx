@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { CSSProperties } from "react";
 import { OnboardingProvider, useOnboardingContext } from "./OnboardingContext";
 import { calculateTariffCosts, CALCULATOR_DEFAULTS } from "./data/tariffs";
@@ -47,6 +47,8 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
       : undefined,
   );
   const { getPortfolio, getGoalOverlay } = usePersonalization();
+  const startedTrackedRef = useRef(false);
+  const completedTrackedRef = useRef(false);
 
   useEffect(() => {
     if (state.status !== "not_started") {
@@ -56,16 +58,24 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
   }, [dosInput, startOnboarding, state.status, userId]);
 
   useEffect(() => {
-    if (state.status === "in_progress" && state.user_id) {
+    if (state.status === "in_progress" && state.user_id && !startedTrackedRef.current) {
+      startedTrackedRef.current = true;
       track(ANALYTICS_EVENTS.ONBOARDING_STARTED, {
         goal: state.dos_input.investment_goal,
         instruments: state.dos_input.instruments,
       });
     }
-  }, [state, track]);
+  }, [
+    state.dos_input.instruments,
+    state.dos_input.investment_goal,
+    state.status,
+    state.user_id,
+    track,
+  ]);
 
   useEffect(() => {
-    if (state.status === "completed") {
+    if (state.status === "completed" && !completedTrackedRef.current) {
+      completedTrackedRef.current = true;
       track(ANALYTICS_EVENTS.ONBOARDING_COMPLETED, {
         completed_lessons: state.completed_lessons,
         total_time_sec: state.total_time_sec,
