@@ -108,3 +108,24 @@ Optional callbacks:
   };
 </script>
 ```
+
+## Onboarding module scaffold (from technical spec)
+
+Added a dedicated feature module:
+
+- `src/features/onboarding/Onboarding.tsx`
+- `src/features/onboarding/OnboardingContext.tsx`
+- `src/features/onboarding/hooks/*`
+- `src/features/onboarding/screens/*`
+- `src/features/onboarding/components/*`
+- `src/features/onboarding/data/*`
+- `src/features/onboarding/types/onboarding.ts`
+
+Implemented in code:
+
+- DOS typing, segmentation and amount tier mapping
+- Track builder (`novice/advanced/expert`)
+- Reducer-based onboarding state machine
+- Risk scoring engine (DOS + Q5–Q8) with self-assessment cap
+- Personalization helpers (content variants, highlighted instruments, portfolio/goal overlays)
+- Base screen/component scaffolding for onboarding flow
