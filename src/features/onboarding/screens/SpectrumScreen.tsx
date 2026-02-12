@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { RiskCard } from "../components/RiskCard";
+import { usePersonalization } from "../hooks/usePersonalization";
 import { useOnboardingContext } from "../OnboardingContext";
 import type { BaseScreenProps } from "./ScreenProps";
 
@@ -11,14 +12,19 @@ const DESCRIPTIONS: Record<string, string> = {
 };
 
 export function SpectrumScreen({ screen, onNext, onPrev }: BaseScreenProps) {
+  const { getContentVariantObject } = usePersonalization();
   const {
     state: { risk_quiz_result },
   } = useOnboardingContext();
+  const segmentVariant = screen.content_variants?.by_segment
+    ? getContentVariantObject(screen.content_variants.by_segment, "segment")
+    : null;
+  const leadText = segmentVariant?.text ?? screen.content ?? screen.subtitle;
 
   return (
     <section style={containerStyle}>
       <h3 style={{ margin: 0 }}>{screen.title}</h3>
-      {screen.subtitle ? <p style={{ margin: 0, color: "#5b6a80" }}>{screen.subtitle}</p> : null}
+      {leadText ? <p style={{ margin: 0, color: "#5b6a80" }}>{leadText}</p> : null}
 
       <div style={{ display: "grid", gap: 8 }}>
         {Object.entries(DESCRIPTIONS).map(([profile, description]) => (

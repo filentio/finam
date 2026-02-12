@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { GoalOverlay } from "../components/GoalOverlay";
 import { PieChart } from "../components/PieChart";
 import { PortfolioTable } from "../components/PortfolioTable";
+import { usePersonalization } from "../hooks/usePersonalization";
 import type { PortfolioScreenProps } from "./ScreenProps";
 
 export function PortfolioScreen({
@@ -11,6 +12,7 @@ export function PortfolioScreen({
   onNext,
   onPrev,
 }: PortfolioScreenProps) {
+  const { segment } = usePersonalization();
   const total = portfolio.items.reduce((sum, item) => sum + item.amount, 0);
   const stocks = portfolio.items
     .filter((item) => item.type === "stock" || item.type === "etf")
@@ -24,7 +26,8 @@ export function PortfolioScreen({
     <section style={containerStyle}>
       <h3 style={{ margin: 0 }}>{screen.title}</h3>
       <p style={{ margin: 0, color: "#5b6a80" }}>
-        Пример на {portfolio.total_amount_label}. Текущая раскладка: {total.toLocaleString("ru-RU")} ₽
+        {(screen.description_variants?.[segment] ?? `Пример на ${portfolio.total_amount_label}.`)}{" "}
+        Текущая раскладка: {total.toLocaleString("ru-RU")} ₽
       </p>
 
       <PieChart

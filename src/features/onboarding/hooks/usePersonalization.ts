@@ -3,15 +3,19 @@ import { DEEPLINKS } from "../data/deeplinks";
 import { GOAL_OVERLAYS, PORTFOLIOS } from "../data/portfolios";
 import { useOnboardingContext } from "../OnboardingContext";
 import type {
+  ContentVariant,
   ContentVariants,
   GoalOverlayConfig,
+  InvestmentAmount,
   PortfolioExample,
   RiskProfile,
 } from "../types/onboarding";
 
 type Axis = "amount" | "goal" | "risk" | "segment";
 
-function mapAmountTierToInputKey(amountTier: "starter" | "base" | "extended" | "premium"): string {
+export function mapAmountTierToInputKey(
+  amountTier: "starter" | "base" | "extended" | "premium",
+): InvestmentAmount {
   if (amountTier === "starter") {
     return "up_to_300k";
   }
@@ -30,6 +34,11 @@ export function usePersonalization(): {
   goal: "purchase" | "passive_income" | "growth" | "preservation";
   instruments: string[];
   riskProfile: RiskProfile | null;
+  amountInputKey: InvestmentAmount;
+  getContentVariantObject: (
+    variants: ContentVariants,
+    axis: Axis,
+  ) => ContentVariant | null;
   getContentVariant: (variants: ContentVariants, axis: Axis) => string;
   isInstrumentHighlighted: (instrumentId: string) => boolean;
   getPortfolio: () => PortfolioExample;
@@ -49,21 +58,24 @@ export function usePersonalization(): {
     [state],
   );
 
-  const getContentVariant = (variants: ContentVariants, axis: Axis): string => {
+  const getContentVariantObject = (
+    variants: ContentVariants,
+    axis: Axis,
+  ): ContentVariant | null => {
+    const amountInputKey = mapAmountTierToInputKey(context.amountTier);
     const keyMap: Record<Axis, string> = {
-      amount: mapAmountTierToInputKey(context.amountTier),
+      amount: amountInputKey,
       goal: context.goal,
       risk: context.riskProfile ?? "moderate",
       segment: context.segment,
     };
 
     const key = keyMap[axis];
-    return (
-      variants[key]?.text ??
-      variants.default?.text ??
-      Object.values(variants)[0]?.text ??
-      ""
-    );
+    return variants[key] ?? variants.default ?? Object.values(variants)[0] ?? null;
+  };
+
+  const getContentVariant = (variants: ContentVariants, axis: Axis): string => {
+    return getContentVariantObject(variants, axis)?.text ?? "";
   };
 
   const isInstrumentHighlighted = (instrumentId: string): boolean => {
@@ -98,7 +110,9 @@ export function usePersonalization(): {
 
   return {
     ...context,
+    amountInputKey: mapAmountTierToInputKey(context.amountTier),
     instruments: context.instruments,
+    getContentVariantObject,
     getContentVariant,
     isInstrumentHighlighted,
     getPortfolio,

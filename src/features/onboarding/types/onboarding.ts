@@ -112,8 +112,10 @@ export interface CTAConfig {
 }
 
 export interface StepItem {
+  icon?: string;
   title: string;
   description?: string;
+  description_variants?: Record<string, string>;
 }
 
 export interface CardItem {
@@ -121,6 +123,8 @@ export interface CardItem {
   title: string;
   description: string;
   risk_level?: "low" | "medium" | "high";
+  instrument_id?: Instrument;
+  highlight_if_in_dos_instruments?: boolean;
 }
 
 export interface ScreenConfig {
@@ -129,12 +133,16 @@ export interface ScreenConfig {
   title: string;
   subtitle?: string;
   image?: string;
+  content?: string;
+  key_points?: string[];
+  visual?: string;
   content_variants?: {
     by_amount?: ContentVariants;
     by_goal?: ContentVariants;
     by_risk_profile?: ContentVariants;
     by_segment?: ContentVariants;
   };
+  description_variants?: Record<string, string>;
   items?: StepItem[] | CardItem[];
   cta?: CTAConfig[];
   show_for?: Segment[];

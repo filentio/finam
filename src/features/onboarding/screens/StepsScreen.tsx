@@ -1,8 +1,10 @@
 import type { CSSProperties } from "react";
+import { usePersonalization } from "../hooks/usePersonalization";
 import type { StepItem } from "../types/onboarding";
 import type { BaseScreenProps } from "./ScreenProps";
 
 export function StepsScreen({ screen, onNext, onPrev }: BaseScreenProps) {
+  const { amountInputKey } = usePersonalization();
   const items = (screen.items ?? []) as StepItem[];
 
   return (
@@ -11,9 +13,14 @@ export function StepsScreen({ screen, onNext, onPrev }: BaseScreenProps) {
       <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
         {items.map((item, index) => (
           <li key={`${item.title}-${index}`}>
-            <strong>{item.title}</strong>
-            {item.description ? (
-              <p style={{ margin: "4px 0 0", color: "#5b6a80" }}>{item.description}</p>
+            <strong>
+              {item.icon ? `${item.icon} ` : null}
+              {item.title}
+            </strong>
+            {item.description || item.description_variants ? (
+              <p style={{ margin: "4px 0 0", color: "#5b6a80" }}>
+                {item.description_variants?.[amountInputKey] ?? item.description}
+              </p>
             ) : null}
           </li>
         ))}

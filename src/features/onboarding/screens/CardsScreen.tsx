@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { InstrumentCard } from "../components/InstrumentCard";
-import type { InstrumentCardConfig } from "../types/onboarding";
+import { usePersonalization } from "../hooks/usePersonalization";
+import type { CardItem, Instrument, InstrumentCardConfig } from "../types/onboarding";
 import type { CardsScreenProps } from "./ScreenProps";
 
 const CARDS: InstrumentCardConfig[] = [
@@ -40,21 +41,60 @@ export function CardsScreen({
   onNext,
   onPrev,
 }: CardsScreenProps) {
+  const { getContentVariantObject, isInstrumentHighlighted } = usePersonalization();
+
+  const rawCards = ((screen.items as CardItem[] | undefined) ?? CARDS) as Array<
+    CardItem | InstrumentCardConfig
+  >;
+  const configuredCards = rawCards.map((card) => {
+    const instrumentId = (card.instrument_id ?? card.id) as Instrument;
+    const title = "label" in card ? card.label : card.title;
+
+    return {
+      key: instrumentId,
+      instrumentId,
+      title,
+      description: card.description,
+      riskLevel: card.risk_level ?? "medium",
+    };
+  });
+
+  const goalAccent = screen.content_variants?.by_goal
+    ? getContentVariantObject(screen.content_variants.by_goal, "goal")
+    : null;
+
   return (
     <section style={containerStyle}>
       <h3 style={{ margin: 0 }}>{screen.title}</h3>
       {screen.subtitle ? <p style={{ margin: 0, color: "#5b6a80" }}>{screen.subtitle}</p> : null}
       <div style={{ display: "grid", gap: 10 }}>
-        {CARDS.map((card) => (
+        {configuredCards.map((card) => (
           <InstrumentCard
-            key={card.instrument_id}
-            title={card.label}
+            key={card.key}
+            title={card.title}
             description={card.description}
-            riskLevel={card.risk_level}
-            highlighted={highlightedInstruments.includes(card.instrument_id)}
+            riskLevel={card.riskLevel}
+            highlighted={
+              highlightedInstruments.includes(card.instrumentId) ||
+              isInstrumentHighlighted(card.instrumentId)
+            }
           />
         ))}
       </div>
+      {goalAccent?.text ? (
+        <div
+          style={{
+            border: "1px solid #d4e1f4",
+            background: "#f7faff",
+            borderRadius: 10,
+            padding: "10px 12px",
+            color: "#40546e",
+            fontSize: 14,
+          }}
+        >
+          {goalAccent.text}
+        </div>
+      ) : null}
 
       <div style={{ display: "flex", gap: 8 }}>
         <button style={ghostButtonStyle} type="button" onClick={onPrev}>
