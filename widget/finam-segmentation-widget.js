@@ -84,12 +84,12 @@
 }
 
 .segw__option {
-  min-height: 52px;
+  min-height: 56px;
   width: 100%;
   border: 1px solid var(--segw-line);
   background: #fff;
-  border-radius: 12px;
-  padding: 12px 14px;
+  border-radius: 14px;
+  padding: 14px 16px;
   cursor: pointer;
   color: inherit;
   text-align: left;
@@ -108,13 +108,13 @@
 
 .segw__option:hover {
   border-color: rgba(47, 95, 204, 0.45);
-  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.1);
+  box-shadow: 0 14px 28px rgba(16, 24, 40, 0.12);
   transform: translateY(-1px);
 }
 
 .segw__option:active {
   transform: translateY(0);
-  box-shadow: 0 6px 14px rgba(16, 24, 40, 0.1);
+  box-shadow: 0 8px 16px rgba(16, 24, 40, 0.1);
 }
 
 .segw__option:focus-visible {
@@ -124,39 +124,34 @@
 
 .segw__option.is-selected {
   border-color: var(--segw-primary);
+  border-width: 2px;
   background: var(--segw-primary-soft);
-  box-shadow: 0 10px 24px rgba(47, 95, 204, 0.12);
-  position: relative;
-}
-
-.segw__option.is-selected::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 10px;
-  bottom: 10px;
-  width: 3px;
-  border-radius: 99px;
-  background: var(--segw-primary);
+  box-shadow: 0 12px 26px rgba(47, 95, 204, 0.14);
 }
 
 .segw__option-mark {
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--segw-primary);
   background: rgba(47, 95, 204, 0.1);
+  border: 1px solid rgba(47, 95, 204, 0.2);
   flex: 0 0 auto;
 }
 
 .segw__option.is-selected .segw__option-mark {
   background: var(--segw-primary);
   color: #fff;
+  border-color: var(--segw-primary);
+}
+
+.segw__option--wide {
+  grid-column: 1 / -1;
 }
 
 .segw__experience {
@@ -375,7 +370,7 @@
       <button type="button" class="segw__option" data-action="experience" data-value="3_5y">
         3–5 лет <span class="segw__option-mark">○</span>
       </button>
-      <button type="button" class="segw__option" data-action="experience" data-value="more_5y">
+      <button type="button" class="segw__option segw__option--wide" data-action="experience" data-value="more_5y">
         Более 5 лет <span class="segw__option-mark">○</span>
       </button>
     </div>
@@ -1037,7 +1032,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.3";
+  window.FinamSegmentationWidget.version = "1.0.4";
 
   ensureStyles();
   initExistingWidgets();
