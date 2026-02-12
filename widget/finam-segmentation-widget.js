@@ -976,6 +976,33 @@
     return mountInto(defaultHost, true);
   }
 
+  function ensureFallbackHostMounted() {
+    var existingWidget = document.querySelector("[" + WIDGET_ROOT_ATTR + "]");
+    if (existingWidget) {
+      return existingWidget;
+    }
+
+    var defaultHost = document.getElementById("finam-segmentation-widget");
+    if (defaultHost) {
+      return mountInto(defaultHost, true);
+    }
+
+    if (!document.body) {
+      return null;
+    }
+
+    var fallbackHost = document.getElementById("finam-segmentation-widget-auto");
+    if (!fallbackHost) {
+      fallbackHost = document.createElement("div");
+      fallbackHost.id = "finam-segmentation-widget-auto";
+      fallbackHost.setAttribute("data-segmentation-widget-auto", "true");
+      fallbackHost.style.margin = "16px 0";
+      document.body.appendChild(fallbackHost);
+    }
+
+    return mountInto(fallbackHost, true);
+  }
+
   function initExistingWidgets() {
     var existingRoots = document.querySelectorAll("[" + WIDGET_ROOT_ATTR + "]");
     for (var i = 0; i < existingRoots.length; i += 1) {
@@ -1008,18 +1035,35 @@
     ensureStyles();
     initExistingWidgets();
     mountDefaultHostIfPresent();
+    ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.2";
+  window.FinamSegmentationWidget.version = "1.0.3";
 
   ensureStyles();
   initExistingWidgets();
   mountDefaultHostIfPresent();
+  ensureFallbackHostMounted();
 
   var mounted = mountFromScript(SCRIPT_REF);
   if (!mounted && SCRIPT_REF && document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       mountFromScript(SCRIPT_REF);
       mountDefaultHostIfPresent();
+      ensureFallbackHostMounted();
+    });
+  }
+
+  if (document.readyState !== "loading") {
+    setTimeout(function () {
+      mountDefaultHostIfPresent();
+      ensureFallbackHostMounted();
+    }, 400);
+  } else {
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(function () {
+        mountDefaultHostIfPresent();
+        ensureFallbackHostMounted();
+      }, 400);
     });
   }
 })();
