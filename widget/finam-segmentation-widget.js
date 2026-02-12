@@ -5,6 +5,15 @@
   var STYLE_ID = "finam-segmentation-widget-style-v1";
   var SCRIPT_MOUNTED_ATTR = "data-segw-mounted";
   var WIDGET_ROOT_ATTR = "data-segmentation-widget";
+  var WIDGET_OPTIONS = {
+    useLegacyGlobalNavigate:
+      SCRIPT_REF && SCRIPT_REF.getAttribute("data-use-global-navigate") === "true",
+    onboardingUrlMap: {
+      novice: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-novice-url") : null,
+      advanced: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-advanced-url") : null,
+      expert: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-expert-url") : null,
+    },
+  };
 
   var WIDGET_CSS = `
 .segw {
@@ -621,14 +630,48 @@
   function navigateToOnboarding(segment, amountTier) {
     var baseRoute = ONBOARDING_ROUTE_BY_SEGMENT[segment];
     var target = baseRoute + "?amountTier=" + encodeURIComponent(amountTier);
+    var customSegmentUrl = WIDGET_OPTIONS.onboardingUrlMap[segment];
 
-    if (typeof window.navigateToOnboarding === "function") {
-      window.navigateToOnboarding(segment, amountTier);
-    } else {
-      window.location.hash = target;
+    if (customSegmentUrl) {
+      var separator = customSegmentUrl.indexOf("?") === -1 ? "?" : "&";
+      var customTarget =
+        customSegmentUrl + separator + "amountTier=" + encodeURIComponent(amountTier);
+      window.location.href = customTarget;
+      return customTarget;
     }
 
-    return target;
+    if (
+      window.FinamSegmentationWidget &&
+      typeof window.FinamSegmentationWidget.navigateToOnboarding === "function"
+    ) {
+      var namespacedTarget = window.FinamSegmentationWidget.navigateToOnboarding(
+        segment,
+        amountTier,
+        target,
+      );
+      return typeof namespacedTarget === "string" && namespacedTarget
+        ? namespacedTarget
+        : target;
+    }
+
+    if (typeof window.__finamSegmentationNavigate === "function") {
+      var customNavigateTarget = window.__finamSegmentationNavigate(
+        segment,
+        amountTier,
+        target,
+      );
+      return typeof customNavigateTarget === "string" && customNavigateTarget
+        ? customNavigateTarget
+        : target;
+    }
+
+    if (WIDGET_OPTIONS.useLegacyGlobalNavigate && typeof window.navigateToOnboarding === "function") {
+      var legacyTarget = window.navigateToOnboarding(segment, amountTier, target);
+      return typeof legacyTarget === "string" && legacyTarget ? legacyTarget : target;
+    }
+
+    window.location.hash = target;
+    return "#" + target;
   }
 
   function updateOptionStates(root, state) {
@@ -1032,7 +1075,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.4";
+  window.FinamSegmentationWidget.version = "1.0.5";
 
   ensureStyles();
   initExistingWidgets();

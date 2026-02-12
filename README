@@ -90,6 +90,24 @@ Optional target mount:
 ></script>
 ```
 
+Optional segment URL mapping (recommended for production routing):
+
+```html
+<script
+  src="https://cdn.jsdelivr.net/gh/filentio/finam@<COMMIT_SHA>/widget/finam-segmentation-widget.js?v=1"
+  data-target="#segmentation-widget-container"
+  data-onboarding-novice-url="/education/full-course/"
+  data-onboarding-advanced-url="/education/short-course/"
+  data-onboarding-expert-url="/education/expert-track/"
+></script>
+```
+
+Notes:
+
+- By default widget uses hash navigation (`#/onboarding/...`) to avoid hard redirects.
+- Legacy global `window.navigateToOnboarding(...)` is disabled by default to prevent accidental conflicts.
+- To enable legacy callback explicitly: `data-use-global-navigate="true"`.
+
 Public API:
 
 - `window.FinamSegmentationWidget.mount(target, { replace?: boolean })`
