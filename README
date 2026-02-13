@@ -110,6 +110,8 @@ Notes:
   навигация по тап-зонам (левая/правая части экрана).
 - В stories добавлен sticky footer с CTA-кнопкой (всегда видна внизу) и
   градиентной подложкой для читаемости.
+- Перед stories показывается transition-экран:
+  "Мы подобрали для вас персональный маршрут" -> "Начать обучение".
 - To force external redirect mode, set `data-onboarding-mode="external"`.
 - If `data-onboarding-mode="auto"`, widget switches to external only when onboarding URLs are configured.
 - In external mode fallback uses a safe hash navigation

@@ -26,13 +26,36 @@
 
   var WIDGET_CSS = `
 .segw {
+  --finam-primary: #1a56db;
+  --finam-primary-hover: #1447c4;
+  --bg-base: #ffffff;
+  --bg-elevated: #f8f9fa;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-inverse: #ffffff;
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --gradient-lesson-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-lesson-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-lesson-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-lesson-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --gradient-lesson-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --gradient-lesson-6: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
   --segw-bg: transparent;
-  --segw-card: #ffffff;
+  --segw-card: var(--bg-base);
   --segw-line: #e6eaf2;
-  --segw-primary: #2f5fcc;
-  --segw-primary-soft: rgba(47, 95, 204, 0.08);
-  --segw-text: #1d2734;
-  --segw-muted: #5a6778;
+  --segw-primary: var(--finam-primary);
+  --segw-primary-soft: rgba(26, 86, 219, 0.08);
+  --segw-text: var(--text-primary);
+  --segw-muted: var(--text-secondary);
   font-family:
     Inter,
     system-ui,
@@ -44,6 +67,42 @@
   background: var(--segw-bg);
   padding: 0;
   border-radius: 0;
+}
+
+.segw__btn-primary {
+  background: var(--finam-primary);
+  color: var(--text-inverse);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.segw__btn-primary:hover {
+  background: var(--finam-primary-hover);
+  transform: translateY(-1px);
+}
+
+.segw__btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.segw__btn-primary:focus-visible,
+.segw__btn-secondary:focus-visible,
+.segw__option:focus-visible {
+  outline: 2px solid rgba(26, 86, 219, 0.55);
+  outline-offset: 2px;
 }
 
 .segw * {
@@ -104,9 +163,9 @@
 .segw__option {
   min-height: 56px;
   width: 100%;
-  border: 1px solid var(--segw-line);
-  background: #fff;
-  border-radius: 14px;
+  border: 2px solid #e2e8f0;
+  background: var(--bg-base);
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   cursor: pointer;
   color: inherit;
@@ -117,16 +176,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  transition:
-    transform 0.08s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease,
-    background-color 0.18s ease;
+  transition: all var(--transition-base);
 }
 
 .segw__option:hover {
-  border-color: rgba(47, 95, 204, 0.45);
-  box-shadow: 0 14px 28px rgba(16, 24, 40, 0.12);
+  border-color: #cbd5e1;
+  background: var(--bg-elevated);
   transform: translateY(-1px);
 }
 
@@ -141,31 +196,53 @@
 }
 
 .segw__option.is-selected {
-  border-color: var(--segw-primary);
+  border-color: var(--finam-primary);
   border-width: 2px;
-  background: var(--segw-primary-soft);
-  box-shadow: 0 12px 26px rgba(47, 95, 204, 0.14);
+  background: rgba(26, 86, 219, 0.05);
+  box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
 }
 
 .segw__option-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 0;
   font-weight: 700;
-  color: var(--segw-primary);
-  background: rgba(47, 95, 204, 0.1);
-  border: 1px solid rgba(47, 95, 204, 0.2);
+  color: transparent;
+  background: #fff;
+  border: 2px solid #e2e8f0;
   flex: 0 0 auto;
+  position: relative;
 }
 
 .segw__option.is-selected .segw__option-mark {
-  background: var(--segw-primary);
-  color: #fff;
-  border-color: var(--segw-primary);
+  border-color: var(--finam-primary);
+  background: var(--finam-primary);
+}
+
+.segw__option.is-selected .segw__option-mark::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.segw__option[data-action="instrument"] .segw__option-mark {
+  border-radius: 6px;
+}
+
+.segw__option[data-action="instrument"].is-selected .segw__option-mark::after {
+  border-radius: 2px;
+  width: 10px;
+  height: 10px;
 }
 
 .segw__option--wide {
@@ -233,12 +310,19 @@
 
 .segw__continue {
   border: 0;
-  background: var(--segw-primary);
-  color: #fff;
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-weight: 700;
+  background: var(--finam-primary);
+  color: var(--text-inverse);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.segw__continue:hover {
+  background: var(--finam-primary-hover);
+  transform: translateY(-1px);
 }
 
 .segw__continue:disabled {
@@ -329,6 +413,48 @@
   display: none;
 }
 
+.segw__route-prep {
+  margin-top: 16px;
+}
+
+.segw__route-prep.is-hidden {
+  display: none;
+}
+
+.segw__route-prep-card {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  background: linear-gradient(160deg, #1f4bb7, #3c77ea);
+  color: #fff;
+  padding: 18px 16px;
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+
+.segw__route-prep-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 30px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.segw__route-prep-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.segw__route-prep-text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .segw__onboarding-kicker {
   margin: 0;
   font-size: 0.82rem;
@@ -351,16 +477,19 @@
 .segw__story-frame {
   width: 100%;
   max-width: 430px;
-  height: min(90vh, 932px);
-  min-height: 640px;
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
   margin: 0 auto;
   position: relative;
   overflow: hidden;
   border-radius: 20px;
   color: #fff;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  background: linear-gradient(180deg, #1a56db 0%, #0f3a8e 100%);
-  transition: background 0.3s ease;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.52);
+  background: var(--gradient-lesson-1);
+  transition: background var(--transition-base);
+  display: flex;
+  flex-direction: column;
 }
 
 .segw__story-progress {
@@ -439,7 +568,9 @@
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  padding: 10px 20px 112px;
+  padding: var(--space-2);
+  padding-bottom: 100px;
+  overflow-y: auto;
 }
 
 .segw__story-content.is-enter-next {
@@ -537,7 +668,7 @@
   top: 46px;
   left: 0;
   right: 0;
-  bottom: 102px;
+  bottom: 86px;
   display: flex;
 }
 
@@ -557,26 +688,31 @@
 }
 
 .segw__story-footer {
-  position: absolute;
-  left: 0;
-  right: 0;
+  position: sticky;
   bottom: 0;
+  margin-top: auto;
   z-index: 8;
-  padding: 16px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding: var(--space-2);
+  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
   background: linear-gradient(to top, rgba(0, 0, 0, 0.86), rgba(0, 0, 0, 0));
 }
 
 .segw__story-next {
   width: 100%;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   min-height: 52px;
-  background: #fff;
-  color: #0f172a;
+  background: var(--bg-base);
+  color: var(--text-primary);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.segw__story-next:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
 }
 
 .segw__story-next:disabled {
@@ -594,7 +730,8 @@
   cursor: pointer;
 }
 
-.segw__btn--secondary {
+.segw__btn--secondary,
+.segw__btn-secondary {
   background: #fff;
   color: #2a3b52;
   border: 1px solid #d7e0ee;
@@ -655,6 +792,15 @@
   overflow: auto;
   font-size: 0.73rem;
   line-height: 1.45;
+}
+
+@media (min-width: 768px) {
+  .segw__story-frame {
+    min-height: min(90vh, 932px);
+    height: min(90vh, 932px);
+    max-height: 90vh;
+    border-radius: 20px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -808,7 +954,7 @@
       <span>Сегмент:</span>
       <strong class="segw__segment-chip" data-role="segment-chip">не определён</strong>
     </div>
-    <button type="button" class="segw__continue" data-action="continue" disabled>
+    <button type="button" class="segw__continue segw__btn-primary" data-action="continue" disabled>
       Получить персональный маршрут
     </button>
   </section>
@@ -841,6 +987,17 @@
         <summary>Показать JSON payload</summary>
         <pre data-role="json"></pre>
       </details>
+    </div>
+  </section>
+
+  <section class="segw__route-prep is-hidden" data-role="route-prep">
+    <div class="segw__route-prep-card">
+      <div class="segw__route-prep-icon" aria-hidden="true">✨</div>
+      <h3 class="segw__route-prep-title">Мы подобрали для вас персональный маршрут</h3>
+      <p class="segw__route-prep-text" data-role="route-prep-text">Готовим программу обучения...</p>
+      <button type="button" class="segw__btn-primary" data-action="start-inline-onboarding">
+        Начать обучение
+      </button>
     </div>
   </section>
 
@@ -883,7 +1040,7 @@
         </div>
 
         <div class="segw__story-footer">
-          <button type="button" class="segw__story-next" data-action="onboarding-next" data-role="onboarding-next-label">
+          <button type="button" class="segw__story-next segw__btn-primary" data-action="onboarding-next" data-role="onboarding-next-label">
             Далее
           </button>
         </div>
@@ -895,7 +1052,7 @@
     </p>
 
     <div class="segw__onboarding-footer">
-      <button type="button" class="segw__btn segw__btn--secondary" data-action="restart-segmentation">
+      <button type="button" class="segw__btn-secondary" data-action="restart-segmentation">
         Изменить ответы анкеты
       </button>
       <a href="#" class="segw__route segw__route--ghost segw__is-hidden" data-role="onboarding-route-link">
@@ -939,6 +1096,12 @@
     novice: "Полный курс",
     advanced: "Сокращённый курс",
     expert: "Минимальный маршрут + анкета риска",
+  };
+
+  var ROUTE_PREP_TEXT_BY_SEGMENT = {
+    novice: "Маршрут для мягкого старта: база, практика и первый шаг к покупке.",
+    advanced: "Маршрут для ускорения: точечные экраны, риск-контроль и оптимизация действий.",
+    expert: "Маршрут для эксперта: компактная программа, риск-профиль и персональные рекомендации.",
   };
 
   var ONBOARDING_ROUTE_BY_SEGMENT = {
@@ -1239,14 +1402,20 @@
       .join(", ");
   }
 
-  function getStoryGradient(segment) {
+  function getStoryGradient(segment, stepIndex) {
     var bySegment = {
-      novice: "linear-gradient(180deg, rgba(26, 86, 219, 0.95) 0%, #1a1a1a 100%)",
-      advanced: "linear-gradient(180deg, rgba(124, 58, 237, 0.95) 0%, #1a1a1a 100%)",
-      expert: "linear-gradient(180deg, rgba(8, 145, 178, 0.95) 0%, #1a1a1a 100%)",
+      novice: ["var(--gradient-lesson-1)", "var(--gradient-lesson-2)", "var(--gradient-lesson-3)"],
+      advanced: [
+        "var(--gradient-lesson-4)",
+        "var(--gradient-lesson-5)",
+        "var(--gradient-lesson-6)",
+      ],
+      expert: ["var(--gradient-lesson-6)", "var(--gradient-lesson-2)", "var(--gradient-lesson-4)"],
     };
 
-    return bySegment[segment] || bySegment.novice;
+    var palette = bySegment[segment] || bySegment.novice;
+    var index = typeof stepIndex === "number" ? stepIndex : 0;
+    return palette[index] || palette[palette.length - 1];
   }
 
   function buildInlineOnboardingSteps(payload) {
@@ -1373,6 +1542,7 @@
 
   function resetInlineOnboardingState(state) {
     state.inlineOnboarding.isActive = false;
+    state.inlineOnboarding.awaitingStart = false;
     state.inlineOnboarding.steps = [];
     state.inlineOnboarding.activeStepIndex = 0;
     state.inlineOnboarding.direction = 1;
@@ -1383,6 +1553,7 @@
 
   function startInlineOnboardingFlow(state, payload, targetRoute) {
     state.inlineOnboarding.isActive = true;
+    state.inlineOnboarding.awaitingStart = true;
     state.inlineOnboarding.steps = buildInlineOnboardingSteps(payload);
     state.inlineOnboarding.activeStepIndex = 0;
     state.inlineOnboarding.direction = 1;
@@ -1422,6 +1593,27 @@
 
     var inlineState = state.inlineOnboarding;
     if (!inlineState.isActive || !inlineState.steps.length) {
+      refs.onboarding.classList.add("is-hidden");
+      if (refs.routePrep) {
+        refs.routePrep.classList.add("is-hidden");
+      }
+      return;
+    }
+
+    if (refs.routePrep) {
+      if (inlineState.awaitingStart && inlineState.payload) {
+        refs.routePrep.classList.remove("is-hidden");
+        if (refs.routePrepText) {
+          refs.routePrepText.textContent =
+            ROUTE_PREP_TEXT_BY_SEGMENT[inlineState.payload.segment] ||
+            "Подготовили персональный маршрут обучения.";
+        }
+      } else {
+        refs.routePrep.classList.add("is-hidden");
+      }
+    }
+
+    if (inlineState.awaitingStart) {
       refs.onboarding.classList.add("is-hidden");
       return;
     }
@@ -1686,6 +1878,7 @@
       segment: null,
       inlineOnboarding: {
         isActive: false,
+        awaitingStart: false,
         steps: [],
         activeStepIndex: 0,
         direction: 1,
@@ -1708,6 +1901,8 @@
       instrumentsValue: root.querySelector('[data-role="instruments-value"]'),
       routeLink: root.querySelector('[data-role="route-link"]'),
       json: root.querySelector('[data-role="json"]'),
+      routePrep: root.querySelector('[data-role="route-prep"]'),
+      routePrepText: root.querySelector('[data-role="route-prep-text"]'),
       onboarding: root.querySelector('[data-role="onboarding"]'),
       storyFrame: root.querySelector('[data-role="story-frame"]'),
       storyProgress: root.querySelector('[data-role="story-progress"]'),
@@ -1740,8 +1935,28 @@
       var action = button.getAttribute("data-action");
       var value = button.getAttribute("data-value");
 
-      if (action === "onboarding-prev") {
+      if (action === "start-inline-onboarding") {
         if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+
+        state.inlineOnboarding.awaitingStart = false;
+        state.inlineOnboarding.direction = 1;
+        state.inlineOnboarding.activeStepIndex = 0;
+        render(root, refs, state);
+
+        if (refs.onboarding && typeof refs.onboarding.scrollIntoView === "function") {
+          setTimeout(function () {
+            refs.onboarding.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 30);
+        }
+        return;
+      } else if (action === "onboarding-prev") {
+        if (
+          !state.inlineOnboarding.isActive ||
+          state.inlineOnboarding.awaitingStart ||
+          !state.inlineOnboarding.steps.length
+        ) {
           return;
         }
 
@@ -1756,7 +1971,11 @@
         render(root, refs, state);
         return;
       } else if (action === "onboarding-next") {
-        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+        if (
+          !state.inlineOnboarding.isActive ||
+          state.inlineOnboarding.awaitingStart ||
+          !state.inlineOnboarding.steps.length
+        ) {
           return;
         }
 
@@ -1835,9 +2054,10 @@
             amount_tier: payload.amount_tier,
           });
 
-          if (refs.onboarding && typeof refs.onboarding.scrollIntoView === "function") {
+          var scrollTarget = refs.routePrep || refs.onboarding;
+          if (scrollTarget && typeof scrollTarget.scrollIntoView === "function") {
             setTimeout(function () {
-              refs.onboarding.scrollIntoView({ behavior: "smooth", block: "start" });
+              scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
             }, 30);
           }
         } else {
