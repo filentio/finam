@@ -112,6 +112,8 @@ Notes:
   градиентной подложкой для читаемости.
 - Перед stories показывается transition-экран:
   "Мы подобрали для вас персональный маршрут" -> "Начать обучение".
+- Внутри inline stories теперь рендерятся не только обложки, но и дополнительные
+  lesson-слайды (обложка + контент каждого урока).
 - To force external redirect mode, set `data-onboarding-mode="external"`.
 - If `data-onboarding-mode="auto"`, widget switches to external only when onboarding URLs are configured.
 - In external mode fallback uses a safe hash navigation
