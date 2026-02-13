@@ -15,18 +15,13 @@ export function PieChart({ allocation }: PieChartProps) {
   )`;
 
   return (
-    <div style={{ display: "grid", gap: 12, justifyItems: "center" }}>
+    <div className="ob-pie-chart">
       <div
-        aria-label="pie-chart"
-        style={{
-          width: 156,
-          height: 156,
-          borderRadius: "50%",
-          background: gradient,
-          border: "1px solid rgba(255,255,255,0.34)",
-        }}
+        className="ob-pie-chart__circle"
+        data-testid="allocation-pie-chart"
+        style={{ background: gradient }}
       />
-      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.82)", textAlign: "center" }}>
+      <div className="ob-pie-chart__summary">
         Акции {stocks_pct}% • Облигации {bonds_pct}% • Альтернативы {alternatives_pct}% •
         Кэш {cash_pct}%
       </div>

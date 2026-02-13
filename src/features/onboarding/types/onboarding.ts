@@ -83,6 +83,7 @@ export type OnboardingStatus =
   | "skipped";
 
 export type ScreenType =
+  | "quiz_intro"
   | "hero"
   | "content"
   | "steps"

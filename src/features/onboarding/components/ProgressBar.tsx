@@ -25,6 +25,9 @@ export function ProgressBar({ progress }: ProgressBarProps) {
         {segments.map((fill, index) => (
           <div
             key={index}
+            data-testid="progress-segment"
+            data-segment-index={index}
+            data-segment-id={`segment-${index}`}
             className={`ob-progress__segment ${
               index < progress.currentStepIndex
                 ? "is-done"

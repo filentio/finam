@@ -20,7 +20,8 @@ export interface CardsScreenProps extends BaseScreenProps {
 
 export interface QuizScreenProps extends BaseScreenProps {
   question: RiskQuizQuestion;
-  onAnswer: (answer: RiskQuizAnswer) => void;
+  selectedOptionId?: string;
+  onSelectOption: (answer: RiskQuizAnswer) => void;
 }
 
 export interface PortfolioScreenProps extends BaseScreenProps {

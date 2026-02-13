@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { OnboardingProvider, useOnboardingContext } from "./OnboardingContext";
 import { calculateTariffCosts, CALCULATOR_DEFAULTS } from "./data/tariffs";
 import { RISK_QUIZ_QUESTIONS } from "./data/riskQuiz";
+import { calculateRiskProfile } from "./hooks/useRiskScoring";
 import { useAnalytics, ANALYTICS_EVENTS } from "./hooks/useAnalytics";
 import { getVisibleScreens } from "./hooks/useOnboardingState";
 import { usePersonalization } from "./hooks/usePersonalization";
@@ -19,6 +20,7 @@ import { TariffScreen } from "./screens/TariffScreen";
 import { CalculatorScreen } from "./screens/CalculatorScreen";
 import { ResultScreen } from "./screens/ResultScreen";
 import { RoutePreparationScreen } from "./screens/RoutePreparationScreen";
+import { QuizIntroScreen } from "./screens/QuizIntroScreen";
 import type {
   DOSInput,
   ProgressInfo,
@@ -34,7 +36,9 @@ interface OnboardingProps {
   onComplete?: () => void;
 }
 
-const OWN_CTA_SCREEN_TYPES = new Set<ScreenConfig["type"]>(["quiz", "cta"]);
+const OWN_CTA_SCREEN_TYPES = new Set<ScreenConfig["type"]>(["cta"]);
+const QUIZ_TOTAL_SEGMENTS = 6;
+const QUIZ_GRADIENT = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
 
 const LESSON_BACKGROUNDS: Record<string, string> = {
   lesson_1: "var(--gradient-lesson-1)",
@@ -47,8 +51,8 @@ const LESSON_BACKGROUNDS: Record<string, string> = {
 
 const STEP_BACKGROUNDS: Record<StepType, string> = {
   lesson: "linear-gradient(180deg, rgba(26, 86, 219, 0.9) 0%, #1a1a1a 100%)",
-  risk_quiz: "linear-gradient(180deg, rgba(185, 28, 28, 0.9) 0%, #1a1a1a 100%)",
-  risk_result: "linear-gradient(180deg, rgba(5, 150, 105, 0.9) 0%, #1a1a1a 100%)",
+  risk_quiz: QUIZ_GRADIENT,
+  risk_result: QUIZ_GRADIENT,
   first_purchase: "linear-gradient(180deg, rgba(8, 145, 178, 0.9) 0%, #1a1a1a 100%)",
   personal_recommendations:
     "linear-gradient(180deg, rgba(124, 58, 237, 0.9) 0%, #1a1a1a 100%)",
@@ -268,6 +272,35 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
     }
     lastViewedScreenRef.current = viewKey;
 
+    const isRiskQuizStep = currentStep?.type === "risk_quiz";
+    const isRiskResultStep = currentStep?.type === "risk_result";
+
+    if (isRiskQuizStep && state.current_screen_index === 0) {
+      track(ANALYTICS_EVENTS.RISK_QUIZ_STARTED, {
+        screen_number: 1,
+      });
+      return;
+    }
+
+    if (isRiskQuizStep && state.current_screen_index > 0) {
+      const question = RISK_QUIZ_QUESTIONS[state.current_screen_index - 1];
+      if (question) {
+        track(ANALYTICS_EVENTS.RISK_QUIZ_QUESTION_VIEWED, {
+          question_id: question.id,
+          screen_number: state.current_screen_index + 1,
+        });
+      }
+      return;
+    }
+
+    if (isRiskResultStep && state.risk_quiz_result) {
+      track(ANALYTICS_EVENTS.RISK_QUIZ_RESULT_VIEWED, {
+        final_profile: state.risk_quiz_result.final_profile,
+        allocation: state.risk_quiz_result.allocation,
+      });
+      return;
+    }
+
     track(ANALYTICS_EVENTS.LESSON_SCREEN_VIEWED, {
       step_type: currentStep?.type,
       lesson_id: currentStep?.lesson_id,
@@ -279,6 +312,8 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
     currentStep?.type,
     routePreparationDone,
     state.current_step_index,
+    state.current_screen_index,
+    state.risk_quiz_result,
     state.status,
     track,
   ]);
@@ -315,8 +350,87 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
     });
   }, [state.amount_tier, state.segment]);
 
-  const handleNext = () => nextScreen();
-  const handlePrev = () => prevScreen();
+  const isRiskQuizStep = currentStep?.type === "risk_quiz";
+  const isRiskResultStep = currentStep?.type === "risk_result";
+  const quizSegmentIndex = isRiskQuizStep
+    ? state.current_screen_index
+    : isRiskResultStep
+      ? QUIZ_TOTAL_SEGMENTS - 1
+      : -1;
+  const currentQuizQuestion =
+    isRiskQuizStep && state.current_screen_index > 0
+      ? RISK_QUIZ_QUESTIONS[state.current_screen_index - 1] ?? null
+      : null;
+  const selectedQuizAnswer = currentQuizQuestion
+    ? state.risk_quiz_result?.answers.find(
+        (answer) => answer.question_id === currentQuizQuestion.id,
+      )
+    : undefined;
+
+  const handleNext = () => {
+    if (!currentStep) {
+      nextScreen();
+      return;
+    }
+
+    if (currentStep.type === "risk_quiz") {
+      if (state.current_screen_index === 0) {
+        track(ANALYTICS_EVENTS.RISK_QUIZ_INTRO_COMPLETED);
+        nextScreen();
+        return;
+      }
+
+      const question = RISK_QUIZ_QUESTIONS[state.current_screen_index - 1];
+      if (!question) {
+        return;
+      }
+      const selectedAnswer = state.risk_quiz_result?.answers.find(
+        (answer) => answer.question_id === question.id,
+      );
+      if (!selectedAnswer) {
+        return;
+      }
+
+      track(ANALYTICS_EVENTS.RISK_QUIZ_ANSWER_SUBMITTED, {
+        question_id: question.id,
+        selected_option: selectedAnswer.selected_option,
+        score: selectedAnswer.score,
+      });
+
+      const isLastQuestion = state.current_screen_index === RISK_QUIZ_QUESTIONS.length;
+      if (isLastQuestion) {
+        const answers = state.risk_quiz_result?.answers ?? [];
+        const result = calculateRiskProfile(state.dos_input, answers);
+        dispatch({ type: "COMPLETE_RISK_QUIZ" });
+        track(ANALYTICS_EVENTS.RISK_QUIZ_COMPLETED, {
+          total_score: result.total_score,
+          raw_profile: result.raw_profile,
+          final_profile: result.final_profile,
+          total_time_sec: state.total_time_sec,
+        });
+      }
+
+      nextScreen();
+      return;
+    }
+
+    if (currentStep.type === "risk_result") {
+      track(ANALYTICS_EVENTS.RISK_QUIZ_CONTINUE_CLICKED, {
+        final_profile: state.risk_quiz_result?.final_profile ?? "conservative",
+      });
+      nextScreen();
+      return;
+    }
+
+    nextScreen();
+  };
+
+  const handlePrev = () => {
+    if (isRiskQuizStep && state.current_screen_index === 0) {
+      return;
+    }
+    prevScreen();
+  };
 
   const renderScreen = (screen: ScreenConfig) => {
     const commonProps = {
@@ -326,6 +440,8 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
     };
 
     switch (screen.type) {
+      case "quiz_intro":
+        return <QuizIntroScreen />;
       case "hero":
         return <HeroScreen {...commonProps} />;
       case "content":
@@ -340,23 +456,21 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
           />
         );
       case "quiz": {
-        const question = RISK_QUIZ_QUESTIONS[state.current_screen_index];
-        if (!question) {
+        if (!currentQuizQuestion) {
           return <ContentScreen {...commonProps} />;
         }
-        const isLastQuestion = state.current_screen_index === RISK_QUIZ_QUESTIONS.length - 1;
         return (
           <QuizScreen
             {...commonProps}
-            question={question}
-            onAnswer={(answer) => {
+            question={currentQuizQuestion}
+            selectedOptionId={selectedQuizAnswer?.selected_option}
+            onSelectOption={(answer) => {
               dispatch({ type: "SUBMIT_RISK_ANSWER", payload: answer });
-            }}
-            onNext={() => {
-              if (isLastQuestion) {
-                dispatch({ type: "COMPLETE_RISK_QUIZ" });
-              }
-              handleNext();
+              track(ANALYTICS_EVENTS.RISK_QUIZ_ANSWER_SELECTED, {
+                question_id: answer.question_id,
+                selected_option: answer.selected_option,
+                score: answer.score,
+              });
             }}
           />
         );
@@ -432,18 +546,45 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
   }
 
   const canRenderMainScreen = Boolean(currentScreen && routePreparationDone);
+  const isRiskQuizFlow = isRiskQuizStep || isRiskResultStep;
+  const quizQuestionScreenActive = isRiskQuizStep && state.current_screen_index > 0;
+  const quizNextDisabled = quizQuestionScreenActive && !selectedQuizAnswer;
+  const layoutProgress: ProgressInfo =
+    !isRiskQuizFlow || quizSegmentIndex < 0
+      ? displayProgress
+      : {
+          ...displayProgress,
+          totalSteps: QUIZ_TOTAL_SEGMENTS,
+          completedSteps: Math.max(0, Math.min(quizSegmentIndex, QUIZ_TOTAL_SEGMENTS - 1)),
+          currentStepIndex: Math.max(0, Math.min(quizSegmentIndex, QUIZ_TOTAL_SEGMENTS - 1)),
+          currentStepProgress: 1,
+          overallProgress:
+            (Math.max(0, Math.min(quizSegmentIndex, QUIZ_TOTAL_SEGMENTS - 1)) + 1) /
+            QUIZ_TOTAL_SEGMENTS,
+          currentStepLabel: `${Math.max(0, Math.min(quizSegmentIndex, QUIZ_TOTAL_SEGMENTS - 1)) + 1}/${QUIZ_TOTAL_SEGMENTS}`,
+        };
+  const layoutStepLabel =
+    isRiskQuizFlow && quizSegmentIndex >= 0
+      ? `${quizSegmentIndex + 1}/${QUIZ_TOTAL_SEGMENTS}`
+      : displayProgress.currentStepLabel;
   const screenHasOwnCTA = currentScreen ? OWN_CTA_SCREEN_TYPES.has(currentScreen.type) : false;
   const showFooter = canRenderMainScreen && !screenHasOwnCTA;
-  const enableTapNavigation = canRenderMainScreen && !screenHasOwnCTA;
+  const enableTapNavigation = canRenderMainScreen && !screenHasOwnCTA && !isRiskQuizFlow;
   const isLastScreenInStep = screens.length > 0 && state.current_screen_index >= screens.length - 1;
   const isLastStep = state.current_step_index >= state.track.length - 1;
-  const nextLabel =
-    isLastStep && isLastScreenInStep
-      ? "Завершить маршрут"
-      : isLastScreenInStep
-        ? "Завершить шаг"
-        : "Далее";
+  const nextLabel = isRiskQuizStep
+    ? state.current_screen_index === 0
+      ? "Начать анкету →"
+      : "Далее →"
+    : isRiskResultStep
+      ? "Продолжить обучение →"
+      : isLastStep && isLastScreenInStep
+        ? "Завершить маршрут"
+        : isLastScreenInStep
+          ? "Завершить шаг"
+          : "Далее";
   const emphasizeNext = currentStep?.type === "first_purchase";
+  const nextDisabled = !canRenderMainScreen || quizNextDisabled;
 
   if (!routePreparationDone) {
     return (
@@ -471,6 +612,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
         }}
         showFooter={false}
         enableTapNavigation={false}
+        quizMode={false}
       >
         <RoutePreparationScreen
           segment={state.segment}
@@ -494,8 +636,8 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
 
   return (
     <OnboardingLayout
-      progress={displayProgress}
-      stepLabel={displayProgress.currentStepLabel}
+      progress={layoutProgress}
+      stepLabel={layoutStepLabel}
       background={stepBackground}
       transitionPreset={transition.preset}
       direction={transition.direction}
@@ -504,10 +646,11 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
       onPrev={handlePrev}
       onNext={handleNext}
       nextLabel={nextLabel}
-      nextDisabled={!canRenderMainScreen}
+      nextDisabled={nextDisabled}
       showFooter={showFooter}
       enableTapNavigation={enableTapNavigation}
       emphasizeNext={emphasizeNext}
+      quizMode={isRiskQuizFlow}
     >
       {currentScreen ? renderScreen(currentScreen) : null}
     </OnboardingLayout>

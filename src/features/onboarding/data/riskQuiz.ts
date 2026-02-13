@@ -26,7 +26,7 @@ export const RISK_QUIZ_QUESTIONS: RiskQuizQuestion[] = [
     block: "A",
     block_title: "Финансовое положение",
     question:
-      "Есть ли у вас финансовая подушка безопасности (резерв на 3–6 месяцев)?",
+      "Есть ли у вас финансовая подушка безопасности (резерв на 3–6 месяцев расходов)?",
     options: [
       { id: "a", text: "Нет, резерва нет", score: 1 },
       { id: "b", text: "Да, на 1–3 месяца", score: 2 },
@@ -42,7 +42,7 @@ export const RISK_QUIZ_QUESTIONS: RiskQuizQuestion[] = [
   {
     id: "Q6",
     block: "B",
-    block_title: "Горизонт",
+    block_title: "Горизонт инвестирования",
     question: "На какой срок вы планируете инвестировать?",
     options: [
       { id: "a", text: "Менее 1 года", score: 1 },
@@ -93,7 +93,7 @@ export const RISK_QUIZ_QUESTIONS: RiskQuizQuestion[] = [
   {
     id: "Q8",
     block: "D",
-    block_title: "Поведение",
+    block_title: "Поведение при падении",
     question:
       "Представьте: за 3 месяца ваши инвестиции упали на 20%. Что вы сделаете?",
     options: [

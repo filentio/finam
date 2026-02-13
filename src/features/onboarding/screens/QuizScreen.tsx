@@ -1,53 +1,38 @@
-import { useState } from "react";
 import type { QuizScreenProps } from "./ScreenProps";
-import { ScreenShell } from "./ScreenShell";
 
-export function QuizScreen({ question, onAnswer, onNext, onPrev }: QuizScreenProps) {
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-
+export function QuizScreen({ question, selectedOptionId, onSelectOption }: QuizScreenProps) {
   return (
-    <ScreenShell title={question.block_title} subtitle={question.question}>
-      <div className="ob-quiz-options">
+    <section className="ob-screen ob-quiz-question-screen">
+      <p className="ob-quiz-question__block-title">{question.block_title}</p>
+      <h2 className="ob-quiz-question__text">{question.question}</h2>
+      <div
+        className={`ob-quiz-options ${
+          question.screen_config.layout === "single_select_horizontal"
+            ? "ob-quiz-options--horizontal"
+            : ""
+        }`}
+      >
         {question.options.map((option) => {
-          const selected = selectedOption === option.id;
+          const selected = selectedOptionId === option.id;
           return (
             <button
               key={option.id}
               type="button"
-              onClick={() => setSelectedOption(option.id)}
-              className={`ob-quiz-option ${selected ? "is-selected" : ""}`}
+              onClick={() =>
+                onSelectOption({
+                  question_id: question.id,
+                  selected_option: option.id,
+                  score: option.score,
+                })
+              }
+              className={`ob-quiz-option ${selected ? "is-selected ob-quiz-option--selecting" : ""}`}
+              data-testid="quiz-option"
             >
               {option.text}
             </button>
           );
         })}
       </div>
-
-      <div className="ob-inline-actions">
-        <button className="is-secondary" type="button" onClick={onPrev}>
-          Назад
-        </button>
-        <button
-          className="is-primary"
-          type="button"
-          disabled={!selectedOption}
-          onClick={() => {
-            const picked = question.options.find((option) => option.id === selectedOption);
-            if (!picked) {
-              return;
-            }
-
-            onAnswer({
-              question_id: question.id,
-              selected_option: picked.id,
-              score: picked.score,
-            });
-            onNext();
-          }}
-        >
-          Ответить
-        </button>
-      </div>
-    </ScreenShell>
+    </section>
   );
 }

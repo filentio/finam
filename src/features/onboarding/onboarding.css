@@ -30,10 +30,13 @@
 }
 
 .ob-layout-header {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 7;
   display: grid;
   gap: var(--space-1);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0));
+  padding-bottom: 4px;
 }
 
 .ob-layout-header__top {
@@ -50,6 +53,13 @@
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.68);
   font-weight: 600;
+}
+
+.ob-layout-step-label--counter {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .ob-layout-close {
@@ -201,6 +211,21 @@
   background: linear-gradient(to top, rgba(0, 0, 0, 0.84), rgba(0, 0, 0, 0));
 }
 
+.ob-layout-frame--quiz .ob-progress__meta {
+  display: none;
+}
+
+.ob-layout-footer--quiz .ob-layout-next {
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  box-shadow: none;
+}
+
+.ob-layout-footer--quiz .ob-layout-next:hover:enabled {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 .ob-layout-next {
   width: 100%;
   min-height: 52px;
@@ -305,9 +330,84 @@
   }
 }
 
+.ob-quiz-intro-screen .ob-screen__title {
+  font-size: clamp(28px, 6vw, 32px);
+  text-align: center;
+}
+
+.ob-quiz-intro-screen .ob-screen__subtitle {
+  font-size: var(--text-lg);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ob-quiz-intro {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.ob-quiz-intro__emoji {
+  font-size: 64px;
+  text-align: center;
+  margin: var(--space-1) 0;
+  animation: obQuizScaleIn var(--transition-slow) ease-out both;
+}
+
+.ob-quiz-intro__benefits {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+}
+
+.ob-quiz-intro__benefits-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.ob-quiz-intro__benefits-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.ob-quiz-intro__benefit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  opacity: 0;
+  animation: obQuizFadeIn var(--transition-base) ease-out forwards;
+}
+
+@keyframes obQuizFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes obQuizScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .ob-progress {
   display: grid;
   gap: var(--space-1);
+  padding: 0 2px;
 }
 
 .ob-progress__segments {
@@ -316,7 +416,7 @@
 }
 
 .ob-progress__segment {
-  height: 3px;
+  height: 4px;
   flex: 1;
   border-radius: 999px;
   overflow: hidden;
@@ -411,23 +511,74 @@
 }
 
 .ob-quiz-options {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-1);
+  margin-bottom: auto;
+}
+
+.ob-quiz-question-screen {
+  gap: var(--space-2);
+}
+
+.ob-quiz-question__block-title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ob-quiz-question__text {
+  margin: 0;
+  font-size: var(--text-2xl);
+  line-height: 1.3;
+  font-weight: 600;
 }
 
 .ob-quiz-option {
-  text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  background: rgba(255, 255, 255, 0.09);
+  text-align: center;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
   border-radius: var(--radius-md);
   padding: var(--space-2);
   cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ob-quiz-options--horizontal {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.ob-quiz-option:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.02);
 }
 
 .ob-quiz-option.is-selected {
-  border-color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.2);
+  background: #fff;
+  color: #667eea;
+  font-weight: 600;
+  border-color: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.ob-quiz-option--selecting {
+  animation: obOptionSelect var(--transition-base) ease-out;
+}
+
+@keyframes obOptionSelect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .ob-inline-actions {
@@ -454,15 +605,138 @@
   color: #0f172a;
 }
 
-.ob-risk-chip {
+.ob-quiz-result-screen .ob-screen__title {
+  font-size: clamp(28px, 6vw, 32px);
+  text-align: center;
+}
+
+.ob-quiz-result-screen .ob-screen__subtitle {
+  display: none;
+}
+
+.ob-quiz-result__emoji {
+  font-size: 64px;
+  text-align: center;
+  margin: var(--space-1) 0;
+  animation: obQuizScaleIn var(--transition-slow) ease-out both;
+}
+
+.ob-quiz-result__profile-badge {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--profile-color, #4caf50);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  margin-bottom: var(--space-1);
+  animation: obQuizScaleIn var(--transition-base) ease-out 200ms both;
+}
+
+.ob-quiz-result__profile-name {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.ob-quiz-result__profile-description {
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.ob-quiz-result__allocation {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.ob-quiz-result__allocation-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.ob-pie-chart {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: center;
+}
+
+.ob-pie-chart__circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  animation: obPieIn 800ms ease-out 400ms both;
+}
+
+.ob-pie-chart__summary {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
+@keyframes obPieIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ob-quiz-result__breakdown {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  animation: obQuizFadeIn var(--transition-base) ease-out 1200ms both;
+}
+
+.ob-quiz-result__breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.ob-quiz-result__breakdown-label {
   display: inline-flex;
   align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 12px;
-  width: fit-content;
+  gap: 8px;
+}
+
+.ob-quiz-result__breakdown-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.ob-quiz-result__breakdown-color.is-stocks {
+  background: #60a5fa;
+}
+
+.ob-quiz-result__breakdown-color.is-bonds {
+  background: #34d399;
+}
+
+.ob-quiz-result__breakdown-color.is-alt {
+  background: #fbbf24;
+}
+
+.ob-quiz-result__breakdown-color.is-cash {
+  background: #c4b5fd;
+}
+
+.ob-quiz-result__breakdown-pct {
+  font-weight: 600;
 }
 
 .ob-confetti {

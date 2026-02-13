@@ -23,6 +23,7 @@ interface OnboardingLayoutProps {
   showFooter?: boolean;
   enableTapNavigation?: boolean;
   emphasizeNext?: boolean;
+  quizMode?: boolean;
   children: ReactNode;
 }
 
@@ -57,15 +58,20 @@ export function OnboardingLayout({
   showFooter = true,
   enableTapNavigation = true,
   emphasizeNext = false,
+  quizMode = false,
   children,
 }: OnboardingLayoutProps) {
+  const isScreenCounter = /^\d+\/\d+$/.test(stepLabel);
+
   return (
     <div className="ob-layout-root">
-      <section className="ob-layout-frame" style={{ background }}>
+      <section className={`ob-layout-frame ${quizMode ? "ob-layout-frame--quiz" : ""}`} style={{ background }}>
         <div className="ob-layout-safe">
           <header className="ob-layout-header">
             <div className="ob-layout-header__top">
-              <p className="ob-layout-step-label">{stepLabel}</p>
+              <p className={`ob-layout-step-label ${isScreenCounter ? "ob-layout-step-label--counter" : ""}`}>
+                {stepLabel}
+              </p>
               <button
                 type="button"
                 className="ob-layout-close"
@@ -105,7 +111,7 @@ export function OnboardingLayout({
           ) : null}
 
           {showFooter ? (
-            <footer className="ob-layout-footer">
+            <footer className={`ob-layout-footer ${quizMode ? "ob-layout-footer--quiz" : ""}`}>
               <button
                 type="button"
                 className={`ob-layout-next btn-primary ${emphasizeNext ? "ob-layout-next--glow" : ""}`}

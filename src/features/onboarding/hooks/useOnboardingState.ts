@@ -51,12 +51,20 @@ function getStepId(step: TrackStep): string {
 
 function getSpecialScreens(stepType: StepType): ScreenConfig[] {
   if (stepType === "risk_quiz") {
-    return RISK_QUIZ_QUESTIONS.map((question, index) => ({
-      screen_id: `risk_${index + 1}`,
-      type: "quiz",
-      title: question.question,
-      subtitle: question.screen_config.progress_label,
-    }));
+    return [
+      {
+        screen_id: "risk_intro",
+        type: "quiz_intro",
+        title: "Определим ваш риск-профиль",
+        subtitle: "Это займёт всего 1 минуту и поможет подобрать подходящие инструменты.",
+      },
+      ...RISK_QUIZ_QUESTIONS.map((question, index) => ({
+        screen_id: `risk_q${index + 5}`,
+        type: "quiz",
+        title: question.question,
+        subtitle: question.screen_config.progress_label,
+      })),
+    ];
   }
 
   if (stepType === "risk_result") {
@@ -64,7 +72,7 @@ function getSpecialScreens(stepType: StepType): ScreenConfig[] {
       {
         screen_id: "risk_result_1",
         type: "result",
-        title: "Ваш риск-профиль",
+        title: "Ваш риск-профиль определён",
         subtitle: "Профиль рассчитан с учётом ДОС и анкеты риска.",
       },
     ];

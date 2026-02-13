@@ -162,5 +162,8 @@ Implemented in code:
 - Track builder (`novice/advanced/expert`)
 - Reducer-based onboarding state machine
 - Risk scoring engine (DOS + Q5–Q8) with self-assessment cap
+- Risk quiz stories flow aligned with design spec:
+  intro + 4 questions + result (6 segments), sticky CTA footer,
+  gradient quiz theme, slide transitions, and dedicated analytics events
 - Personalization helpers (content variants, highlighted instruments, portfolio/goal overlays)
 - Base screen/component scaffolding for onboarding flow
