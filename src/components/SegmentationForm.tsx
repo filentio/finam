@@ -77,6 +77,49 @@ const INSTRUMENT_OPTIONS: SegmentationOption[] = [
   { value: "currency", label: "Валюта" },
 ];
 
+const PROGRESS_SEGMENTS_TOTAL = 7;
+
+const STEP_PROGRESS_INDEX: Record<SegmentationStepId, number> = {
+  qualified: 1,
+  experience: 2,
+  amount: 3,
+  goal: 4,
+  instruments: 5,
+};
+
+const STEP_BLOCK_TITLE: Record<SegmentationStepId, string> = {
+  qualified: "Статус инвестора",
+  experience: "Опыт инвестирования",
+  amount: "Инвестиционный капитал",
+  goal: "Цель инвестирования",
+  instruments: "Интересующие инструменты",
+};
+
+const SEGMENT_PRESENTATION: Record<
+  SegmentationPayload["segment"],
+  {
+    emoji: string;
+    title: string;
+    track: string[];
+  }
+> = {
+  novice: {
+    emoji: "🌱",
+    title: "Новичок",
+    track: ["6 уроков", "Анкета риска", "Первая покупка"],
+  },
+  advanced: {
+    emoji: "🚀",
+    title: "Обучающийся",
+    track: ["3 урока", "Анкета риска", "Первая покупка"],
+  },
+  expert: {
+    emoji: "⚡",
+    title: "Квалифицированный инвестор",
+    track: ["Анкета риска", "Персональные рекомендации", "Первая покупка"],
+  },
+};
+
 function getSteps(state: SegmentationState): SegmentationStepConfig[] {
   const steps: SegmentationStepConfig[] = [
     {
@@ -159,7 +202,8 @@ function buildPayload(state: SegmentationState): SegmentationPayload | null {
 
 export function SegmentationForm({ onComplete }: SegmentationFormProps) {
   const [state, setState] = useState<SegmentationState>(INITIAL_STATE);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(-1);
+  const [resultPayload, setResultPayload] = useState<SegmentationPayload | null>(null);
   const [direction, setDirection] = useState<1 | -1>(1);
   const startedSentRef = useRef(false);
 
@@ -174,11 +218,16 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
 
   const steps = useMemo(() => getSteps(state), [state]);
   const currentStep = steps[currentStepIndex];
-  const canContinue = useMemo(() => getCanContinue(state), [state]);
 
   useEffect(() => {
-    setCurrentStepIndex((prev) => Math.min(prev, Math.max(steps.length - 1, 0)));
-  }, [steps.length]);
+    if (resultPayload) {
+      return;
+    }
+    setCurrentStepIndex((prev) => {
+      const bounded = Math.min(prev, Math.max(steps.length - 1, -1));
+      return Math.max(-1, bounded);
+    });
+  }, [resultPayload, steps.length]);
 
   const updateState = (patch: Partial<SegmentationState>) => {
     setState((previous) => {
@@ -267,7 +316,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
     return state.instruments.includes(optionValue as Instrument);
   };
 
-  const handleSubmit = () => {
+  const handleOpenResult = () => {
     const payload = buildPayload(state);
     if (!payload) {
       return;
@@ -279,21 +328,35 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
     });
     trackEvent(`segment_${payload.segment}`, { amount_tier: payload.amount_tier });
 
+    setDirection(1);
+    setResultPayload(payload);
+  };
+
+  const handleStartOnboarding = () => {
+    if (!resultPayload) {
+      return;
+    }
     if (!onComplete) {
-      navigateToOnboarding(payload.segment, payload.amount_tier);
+      navigateToOnboarding(resultPayload.segment, resultPayload.amount_tier);
     }
 
-    onComplete?.(payload);
+    onComplete?.(resultPayload);
   };
 
   const handleNext = () => {
+    if (currentStepIndex === -1) {
+      setDirection(1);
+      setCurrentStepIndex(0);
+      return;
+    }
+
     if (!currentStep) {
       return;
     }
 
     const lastStep = currentStepIndex === steps.length - 1;
     if (lastStep) {
-      handleSubmit();
+      handleOpenResult();
       return;
     }
 
@@ -301,100 +364,174 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
     setCurrentStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
   };
 
-  const handlePrev = () => {
+  const handleReset = () => {
+    setState(INITIAL_STATE);
+    setResultPayload(null);
     setDirection(-1);
-    setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
+    setCurrentStepIndex(-1);
   };
 
+  const showIntro = currentStepIndex === -1 && !resultPayload;
+  const showResult = Boolean(resultPayload);
+  const showQuestion = Boolean(currentStep) && !showIntro && !showResult;
   const nextDisabled = currentStep ? !isStepAnswered(currentStep.id) : true;
+  const progressIndex = showResult
+    ? PROGRESS_SEGMENTS_TOTAL - 1
+    : showIntro
+      ? 0
+      : currentStep
+        ? STEP_PROGRESS_INDEX[currentStep.id]
+        : 0;
+  const progressLabel = `${progressIndex + 1}/${PROGRESS_SEGMENTS_TOTAL}`;
+  const segmentView = resultPayload ? SEGMENT_PRESENTATION[resultPayload.segment] : null;
+  const questionScreenKey = currentStep ? `question-${currentStep.id}` : "question-empty";
 
   return (
     <section className="seg-story">
-      <div className="seg-story__progress">
-        {steps.map((step, index) => (
-          <span
-            key={step.id}
-            className={`seg-story__progress-segment ${
-              index < currentStepIndex
-                ? "is-done"
-                : index === currentStepIndex
-                  ? "is-active"
-                  : ""
+      <div className="seg-story__frame">
+        <header className="seg-story__top">
+          <button
+            type="button"
+            className="seg-story__close"
+            onClick={handleReset}
+            aria-label="Сбросить анкету"
+          >
+            ×
+          </button>
+          <span className="seg-story__counter">{progressLabel}</span>
+        </header>
+
+        <div className="seg-story__progress">
+          {Array.from({ length: PROGRESS_SEGMENTS_TOTAL }).map((_, index) => (
+            <span
+              key={index}
+              className={`seg-story__progress-segment ${
+                index <= progressIndex ? "is-done" : ""
+              }`}
+            />
+          ))}
+        </div>
+
+        {showIntro ? (
+          <article
+            key="intro"
+            className={`seg-story__screen ${
+              direction > 0 ? "seg-story__screen--next" : "seg-story__screen--prev"
+            } seg-story__screen--intro`}
+          >
+            <div className="seg-story__intro-emoji">👋</div>
+            <h1 className="seg-story__intro-title">Добро пожаловать!</h1>
+            <p className="seg-story__intro-subtitle">
+              Ответьте на 5 вопросов, чтобы мы подобрали для вас подходящий путь обучения
+            </p>
+            <section className="seg-story__intro-card">
+              <ul className="seg-story__intro-benefits">
+                <li>
+                  <span>✓</span>
+                  <span>Определим ваш опыт</span>
+                </li>
+                <li>
+                  <span>✓</span>
+                  <span>Подберём уроки</span>
+                </li>
+                <li>
+                  <span>✓</span>
+                  <span>Порекомендуем инструменты</span>
+                </li>
+              </ul>
+            </section>
+            <p className="seg-story__intro-time">Это займёт 2 минуты</p>
+            <button type="button" className="seg-story__ghost-btn" onClick={handleNext}>
+              Начать →
+            </button>
+          </article>
+        ) : null}
+
+        {showQuestion && currentStep ? (
+          <article
+            key={questionScreenKey}
+            className={`seg-story__screen ${
+              direction > 0 ? "seg-story__screen--next" : "seg-story__screen--prev"
             }`}
           >
-            <span
-              className="seg-story__progress-fill"
-              style={{
-                width:
-                  index < currentStepIndex ? "100%" : index === currentStepIndex ? "100%" : "0%",
-              }}
-            />
-          </span>
-        ))}
-      </div>
+            <div className="seg-story__question-content">
+              <p className="seg-story__block-title">{STEP_BLOCK_TITLE[currentStep.id]}</p>
+              <h2 className="seg-story__question-title">{currentStep.title}</h2>
+              {currentStep.multiple ? (
+                <p className="seg-story__question-subtitle">{currentStep.subtitle}</p>
+              ) : null}
 
-      <div className="seg-story__meta">
-        <span>
-          Вопрос {Math.min(currentStepIndex + 1, steps.length)} из {steps.length}
-        </span>
-        <strong className={`segment-chip ${state.segment ? "segment-chip--active" : ""}`}>
-          {state.segment ?? "не определён"}
-        </strong>
-      </div>
+              <div className="seg-story__options">
+                {currentStep.options.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`seg-story__option ${
+                      isOptionSelected(currentStep.id, option.value) ? "is-selected" : ""
+                    }`}
+                    onClick={() => handleStepValueChange(currentStep.id, option.value)}
+                  >
+                    {currentStep.multiple ? (
+                      <span className="seg-story__multi-mark">
+                        {isOptionSelected(currentStep.id, option.value) ? "✓" : "☐"}
+                      </span>
+                    ) : null}
+                    <span>{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-      {currentStep ? (
-        <article
-          key={currentStep.id}
-          className={`seg-story__screen ${
-            direction > 0 ? "seg-story__screen--next" : "seg-story__screen--prev"
-          }`}
-        >
-          <header className="seg-story__header">
-            <h2>{currentStep.title}</h2>
-            <p>{currentStep.subtitle}</p>
-          </header>
-
-          <div className="seg-story__options">
-            {currentStep.options.map((option) => (
+            <footer className="seg-story__footer">
               <button
-                key={option.value}
                 type="button"
-                className={`seg-story__option choice-card ${
-                  currentStep.multiple ? "choice-card--multiple" : ""
-                } ${
-                  isOptionSelected(currentStep.id, option.value) ? "is-selected selected" : ""
-                }`}
-                onClick={() => handleStepValueChange(currentStep.id, option.value)}
+                className="seg-story__ghost-btn"
+                disabled={nextDisabled}
+                onClick={handleNext}
               >
-                <span className="radio-indicator" aria-hidden="true" />
-                <span className="seg-story__option-content">
-                  <span>{option.label}</span>
-                  {option.hint ? <small>{option.hint}</small> : null}
-                </span>
+                Далее →
               </button>
-            ))}
-          </div>
-        </article>
-      ) : null}
+            </footer>
+          </article>
+        ) : null}
 
-      <footer className="seg-story__footer">
-        <button
-          type="button"
-          className="seg-story__back btn-secondary"
-          onClick={handlePrev}
-          disabled={currentStepIndex === 0}
-        >
-          Назад
-        </button>
-        <button
-          type="button"
-          className="seg-story__next btn-primary"
-          disabled={nextDisabled || (!canContinue && currentStepIndex === steps.length - 1)}
-          onClick={handleNext}
-        >
-          {currentStepIndex === steps.length - 1 ? "Подобрать маршрут" : "Далее"}
-        </button>
-      </footer>
+        {showResult && resultPayload && segmentView ? (
+          <article
+            key="result"
+            className={`seg-story__screen ${
+              direction > 0 ? "seg-story__screen--next" : "seg-story__screen--prev"
+            } seg-story__screen--result`}
+          >
+            <div className="seg-story__result-emoji">🎉</div>
+            <h1 className="seg-story__result-title">Ваш путь определён</h1>
+            <section className="seg-story__result-card">
+              <div className="seg-story__result-badge">
+                <span>{segmentView.emoji}</span>
+                <span>{segmentView.title}</span>
+              </div>
+              <p className="seg-story__result-description">
+                Мы подготовили для вас пошаговую программу обучения
+              </p>
+              <div className="seg-story__result-track">
+                <h3>Что вас ждёт:</h3>
+                {segmentView.track.map((item, index) => (
+                  <div key={item} className="seg-story__result-track-item">
+                    <span>{index === 0 ? "📚" : index === 1 ? "🎯" : "💼"}</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <button
+              type="button"
+              className="seg-story__ghost-btn"
+              onClick={handleStartOnboarding}
+            >
+              Начать обучение →
+            </button>
+          </article>
+        ) : null}
+      </div>
     </section>
   );
 }
