@@ -393,15 +393,17 @@
 }
 
 .segw__seg-story-progress-segment {
-  height: 4px;
+  height: 12px;
   flex: 1;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.3);
-  transition: background-color var(--transition-base);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+  transition: background-color var(--transition-base), border-color var(--transition-base);
 }
 
 .segw__seg-story-progress-segment.is-done {
   background: #fff;
+  border-color: transparent;
 }
 
 .segw__seg-story-content {
@@ -511,23 +513,21 @@
 
 .segw__seg-block-title {
   margin: 0 0 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.82);
 }
 
 .segw__seg-question-title {
   margin: 0 0 14px;
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1.25;
 }
 
 .segw__seg-question-subtitle {
   margin: 0 0 10px;
   color: rgba(255, 255, 255, 0.74);
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .segw__seg-options {
@@ -539,16 +539,19 @@
 
 .segw__seg-option {
   width: 100%;
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 16px;
   min-height: 56px;
   padding: 14px 16px;
   display: flex;
   align-items: center;
   gap: 10px;
-  text-align: left;
-  background: rgba(255, 255, 255, 0.2);
+  justify-content: center;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.18);
   color: #fff;
+  font-size: 17px;
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-base);
 }
@@ -559,13 +562,42 @@
 
 .segw__seg-option.is-selected {
   background: #fff;
-  color: #4facfe;
+  border-color: #fff;
+  color: #2f9adf;
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
 }
 
+.segw__seg-option.is-multiple {
+  justify-content: flex-start;
+  text-align: left;
+  padding-left: 16px;
+}
+
 .segw__seg-option-check {
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1;
+}
+
+.segw__seg-helper {
+  margin: 12px 0 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.segw__seg-helper-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex: 0 0 auto;
 }
 
 .segw__seg-story-footer {
@@ -613,8 +645,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 14px;
+}
+
+.segw__seg-result-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  font-size: 28px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #54be57 0%, #3f9b3f 100%);
+  font-size: 18px;
   font-weight: 700;
   margin-bottom: 12px;
 }
@@ -633,13 +676,19 @@
 .segw__seg-track h3 {
   margin: 0 0 8px;
   font-size: 15px;
+  text-align: center;
 }
 
 .segw__seg-track-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 10px;
+  min-height: 54px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1e293b;
+  padding: 0 14px;
 }
 
 .segw__questionnaire.is-hidden {
@@ -1572,17 +1621,17 @@
 `;
 
   var AMOUNT_LABELS = {
-    up_to_300k: "До 300 000 ₽",
-    "300k_2m": "300 000 – 2 млн ₽",
-    "2m_5m": "2 – 5 млн ₽",
+    up_to_300k: "До 300 тыс. ₽",
+    "300k_2m": "300 тыс. – 2 млн ₽",
+    "2m_5m": "2–5 млн ₽",
     more_5m: "Более 5 млн ₽",
   };
 
   var GOAL_LABELS = {
-    purchase: "Накопление",
-    passive_income: "Пассивный доход",
-    growth: "Рост капитала",
-    preservation: "Сохранение",
+    purchase: "Накопить на крупную покупку",
+    passive_income: "Получать пассивный доход",
+    growth: "Увеличить капитал",
+    preservation: "Сохранить капитал",
   };
 
   var INSTRUMENT_LABELS = {
@@ -1592,6 +1641,8 @@
     trust_management: "Доверительное управление",
     ipo: "IPO",
     currency: "Валюта",
+    structured: "Структурные продукты",
+    derivatives: "Производные инструменты",
   };
 
   var SEGMENT_LABELS = {
@@ -1607,19 +1658,8 @@
   };
 
   var SEGMENTATION_TOTAL_SEGMENTS = 7;
-  var SEGMENTATION_STORY_ORDER = ["qualified", "experience", "amount", "goal", "instruments"];
+  var SEGMENTATION_STORY_ORDER = ["experience", "amount", "goal", "instruments", "qualified"];
   var SEGMENTATION_STORY_STEPS = {
-    qualified: {
-      action: "qualified",
-      blockTitle: "Статус инвестора",
-      title: "Являетесь ли вы квалифицированным инвестором?",
-      subtitle: "",
-      multiple: false,
-      options: [
-        { value: "true", label: "Да, являюсь квалифицированным инвестором" },
-        { value: "false", label: "Нет, не являюсь квалифицированным инвестором" },
-      ],
-    },
     experience: {
       action: "experience",
       blockTitle: "Опыт инвестирования",
@@ -1627,44 +1667,44 @@
       subtitle: "",
       multiple: false,
       options: [
-        { value: "none", label: "Нет опыта" },
+        { value: "none", label: "Нет опыта, только начинаю" },
         { value: "less_1y", label: "Менее 1 года" },
-        { value: "1_3y", label: "1-3 года" },
-        { value: "3_5y", label: "3-5 лет" },
+        { value: "1_3y", label: "1–3 года" },
+        { value: "3_5y", label: "3–5 лет" },
         { value: "more_5y", label: "Более 5 лет" },
       ],
     },
     amount: {
       action: "amount",
-      blockTitle: "Инвестиционный капитал",
+      blockTitle: "Сумма инвестиций",
       title: "Какую сумму вы планируете инвестировать?",
       subtitle: "",
       multiple: false,
       options: [
-        { value: "up_to_300k", label: "До 300 000 ₽" },
-        { value: "300k_2m", label: "300 000 - 2 млн ₽" },
-        { value: "2m_5m", label: "2 - 5 млн ₽" },
+        { value: "up_to_300k", label: "До 300 тыс. ₽" },
+        { value: "300k_2m", label: "300 тыс. – 2 млн ₽" },
+        { value: "2m_5m", label: "2–5 млн ₽" },
         { value: "more_5m", label: "Более 5 млн ₽" },
       ],
     },
     goal: {
       action: "goal",
       blockTitle: "Цель инвестирования",
-      title: "Ваша главная инвестиционная цель",
+      title: "Какая у вас основная цель инвестирования?",
       subtitle: "",
       multiple: false,
       options: [
-        { value: "purchase", label: "Накопление" },
-        { value: "passive_income", label: "Пассивный доход" },
-        { value: "growth", label: "Рост капитала" },
-        { value: "preservation", label: "Сохранение" },
+        { value: "purchase", label: "Накопить на крупную покупку" },
+        { value: "passive_income", label: "Получать пассивный доход" },
+        { value: "growth", label: "Увеличить капитал" },
+        { value: "preservation", label: "Сохранить капитал" },
       ],
     },
     instruments: {
       action: "instrument",
       blockTitle: "Интересующие инструменты",
-      title: "Какие инструменты вам интересны?",
-      subtitle: "Можно выбрать несколько вариантов.",
+      title: "Какие инструменты вас интересуют?",
+      subtitle: "(можно выбрать несколько)",
       multiple: true,
       options: [
         { value: "etf", label: "ETF" },
@@ -1673,6 +1713,21 @@
         { value: "trust_management", label: "Доверительное управление" },
         { value: "ipo", label: "IPO" },
         { value: "currency", label: "Валюта" },
+        { value: "structured", label: "Структурные продукты" },
+        { value: "derivatives", label: "Производные инструменты" },
+      ],
+    },
+    qualified: {
+      action: "qualified",
+      blockTitle: "Статус инвестора",
+      title: "Являетесь ли вы квалифицированным инвестором?",
+      subtitle: "",
+      helper:
+        "Квалифицированный инвестор — статус для опытных инвесторов с активами от 6 млн ₽",
+      multiple: false,
+      options: [
+        { value: "true", label: "Да" },
+        { value: "false", label: "Нет" },
       ],
     },
   };
@@ -2401,8 +2456,10 @@
 
       var resultCard = createStoryNode("div", "segw__seg-result-card");
       var resultBadge = createStoryNode("div", "segw__seg-result-badge");
-      resultBadge.appendChild(createStoryNode("span", "", resultMeta.emoji || "🌱"));
-      resultBadge.appendChild(createStoryNode("span", "", resultMeta.title || "Новичок"));
+      var resultPill = createStoryNode("div", "segw__seg-result-pill");
+      resultPill.appendChild(createStoryNode("span", "", resultMeta.emoji || "🌱"));
+      resultPill.appendChild(createStoryNode("span", "", resultMeta.title || "Новичок"));
+      resultBadge.appendChild(resultPill);
       resultCard.appendChild(resultBadge);
       resultCard.appendChild(
         createStoryNode(
@@ -2496,6 +2553,9 @@
       if (isSelected) {
         optionButton.classList.add("is-selected");
       }
+      if (stepConfig.multiple) {
+        optionButton.classList.add("is-multiple");
+      }
 
       if (stepConfig.multiple) {
         optionButton.appendChild(
@@ -2507,6 +2567,14 @@
       optionsWrap.appendChild(optionButton);
     }
     questionWrap.appendChild(optionsWrap);
+
+      if (stepConfig.helper) {
+        var helper = createStoryNode("div", "segw__seg-helper");
+        helper.appendChild(createStoryNode("span", "segw__seg-helper-icon", "i"));
+        helper.appendChild(createStoryNode("span", "", stepConfig.helper));
+        questionWrap.appendChild(helper);
+      }
+
     refs.segContent.appendChild(questionWrap);
   }
 
@@ -3880,11 +3948,7 @@
         render(root, refs, state);
         return;
       } else if (action === "qualified") {
-        var qualified = value === "true";
-        state.qualifiedInvestor = qualified;
-        if (qualified) {
-          state.experience = null;
-        }
+        state.qualifiedInvestor = value === "true";
       } else if (action === "experience") {
         state.experience = value;
       } else if (action === "amount") {
