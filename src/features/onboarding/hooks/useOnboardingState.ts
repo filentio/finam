@@ -106,7 +106,8 @@ export function getVisibleScreens(
   }
 
   const variant = step.variant ?? "full";
-  let screens = lesson.screens;
+  const lessonScreens = [...lesson.screens];
+  let screens = lessonScreens;
 
   if (
     variant !== "full" &&
@@ -114,13 +115,30 @@ export function getVisibleScreens(
     variant in lesson.variants &&
     lesson.variants[variant]
   ) {
-    const allowed = lesson.variants[variant]?.screens ?? [];
-    screens = screens.filter((screen) => allowed.includes(screen.screen_id));
+    const allowed = new Set(lesson.variants[variant]?.screens ?? []);
+    if (allowed.size > 0) {
+      screens = lessonScreens.filter((screen) => allowed.has(screen.screen_id));
+    }
   }
 
-  return screens.filter(
-    (screen) => !screen.show_for || screen.show_for.includes(state.segment),
-  );
+  const filtered = screens.filter((screen) => {
+    if (!screen.show_for || screen.show_for.length === 0) {
+      return true;
+    }
+    return screen.show_for.includes(state.segment);
+  });
+
+  const unique: ScreenConfig[] = [];
+  const seen = new Set<string>();
+  for (const screen of filtered) {
+    if (seen.has(screen.screen_id)) {
+      continue;
+    }
+    seen.add(screen.screen_id);
+    unique.push(screen);
+  }
+
+  return unique;
 }
 
 export function getScreenCount(step: TrackStep, state: OnboardingState): number {

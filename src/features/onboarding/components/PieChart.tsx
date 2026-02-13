@@ -8,10 +8,10 @@ export function PieChart({ allocation }: PieChartProps) {
   const { stocks_pct, bonds_pct, alternatives_pct, cash_pct } = allocation;
 
   const gradient = `conic-gradient(
-    #365fca 0 ${stocks_pct}%,
-    #3b9f74 ${stocks_pct}% ${stocks_pct + bonds_pct}%,
-    #d29a2a ${stocks_pct + bonds_pct}% ${stocks_pct + bonds_pct + alternatives_pct}%,
-    #7e8da7 ${stocks_pct + bonds_pct + alternatives_pct}% ${stocks_pct + bonds_pct + alternatives_pct + cash_pct}%
+    #60a5fa 0 ${stocks_pct}%,
+    #34d399 ${stocks_pct}% ${stocks_pct + bonds_pct}%,
+    #fbbf24 ${stocks_pct + bonds_pct}% ${stocks_pct + bonds_pct + alternatives_pct}%,
+    #c4b5fd ${stocks_pct + bonds_pct + alternatives_pct}% ${stocks_pct + bonds_pct + alternatives_pct + cash_pct}%
   )`;
 
   return (
@@ -19,14 +19,14 @@ export function PieChart({ allocation }: PieChartProps) {
       <div
         aria-label="pie-chart"
         style={{
-          width: 180,
-          height: 180,
+          width: 156,
+          height: 156,
           borderRadius: "50%",
           background: gradient,
-          border: "1px solid #d7e1ef",
+          border: "1px solid rgba(255,255,255,0.34)",
         }}
       />
-      <div style={{ fontSize: 13, color: "#4f6077", textAlign: "center" }}>
+      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.82)", textAlign: "center" }}>
         Акции {stocks_pct}% • Облигации {bonds_pct}% • Альтернативы {alternatives_pct}% •
         Кэш {cash_pct}%
       </div>

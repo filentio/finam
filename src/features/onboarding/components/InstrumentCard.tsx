@@ -23,11 +23,11 @@ export function InstrumentCard({
     <article
       style={{
         borderRadius: 12,
-        border: `1px solid ${highlighted ? "#5f82d8" : "#d9e2ef"}`,
-        background: highlighted ? "#f2f6ff" : "#fff",
-        padding: 14,
+        border: `1px solid ${highlighted ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.22)"}`,
+        background: highlighted ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.1)",
+        padding: 10,
         display: "grid",
-        gap: 8,
+        gap: 6,
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
@@ -42,7 +42,7 @@ export function InstrumentCard({
           Риск: {riskLevel}
         </span>
       </div>
-      <p style={{ margin: 0, color: "#49576b", fontSize: 14 }}>{description}</p>
+      <p style={{ margin: 0, color: "rgba(255,255,255,0.82)", fontSize: 13 }}>{description}</p>
       {highlighted ? <HighlightBadge /> : null}
     </article>
   );

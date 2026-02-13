@@ -20,38 +20,30 @@ export function ProgressBar({ progress }: ProgressBarProps) {
   });
 
   return (
-    <div style={{ display: "grid", gap: 8 }}>
-      <div style={{ display: "flex", gap: 6 }}>
+    <div className="ob-progress">
+      <div className="ob-progress__segments">
         {segments.map((fill, index) => (
           <div
             key={index}
-            style={{
-              flex: 1,
-              height: 6,
-              borderRadius: 999,
-              background: "#e6ebf4",
-              overflow: "hidden",
-            }}
+            className={`ob-progress__segment ${
+              index < progress.currentStepIndex
+                ? "is-done"
+                : index === progress.currentStepIndex
+                  ? "is-active"
+                  : ""
+            }`}
           >
-            <div
+            <span
+              className="ob-progress__fill"
               style={{
                 width: `${Math.max(0, Math.min(fill, 1)) * 100}%`,
-                height: "100%",
-                background: "#3f67c8",
-                transition: "width 180ms ease",
               }}
             />
           </div>
         ))}
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: 12,
-          color: "#5c6879",
-        }}
-      >
+
+      <div className="ob-progress__meta">
         <span>{progress.currentStepLabel}</span>
         <span>{Math.round(progress.overallProgress * 100)}%</span>
       </div>

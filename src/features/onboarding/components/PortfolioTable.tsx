@@ -8,7 +8,7 @@ interface PortfolioTableProps {
 export function PortfolioTable({ items }: PortfolioTableProps) {
   return (
     <div style={{ overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th style={thStyle}>Инструмент</th>
@@ -35,13 +35,14 @@ export function PortfolioTable({ items }: PortfolioTableProps) {
 const thStyle: CSSProperties = {
   textAlign: "left",
   fontSize: 12,
-  color: "#607087",
-  borderBottom: "1px solid #dbe5f2",
+  color: "rgba(255,255,255,0.72)",
+  borderBottom: "1px solid rgba(255,255,255,0.22)",
   padding: "8px 6px",
 };
 
 const tdStyle: CSSProperties = {
-  fontSize: 14,
-  borderBottom: "1px solid #edf2f8",
-  padding: "10px 6px",
+  fontSize: 13,
+  color: "rgba(255,255,255,0.9)",
+  borderBottom: "1px solid rgba(255,255,255,0.12)",
+  padding: "8px 6px",
 };

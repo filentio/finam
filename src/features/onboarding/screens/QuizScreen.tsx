@@ -1,15 +1,13 @@
 import { useState } from "react";
-import type { CSSProperties } from "react";
 import type { QuizScreenProps } from "./ScreenProps";
+import { ScreenShell } from "./ScreenShell";
 
 export function QuizScreen({ question, onAnswer, onNext, onPrev }: QuizScreenProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   return (
-    <section style={containerStyle}>
-      <h3 style={{ margin: 0 }}>{question.block_title}</h3>
-      <p style={{ margin: 0, color: "#44536a" }}>{question.question}</p>
-      <div style={{ display: "grid", gap: 8 }}>
+    <ScreenShell title={question.block_title} subtitle={question.question}>
+      <div className="ob-quiz-options">
         {question.options.map((option) => {
           const selected = selectedOption === option.id;
           return (
@@ -17,14 +15,7 @@ export function QuizScreen({ question, onAnswer, onNext, onPrev }: QuizScreenPro
               key={option.id}
               type="button"
               onClick={() => setSelectedOption(option.id)}
-              style={{
-                textAlign: "left",
-                border: `1px solid ${selected ? "#466dc9" : "#d7e0ef"}`,
-                background: selected ? "#eff4ff" : "#fff",
-                borderRadius: 10,
-                padding: "12px 14px",
-                cursor: "pointer",
-              }}
+              className={`ob-quiz-option ${selected ? "is-selected" : ""}`}
             >
               {option.text}
             </button>
@@ -32,12 +23,12 @@ export function QuizScreen({ question, onAnswer, onNext, onPrev }: QuizScreenPro
         })}
       </div>
 
-      <div style={{ display: "flex", gap: 8 }}>
-        <button style={ghostButtonStyle} type="button" onClick={onPrev}>
+      <div className="ob-inline-actions">
+        <button className="is-secondary" type="button" onClick={onPrev}>
           Назад
         </button>
         <button
-          style={primaryButtonStyle}
+          className="is-primary"
           type="button"
           disabled={!selectedOption}
           onClick={() => {
@@ -57,33 +48,6 @@ export function QuizScreen({ question, onAnswer, onNext, onPrev }: QuizScreenPro
           Ответить
         </button>
       </div>
-    </section>
+    </ScreenShell>
   );
 }
-
-const containerStyle: CSSProperties = {
-  border: "1px solid #dce5f2",
-  borderRadius: 14,
-  padding: 16,
-  background: "#fff",
-  display: "grid",
-  gap: 12,
-};
-
-const primaryButtonStyle: CSSProperties = {
-  border: 0,
-  borderRadius: 10,
-  background: "#2f5fcc",
-  color: "#fff",
-  padding: "10px 14px",
-  cursor: "pointer",
-};
-
-const ghostButtonStyle: CSSProperties = {
-  border: "1px solid #c8d4e8",
-  borderRadius: 10,
-  background: "#fff",
-  color: "#3a4a61",
-  padding: "10px 14px",
-  cursor: "pointer",
-};

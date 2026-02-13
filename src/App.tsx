@@ -80,50 +80,23 @@ function App() {
   };
 
   if (mode === "onboarding" && onboardingInput) {
-    const preset = CLIENT_PRESETS.find((item) => item.id === selectedClient);
-
     return (
-      <main className="app-shell app-shell--wide">
-        <section className="demo-panel">
-          <div className="demo-panel__header">
-            <div>
-              <p className="demo-panel__eyebrow">Client Journey Preview</p>
-              <h2>Просмотр онбординга для клиента</h2>
-              <p className="demo-panel__description">
-                {preset ? `${preset.label}: ${preset.description}` : "Персональный клиент из анкеты сегментации"}
-              </p>
-            </div>
-            <div className="demo-panel__actions">
-              <button
-                type="button"
-                className="ghost-action"
-                onClick={() => setMode("segmentation")}
-              >
-                К сегментации
-              </button>
-              <button
-                type="button"
-                className="ghost-action"
-                onClick={() => startOnboarding(onboardingInput, selectedClient)}
-              >
-                Перезапустить
-              </button>
-            </div>
-          </div>
-
-          {completed ? (
-            <p className="demo-panel__success">
-              Онбординг завершён — можно вернуться к анкете или запустить другой профиль.
-            </p>
-          ) : null}
-        </section>
-
+      <main className="app-shell app-shell--flow">
         <Onboarding
           key={sessionKey}
           userId={userId}
           dosInput={onboardingInput}
           onComplete={() => setCompleted(true)}
         />
+        {completed ? (
+          <button
+            type="button"
+            className="flow-exit"
+            onClick={() => setMode("segmentation")}
+          >
+            Вернуться к анкете
+          </button>
+        ) : null}
       </main>
     );
   }

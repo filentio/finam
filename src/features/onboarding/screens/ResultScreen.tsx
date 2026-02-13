@@ -1,44 +1,36 @@
-import type { CSSProperties } from "react";
 import { PieChart } from "../components/PieChart";
 import type { ResultScreenProps } from "./ScreenProps";
+import { ScreenShell } from "./ScreenShell";
 
-export function ResultScreen({ screen, riskResult, onNext }: ResultScreenProps) {
+const CONFETTI_COLORS = ["#ffffff", "#7dd3fc", "#86efac", "#fde047", "#fca5a5", "#c4b5fd"];
+
+export function ResultScreen({ screen, riskResult }: ResultScreenProps) {
   return (
-    <section style={containerStyle}>
-      <h3 style={{ margin: 0 }}>{screen.title}</h3>
+    <ScreenShell title={screen.title} subtitle={screen.subtitle}>
       {riskResult ? (
         <>
-          <p style={{ margin: 0, color: "#4b5b71" }}>
+          <span className="ob-risk-chip">
             Итоговый профиль: <strong>{riskResult.final_profile.replace("_", " ")}</strong>
-          </p>
+          </span>
           <PieChart allocation={riskResult.allocation} />
+          <div className="ob-confetti" aria-hidden="true">
+            {Array.from({ length: 18 }).map((_, index) => (
+              <span
+                key={index}
+                style={{
+                  left: `${(index % 6) * 16 + 4}%`,
+                  background: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
+                  animationDelay: `${index * 40}ms`,
+                }}
+              />
+            ))}
+          </div>
         </>
       ) : (
-        <p style={{ margin: 0, color: "#4b5b71" }}>
+        <p className="ob-screen__subtitle">
           Заполните анкету риска, чтобы получить персональный профиль.
         </p>
       )}
-      <button type="button" style={primaryButtonStyle} onClick={onNext}>
-        Продолжить
-      </button>
-    </section>
+    </ScreenShell>
   );
 }
-
-const containerStyle: CSSProperties = {
-  border: "1px solid #dce5f2",
-  borderRadius: 14,
-  padding: 16,
-  background: "#fff",
-  display: "grid",
-  gap: 12,
-};
-
-const primaryButtonStyle: CSSProperties = {
-  border: 0,
-  borderRadius: 10,
-  background: "#2f5fcc",
-  color: "#fff",
-  padding: "10px 14px",
-  cursor: "pointer",
-};
