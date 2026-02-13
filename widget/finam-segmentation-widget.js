@@ -4222,7 +4222,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.16";
+  window.FinamSegmentationWidget.version = "1.0.17";
 
   ensureStyles();
   initExistingWidgets();
