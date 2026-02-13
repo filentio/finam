@@ -2284,7 +2284,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.11";
+  window.FinamSegmentationWidget.version = "1.0.12";
 
   ensureStyles();
   initExistingWidgets();
