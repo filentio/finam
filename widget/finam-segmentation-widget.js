@@ -86,6 +86,12 @@
   transform: translateY(-1px);
 }
 
+.segw__btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .segw__btn-secondary {
   background: transparent;
   color: var(--text-secondary);
@@ -430,6 +436,12 @@
   display: grid;
   gap: 10px;
   text-align: center;
+  transform-origin: center;
+  animation: segwRoutePrepEnter var(--transition-slow) both;
+}
+
+.segw__route-prep.is-exiting .segw__route-prep-card {
+  animation: segwRoutePrepExit var(--transition-base) forwards;
 }
 
 .segw__route-prep-icon {
@@ -453,6 +465,28 @@
 .segw__route-prep-text {
   margin: 0;
   color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes segwRoutePrepEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes segwRoutePrepExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
 .segw__onboarding-kicker {
@@ -495,9 +529,11 @@
 .segw__story-progress {
   display: flex;
   gap: 4px;
-  padding: 10px 10px 0;
-  position: relative;
-  z-index: 5;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .segw__story-progress-segment {
@@ -514,7 +550,7 @@
   width: 0;
   background: #fff;
   border-radius: inherit;
-  transition: width 0.2s ease-out;
+  transition: width var(--transition-base);
 }
 
 .segw__story-progress-segment.is-done .segw__story-progress-fill {
@@ -522,16 +558,15 @@
 }
 
 .segw__story-progress-segment.is-active .segw__story-progress-fill {
-  animation: segwStoryProgressFill 0.3s ease-out forwards;
+  background: #fff;
 }
 
-@keyframes segwStoryProgressFill {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
+.segw__story-progress-segment.is-active {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.segw__story-progress-segment.is-done {
+  background: #fff;
 }
 
 .segw__story-header {
@@ -574,11 +609,11 @@
 }
 
 .segw__story-content.is-enter-next {
-  animation: segwStorySlideNext 0.2s ease-out;
+  animation: segwStorySlideNext var(--transition-base);
 }
 
 .segw__story-content.is-enter-prev {
-  animation: segwStorySlidePrev 0.2s ease-out;
+  animation: segwStorySlidePrev var(--transition-base);
 }
 
 @keyframes segwStorySlideNext {
@@ -613,7 +648,7 @@
 .segw__onboarding-step-title {
   margin: 0;
   text-align: center;
-  font-size: clamp(22px, 4.3vw, 28px);
+  font-size: var(--text-2xl);
   line-height: 1.2;
   font-weight: 700;
 }
@@ -621,8 +656,8 @@
 .segw__onboarding-step-text {
   margin: 0;
   text-align: center;
-  color: rgba(255, 255, 255, 0.74);
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--text-base);
   line-height: 1.45;
 }
 
@@ -630,8 +665,8 @@
   margin: 2px 0 0;
   padding-left: 18px;
   display: grid;
-  gap: 8px;
-  font-size: 13px;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
   color: rgba(255, 255, 255, 0.94);
 }
 
@@ -700,24 +735,27 @@
 .segw__story-next {
   width: 100%;
   border: 0;
-  border-radius: var(--radius-md);
   min-height: 52px;
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-base);
-}
-
-.segw__story-next:hover {
-  background: #f8fafc;
-  transform: translateY(-1px);
 }
 
 .segw__story-next:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.segw__onboarding.is-entering .segw__story-frame {
+  animation: segwLessonsEnter var(--transition-slow) both;
+}
+
+@keyframes segwLessonsEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .segw__btn {
@@ -995,7 +1033,12 @@
       <div class="segw__route-prep-icon" aria-hidden="true">✨</div>
       <h3 class="segw__route-prep-title">Мы подобрали для вас персональный маршрут</h3>
       <p class="segw__route-prep-text" data-role="route-prep-text">Готовим программу обучения...</p>
-      <button type="button" class="segw__btn-primary" data-action="start-inline-onboarding">
+      <button
+        type="button"
+        class="segw__btn-primary"
+        data-action="start-inline-onboarding"
+        data-role="route-prep-start"
+      >
         Начать обучение
       </button>
     </div>
@@ -1019,7 +1062,7 @@
           <ul class="segw__onboarding-points" data-role="onboarding-step-points"></ul>
         </div>
 
-        <p class="segw__onboarding-meta" data-role="onboarding-counter">Шаг 1 из 3</p>
+        <p class="segw__onboarding-meta" data-role="onboarding-counter">Урок 1 из 6</p>
         <p class="segw__story-hint" data-role="onboarding-hint">
           Тап по правой части — следующий экран, по левой — предыдущий.
         </p>
@@ -1109,6 +1152,8 @@
     advanced: "/onboarding/short-course",
     expert: "/onboarding/minimal-risk-form",
   };
+
+  var INLINE_STORY_TOTAL_SEGMENTS = 6;
 
   function hasConfiguredExternalOnboarding() {
     return Boolean(
@@ -1404,13 +1449,30 @@
 
   function getStoryGradient(segment, stepIndex) {
     var bySegment = {
-      novice: ["var(--gradient-lesson-1)", "var(--gradient-lesson-2)", "var(--gradient-lesson-3)"],
-      advanced: [
+      novice: [
+        "var(--gradient-lesson-1)",
+        "var(--gradient-lesson-2)",
+        "var(--gradient-lesson-3)",
         "var(--gradient-lesson-4)",
         "var(--gradient-lesson-5)",
         "var(--gradient-lesson-6)",
       ],
-      expert: ["var(--gradient-lesson-6)", "var(--gradient-lesson-2)", "var(--gradient-lesson-4)"],
+      advanced: [
+        "var(--gradient-lesson-4)",
+        "var(--gradient-lesson-5)",
+        "var(--gradient-lesson-6)",
+        "var(--gradient-lesson-1)",
+        "var(--gradient-lesson-2)",
+        "var(--gradient-lesson-3)",
+      ],
+      expert: [
+        "var(--gradient-lesson-6)",
+        "var(--gradient-lesson-2)",
+        "var(--gradient-lesson-4)",
+        "var(--gradient-lesson-1)",
+        "var(--gradient-lesson-5)",
+        "var(--gradient-lesson-3)",
+      ],
     };
 
     var palette = bySegment[segment] || bySegment.novice;
@@ -1427,185 +1489,235 @@
         ? INSTRUMENT_LABELS[payload.instruments[0]] || payload.instruments[0]
         : "инструменты с низким порогом входа";
 
+    function buildStep(lesson, emoji, title, text, hint, points) {
+      return {
+        lesson: lesson,
+        emoji: emoji,
+        title: title,
+        text: text,
+        hint: hint,
+        gradient: getStoryGradient(payload.segment, lesson - 1),
+        points: Array.isArray(points) ? points : [],
+      };
+    }
+
     if (payload.segment === "novice") {
       return [
-        {
-          emoji: "🚀",
-          title: "Урок 1. С чего начать?",
-          text: "Спокойный старт под цель \"" + goalLabel + "\" и бюджет " + amountLabel + ".",
-          hint: "Обложка урока 1",
-          gradient: getStoryGradient(payload.segment, 0),
-          points: [],
-        },
-        {
-          emoji: "🧭",
-          title: "Урок 1. Базовый план старта",
-          text: "Сфокусируемся на первом действии без перегруза деталями.",
-          hint: "Практика урока 1",
-          points: [
-            "Открываем счет и определяем стартовую стратегию.",
-            "Избегаем частых ошибок первого месяца.",
+        buildStep(
+          1,
+          "🚀",
+          "Урок 1. Старт под вашу цель",
+          "Формируем безопасный старт под цель \"" + goalLabel + "\" и бюджет " + amountLabel + ".",
+          "Начинаем с фундамента и первого действия.",
+          [
+            "Определяем первый шаг без перегруза.",
+            "Собираем базовый план на первые 7 дней.",
           ],
-        },
-        {
-          emoji: "🧩",
-          title: "Урок 2. Собираем первый портфель",
-          text: "Фокус на " + primaryInstrument + " и балансе риска.",
-          hint: "Обложка урока 2",
-          gradient: getStoryGradient(payload.segment, 0),
-          points: [],
-        },
-        {
-          emoji: "📈",
-          title: "Урок 2. Готовая схема входа",
-          text: "Разложим покупки на этапы, чтобы снизить стресс и риск точки входа.",
-          hint: "Практика урока 2",
-          points: [
-            "Фиксируем доли активов под ваш горизонт.",
-            "Планируем пошаговые покупки вместо одной точки входа.",
+        ),
+        buildStep(
+          2,
+          "🛡️",
+          "Урок 2. Защита первых инвестиций",
+          "Разбираем, как не потерять темп и не допустить типичных ошибок новичка.",
+          "Фокус на риск-контроле и дисциплине входа.",
+          [
+            "Лимиты по объему сделки на старте.",
+            "Правила: когда входить и когда ждать.",
           ],
-        },
-        {
-          emoji: "✅",
-          title: "Урок 3. Дисциплина и контроль",
-          text: "Рабочий ритм для инструментов: " + instrumentList + ".",
-          hint: "Обложка урока 3",
-          gradient: getStoryGradient(payload.segment, 0),
-          points: [],
-        },
-        {
-          emoji: "📌",
-          title: "Урок 3. Регламент действий",
-          text: "Закрепим понятный шаблон: что делать регулярно и что отслеживать.",
-          hint: "Практика урока 3",
-          points: [
-            "Чек-лист регулярной проверки портфеля.",
-            "Понятный следующий шаг в онбординге.",
+        ),
+        buildStep(
+          3,
+          "🧩",
+          "Урок 3. Первый сбалансированный портфель",
+          "Опираемся на инструменты: " + instrumentList + ".",
+          "Формируем понятную структуру портфеля.",
+          [
+            "Распределяем доли под ваш горизонт.",
+            "Делаем акцент на " + primaryInstrument + ".",
           ],
-        },
+        ),
+        buildStep(
+          4,
+          "📅",
+          "Урок 4. Регулярные пополнения",
+          "Создаем ритм пополнений, чтобы рост капитала был управляемым.",
+          "Минимизируем влияние эмоций на решения.",
+          [
+            "График пополнений и автоконтроль.",
+            "Пошаговый план покупок вместо одного входа.",
+          ],
+        ),
+        buildStep(
+          5,
+          "📉",
+          "Урок 5. Контроль просадки",
+          "Подключаем простые правила снижения риска без сложных формул.",
+          "Контроль риска в ежедневной практике.",
+          [
+            "Ограничения по убытку на позицию.",
+            "Порог пересмотра стратегии и фиксации прибыли.",
+          ],
+        ),
+        buildStep(
+          6,
+          "✅",
+          "Урок 6. План на 30 дней",
+          "Собираем персональный маршрут в понятный чек-лист внедрения.",
+          "Финальный урок перед самостоятельным режимом.",
+          [
+            "Чек-лист еженедельной проверки портфеля.",
+            "Готовый следующий шаг после онбординга.",
+          ],
+        ),
       ];
     }
 
     if (payload.segment === "advanced") {
       return [
-        {
-          emoji: "📊",
-          title: "Урок 1. Капитал и риск-контроль",
-          text: "Актуализируем структуру портфеля под \"" + goalLabel + "\" и " + amountLabel + ".",
-          hint: "Обложка урока 1",
-          gradient: getStoryGradient(payload.segment, 0),
-          points: [],
-        },
-        {
-          emoji: "🛡️",
-          title: "Урок 1. Ревизия стратегии",
-          text: "Сжато проверим структуру и ограничения перед активными действиями.",
-          hint: "Практика урока 1",
-          points: [
-            "Проверяем перекосы по риску и долям активов.",
-            "Фиксируем лимиты до начала сделок.",
+        buildStep(
+          1,
+          "📊",
+          "Урок 1. Ревизия структуры",
+          "Обновляем структуру под цель \"" + goalLabel + "\" и капитал " + amountLabel + ".",
+          "Быстрый аудит перед активными действиями.",
+          [
+            "Выявляем перекосы по классам активов.",
+            "Обновляем целевые доли портфеля.",
           ],
-        },
-        {
-          emoji: "🎯",
-          title: "Урок 2. Оптимизация инструментов",
-          text: "Настраиваем набор: " + instrumentList + ".",
-          hint: "Обложка урока 2",
-          gradient: getStoryGradient(payload.segment, 0),
-          points: [],
-        },
-        {
-          emoji: "⚙️",
-          title: "Урок 2. Точечные улучшения",
-          text: "Настроим вход/выходы и сценарии на волатильном рынке.",
-          hint: "Практика урока 2",
-          points: [
-            "Сценарии входа/выхода под волатильность.",
-            "Правила фиксации прибыли и ограничений убытков.",
+        ),
+        buildStep(
+          2,
+          "🛡️",
+          "Урок 2. Персональные риск-лимиты",
+          "Формируем рабочие лимиты по риску и просадке под текущий рынок.",
+          "Лимиты, которые реально соблюдать каждый день.",
+          [
+            "Ограничения по позиции и сектору.",
+            "Триггеры для частичной фиксации и выхода.",
           ],
-        },
-        {
-          emoji: "🏁",
-          title: "Урок 3. Личный регламент",
-          text: "Финализируем короткий операционный план инвестора.",
-          hint: "Обложка урока 3",
-          gradient: getStoryGradient(payload.segment, 0),
-          points: [],
-        },
-        {
-          emoji: "✅",
-          title: "Урок 3. Внедрение",
-          text: "Переходим от теории к регулярным действиям в одном цикле.",
-          hint: "Практика урока 3",
-          points: [
-            "Ритм ревизии портфеля и KPI эффективности.",
-            "Подготовка к следующему уровню онбординга.",
+        ),
+        buildStep(
+          3,
+          "🎯",
+          "Урок 3. Сценарии входа и выхода",
+          "Настраиваем сценарии под инструменты: " + instrumentList + ".",
+          "Сохраняем гибкость при росте волатильности.",
+          [
+            "План входа по частям вместо одной точки.",
+            "План фиксации прибыли и защитных действий.",
           ],
-        },
+        ),
+        buildStep(
+          4,
+          "⚙️",
+          "Урок 4. Эффективность исполнения",
+          "Оптимизируем частоту сделок и комиссионную нагрузку.",
+          "Улучшаем результат без роста лишнего риска.",
+          [
+            "Контроль частоты сделок по KPI.",
+            "Снижение издержек на исполнение.",
+          ],
+        ),
+        buildStep(
+          5,
+          "📈",
+          "Урок 5. Ребалансировка",
+          "Фиксируем понятный регламент ребалансировки портфеля.",
+          "Портфель остается в целевой структуре.",
+          [
+            "Календарная и пороговая ребалансировка.",
+            "Правила возврата к целевым долям.",
+          ],
+        ),
+        buildStep(
+          6,
+          "🏁",
+          "Урок 6. План роста на квартал",
+          "Собираем персональный план действий на 90 дней.",
+          "Финальный модуль для устойчивого темпа роста.",
+          [
+            "Маршрут регулярной ревизии стратегии.",
+            "Следующий уровень после завершения курса.",
+          ],
+        ),
       ];
     }
 
     return [
-      {
-        emoji: "🧠",
-        title: "Урок 1. Экспресс-аудит стратегии",
-        text: "Проверяем, насколько текущий подход соответствует цели \"" + goalLabel + "\".",
-        hint: "Обложка урока 1",
-        gradient: getStoryGradient(payload.segment, 0),
-        points: [],
-      },
-      {
-        emoji: "🔎",
-        title: "Урок 1. Диагностика",
-        text: "Отмечаем ключевые расхождения и приоритетные правки.",
-        hint: "Практика урока 1",
-        points: [
-          "Сверяем структуру активов и риск-профиль.",
-          "Выявляем узкие места в текущей системе.",
+      buildStep(
+        1,
+        "🧠",
+        "Урок 1. Экспресс-аудит стратегии",
+        "Проверяем соответствие текущего подхода цели \"" + goalLabel + "\".",
+        "Краткая диагностика ключевых зон роста.",
+        [
+          "Сверяем профиль риска и структуру активов.",
+          "Фиксируем приоритеты корректировки.",
         ],
-      },
-      {
-        emoji: "🛡️",
-        title: "Урок 2. Управление риском",
-        text: "Корректируем параметры под объем " + amountLabel + ".",
-        hint: "Обложка урока 2",
-        gradient: getStoryGradient(payload.segment, 0),
-        points: [],
-      },
-      {
-        emoji: "📉",
-        title: "Урок 2. Риск-правила",
-        text: "Фиксируем лимиты просадки и концентрации в понятном формате.",
-        hint: "Практика урока 2",
-        points: [
-          "Ограничения по просадке и концентрации.",
-          "Понятные условия входа и выхода из позиций.",
+      ),
+      buildStep(
+        2,
+        "🛡️",
+        "Урок 2. Риск-модель портфеля",
+        "Перенастраиваем риск-параметры под объем " + amountLabel + ".",
+        "Точные ограничения без потери гибкости.",
+        [
+          "Лимиты концентрации и допустимой просадки.",
+          "Правила обработки стресс-сценариев.",
         ],
-      },
-      {
-        emoji: "📌",
-        title: "Урок 3. План внедрения",
-        text: "Финальный маршрут по инструментам: " + instrumentList + ".",
-        hint: "Обложка урока 3",
-        gradient: getStoryGradient(payload.segment, 0),
-        points: [],
-      },
-      {
-        emoji: "🚀",
-        title: "Урок 3. Завершение и запуск",
-        text: "Закрываем цикл внедрения и выходим в рабочий режим.",
-        hint: "Практика урока 3",
-        points: [
-          "Последовательность внедрения без потери темпа.",
-          "Переход к следующему блоку обучения.",
+      ),
+      buildStep(
+        3,
+        "📉",
+        "Урок 3. Стресс-тест и защита",
+        "Проверяем устойчивость к волатильности и шоковым движениям.",
+        "Сценарный подход к управлению портфелем.",
+        [
+          "Сценарии market drawdown и восстановление.",
+          "Реакции на рост корреляций между активами.",
         ],
-      },
+      ),
+      buildStep(
+        4,
+        "⚖️",
+        "Урок 4. Ликвидность и хедж",
+        "Актуализируем инструменты ликвидности и защитные конструкции.",
+        "Контроль ликвидности на уровне портфеля.",
+        [
+          "План действий при снижении ликвидности.",
+          "Точечное хеджирование ключевых рисков.",
+        ],
+      ),
+      buildStep(
+        5,
+        "🤖",
+        "Урок 5. Автоматизация контроля",
+        "Собираем регулярный мониторинг и сигналы контроля.",
+        "Система, которая поддерживает дисциплину.",
+        [
+          "Авто-проверка порогов риска и структуры.",
+          "Шаблон еженедельного управленческого отчета.",
+        ],
+      ),
+      buildStep(
+        6,
+        "🚀",
+        "Урок 6. План внедрения",
+        "Финализируем маршрут внедрения по инструментам: " + instrumentList + ".",
+        "Переход в стабильный рабочий режим.",
+        [
+          "Порядок внедрения изменений без просадки темпа.",
+          "Следующий шаг после завершения онбординга.",
+        ],
+      ),
     ];
   }
 
   function resetInlineOnboardingState(state) {
     state.inlineOnboarding.isActive = false;
     state.inlineOnboarding.awaitingStart = false;
+    state.inlineOnboarding.transitioningToLessons = false;
+    state.inlineOnboarding.enteringLessons = false;
     state.inlineOnboarding.steps = [];
     state.inlineOnboarding.activeStepIndex = 0;
     state.inlineOnboarding.direction = 1;
@@ -1617,6 +1729,8 @@
   function startInlineOnboardingFlow(state, payload, targetRoute) {
     state.inlineOnboarding.isActive = true;
     state.inlineOnboarding.awaitingStart = true;
+    state.inlineOnboarding.transitioningToLessons = false;
+    state.inlineOnboarding.enteringLessons = false;
     state.inlineOnboarding.steps = buildInlineOnboardingSteps(payload);
     state.inlineOnboarding.activeStepIndex = 0;
     state.inlineOnboarding.direction = 1;
@@ -1625,25 +1739,98 @@
     state.inlineOnboarding.targetRoute = targetRoute || "";
   }
 
-  function renderStoryProgress(progressRoot, stepsCount, activeStepIndex) {
+  function getStepLessonNumber(step, fallbackLesson) {
+    var lesson = fallbackLesson;
+    if (step && typeof step.lesson === "number" && isFinite(step.lesson)) {
+      lesson = step.lesson;
+    }
+
+    lesson = Math.round(lesson);
+    if (lesson < 1) {
+      return 1;
+    }
+    if (lesson > INLINE_STORY_TOTAL_SEGMENTS) {
+      return INLINE_STORY_TOTAL_SEGMENTS;
+    }
+    return lesson;
+  }
+
+  function getStoryProgressState(steps, activeStepIndex) {
+    if (!Array.isArray(steps) || !steps.length) {
+      return {
+        totalSegments: INLINE_STORY_TOTAL_SEGMENTS,
+        currentSegment: 0,
+        progress: 0,
+      };
+    }
+
+    var safeActiveIndex = activeStepIndex;
+    if (safeActiveIndex < 0) {
+      safeActiveIndex = 0;
+    } else if (safeActiveIndex > steps.length - 1) {
+      safeActiveIndex = steps.length - 1;
+    }
+
+    var activeLesson = getStepLessonNumber(steps[safeActiveIndex], safeActiveIndex + 1);
+    var currentSegment = activeLesson - 1;
+    var lessonIndexes = [];
+    for (var i = 0; i < steps.length; i += 1) {
+      if (getStepLessonNumber(steps[i], i + 1) === activeLesson) {
+        lessonIndexes.push(i);
+      }
+    }
+
+    var progress = 1;
+    if (lessonIndexes.length > 1) {
+      var lessonPosition = 0;
+      for (var j = 0; j < lessonIndexes.length; j += 1) {
+        if (lessonIndexes[j] === safeActiveIndex) {
+          lessonPosition = j;
+          break;
+        }
+      }
+      progress = (lessonPosition + 1) / lessonIndexes.length;
+    }
+
+    if (!isFinite(progress)) {
+      progress = 0;
+    }
+    if (progress < 0) {
+      progress = 0;
+    } else if (progress > 1) {
+      progress = 1;
+    }
+
+    return {
+      totalSegments: INLINE_STORY_TOTAL_SEGMENTS,
+      currentSegment: currentSegment,
+      progress: progress,
+    };
+  }
+
+  function renderStoryProgress(progressRoot, totalSegments, currentSegment, progress) {
     if (!progressRoot) {
       return;
     }
 
     progressRoot.innerHTML = "";
 
-    for (var i = 0; i < stepsCount; i += 1) {
+    for (var i = 0; i < totalSegments; i += 1) {
       var segment = document.createElement("span");
       segment.className = "segw__story-progress-segment";
+      var fillWidth = "0%";
 
-      if (i < activeStepIndex) {
+      if (i < currentSegment) {
         segment.classList.add("is-done");
-      } else if (i === activeStepIndex) {
+        fillWidth = "100%";
+      } else if (i === currentSegment) {
         segment.classList.add("is-active");
+        fillWidth = String(Math.round(progress * 100)) + "%";
       }
 
       var fill = document.createElement("span");
       fill.className = "segw__story-progress-fill";
+      fill.style.width = fillWidth;
       segment.appendChild(fill);
       progressRoot.appendChild(segment);
     }
@@ -1657,8 +1844,13 @@
     var inlineState = state.inlineOnboarding;
     if (!inlineState.isActive || !inlineState.steps.length) {
       refs.onboarding.classList.add("is-hidden");
+      refs.onboarding.classList.remove("is-entering");
       if (refs.routePrep) {
         refs.routePrep.classList.add("is-hidden");
+        refs.routePrep.classList.remove("is-exiting");
+      }
+      if (refs.routePrepStart) {
+        refs.routePrepStart.disabled = false;
       }
       return;
     }
@@ -1666,6 +1858,7 @@
     if (refs.routePrep) {
       if (inlineState.awaitingStart && inlineState.payload) {
         refs.routePrep.classList.remove("is-hidden");
+        refs.routePrep.classList.toggle("is-exiting", inlineState.transitioningToLessons);
         if (refs.routePrepText) {
           refs.routePrepText.textContent =
             ROUTE_PREP_TEXT_BY_SEGMENT[inlineState.payload.segment] ||
@@ -1673,15 +1866,21 @@
         }
       } else {
         refs.routePrep.classList.add("is-hidden");
+        refs.routePrep.classList.remove("is-exiting");
       }
+    }
+    if (refs.routePrepStart) {
+      refs.routePrepStart.disabled = inlineState.transitioningToLessons;
     }
 
     if (inlineState.awaitingStart) {
       refs.onboarding.classList.add("is-hidden");
+      refs.onboarding.classList.remove("is-entering");
       return;
     }
 
     refs.onboarding.classList.remove("is-hidden");
+    refs.onboarding.classList.toggle("is-entering", inlineState.enteringLessons);
     var maxStepIndex = inlineState.steps.length - 1;
 
     if (inlineState.activeStepIndex < 0) {
@@ -1693,11 +1892,13 @@
     var activeStep = inlineState.steps[inlineState.activeStepIndex];
     var isLastStep = inlineState.activeStepIndex === maxStepIndex;
     var hasExternalLink = hasConfiguredExternalOnboarding() && Boolean(inlineState.targetRoute);
+    var progressState = getStoryProgressState(inlineState.steps, inlineState.activeStepIndex);
 
     renderStoryProgress(
       refs.storyProgress,
-      inlineState.steps.length,
-      inlineState.activeStepIndex,
+      progressState.totalSegments,
+      progressState.currentSegment,
+      progressState.progress,
     );
 
     if (refs.storyFrame && activeStep.gradient) {
@@ -1718,7 +1919,10 @@
 
     if (refs.onboardingCounter) {
       refs.onboardingCounter.textContent =
-        "Шаг " + String(inlineState.activeStepIndex + 1) + " из " + String(inlineState.steps.length);
+        "Урок " +
+        String(progressState.currentSegment + 1) +
+        " из " +
+        String(progressState.totalSegments);
     }
 
     if (refs.onboardingStepTitle) {
@@ -1766,7 +1970,7 @@
         refs.onboardingNextButton.textContent = "Пройдено";
         refs.onboardingNextButton.disabled = true;
       } else if (isLastStep) {
-        refs.onboardingNextButton.textContent = "Завершить урок";
+        refs.onboardingNextButton.textContent = "Завершить маршрут";
         refs.onboardingNextButton.disabled = false;
       } else {
         refs.onboardingNextButton.textContent = "Далее";
@@ -1942,6 +2146,8 @@
       inlineOnboarding: {
         isActive: false,
         awaitingStart: false,
+        transitioningToLessons: false,
+        enteringLessons: false,
         steps: [],
         activeStepIndex: 0,
         direction: 1,
@@ -1966,6 +2172,7 @@
       json: root.querySelector('[data-role="json"]'),
       routePrep: root.querySelector('[data-role="route-prep"]'),
       routePrepText: root.querySelector('[data-role="route-prep-text"]'),
+      routePrepStart: root.querySelector('[data-role="route-prep-start"]'),
       onboarding: root.querySelector('[data-role="onboarding"]'),
       storyFrame: root.querySelector('[data-role="story-frame"]'),
       storyProgress: root.querySelector('[data-role="story-progress"]'),
@@ -1999,20 +2206,47 @@
       var value = button.getAttribute("data-value");
 
       if (action === "start-inline-onboarding") {
-        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+        if (
+          !state.inlineOnboarding.isActive ||
+          !state.inlineOnboarding.steps.length ||
+          state.inlineOnboarding.transitioningToLessons
+        ) {
           return;
         }
 
-        state.inlineOnboarding.awaitingStart = false;
-        state.inlineOnboarding.direction = 1;
-        state.inlineOnboarding.activeStepIndex = 0;
+        state.inlineOnboarding.transitioningToLessons = true;
         render(root, refs, state);
 
-        if (refs.onboarding && typeof refs.onboarding.scrollIntoView === "function") {
+        setTimeout(function () {
+          if (
+            !state.inlineOnboarding.isActive ||
+            !state.inlineOnboarding.steps.length ||
+            !state.inlineOnboarding.transitioningToLessons
+          ) {
+            return;
+          }
+
+          state.inlineOnboarding.awaitingStart = false;
+          state.inlineOnboarding.transitioningToLessons = false;
+          state.inlineOnboarding.enteringLessons = true;
+          state.inlineOnboarding.direction = 1;
+          state.inlineOnboarding.activeStepIndex = 0;
+          render(root, refs, state);
+
+          if (refs.onboarding && typeof refs.onboarding.scrollIntoView === "function") {
+            setTimeout(function () {
+              refs.onboarding.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 30);
+          }
+
           setTimeout(function () {
-            refs.onboarding.scrollIntoView({ behavior: "smooth", block: "start" });
-          }, 30);
-        }
+            if (!state.inlineOnboarding.isActive) {
+              return;
+            }
+            state.inlineOnboarding.enteringLessons = false;
+            render(root, refs, state);
+          }, 350);
+        }, 300);
         return;
       } else if (action === "onboarding-prev") {
         if (
@@ -2347,7 +2581,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.13";
+  window.FinamSegmentationWidget.version = "1.0.14";
 
   ensureStyles();
   initExistingWidgets();
