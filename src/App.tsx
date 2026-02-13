@@ -64,7 +64,6 @@ function mapSegmentationToDosInput(payload: SegmentationPayload): DOSInput {
 
 function App() {
   const [mode, setMode] = useState<AppMode>("segmentation");
-  const [selectedClient, setSelectedClient] = useState<string>("custom");
   const [userId, setUserId] = useState<string>("demo-user-custom");
   const [onboardingInput, setOnboardingInput] = useState<DOSInput | null>(null);
   const [sessionKey, setSessionKey] = useState(0);
@@ -72,7 +71,6 @@ function App() {
 
   const startOnboarding = (input: DOSInput, source: string) => {
     setCompleted(false);
-    setSelectedClient(source);
     setOnboardingInput(input);
     setUserId(`demo-user-${source}-${Date.now()}`);
     setSessionKey((value) => value + 1);
