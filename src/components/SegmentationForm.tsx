@@ -120,7 +120,7 @@ const SEGMENT_PRESENTATION: Record<
   },
 };
 
-function getSteps(state: SegmentationState): SegmentationStepConfig[] {
+function getSteps(): SegmentationStepConfig[] {
   const steps: SegmentationStepConfig[] = [
     {
       id: "qualified",
@@ -128,18 +128,10 @@ function getSteps(state: SegmentationState): SegmentationStepConfig[] {
       subtitle: "Этот ответ влияет на глубину вашего персонального маршрута.",
       options: QUALIFIED_OPTIONS,
     },
-  ];
-
-  if (state.qualifiedInvestor === false) {
-    steps.push({
       id: "experience",
       title: "Какой у вас опыт инвестирования?",
       subtitle: "Оценим комфортную сложность первых шагов.",
       options: EXPERIENCE_OPTIONS,
-    });
-  }
-
-  steps.push(
     {
       id: "amount",
       title: "Какую сумму вы планируете инвестировать?",
@@ -159,7 +151,7 @@ function getSteps(state: SegmentationState): SegmentationStepConfig[] {
       options: INSTRUMENT_OPTIONS,
       multiple: true,
     },
-  );
+  ];
 
   return steps;
 }
@@ -191,8 +183,8 @@ function buildPayload(state: SegmentationState): SegmentationPayload | null {
 
   return {
     qualified_investor: state.qualifiedInvestor as boolean,
-    // For qualified users experience is hidden; keep a normalized value in the payload.
-    experience: state.experience ?? "more_5y",
+    // Keep payload normalized: qualified users are always sent as expert-level experience.
+    experience: state.qualifiedInvestor ? "more_5y" : (state.experience ?? "more_5y"),
     segment: state.segment,
     amount_tier: state.amountTier,
     investment_goal: state.goal,
@@ -216,7 +208,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
     trackEvent("segmentation_started");
   }, []);
 
-  const steps = useMemo(() => getSteps(state), [state]);
+  const steps = useMemo(() => getSteps(), []);
   const currentStep = steps[currentStepIndex];
 
   useEffect(() => {
