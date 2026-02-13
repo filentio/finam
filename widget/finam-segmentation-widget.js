@@ -608,6 +608,274 @@
   overflow-y: auto;
 }
 
+.segw__story-content.is-lesson {
+  justify-content: center;
+}
+
+.segw__story-content.is-quiz-mode {
+  justify-content: flex-start;
+  gap: 12px;
+  padding-top: 18px;
+}
+
+.segw__story-content.is-quiz-intro {
+  justify-content: center;
+}
+
+.segw__quiz-intro-emoji {
+  font-size: 64px;
+  line-height: 1;
+  text-align: center;
+  margin: 4px 0;
+  animation: segwQuizScaleIn var(--transition-slow) ease-out both;
+}
+
+.segw__quiz-intro-title {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(26px, 5.4vw, 32px);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.segw__quiz-intro-subtitle {
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.segw__quiz-benefits {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+}
+
+.segw__quiz-benefits-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.segw__quiz-benefits-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.segw__quiz-benefit-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  opacity: 0;
+  animation: segwQuizFadeIn var(--transition-base) ease-out forwards;
+}
+
+.segw__quiz-benefit-icon {
+  font-weight: 700;
+}
+
+.segw__quiz-question-block-title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.segw__quiz-question-title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.segw__quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: 6px;
+}
+
+.segw__quiz-options--horizontal {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.segw__quiz-option {
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: var(--text-base);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.segw__quiz-option:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.02);
+}
+
+.segw__quiz-option.is-selected {
+  background: #fff;
+  color: #667eea;
+  border-color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.segw__quiz-result-emoji {
+  font-size: 64px;
+  line-height: 1;
+  text-align: center;
+  margin: 4px 0;
+  animation: segwQuizScaleIn var(--transition-slow) ease-out both;
+}
+
+.segw__quiz-result-title {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(26px, 5.4vw, 32px);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.segw__quiz-result-badge {
+  border: 2px solid var(--quiz-profile-color, #4caf50);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  animation: segwQuizScaleIn var(--transition-base) ease-out;
+}
+
+.segw__quiz-result-badge-name {
+  margin: 0;
+  text-align: center;
+  font-size: var(--text-2xl);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.segw__quiz-result-description {
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: var(--text-base);
+}
+
+.segw__quiz-allocation-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.segw__quiz-allocation-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.segw__quiz-allocation-pie {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  animation: segwQuizPieIn 800ms ease-out both;
+}
+
+.segw__quiz-allocation-breakdown {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  animation: segwQuizFadeIn var(--transition-base) ease-out 220ms both;
+}
+
+.segw__quiz-allocation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px;
+}
+
+.segw__quiz-allocation-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.segw__quiz-allocation-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.segw__quiz-allocation-color.is-stocks {
+  background: #60a5fa;
+}
+
+.segw__quiz-allocation-color.is-bonds {
+  background: #34d399;
+}
+
+.segw__quiz-allocation-color.is-alt {
+  background: #fbbf24;
+}
+
+.segw__quiz-allocation-color.is-cash {
+  background: #c4b5fd;
+}
+
+.segw__quiz-allocation-value {
+  font-weight: 700;
+}
+
+@keyframes segwQuizFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes segwQuizScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes segwQuizPieIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .segw__story-content.is-enter-next {
   animation: segwStorySlideNext var(--transition-base);
 }
@@ -736,6 +1004,17 @@
   width: 100%;
   border: 0;
   min-height: 52px;
+}
+
+.segw__story-next.is-quiz-cta {
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  box-shadow: none;
+}
+
+.segw__story-next.is-quiz-cta:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .segw__story-next:disabled {
@@ -1055,12 +1334,7 @@
           </button>
         </div>
 
-        <div class="segw__story-content" data-role="story-content">
-          <div class="segw__story-emoji" data-role="onboarding-emoji">🚀</div>
-          <h3 class="segw__onboarding-step-title" data-role="onboarding-step-title">—</h3>
-          <p class="segw__onboarding-step-text" data-role="onboarding-step-text"></p>
-          <ul class="segw__onboarding-points" data-role="onboarding-step-points"></ul>
-        </div>
+        <div class="segw__story-content" data-role="story-content"></div>
 
         <p class="segw__onboarding-meta" data-role="onboarding-counter">Урок 1 из 6</p>
         <p class="segw__story-hint" data-role="onboarding-hint">
@@ -1154,6 +1428,300 @@
   };
 
   var INLINE_STORY_TOTAL_SEGMENTS = 6;
+  var QUIZ_TOTAL_SEGMENTS = 6;
+  var QUIZ_THEME_GRADIENT = "var(--gradient-lesson-1)";
+  var QUIZ_PROFILE_ORDER = ["conservative", "moderate", "aggressive", "ultra_aggressive"];
+  var QUIZ_PROFILE_PRESENTATION = {
+    conservative: {
+      name: "Консервативный",
+      emoji: "🛡️",
+      color: "#2196F3",
+      description: "Приоритет — сохранение капитала и стабильный доход.",
+    },
+    moderate: {
+      name: "Умеренный",
+      emoji: "⚖️",
+      color: "#4CAF50",
+      description: "Баланс между ростом и защитой капитала.",
+    },
+    aggressive: {
+      name: "Агрессивный",
+      emoji: "🚀",
+      color: "#FF9800",
+      description: "Приоритет — максимальный рост капитала.",
+    },
+    ultra_aggressive: {
+      name: "Сверхагрессивный",
+      emoji: "⚡",
+      color: "#F44336",
+      description: "Готовность к высоким рискам ради высокой доходности.",
+    },
+  };
+  var QUIZ_PROFILE_ALLOCATIONS = {
+    conservative: {
+      stocks_pct: 20,
+      bonds_pct: 65,
+      alternatives_pct: 5,
+      cash_pct: 10,
+    },
+    moderate: {
+      stocks_pct: 50,
+      bonds_pct: 40,
+      alternatives_pct: 5,
+      cash_pct: 5,
+    },
+    aggressive: {
+      stocks_pct: 75,
+      bonds_pct: 15,
+      alternatives_pct: 10,
+      cash_pct: 0,
+    },
+    ultra_aggressive: {
+      stocks_pct: 90,
+      bonds_pct: 0,
+      alternatives_pct: 10,
+      cash_pct: 0,
+    },
+  };
+  var QUIZ_EXPERIENCE_SCORE = {
+    none: 1,
+    less_1y: 2,
+    "1_3y": 3,
+    "3_5y": 3,
+    more_5y: 4,
+  };
+  var QUIZ_AMOUNT_SCORE = {
+    up_to_300k: 2,
+    "300k_2m": 3,
+    "2m_5m": 3,
+    more_5m: 4,
+  };
+  var QUIZ_GOAL_SCORE = {
+    preservation: 1,
+    purchase: 2,
+    passive_income: 2,
+    growth: 3,
+  };
+  var QUIZ_INSTRUMENT_SCORE = {
+    etf: 1,
+    stocks: 1,
+    bonds: 1,
+    trust_management: 0,
+    ipo: 1,
+    currency: 1,
+    structured: 2,
+    derivatives: 2,
+  };
+  var QUIZ_QUESTIONS = [
+    {
+      id: "Q5",
+      blockTitle: "Финансовое положение",
+      question:
+        "Есть ли у вас финансовая подушка безопасности (резерв на 3-6 месяцев расходов)?",
+      layout: "vertical",
+      options: [
+        { id: "a", text: "Нет, резерва нет", score: 1 },
+        { id: "b", text: "Да, на 1-3 месяца", score: 2 },
+        { id: "c", text: "Да, на 3-6 месяцев", score: 3 },
+        { id: "d", text: "Да, более чем на 6 месяцев", score: 4 },
+      ],
+    },
+    {
+      id: "Q6",
+      blockTitle: "Горизонт инвестирования",
+      question: "На какой срок вы планируете инвестировать?",
+      layout: "horizontal",
+      options: [
+        { id: "a", text: "Менее 1 года", score: 1 },
+        { id: "b", text: "1-3 года", score: 2 },
+        { id: "c", text: "3-5 лет", score: 3 },
+        { id: "d", text: "Более 5 лет", score: 4 },
+      ],
+    },
+    {
+      id: "Q7",
+      blockTitle: "Отношение к риску",
+      question: "Как вы оцениваете свое отношение к риску?",
+      layout: "vertical",
+      options: [
+        {
+          id: "a",
+          text: "Риски должны быть минимальными, я не готов(а) к потерям",
+          score: 1,
+        },
+        {
+          id: "b",
+          text: "Готов(а) к небольшим колебаниям ради умеренного дохода",
+          score: 2,
+        },
+        {
+          id: "c",
+          text: "Принимаю значительные колебания ради хорошей доходности",
+          score: 3,
+        },
+        {
+          id: "d",
+          text: "Готов(а) к существенным потерям ради максимальной доходности",
+          score: 4,
+        },
+      ],
+    },
+    {
+      id: "Q8",
+      blockTitle: "Поведение при падении",
+      question: "Представьте: за 3 месяца ваши инвестиции упали на 20%. Что вы сделаете?",
+      layout: "vertical",
+      options: [
+        { id: "a", text: "Продам все и переведу на вклад", score: 1 },
+        {
+          id: "b",
+          text: "Продам часть и переложу в более надежные инструменты",
+          score: 2,
+        },
+        { id: "c", text: "Подожду восстановления, ничего не буду делать", score: 3 },
+        { id: "d", text: "Докуплю подешевевшие активы", score: 4 },
+      ],
+    },
+  ];
+
+  function getQuizAnswer(inlineState, questionId) {
+    if (!inlineState || !inlineState.quizAnswers) {
+      return null;
+    }
+    return inlineState.quizAnswers[questionId] || null;
+  }
+
+  function scoreToRiskProfile(score) {
+    if (score <= 13) {
+      return "conservative";
+    }
+    if (score <= 19) {
+      return "moderate";
+    }
+    if (score <= 25) {
+      return "aggressive";
+    }
+    return "ultra_aggressive";
+  }
+
+  function selfAssessmentToRiskProfile(score) {
+    if (score <= 1) {
+      return "conservative";
+    }
+    if (score === 2) {
+      return "moderate";
+    }
+    if (score === 3) {
+      return "aggressive";
+    }
+    return "ultra_aggressive";
+  }
+
+  function capRiskProfile(rawProfile, capProfile) {
+    var rawIndex = QUIZ_PROFILE_ORDER.indexOf(rawProfile);
+    var capIndex = QUIZ_PROFILE_ORDER.indexOf(capProfile);
+
+    if (rawIndex === -1 || capIndex === -1) {
+      return "conservative";
+    }
+
+    return QUIZ_PROFILE_ORDER[Math.min(rawIndex, capIndex)];
+  }
+
+  function calculateInstrumentRiskScore(instruments) {
+    if (!Array.isArray(instruments) || !instruments.length) {
+      return 0;
+    }
+
+    var sum = 0;
+    for (var i = 0; i < instruments.length; i += 1) {
+      var instrument = instruments[i];
+      sum += QUIZ_INSTRUMENT_SCORE[instrument] || 0;
+    }
+
+    return Math.min(sum, 4);
+  }
+
+  function calculateInlineQuizResult(payload, quizAnswers) {
+    if (!payload) {
+      return null;
+    }
+
+    var answers = quizAnswers || {};
+    var q5 = answers.Q5 || null;
+    var q6 = answers.Q6 || null;
+    var q7 = answers.Q7 || null;
+    var q8 = answers.Q8 || null;
+    var totalScore =
+      (QUIZ_EXPERIENCE_SCORE[payload.experience] || 1) +
+      (QUIZ_AMOUNT_SCORE[payload.amount_tier] || 2) +
+      (QUIZ_GOAL_SCORE[payload.investment_goal] || 2) +
+      calculateInstrumentRiskScore(payload.instruments) +
+      (q5 ? q5.score : 0) +
+      (q6 ? q6.score : 0) +
+      (q7 ? q7.score : 0) +
+      (q8 ? q8.score : 0);
+    var rawProfile = scoreToRiskProfile(totalScore);
+    var selfCap = selfAssessmentToRiskProfile(q7 ? q7.score : 4);
+    var finalProfile = capRiskProfile(rawProfile, selfCap);
+
+    return {
+      total_score: totalScore,
+      raw_profile: rawProfile,
+      self_assessment_cap: selfCap,
+      final_profile: finalProfile,
+      allocation: QUIZ_PROFILE_ALLOCATIONS[finalProfile] || QUIZ_PROFILE_ALLOCATIONS.conservative,
+    };
+  }
+
+  function buildRiskQuizSteps() {
+    var steps = [
+      {
+        kind: "quiz_intro",
+        quizIndex: 0,
+        gradient: QUIZ_THEME_GRADIENT,
+        emoji: "🎯",
+        title: "Определим ваш риск-профиль",
+        subtitle: "Это займет всего 1 минуту и поможет подобрать подходящие инструменты.",
+        benefits: [
+          "Ваша готовность к риску",
+          "Рекомендуемая аллокация",
+          "Подходящие инструменты",
+        ],
+      },
+    ];
+
+    for (var i = 0; i < QUIZ_QUESTIONS.length; i += 1) {
+      steps.push({
+        kind: "quiz_question",
+        quizIndex: i + 1,
+        gradient: QUIZ_THEME_GRADIENT,
+        question: QUIZ_QUESTIONS[i],
+      });
+    }
+
+    steps.push({
+      kind: "quiz_result",
+      quizIndex: QUIZ_TOTAL_SEGMENTS - 1,
+      gradient: QUIZ_THEME_GRADIENT,
+      title: "Ваш риск-профиль определен",
+    });
+
+    return steps;
+  }
+
+  function insertRiskQuizSteps(segment, lessonSteps) {
+    var quizSteps = buildRiskQuizSteps();
+    if (!Array.isArray(lessonSteps) || !lessonSteps.length) {
+      return quizSteps;
+    }
+
+    if (segment === "expert") {
+      return quizSteps.concat(lessonSteps);
+    }
+
+    return lessonSteps.slice(0, 3).concat(quizSteps, lessonSteps.slice(3));
+  }
 
   function hasConfiguredExternalOnboarding() {
     return Boolean(
@@ -1491,6 +2059,7 @@
 
     function buildStep(lesson, emoji, title, text, hint, points) {
       return {
+        kind: "lesson",
         lesson: lesson,
         emoji: emoji,
         title: title,
@@ -1502,7 +2071,7 @@
     }
 
     if (payload.segment === "novice") {
-      return [
+      var noviceSteps = [
         buildStep(
           1,
           "🚀",
@@ -1570,10 +2139,12 @@
           ],
         ),
       ];
+
+      return insertRiskQuizSteps(payload.segment, noviceSteps);
     }
 
     if (payload.segment === "advanced") {
-      return [
+      var advancedSteps = [
         buildStep(
           1,
           "📊",
@@ -1641,9 +2212,11 @@
           ],
         ),
       ];
+
+      return insertRiskQuizSteps(payload.segment, advancedSteps);
     }
 
-    return [
+    var expertSteps = [
       buildStep(
         1,
         "🧠",
@@ -1711,6 +2284,8 @@
         ],
       ),
     ];
+
+    return insertRiskQuizSteps(payload.segment, expertSteps);
   }
 
   function resetInlineOnboardingState(state) {
@@ -1724,6 +2299,10 @@
     state.inlineOnboarding.completed = false;
     state.inlineOnboarding.payload = null;
     state.inlineOnboarding.targetRoute = "";
+    state.inlineOnboarding.quizAnswers = {};
+    state.inlineOnboarding.quizResult = null;
+    state.inlineOnboarding.quizStartedAt = 0;
+    state.inlineOnboarding.lastViewedStepKey = "";
   }
 
   function startInlineOnboardingFlow(state, payload, targetRoute) {
@@ -1737,6 +2316,10 @@
     state.inlineOnboarding.completed = false;
     state.inlineOnboarding.payload = payload;
     state.inlineOnboarding.targetRoute = targetRoute || "";
+    state.inlineOnboarding.quizAnswers = {};
+    state.inlineOnboarding.quizResult = null;
+    state.inlineOnboarding.quizStartedAt = 0;
+    state.inlineOnboarding.lastViewedStepKey = "";
   }
 
   function getStepLessonNumber(step, fallbackLesson) {
@@ -1769,6 +2352,22 @@
       safeActiveIndex = 0;
     } else if (safeActiveIndex > steps.length - 1) {
       safeActiveIndex = steps.length - 1;
+    }
+
+    var activeStep = steps[safeActiveIndex];
+    if (isQuizStep(activeStep)) {
+      var quizIndex = typeof activeStep.quizIndex === "number" ? activeStep.quizIndex : 0;
+      if (quizIndex < 0) {
+        quizIndex = 0;
+      } else if (quizIndex > QUIZ_TOTAL_SEGMENTS - 1) {
+        quizIndex = QUIZ_TOTAL_SEGMENTS - 1;
+      }
+
+      return {
+        totalSegments: QUIZ_TOTAL_SEGMENTS,
+        currentSegment: quizIndex,
+        progress: 1,
+      };
     }
 
     var activeLesson = getStepLessonNumber(steps[safeActiveIndex], safeActiveIndex + 1);
@@ -1836,6 +2435,243 @@
     }
   }
 
+  function isQuizStep(step) {
+    return Boolean(step && typeof step.kind === "string" && step.kind.indexOf("quiz_") === 0);
+  }
+
+  function createStoryNode(tagName, className, textContent) {
+    var node = document.createElement(tagName);
+    if (className) {
+      node.className = className;
+    }
+    if (typeof textContent === "string") {
+      node.textContent = textContent;
+    }
+    return node;
+  }
+
+  function renderStoryStepContent(contentRoot, step, inlineState) {
+    if (!contentRoot || !step) {
+      return;
+    }
+
+    contentRoot.innerHTML = "";
+    contentRoot.classList.remove(
+      "is-lesson",
+      "is-quiz-mode",
+      "is-quiz-intro",
+      "is-quiz-question",
+      "is-quiz-result",
+    );
+
+    if (step.kind === "quiz_intro") {
+      contentRoot.classList.add("is-quiz-mode", "is-quiz-intro");
+      var introEmoji = createStoryNode("div", "segw__quiz-intro-emoji", step.emoji || "🎯");
+      var introTitle = createStoryNode(
+        "h3",
+        "segw__quiz-intro-title",
+        step.title || "Определим ваш риск-профиль",
+      );
+      var introSubtitle = createStoryNode(
+        "p",
+        "segw__quiz-intro-subtitle",
+        step.subtitle ||
+          "Это займет всего 1 минуту и поможет подобрать подходящие инструменты.",
+      );
+      var benefitsCard = createStoryNode("section", "segw__quiz-benefits");
+      var benefitsTitle = createStoryNode("p", "segw__quiz-benefits-title", "Что мы узнаем:");
+      var benefitsList = createStoryNode("ul", "segw__quiz-benefits-list");
+      var benefits = Array.isArray(step.benefits) ? step.benefits : [];
+      for (var i = 0; i < benefits.length; i += 1) {
+        var benefitItem = createStoryNode("li", "segw__quiz-benefit-item");
+        benefitItem.style.animationDelay = String(100 + i * 100) + "ms";
+        var icon = createStoryNode("span", "segw__quiz-benefit-icon", "✓");
+        var text = createStoryNode("span", "segw__quiz-benefit-text", benefits[i]);
+        benefitItem.appendChild(icon);
+        benefitItem.appendChild(text);
+        benefitsList.appendChild(benefitItem);
+      }
+      benefitsCard.appendChild(benefitsTitle);
+      benefitsCard.appendChild(benefitsList);
+      contentRoot.appendChild(introEmoji);
+      contentRoot.appendChild(introTitle);
+      contentRoot.appendChild(introSubtitle);
+      contentRoot.appendChild(benefitsCard);
+      return;
+    }
+
+    if (step.kind === "quiz_question") {
+      contentRoot.classList.add("is-quiz-mode", "is-quiz-question");
+      var question = step.question || {};
+      var blockTitle = createStoryNode(
+        "p",
+        "segw__quiz-question-block-title",
+        question.blockTitle || "Анкета риск-профиля",
+      );
+      var questionTitle = createStoryNode(
+        "h3",
+        "segw__quiz-question-title",
+        question.question || "Выберите вариант ответа",
+      );
+      var optionsRoot = createStoryNode(
+        "div",
+        "segw__quiz-options" + (question.layout === "horizontal" ? " segw__quiz-options--horizontal" : ""),
+      );
+      var options = Array.isArray(question.options) ? question.options : [];
+      var selected = getQuizAnswer(inlineState, question.id);
+
+      for (var j = 0; j < options.length; j += 1) {
+        var option = options[j];
+        var optionButton = createStoryNode(
+          "button",
+          "segw__quiz-option" +
+            (selected && selected.selected_option === option.id ? " is-selected" : ""),
+          option.text,
+        );
+        optionButton.type = "button";
+        optionButton.setAttribute("data-action", "quiz-answer-select");
+        optionButton.setAttribute("data-question-id", question.id);
+        optionButton.setAttribute("data-option-id", option.id);
+        optionButton.setAttribute("data-option-score", String(option.score));
+        optionsRoot.appendChild(optionButton);
+      }
+
+      contentRoot.appendChild(blockTitle);
+      contentRoot.appendChild(questionTitle);
+      contentRoot.appendChild(optionsRoot);
+      return;
+    }
+
+    if (step.kind === "quiz_result") {
+      contentRoot.classList.add("is-quiz-mode", "is-quiz-result");
+      var resultEmoji = createStoryNode("div", "segw__quiz-result-emoji", "🎉");
+      var resultTitle = createStoryNode(
+        "h3",
+        "segw__quiz-result-title",
+        step.title || "Ваш риск-профиль определен",
+      );
+      var quizResult = inlineState.quizResult;
+      if (!quizResult) {
+        quizResult = calculateInlineQuizResult(inlineState.payload, inlineState.quizAnswers);
+        inlineState.quizResult = quizResult;
+      }
+
+      if (!quizResult) {
+        contentRoot.appendChild(resultEmoji);
+        contentRoot.appendChild(resultTitle);
+        contentRoot.appendChild(
+          createStoryNode(
+            "p",
+            "segw__quiz-result-description",
+            "Нужно ответить на вопросы анкеты, чтобы получить результат.",
+          ),
+        );
+        return;
+      }
+
+      var profile = QUIZ_PROFILE_PRESENTATION[quizResult.final_profile];
+      var allocation = quizResult.allocation || QUIZ_PROFILE_ALLOCATIONS.conservative;
+      var badge = createStoryNode("div", "segw__quiz-result-badge");
+      badge.style.setProperty("--quiz-profile-color", profile.color);
+      var badgeName = createStoryNode(
+        "p",
+        "segw__quiz-result-badge-name",
+        profile.emoji + " " + profile.name,
+      );
+      var description = createStoryNode("p", "segw__quiz-result-description", profile.description);
+      var allocationCard = createStoryNode("section", "segw__quiz-allocation-card");
+      var allocationTitle = createStoryNode(
+        "p",
+        "segw__quiz-allocation-title",
+        "Рекомендуемая аллокация",
+      );
+      var pie = createStoryNode("div", "segw__quiz-allocation-pie");
+      var stocks = allocation.stocks_pct || 0;
+      var bonds = allocation.bonds_pct || 0;
+      var alternatives = allocation.alternatives_pct || 0;
+      var cash = allocation.cash_pct || 0;
+      pie.style.background =
+        "conic-gradient(" +
+        "#60a5fa 0 " +
+        String(stocks) +
+        "%, " +
+        "#34d399 " +
+        String(stocks) +
+        "% " +
+        String(stocks + bonds) +
+        "%, " +
+        "#fbbf24 " +
+        String(stocks + bonds) +
+        "% " +
+        String(stocks + bonds + alternatives) +
+        "%, " +
+        "#c4b5fd " +
+        String(stocks + bonds + alternatives) +
+        "% " +
+        String(stocks + bonds + alternatives + cash) +
+        "%)";
+
+      var breakdown = createStoryNode("ul", "segw__quiz-allocation-breakdown");
+      var rows = [
+        { label: "Акции", value: stocks, colorClass: "is-stocks" },
+        { label: "Облигации", value: bonds, colorClass: "is-bonds" },
+        { label: "Альтернативы", value: alternatives, colorClass: "is-alt" },
+        { label: "Кэш", value: cash, colorClass: "is-cash" },
+      ];
+
+      for (var k = 0; k < rows.length; k += 1) {
+        var row = rows[k];
+        var rowNode = createStoryNode("li", "segw__quiz-allocation-item");
+        var rowLabel = createStoryNode("span", "segw__quiz-allocation-label");
+        var rowColor = createStoryNode(
+          "span",
+          "segw__quiz-allocation-color " + row.colorClass,
+        );
+        var rowText = createStoryNode("span", "", row.label);
+        var rowValue = createStoryNode(
+          "strong",
+          "segw__quiz-allocation-value",
+          String(row.value) + "%",
+        );
+        rowLabel.appendChild(rowColor);
+        rowLabel.appendChild(rowText);
+        rowNode.appendChild(rowLabel);
+        rowNode.appendChild(rowValue);
+        breakdown.appendChild(rowNode);
+      }
+
+      badge.appendChild(badgeName);
+      allocationCard.appendChild(allocationTitle);
+      allocationCard.appendChild(pie);
+      allocationCard.appendChild(breakdown);
+      contentRoot.appendChild(resultEmoji);
+      contentRoot.appendChild(resultTitle);
+      contentRoot.appendChild(badge);
+      contentRoot.appendChild(description);
+      contentRoot.appendChild(allocationCard);
+      return;
+    }
+
+    contentRoot.classList.add("is-lesson");
+    contentRoot.appendChild(createStoryNode("div", "segw__story-emoji", step.emoji || "📘"));
+    contentRoot.appendChild(
+      createStoryNode("h3", "segw__onboarding-step-title", step.title || "Персональный урок"),
+    );
+    contentRoot.appendChild(
+      createStoryNode(
+        "p",
+        "segw__onboarding-step-text",
+        step.text || "Подготовили персональный контент для этого шага.",
+      ),
+    );
+    var points = createStoryNode("ul", "segw__onboarding-points");
+    var stepPoints = Array.isArray(step.points) ? step.points : [];
+    for (var m = 0; m < stepPoints.length; m += 1) {
+      points.appendChild(createStoryNode("li", "segw__story-point", stepPoints[m]));
+    }
+    contentRoot.appendChild(points);
+  }
+
   function renderInlineOnboarding(refs, state) {
     if (!refs.onboarding) {
       return;
@@ -1893,6 +2729,46 @@
     var isLastStep = inlineState.activeStepIndex === maxStepIndex;
     var hasExternalLink = hasConfiguredExternalOnboarding() && Boolean(inlineState.targetRoute);
     var progressState = getStoryProgressState(inlineState.steps, inlineState.activeStepIndex);
+    var quizAnswer =
+      activeStep.kind === "quiz_question" && activeStep.question
+        ? getQuizAnswer(inlineState, activeStep.question.id)
+        : null;
+    var isQuiz = isQuizStep(activeStep);
+    var activeStepKey =
+      String(activeStep.kind || "lesson") +
+      ":" +
+      String(activeStep.question ? activeStep.question.id : inlineState.activeStepIndex);
+
+    if (inlineState.lastViewedStepKey !== activeStepKey) {
+      if (activeStep.kind === "quiz_intro" && inlineState.payload) {
+        if (!inlineState.quizStartedAt) {
+          inlineState.quizStartedAt = Date.now();
+          trackEvent("risk_quiz_started", {
+            segment: inlineState.payload.segment,
+            amount_tier: inlineState.payload.amount_tier,
+          });
+        }
+      } else if (activeStep.kind === "quiz_question" && activeStep.question) {
+        trackEvent("risk_quiz_question_viewed", {
+          question_id: activeStep.question.id,
+          screen_number: (activeStep.quizIndex || 0) + 1,
+        });
+      } else if (activeStep.kind === "quiz_result") {
+        if (!inlineState.quizResult) {
+          inlineState.quizResult = calculateInlineQuizResult(
+            inlineState.payload,
+            inlineState.quizAnswers,
+          );
+        }
+        if (inlineState.quizResult) {
+          trackEvent("risk_quiz_result_viewed", {
+            final_profile: inlineState.quizResult.final_profile,
+            allocation: inlineState.quizResult.allocation,
+          });
+        }
+      }
+      inlineState.lastViewedStepKey = activeStepKey;
+    }
 
     renderStoryProgress(
       refs.storyProgress,
@@ -1911,45 +2787,36 @@
       refs.storyContent.classList.add(
         inlineState.direction < 0 ? "is-enter-prev" : "is-enter-next",
       );
+      renderStoryStepContent(refs.storyContent, activeStep, inlineState);
     }
 
     if (refs.onboardingTitle && inlineState.payload) {
-      refs.onboardingTitle.textContent = ONBOARDING_PLAN_LABELS[inlineState.payload.segment];
+      refs.onboardingTitle.textContent = isQuiz
+        ? "Анкета риск-профиля"
+        : ONBOARDING_PLAN_LABELS[inlineState.payload.segment];
     }
 
     if (refs.onboardingCounter) {
-      refs.onboardingCounter.textContent =
-        "Урок " +
-        String(progressState.currentSegment + 1) +
-        " из " +
-        String(progressState.totalSegments);
-    }
-
-    if (refs.onboardingStepTitle) {
-      refs.onboardingStepTitle.textContent = activeStep.title;
-    }
-
-    if (refs.onboardingStepText) {
-      refs.onboardingStepText.textContent = activeStep.text;
-    }
-
-    if (refs.onboardingEmoji) {
-      refs.onboardingEmoji.textContent = activeStep.emoji || "📘";
+      if (isQuiz) {
+        refs.onboardingCounter.textContent =
+          String(progressState.currentSegment + 1) + "/" + String(progressState.totalSegments);
+      } else {
+        refs.onboardingCounter.textContent =
+          "Урок " +
+          String(progressState.currentSegment + 1) +
+          " из " +
+          String(progressState.totalSegments);
+      }
     }
 
     if (refs.onboardingHint) {
-      refs.onboardingHint.textContent =
-        activeStep.hint ||
-        "Тап по правой части — следующий экран, по левой — предыдущий.";
-    }
-
-    if (refs.onboardingStepPoints) {
-      refs.onboardingStepPoints.innerHTML = "";
-      for (var i = 0; i < activeStep.points.length; i += 1) {
-        var point = document.createElement("li");
-        point.className = "segw__story-point";
-        point.textContent = activeStep.points[i];
-        refs.onboardingStepPoints.appendChild(point);
+      if (isQuiz) {
+        refs.onboardingHint.classList.add("segw__is-hidden");
+      } else {
+        refs.onboardingHint.classList.remove("segw__is-hidden");
+        refs.onboardingHint.textContent =
+          activeStep.hint ||
+          "Тап по правой части — следующий экран, по левой — предыдущий.";
       }
     }
 
@@ -1958,7 +2825,7 @@
     }
 
     if (refs.onboardingNext) {
-      if (inlineState.completed) {
+      if (inlineState.completed || (activeStep.kind === "quiz_question" && !quizAnswer)) {
         refs.onboardingNext.disabled = true;
       } else {
         refs.onboardingNext.disabled = false;
@@ -1966,9 +2833,19 @@
     }
 
     if (refs.onboardingNextButton) {
+      refs.onboardingNextButton.classList.toggle("is-quiz-cta", isQuiz);
       if (inlineState.completed) {
         refs.onboardingNextButton.textContent = "Пройдено";
         refs.onboardingNextButton.disabled = true;
+      } else if (activeStep.kind === "quiz_intro") {
+        refs.onboardingNextButton.textContent = "Начать анкету →";
+        refs.onboardingNextButton.disabled = false;
+      } else if (activeStep.kind === "quiz_question") {
+        refs.onboardingNextButton.textContent = "Далее →";
+        refs.onboardingNextButton.disabled = !quizAnswer;
+      } else if (activeStep.kind === "quiz_result") {
+        refs.onboardingNextButton.textContent = "Продолжить обучение →";
+        refs.onboardingNextButton.disabled = false;
       } else if (isLastStep) {
         refs.onboardingNextButton.textContent = "Завершить маршрут";
         refs.onboardingNextButton.disabled = false;
@@ -2154,6 +3031,10 @@
         completed: false,
         payload: null,
         targetRoute: "",
+        quizAnswers: {},
+        quizResult: null,
+        quizStartedAt: 0,
+        lastViewedStepKey: "",
       },
     };
 
@@ -2179,10 +3060,6 @@
       storyContent: root.querySelector('[data-role="story-content"]'),
       onboardingTitle: root.querySelector('[data-role="onboarding-title"]'),
       onboardingCounter: root.querySelector('[data-role="onboarding-counter"]'),
-      onboardingEmoji: root.querySelector('[data-role="onboarding-emoji"]'),
-      onboardingStepTitle: root.querySelector('[data-role="onboarding-step-title"]'),
-      onboardingStepText: root.querySelector('[data-role="onboarding-step-text"]'),
-      onboardingStepPoints: root.querySelector('[data-role="onboarding-step-points"]'),
       onboardingHint: root.querySelector('[data-role="onboarding-hint"]'),
       onboardingPrev: root.querySelector('[data-action="onboarding-prev"]'),
       onboardingNext: root.querySelector('[data-action="onboarding-next"]'),
@@ -2248,6 +3125,41 @@
           }, 350);
         }, 300);
         return;
+      } else if (action === "quiz-answer-select") {
+        if (
+          !state.inlineOnboarding.isActive ||
+          state.inlineOnboarding.awaitingStart ||
+          !state.inlineOnboarding.steps.length
+        ) {
+          return;
+        }
+
+        var activeQuizStep = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (!activeQuizStep || activeQuizStep.kind !== "quiz_question" || !activeQuizStep.question) {
+          return;
+        }
+
+        var questionId = button.getAttribute("data-question-id");
+        var optionId = button.getAttribute("data-option-id");
+        var optionScore = Number(button.getAttribute("data-option-score"));
+        if (!questionId || !optionId || !isFinite(optionScore)) {
+          return;
+        }
+
+        state.inlineOnboarding.quizAnswers[questionId] = {
+          question_id: questionId,
+          selected_option: optionId,
+          score: optionScore,
+        };
+        state.inlineOnboarding.quizResult = null;
+
+        trackEvent("risk_quiz_answer_selected", {
+          question_id: questionId,
+          selected_option: optionId,
+          score: optionScore,
+        });
+        render(root, refs, state);
+        return;
       } else if (action === "onboarding-prev") {
         if (
           !state.inlineOnboarding.isActive ||
@@ -2277,6 +3189,60 @@
         }
 
         state.inlineOnboarding.direction = 1;
+        var activeInlineStep = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (activeInlineStep) {
+          if (activeInlineStep.kind === "quiz_intro") {
+            trackEvent("risk_quiz_intro_completed");
+          } else if (activeInlineStep.kind === "quiz_question" && activeInlineStep.question) {
+            var activeAnswer = getQuizAnswer(state.inlineOnboarding, activeInlineStep.question.id);
+            if (!activeAnswer) {
+              render(root, refs, state);
+              return;
+            }
+
+            trackEvent("risk_quiz_answer_submitted", {
+              question_id: activeInlineStep.question.id,
+              selected_option: activeAnswer.selected_option,
+              score: activeAnswer.score,
+            });
+
+            if (activeInlineStep.question.id === "Q8") {
+              state.inlineOnboarding.quizResult = calculateInlineQuizResult(
+                state.inlineOnboarding.payload,
+                state.inlineOnboarding.quizAnswers,
+              );
+              if (state.inlineOnboarding.quizResult) {
+                var elapsedSec = 0;
+                if (state.inlineOnboarding.quizStartedAt) {
+                  elapsedSec = Math.max(
+                    0,
+                    Math.round((Date.now() - state.inlineOnboarding.quizStartedAt) / 1000),
+                  );
+                }
+                trackEvent("risk_quiz_completed", {
+                  total_score: state.inlineOnboarding.quizResult.total_score,
+                  raw_profile: state.inlineOnboarding.quizResult.raw_profile,
+                  final_profile: state.inlineOnboarding.quizResult.final_profile,
+                  total_time_sec: elapsedSec,
+                });
+              }
+            }
+          } else if (activeInlineStep.kind === "quiz_result") {
+            var resultForContinue =
+              state.inlineOnboarding.quizResult ||
+              calculateInlineQuizResult(
+                state.inlineOnboarding.payload,
+                state.inlineOnboarding.quizAnswers,
+              );
+            if (resultForContinue) {
+              state.inlineOnboarding.quizResult = resultForContinue;
+              trackEvent("risk_quiz_continue_clicked", {
+                final_profile: resultForContinue.final_profile,
+              });
+            }
+          }
+        }
+
         var lastIndex = state.inlineOnboarding.steps.length - 1;
         if (state.inlineOnboarding.activeStepIndex < lastIndex) {
           state.inlineOnboarding.activeStepIndex += 1;
@@ -2581,7 +3547,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.14";
+  window.FinamSegmentationWidget.version = "1.0.15";
 
   ensureStyles();
   initExistingWidgets();

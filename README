@@ -113,6 +113,9 @@ Notes:
 - Перед stories показывается transition-экран:
   "Мы подобрали для вас персональный маршрут" -> "Начать обучение" с плавным переходом.
 - Внутри inline stories рендерятся полноценные уроки (6 экранов с контентом и практическими пунктами).
+- В inline-флоу добавлена stories-анкета риск-профиля:
+  intro + Q5–Q8 + result (6 сегментов), отдельный quiz-прогресс, результат с аллокацией и
+  analytics-события `risk_quiz_*`.
 - To force external redirect mode, set `data-onboarding-mode="external"`.
 - If `data-onboarding-mode="auto"`, widget switches to external only when onboarding URLs are configured.
 - In external mode fallback uses a safe hash navigation
