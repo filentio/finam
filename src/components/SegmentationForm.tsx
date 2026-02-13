@@ -128,10 +128,12 @@ function getSteps(): SegmentationStepConfig[] {
       subtitle: "Этот ответ влияет на глубину вашего персонального маршрута.",
       options: QUALIFIED_OPTIONS,
     },
+    {
       id: "experience",
       title: "Какой у вас опыт инвестирования?",
       subtitle: "Оценим комфортную сложность первых шагов.",
       options: EXPERIENCE_OPTIONS,
+    },
     {
       id: "amount",
       title: "Какую сумму вы планируете инвестировать?",
