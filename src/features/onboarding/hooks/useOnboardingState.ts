@@ -54,13 +54,13 @@ function getSpecialScreens(stepType: StepType): ScreenConfig[] {
     return [
       {
         screen_id: "risk_intro",
-        type: "quiz_intro",
+        type: "quiz_intro" as const,
         title: "Определим ваш риск-профиль",
         subtitle: "Это займёт всего 1 минуту и поможет подобрать подходящие инструменты.",
       },
       ...RISK_QUIZ_QUESTIONS.map((question, index) => ({
         screen_id: `risk_q${index + 5}`,
-        type: "quiz",
+        type: "quiz" as const,
         title: question.question,
         subtitle: question.screen_config.progress_label,
       })),
