@@ -337,6 +337,311 @@
   filter: grayscale(0.15);
 }
 
+.segw__questionnaire {
+  margin-top: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.segw__seg-story-frame {
+  width: 100%;
+  max-width: 430px;
+  min-height: 932px;
+  height: 932px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.25);
+}
+
+.segw__seg-story-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+}
+
+.segw__seg-story-close {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.segw__seg-story-close:hover {
+  opacity: 0.8;
+}
+
+.segw__seg-story-counter {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.segw__seg-story-progress {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px 8px;
+}
+
+.segw__seg-story-progress-segment {
+  height: 4px;
+  flex: 1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background-color var(--transition-base);
+}
+
+.segw__seg-story-progress-segment.is-done {
+  background: #fff;
+}
+
+.segw__seg-story-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.segw__seg-story-content.is-enter-next {
+  animation: segwSegSlideNext var(--transition-base);
+}
+
+.segw__seg-story-content.is-enter-prev {
+  animation: segwSegSlidePrev var(--transition-base);
+}
+
+@keyframes segwSegSlideNext {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes segwSegSlidePrev {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.segw__seg-intro {
+  margin: auto 0;
+  text-align: center;
+}
+
+.segw__seg-intro-emoji,
+.segw__seg-result-emoji {
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 18px;
+}
+
+.segw__seg-intro-title,
+.segw__seg-result-title {
+  margin: 0 0 12px;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.segw__seg-intro-subtitle {
+  margin: 0 0 20px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.segw__seg-intro-card,
+.segw__seg-result-card {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(8px);
+  padding: 18px;
+}
+
+.segw__seg-benefits {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.segw__seg-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+
+.segw__seg-intro-time {
+  margin: 0 0 18px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+}
+
+.segw__seg-question {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.segw__seg-block-title {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.segw__seg-question-title {
+  margin: 0 0 14px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.segw__seg-question-subtitle {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 14px;
+}
+
+.segw__seg-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.segw__seg-option {
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  min-height: 56px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.segw__seg-option:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.segw__seg-option.is-selected {
+  background: #fff;
+  color: #4facfe;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
+}
+
+.segw__seg-option-check {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.segw__seg-story-footer {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 24px 24px;
+  background: linear-gradient(to top, rgba(0, 107, 235, 0.22), rgba(0, 107, 235, 0));
+}
+
+.segw__seg-story-next,
+.segw__seg-cta {
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  min-height: 52px;
+  padding: 0 18px;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all var(--transition-base);
+}
+
+.segw__seg-story-next:hover,
+.segw__seg-cta:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.segw__seg-story-next:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+.segw__seg-result {
+  margin: auto 0;
+  text-align: center;
+}
+
+.segw__seg-result-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.segw__seg-result-description {
+  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  text-align: center;
+}
+
+.segw__seg-track {
+  text-align: left;
+}
+
+.segw__seg-track h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.segw__seg-track-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 .segw__questionnaire.is-hidden {
   display: none;
 }
@@ -1121,17 +1426,16 @@
 }
 
 @media (max-width: 720px) {
-  .segw__grid {
-    grid-template-columns: 1fr;
+  .segw__questionnaire {
+    padding: 0;
   }
 
-  .segw__submit {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .segw__continue {
-    width: 100%;
+  .segw__seg-story-frame {
+    max-width: none;
+    min-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .segw__story-wrapper {
@@ -1163,149 +1467,36 @@
 
   var WIDGET_HTML = `
 <div data-segmentation-widget class="segw">
-  <header class="segw__header">
-    <p class="segw__eyebrow">DOC → Segment Engine</p>
-    <h2>Анкета сегментации клиента</h2>
-    <p class="segw__description">
-      Заполните анкету, чтобы получить персональный маршрут онбординга.
-    </p>
-  </header>
-
   <div class="segw__questionnaire" data-role="questionnaire">
-  <section class="segw__section">
-    <h3 class="segw__title">Являетесь ли вы квалифицированным инвестором?</h3>
-    <div class="segw__grid">
-      <button type="button" class="segw__option" data-action="qualified" data-value="true">
-        Да <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="qualified" data-value="false">
-        Нет <span class="segw__option-mark">○</span>
-      </button>
-    </div>
-  </section>
+    <article class="segw__seg-story-frame">
+      <header class="segw__seg-story-header">
+        <button
+          type="button"
+          class="segw__seg-story-close"
+          data-action="seg-reset"
+          aria-label="Сбросить анкету"
+        >
+          ×
+        </button>
+        <span class="segw__seg-story-counter" data-role="seg-counter">1/7</span>
+      </header>
 
-  <section class="segw__section segw__experience" data-role="experience-section">
-    <h3 class="segw__title">Какой у вас опыт инвестирования?</h3>
-    <div class="segw__grid">
-      <button type="button" class="segw__option" data-action="experience" data-value="none">
-        Нет опыта <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="experience" data-value="less_1y">
-        Менее 1 года <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="experience" data-value="1_3y">
-        1–3 года <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="experience" data-value="3_5y">
-        3–5 лет <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option segw__option--wide" data-action="experience" data-value="more_5y">
-        Более 5 лет <span class="segw__option-mark">○</span>
-      </button>
-    </div>
-  </section>
+      <div class="segw__seg-story-progress" data-role="seg-progress"></div>
+      <div class="segw__seg-story-content" data-role="seg-content"></div>
 
-  <section class="segw__section">
-    <h3 class="segw__title">Какую сумму вы планируете инвестировать?</h3>
-    <div class="segw__grid">
-      <button type="button" class="segw__option" data-action="amount" data-value="up_to_300k">
-        До 300 000 ₽ <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="amount" data-value="300k_2m">
-        300 000 – 2 млн ₽ <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="amount" data-value="2m_5m">
-        2 – 5 млн ₽ <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="amount" data-value="more_5m">
-        Более 5 млн ₽ <span class="segw__option-mark">○</span>
-      </button>
-    </div>
-  </section>
-
-  <section class="segw__section">
-    <h3 class="segw__title">Ваша главная цель инвестирования</h3>
-    <div class="segw__grid">
-      <button type="button" class="segw__option" data-action="goal" data-value="purchase">
-        Накопление <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="goal" data-value="passive_income">
-        Пассивный доход <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="goal" data-value="growth">
-        Рост капитала <span class="segw__option-mark">○</span>
-      </button>
-      <button type="button" class="segw__option" data-action="goal" data-value="preservation">
-        Сохранение <span class="segw__option-mark">○</span>
-      </button>
-    </div>
-  </section>
-
-  <section class="segw__section">
-    <h3 class="segw__title">Какие инструменты вам интересны?</h3>
-    <p class="segw__hint">Можно выбрать несколько вариантов.</p>
-    <div class="segw__grid">
-      <button type="button" class="segw__option" data-action="instrument" data-value="etf">
-        ETF <span class="segw__option-mark">□</span>
-      </button>
-      <button type="button" class="segw__option" data-action="instrument" data-value="stocks">
-        Акции <span class="segw__option-mark">□</span>
-      </button>
-      <button type="button" class="segw__option" data-action="instrument" data-value="bonds">
-        Облигации <span class="segw__option-mark">□</span>
-      </button>
-      <button type="button" class="segw__option" data-action="instrument" data-value="trust_management">
-        Доверительное управление <span class="segw__option-mark">□</span>
-      </button>
-      <button type="button" class="segw__option" data-action="instrument" data-value="ipo">
-        IPO <span class="segw__option-mark">□</span>
-      </button>
-      <button type="button" class="segw__option" data-action="instrument" data-value="currency">
-        Валюта <span class="segw__option-mark">□</span>
-      </button>
-    </div>
-  </section>
-
-  <section class="segw__submit">
-    <div class="segw__segment">
-      <span>Сегмент:</span>
-      <strong class="segw__segment-chip" data-role="segment-chip">не определён</strong>
-    </div>
-    <button type="button" class="segw__continue segw__btn-primary" data-action="continue" disabled>
-      Получить персональный маршрут
-    </button>
-  </section>
+      <footer class="segw__seg-story-footer" data-role="seg-footer">
+        <button
+          type="button"
+          class="segw__seg-story-next"
+          data-action="seg-next"
+          data-role="seg-next"
+          disabled
+        >
+          Далее →
+        </button>
+      </footer>
+    </article>
   </div>
-
-  <section class="segw__result is-hidden" data-role="result">
-    <div class="segw__tariff">
-      <p class="segw__tariff-caption">Ваш маршрут онбординга</p>
-      <h3 class="segw__tariff-title" data-role="plan-title">—</h3>
-      <ul class="segw__tariff-list">
-        <li>
-          <span class="segw__label">Сегмент</span>
-          <span class="segw__value" data-role="segment-value">—</span>
-        </li>
-        <li>
-          <span class="segw__label">Сумма</span>
-          <span class="segw__value" data-role="amount-value">—</span>
-        </li>
-        <li>
-          <span class="segw__label">Цель</span>
-          <span class="segw__value" data-role="goal-value">—</span>
-        </li>
-        <li>
-          <span class="segw__label">Инструменты</span>
-          <span class="segw__value" data-role="instruments-value">—</span>
-        </li>
-      </ul>
-      <a href="#" class="segw__route" data-role="route-link">Перейти к онбордингу</a>
-      <details class="segw__json">
-        <summary>Показать JSON payload</summary>
-        <pre data-role="json"></pre>
-      </details>
-    </div>
-  </section>
 
   <section class="segw__route-prep is-hidden" data-role="route-prep">
     <div class="segw__route-prep-card">
@@ -1405,14 +1596,103 @@
 
   var SEGMENT_LABELS = {
     novice: "Новичок",
-    advanced: "Продвинутый",
-    expert: "Эксперт",
+    advanced: "Обучающийся",
+    expert: "Квалифицированный инвестор",
   };
 
   var ONBOARDING_PLAN_LABELS = {
     novice: "Полный курс",
     advanced: "Сокращённый курс",
     expert: "Минимальный маршрут + анкета риска",
+  };
+
+  var SEGMENTATION_TOTAL_SEGMENTS = 7;
+  var SEGMENTATION_STORY_ORDER = ["qualified", "experience", "amount", "goal", "instruments"];
+  var SEGMENTATION_STORY_STEPS = {
+    qualified: {
+      action: "qualified",
+      blockTitle: "Статус инвестора",
+      title: "Являетесь ли вы квалифицированным инвестором?",
+      subtitle: "",
+      multiple: false,
+      options: [
+        { value: "true", label: "Да, являюсь квалифицированным инвестором" },
+        { value: "false", label: "Нет, не являюсь квалифицированным инвестором" },
+      ],
+    },
+    experience: {
+      action: "experience",
+      blockTitle: "Опыт инвестирования",
+      title: "Какой у вас опыт инвестирования?",
+      subtitle: "",
+      multiple: false,
+      options: [
+        { value: "none", label: "Нет опыта" },
+        { value: "less_1y", label: "Менее 1 года" },
+        { value: "1_3y", label: "1-3 года" },
+        { value: "3_5y", label: "3-5 лет" },
+        { value: "more_5y", label: "Более 5 лет" },
+      ],
+    },
+    amount: {
+      action: "amount",
+      blockTitle: "Инвестиционный капитал",
+      title: "Какую сумму вы планируете инвестировать?",
+      subtitle: "",
+      multiple: false,
+      options: [
+        { value: "up_to_300k", label: "До 300 000 ₽" },
+        { value: "300k_2m", label: "300 000 - 2 млн ₽" },
+        { value: "2m_5m", label: "2 - 5 млн ₽" },
+        { value: "more_5m", label: "Более 5 млн ₽" },
+      ],
+    },
+    goal: {
+      action: "goal",
+      blockTitle: "Цель инвестирования",
+      title: "Ваша главная инвестиционная цель",
+      subtitle: "",
+      multiple: false,
+      options: [
+        { value: "purchase", label: "Накопление" },
+        { value: "passive_income", label: "Пассивный доход" },
+        { value: "growth", label: "Рост капитала" },
+        { value: "preservation", label: "Сохранение" },
+      ],
+    },
+    instruments: {
+      action: "instrument",
+      blockTitle: "Интересующие инструменты",
+      title: "Какие инструменты вам интересны?",
+      subtitle: "Можно выбрать несколько вариантов.",
+      multiple: true,
+      options: [
+        { value: "etf", label: "ETF" },
+        { value: "stocks", label: "Акции" },
+        { value: "bonds", label: "Облигации" },
+        { value: "trust_management", label: "Доверительное управление" },
+        { value: "ipo", label: "IPO" },
+        { value: "currency", label: "Валюта" },
+      ],
+    },
+  };
+
+  var SEGMENTATION_RESULT_META = {
+    novice: {
+      emoji: "🌱",
+      title: "Новичок",
+      track: ["6 уроков", "Анкета риска", "Первая покупка"],
+    },
+    advanced: {
+      emoji: "🚀",
+      title: "Обучающийся",
+      track: ["3 урока", "Анкета риска", "Первая покупка"],
+    },
+    expert: {
+      emoji: "⚡",
+      title: "Квалифицированный инвестор",
+      track: ["Анкета риска", "Персональные рекомендации", "Первая покупка"],
+    },
   };
 
   var ROUTE_PREP_TEXT_BY_SEGMENT = {
@@ -1995,12 +2275,239 @@
 
     return {
       qualified_investor: state.qualifiedInvestor,
-      experience: state.experience || "more_5y",
+      experience: state.qualifiedInvestor ? "more_5y" : state.experience || "more_5y",
       segment: state.segment,
       amount_tier: state.amountTier,
       investment_goal: state.goal,
       instruments: state.instruments.slice(),
     };
+  }
+
+  function isSegmentationStepAnswered(state, stepId) {
+    if (stepId === "qualified") {
+      return state.qualifiedInvestor !== null;
+    }
+    if (stepId === "experience") {
+      return state.experience !== null;
+    }
+    if (stepId === "amount") {
+      return state.amountTier !== null;
+    }
+    if (stepId === "goal") {
+      return state.goal !== null;
+    }
+    return Array.isArray(state.instruments) && state.instruments.length > 0;
+  }
+
+  function isSegmentationOptionSelected(state, stepId, optionValue) {
+    if (stepId === "qualified") {
+      return String(state.qualifiedInvestor) === optionValue;
+    }
+    if (stepId === "experience") {
+      return state.experience === optionValue;
+    }
+    if (stepId === "amount") {
+      return state.amountTier === optionValue;
+    }
+    if (stepId === "goal") {
+      return state.goal === optionValue;
+    }
+    return state.instruments.indexOf(optionValue) !== -1;
+  }
+
+  function getSegmentationProgressIndex(state) {
+    var flow = state.segmentationFlow;
+    if (flow.resultPayload) {
+      return SEGMENTATION_TOTAL_SEGMENTS - 1;
+    }
+    if (flow.stepIndex < 0) {
+      return 0;
+    }
+    var index = flow.stepIndex + 1;
+    if (index < 0) {
+      return 0;
+    }
+    if (index > SEGMENTATION_TOTAL_SEGMENTS - 1) {
+      return SEGMENTATION_TOTAL_SEGMENTS - 1;
+    }
+    return index;
+  }
+
+  function renderSegmentationProgress(progressRoot, progressIndex) {
+    if (!progressRoot) {
+      return;
+    }
+
+    progressRoot.innerHTML = "";
+    for (var i = 0; i < SEGMENTATION_TOTAL_SEGMENTS; i += 1) {
+      var segment = document.createElement("span");
+      segment.className = "segw__seg-story-progress-segment";
+      if (i <= progressIndex) {
+        segment.classList.add("is-done");
+      }
+      progressRoot.appendChild(segment);
+    }
+  }
+
+  function renderSegmentationStory(refs, state) {
+    if (!refs.segContent || !refs.segCounter || !refs.segProgress) {
+      return;
+    }
+
+    var flow = state.segmentationFlow;
+    var progressIndex = getSegmentationProgressIndex(state);
+    refs.segCounter.textContent = String(progressIndex + 1) + "/" + String(SEGMENTATION_TOTAL_SEGMENTS);
+    renderSegmentationProgress(refs.segProgress, progressIndex);
+
+    var isQuestionScreen =
+      !flow.resultPayload && flow.stepIndex >= 0 && flow.stepIndex < SEGMENTATION_STORY_ORDER.length;
+
+    if (refs.segFooter) {
+      if (isQuestionScreen) {
+        refs.segFooter.classList.remove("segw__is-hidden");
+      } else {
+        refs.segFooter.classList.add("segw__is-hidden");
+      }
+    }
+
+    if (refs.segNextButton) {
+      if (isQuestionScreen) {
+        var activeStepId = SEGMENTATION_STORY_ORDER[flow.stepIndex];
+        refs.segNextButton.disabled = !isSegmentationStepAnswered(state, activeStepId);
+      } else {
+        refs.segNextButton.disabled = true;
+      }
+      refs.segNextButton.textContent = "Далее →";
+    }
+
+    refs.segContent.innerHTML = "";
+    refs.segContent.classList.remove(
+      "is-enter-next",
+      "is-enter-prev",
+      "is-intro",
+      "is-question",
+      "is-result",
+    );
+    refs.segContent.classList.add(flow.direction >= 0 ? "is-enter-next" : "is-enter-prev");
+
+    if (flow.resultPayload) {
+      refs.segContent.classList.add("is-result");
+      var resultMeta =
+        SEGMENTATION_RESULT_META[flow.resultPayload.segment] || SEGMENTATION_RESULT_META.novice;
+
+      var resultWrap = createStoryNode("section", "segw__seg-result");
+      resultWrap.appendChild(createStoryNode("div", "segw__seg-result-emoji", "🎉"));
+      resultWrap.appendChild(createStoryNode("h3", "segw__seg-result-title", "Ваш путь определён"));
+
+      var resultCard = createStoryNode("div", "segw__seg-result-card");
+      var resultBadge = createStoryNode("div", "segw__seg-result-badge");
+      resultBadge.appendChild(createStoryNode("span", "", resultMeta.emoji || "🌱"));
+      resultBadge.appendChild(createStoryNode("span", "", resultMeta.title || "Новичок"));
+      resultCard.appendChild(resultBadge);
+      resultCard.appendChild(
+        createStoryNode(
+          "p",
+          "segw__seg-result-description",
+          "Мы подготовили для вас пошаговую программу обучения",
+        ),
+      );
+
+      var track = createStoryNode("div", "segw__seg-track");
+      track.appendChild(createStoryNode("h3", "", "Что вас ждёт:"));
+      var items = Array.isArray(resultMeta.track) ? resultMeta.track : [];
+      for (var t = 0; t < items.length; t += 1) {
+        var row = createStoryNode("div", "segw__seg-track-item");
+        row.appendChild(createStoryNode("span", "", t === 0 ? "📚" : t === 1 ? "🎯" : "💼"));
+        row.appendChild(createStoryNode("span", "", items[t]));
+        track.appendChild(row);
+      }
+      resultCard.appendChild(track);
+      resultWrap.appendChild(resultCard);
+
+      var startButton = createStoryNode("button", "segw__seg-cta", "Начать обучение →");
+      startButton.type = "button";
+      startButton.setAttribute("data-action", "seg-start-onboarding");
+      resultWrap.appendChild(startButton);
+      refs.segContent.appendChild(resultWrap);
+      return;
+    }
+
+    if (flow.stepIndex < 0) {
+      refs.segContent.classList.add("is-intro");
+      var introWrap = createStoryNode("section", "segw__seg-intro");
+      introWrap.appendChild(createStoryNode("div", "segw__seg-intro-emoji", "👋"));
+      introWrap.appendChild(createStoryNode("h3", "segw__seg-intro-title", "Добро пожаловать!"));
+      introWrap.appendChild(
+        createStoryNode(
+          "p",
+          "segw__seg-intro-subtitle",
+          "Ответьте на 5 вопросов, чтобы мы подобрали для вас подходящий путь обучения",
+        ),
+      );
+
+      var introCard = createStoryNode("div", "segw__seg-intro-card");
+      var benefits = createStoryNode("ul", "segw__seg-benefits");
+      var benefitItems = [
+        "Определим ваш опыт",
+        "Подберём уроки",
+        "Порекомендуем инструменты",
+      ];
+      for (var b = 0; b < benefitItems.length; b += 1) {
+        var benefit = createStoryNode("li");
+        benefit.appendChild(createStoryNode("span", "", "✓"));
+        benefit.appendChild(createStoryNode("span", "", benefitItems[b]));
+        benefits.appendChild(benefit);
+      }
+      introCard.appendChild(benefits);
+      introWrap.appendChild(introCard);
+      introWrap.appendChild(createStoryNode("p", "segw__seg-intro-time", "Это займёт 2 минуты"));
+
+      var introButton = createStoryNode("button", "segw__seg-cta", "Начать →");
+      introButton.type = "button";
+      introButton.setAttribute("data-action", "seg-next");
+      introWrap.appendChild(introButton);
+      refs.segContent.appendChild(introWrap);
+      return;
+    }
+
+    var stepId = SEGMENTATION_STORY_ORDER[flow.stepIndex];
+    var stepConfig = SEGMENTATION_STORY_STEPS[stepId];
+    if (!stepConfig) {
+      return;
+    }
+
+    refs.segContent.classList.add("is-question");
+    var questionWrap = createStoryNode("section", "segw__seg-question");
+    questionWrap.appendChild(createStoryNode("p", "segw__seg-block-title", stepConfig.blockTitle));
+    questionWrap.appendChild(createStoryNode("h3", "segw__seg-question-title", stepConfig.title));
+    if (stepConfig.subtitle) {
+      questionWrap.appendChild(createStoryNode("p", "segw__seg-question-subtitle", stepConfig.subtitle));
+    }
+
+    var optionsWrap = createStoryNode("div", "segw__seg-options");
+    var options = Array.isArray(stepConfig.options) ? stepConfig.options : [];
+    for (var o = 0; o < options.length; o += 1) {
+      var option = options[o];
+      var isSelected = isSegmentationOptionSelected(state, stepId, option.value);
+      var optionButton = createStoryNode("button", "segw__seg-option");
+      optionButton.type = "button";
+      optionButton.setAttribute("data-action", stepConfig.action);
+      optionButton.setAttribute("data-value", option.value);
+      if (isSelected) {
+        optionButton.classList.add("is-selected");
+      }
+
+      if (stepConfig.multiple) {
+        optionButton.appendChild(
+          createStoryNode("span", "segw__seg-option-check", isSelected ? "✓" : "☐"),
+        );
+      }
+
+      optionButton.appendChild(createStoryNode("span", "", option.label));
+      optionsWrap.appendChild(optionButton);
+    }
+    questionWrap.appendChild(optionsWrap);
+    refs.segContent.appendChild(questionWrap);
   }
 
   function getInstrumentLabelList(instruments) {
@@ -2923,30 +3430,6 @@
   }
 
   function render(root, refs, state) {
-    var showExperience = state.qualifiedInvestor === false;
-
-    if (refs.experienceSection) {
-      if (showExperience) {
-        refs.experienceSection.classList.add("is-open");
-      } else {
-        refs.experienceSection.classList.remove("is-open");
-      }
-    }
-
-    if (refs.segmentChip) {
-      if (state.segment) {
-        refs.segmentChip.textContent = SEGMENT_LABELS[state.segment];
-        refs.segmentChip.classList.add("is-active");
-      } else {
-        refs.segmentChip.textContent = "не определён";
-        refs.segmentChip.classList.remove("is-active");
-      }
-    }
-
-    if (refs.continueButton) {
-      refs.continueButton.disabled = !canContinue(state);
-    }
-
     if (refs.questionnaire) {
       if (state.inlineOnboarding.isActive) {
         refs.questionnaire.classList.add("is-hidden");
@@ -2955,8 +3438,11 @@
       }
     }
 
+    if (!state.inlineOnboarding.isActive) {
+      renderSegmentationStory(refs, state);
+    }
+
     renderInlineOnboarding(refs, state);
-    updateOptionStates(root, state);
   }
 
   function showTariffCard(refs, payload, targetRoute, options) {
@@ -3020,6 +3506,13 @@
       goal: null,
       instruments: [],
       segment: null,
+      segmentationFlow: {
+        stepIndex: -1,
+        direction: 1,
+        resultPayload: null,
+        targetRoute: "",
+        inlineMode: true,
+      },
       inlineOnboarding: {
         isActive: false,
         awaitingStart: false,
@@ -3040,9 +3533,11 @@
 
     var refs = {
       questionnaire: root.querySelector('[data-role="questionnaire"]'),
-      experienceSection: root.querySelector('[data-role="experience-section"]'),
-      segmentChip: root.querySelector('[data-role="segment-chip"]'),
-      continueButton: root.querySelector('[data-action="continue"]'),
+      segCounter: root.querySelector('[data-role="seg-counter"]'),
+      segProgress: root.querySelector('[data-role="seg-progress"]'),
+      segContent: root.querySelector('[data-role="seg-content"]'),
+      segFooter: root.querySelector('[data-role="seg-footer"]'),
+      segNextButton: root.querySelector('[data-role="seg-next"]'),
       result: root.querySelector('[data-role="result"]'),
       planTitle: root.querySelector('[data-role="plan-title"]'),
       segmentValue: root.querySelector('[data-role="segment-value"]'),
@@ -3082,7 +3577,118 @@
       var action = button.getAttribute("data-action");
       var value = button.getAttribute("data-value");
 
-      if (action === "start-inline-onboarding") {
+      if (action === "seg-reset") {
+        state.qualifiedInvestor = null;
+        state.experience = null;
+        state.amountTier = null;
+        state.goal = null;
+        state.instruments = [];
+        state.segment = null;
+        state.segmentationFlow.stepIndex = -1;
+        state.segmentationFlow.direction = -1;
+        state.segmentationFlow.resultPayload = null;
+        state.segmentationFlow.targetRoute = "";
+        state.segmentationFlow.inlineMode = true;
+        resetInlineOnboardingState(state);
+        if (refs.result) {
+          refs.result.classList.add("is-hidden");
+        }
+        trackEvent("segmentation_edit_started");
+        render(root, refs, state);
+        return;
+      } else if (action === "seg-next") {
+        if (state.inlineOnboarding.isActive) {
+          return;
+        }
+
+        state.segmentationFlow.direction = 1;
+        if (state.segmentationFlow.stepIndex < 0) {
+          state.segmentationFlow.stepIndex = 0;
+          render(root, refs, state);
+          return;
+        }
+
+        var activeStepId = SEGMENTATION_STORY_ORDER[state.segmentationFlow.stepIndex];
+        if (!isSegmentationStepAnswered(state, activeStepId)) {
+          render(root, refs, state);
+          return;
+        }
+
+        var isLastQuestion = state.segmentationFlow.stepIndex === SEGMENTATION_STORY_ORDER.length - 1;
+        if (!isLastQuestion) {
+          state.segmentationFlow.stepIndex += 1;
+          render(root, refs, state);
+          return;
+        }
+
+        var payload = buildPayload(state);
+        if (!payload) {
+          render(root, refs, state);
+          return;
+        }
+
+        trackEvent("segmentation_completed", {
+          segment: payload.segment,
+          amount_tier: payload.amount_tier,
+        });
+        trackEvent("segment_" + payload.segment, {
+          amount_tier: payload.amount_tier,
+        });
+
+        var inlineMode = shouldUseInlineOnboarding();
+        var targetRoute = navigateToOnboarding(payload.segment, payload.amount_tier, {
+          skipNavigation: true,
+        });
+
+        state.segmentationFlow.resultPayload = payload;
+        state.segmentationFlow.targetRoute = targetRoute;
+        state.segmentationFlow.inlineMode = inlineMode;
+        state.segmentationFlow.stepIndex = SEGMENTATION_STORY_ORDER.length;
+
+        safeInvokeComplete(payload);
+        root.dispatchEvent(
+          new CustomEvent("segmentation:completed", {
+            detail: {
+              payload: payload,
+              targetRoute: targetRoute,
+            },
+          }),
+        );
+
+        render(root, refs, state);
+        return;
+      } else if (action === "seg-start-onboarding") {
+        var resultPayload = state.segmentationFlow.resultPayload;
+        if (!resultPayload) {
+          return;
+        }
+
+        if (state.segmentationFlow.inlineMode) {
+          startInlineOnboardingFlow(
+            state,
+            resultPayload,
+            state.segmentationFlow.targetRoute || "",
+          );
+          trackEvent("inline_onboarding_started", {
+            segment: resultPayload.segment,
+            amount_tier: resultPayload.amount_tier,
+          });
+
+          var scrollTarget = refs.routePrep || refs.onboarding;
+          if (scrollTarget && typeof scrollTarget.scrollIntoView === "function") {
+            setTimeout(function () {
+              scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 30);
+          }
+          render(root, refs, state);
+          return;
+        }
+
+        navigateToOnboarding(resultPayload.segment, resultPayload.amount_tier, {
+          skipNavigation: false,
+        });
+        return;
+      } else if (action === "start-inline-onboarding") {
         if (
           !state.inlineOnboarding.isActive ||
           !state.inlineOnboarding.steps.length ||
@@ -3260,6 +3866,11 @@
         return;
       } else if (action === "restart-segmentation") {
         resetInlineOnboardingState(state);
+        state.segmentationFlow.resultPayload = null;
+        state.segmentationFlow.targetRoute = "";
+        state.segmentationFlow.inlineMode = true;
+        state.segmentationFlow.direction = -1;
+        state.segmentationFlow.stepIndex = 0;
         if (refs.result) {
           refs.result.classList.add("is-hidden");
         }
@@ -3547,7 +4158,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.15";
+  window.FinamSegmentationWidget.version = "1.0.16";
 
   ensureStyles();
   initExistingWidgets();
