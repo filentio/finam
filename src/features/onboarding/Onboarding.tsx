@@ -37,12 +37,12 @@ interface OnboardingProps {
 const OWN_CTA_SCREEN_TYPES = new Set<ScreenConfig["type"]>(["quiz", "cta"]);
 
 const LESSON_BACKGROUNDS: Record<string, string> = {
-  lesson_1: "linear-gradient(180deg, rgba(217, 119, 6, 0.9) 0%, #1a1a1a 100%)",
-  lesson_2: "linear-gradient(180deg, rgba(220, 38, 38, 0.9) 0%, #1a1a1a 100%)",
-  lesson_3: "linear-gradient(180deg, rgba(79, 70, 229, 0.9) 0%, #1a1a1a 100%)",
-  lesson_4: "linear-gradient(180deg, rgba(20, 184, 166, 0.9) 0%, #1a1a1a 100%)",
-  lesson_5: "linear-gradient(180deg, rgba(30, 64, 175, 0.9) 0%, #1a1a1a 100%)",
-  lesson_6: "linear-gradient(180deg, rgba(124, 58, 237, 0.9) 0%, #1a1a1a 100%)",
+  lesson_1: "var(--gradient-lesson-1)",
+  lesson_2: "var(--gradient-lesson-2)",
+  lesson_3: "var(--gradient-lesson-3)",
+  lesson_4: "var(--gradient-lesson-4)",
+  lesson_5: "var(--gradient-lesson-5)",
+  lesson_6: "var(--gradient-lesson-6)",
 };
 
 const STEP_BACKGROUNDS: Record<StepType, string> = {
@@ -405,7 +405,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
               <div className="ob-route-prep__icon">⏸️</div>
               <h2>Обучение на паузе</h2>
               <p>Продолжим с того же места, где вы остановились.</p>
-              <button type="button" onClick={() => dispatch({ type: "RESUME" })}>
+              <button type="button" className="btn-primary" onClick={() => dispatch({ type: "RESUME" })}>
                 Продолжить
               </button>
             </section>

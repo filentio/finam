@@ -1,0 +1,108 @@
+.btn-primary {
+  background: var(--finam-primary);
+  color: var(--text-inverse);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--finam-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+  transform: scale(0.985);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.btn-secondary:hover {
+  border-color: #cbd5e1;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+.choice-card {
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.choice-card:hover {
+  border-color: #cbd5e1;
+  background: var(--bg-elevated);
+}
+
+.choice-card.selected {
+  border-color: var(--finam-primary);
+  background: rgba(26, 86, 219, 0.05);
+  box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+}
+
+.choice-card .radio-indicator {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-soft);
+  border-radius: 50%;
+  position: relative;
+  transition: all var(--transition-base);
+  flex: 0 0 auto;
+}
+
+.choice-card.selected .radio-indicator {
+  border-color: var(--finam-primary);
+  background: var(--finam-primary);
+}
+
+.choice-card.selected .radio-indicator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.choice-card--multiple .radio-indicator {
+  border-radius: 6px;
+}
+
+.choice-card--multiple.selected .radio-indicator::after {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+

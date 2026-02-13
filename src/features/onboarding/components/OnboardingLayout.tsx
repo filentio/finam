@@ -108,7 +108,7 @@ export function OnboardingLayout({
             <footer className="ob-layout-footer">
               <button
                 type="button"
-                className={`ob-layout-next ${emphasizeNext ? "ob-layout-next--glow" : ""}`}
+                className={`ob-layout-next btn-primary ${emphasizeNext ? "ob-layout-next--glow" : ""}`}
                 onClick={onNext}
                 disabled={nextDisabled}
               >

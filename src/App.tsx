@@ -3,6 +3,8 @@ import { SegmentationForm } from "./components/SegmentationForm";
 import { Onboarding } from "./features/onboarding/Onboarding";
 import type { DOSInput } from "./features/onboarding/types/onboarding";
 import type { SegmentationPayload } from "./types/segmentation";
+import "./styles/tokens.css";
+import "./styles/components.css";
 
 type AppMode = "segmentation" | "onboarding";
 

@@ -359,13 +359,18 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
               <button
                 key={option.value}
                 type="button"
-                className={`seg-story__option ${
-                  isOptionSelected(currentStep.id, option.value) ? "is-selected" : ""
+                className={`seg-story__option choice-card ${
+                  currentStep.multiple ? "choice-card--multiple" : ""
+                } ${
+                  isOptionSelected(currentStep.id, option.value) ? "is-selected selected" : ""
                 }`}
                 onClick={() => handleStepValueChange(currentStep.id, option.value)}
               >
-                <span>{option.label}</span>
-                {option.hint ? <small>{option.hint}</small> : null}
+                <span className="radio-indicator" aria-hidden="true" />
+                <span className="seg-story__option-content">
+                  <span>{option.label}</span>
+                  {option.hint ? <small>{option.hint}</small> : null}
+                </span>
               </button>
             ))}
           </div>
@@ -375,7 +380,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
       <footer className="seg-story__footer">
         <button
           type="button"
-          className="seg-story__back"
+          className="seg-story__back btn-secondary"
           onClick={handlePrev}
           disabled={currentStepIndex === 0}
         >
@@ -383,7 +388,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
         </button>
         <button
           type="button"
-          className="seg-story__next"
+          className="seg-story__next btn-primary"
           disabled={nextDisabled || (!canContinue && currentStepIndex === steps.length - 1)}
           onClick={handleNext}
         >

@@ -21,7 +21,7 @@ export function RoutePreparationScreen({ segment, onStart }: RoutePreparationScr
       </div>
       <h2>Мы подобрали для вас персональный маршрут</h2>
       <p>{SEGMENT_DESCRIPTION[segment]}</p>
-      <button type="button" onClick={onStart}>
+      <button type="button" className="btn-primary" onClick={onStart}>
         Начать обучение
       </button>
     </section>
