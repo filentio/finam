@@ -1299,6 +1299,216 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.segw__lesson1-screen {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.segw__lesson1-screen--hero,
+.segw__lesson1-screen--cta {
+  min-height: 100%;
+  align-content: center;
+}
+
+.segw__lesson1-emoji {
+  font-size: 58px;
+  line-height: 1;
+  text-align: center;
+}
+
+.segw__lesson1-title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.segw__lesson1-subtitle,
+.segw__lesson1-body {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.segw__lesson1-subtitle {
+  text-align: center;
+}
+
+.segw__lesson1-visual {
+  min-height: 124px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14px;
+}
+
+.segw__lesson1-visual-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.segw__lesson1-highlight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: rgba(76, 175, 80, 0.24);
+  border: 1px solid rgba(76, 175, 80, 0.6);
+}
+
+.segw__lesson1-highlight-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #4caf50;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.segw__lesson1-highlight-text {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.segw__lesson1-step-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.segw__lesson1-step-card {
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: segwQuizFadeIn 300ms ease both;
+}
+
+.segw__lesson1-step-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.segw__lesson1-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.segw__lesson1-step-emoji {
+  font-size: 18px;
+}
+
+.segw__lesson1-step-title {
+  font-size: 16px;
+}
+
+.segw__lesson1-step-description {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.segw__lesson1-cards-scroller {
+  display: grid;
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.segw__lesson1-instrument-card {
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.segw__lesson1-instrument-card.is-highlighted {
+  border-color: rgba(245, 166, 35, 0.9);
+  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.28);
+}
+
+.segw__lesson1-instrument-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.segw__lesson1-badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(245, 166, 35, 0.22);
+  border: 1px solid rgba(245, 166, 35, 0.72);
+}
+
+.segw__lesson1-instrument-description {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.segw__lesson1-instrument-risk {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.segw__lesson1-goal-accent {
+  margin-top: 4px;
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.segw__lesson1-cta-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.segw__lesson1-cta {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 14px;
+  border: 0;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segw__lesson1-cta--primary {
+  background: #f5a623;
+  color: #1f2937;
+}
+
+.segw__lesson1-cta--secondary {
+  background: rgba(255, 255, 255, 0.26);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
 .segw__onboarding-meta {
   position: relative;
   z-index: 6;
@@ -1546,22 +1756,6 @@
       </footer>
     </article>
   </div>
-
-  <section class="segw__route-prep is-hidden" data-role="route-prep">
-    <div class="segw__route-prep-card">
-      <div class="segw__route-prep-icon" aria-hidden="true">✨</div>
-      <h3 class="segw__route-prep-title">Мы подобрали для вас персональный маршрут</h3>
-      <p class="segw__route-prep-text" data-role="route-prep-text">Готовим программу обучения...</p>
-      <button
-        type="button"
-        class="segw__btn-primary"
-        data-action="start-inline-onboarding"
-        data-role="route-prep-start"
-      >
-        Начать обучение
-      </button>
-    </div>
-  </section>
 
   <section class="segw__onboarding is-hidden" data-role="onboarding">
     <div class="segw__story-wrapper">
@@ -2055,7 +2249,23 @@
       return quizSteps.concat(lessonSteps);
     }
 
-    return lessonSteps.slice(0, 3).concat(quizSteps, lessonSteps.slice(3));
+    var insertAfterIndex = -1;
+    for (var i = 0; i < lessonSteps.length; i += 1) {
+      var lessonValue = lessonSteps[i] && typeof lessonSteps[i].lesson === "number"
+        ? lessonSteps[i].lesson
+        : null;
+      if (lessonValue !== null && lessonValue <= 3) {
+        insertAfterIndex = i;
+      }
+    }
+
+    if (insertAfterIndex === -1) {
+      return lessonSteps.concat(quizSteps);
+    }
+
+    return lessonSteps
+      .slice(0, insertAfterIndex + 1)
+      .concat(quizSteps, lessonSteps.slice(insertAfterIndex + 1));
   }
 
   function hasConfiguredExternalOnboarding() {
@@ -2646,18 +2856,155 @@
     }
 
     if (payload.segment === "novice") {
+      var mythByAmount = {
+        up_to_300k: {
+          text:
+            "Даже с 10 000 ₽ можно купить первые бумаги. Многие успешные инвесторы начинали с небольших сумм и постепенно наращивали портфель.",
+          highlight: "10 000 ₽ — достаточно для старта",
+        },
+        "300k_2m": {
+          text:
+            "С вашей суммой можно сразу собрать диверсифицированный портфель из нескольких инструментов. Это отличная стартовая позиция.",
+          highlight: "Ваша сумма позволяет сразу диверсифицировать",
+        },
+        "2m_5m": {
+          text:
+            "Ваш капитал открывает доступ ко всем основным стратегиям: от консервативных облигаций до доверительного управления.",
+          highlight: "Все основные стратегии доступны",
+        },
+        more_5m: {
+          text:
+            "С вашим капиталом доступны все стратегии, включая индивидуальные решения и персонального менеджера.",
+          highlight: "Включая индивидуальные стратегии и ДУ",
+        },
+      };
+      var mythContent = mythByAmount[payload.amount_tier] || mythByAmount.up_to_300k;
+
+      var firstStepByAmount = {
+        up_to_300k: "Начните с комфортной суммы — от 10 000 ₽",
+        "300k_2m": "Переведите сумму, с которой хотите начать",
+        "2m_5m": "Переведите часть запланированной суммы",
+        more_5m: "Переведите первый транш для формирования портфеля",
+      };
+      var firstStepText = firstStepByAmount[payload.amount_tier] || firstStepByAmount.up_to_300k;
+
+      var goalAccentByGoal = {
+        purchase:
+          "Для накопления на покупку лучше всего подходят облигации — предсказуемый доход к нужной дате.",
+        passive_income:
+          "Для пассивного дохода обратите внимание на дивидендные акции и купонные облигации.",
+        growth: "Для роста капитала основной инструмент — акции и ETF на индексы.",
+        preservation:
+          "Для сохранения капитала подойдут ОФЗ и фонды облигаций — защита от инфляции.",
+      };
+      var goalAccent = goalAccentByGoal[payload.investment_goal] || goalAccentByGoal.growth;
+
+      var lessonOneCards = [
+        {
+          id: "stocks",
+          name: "Акции",
+          description: "Доли в компаниях. Могут расти в цене и платить дивиденды.",
+          risk_label: "🔴 Высокий",
+          highlighted: payload.instruments.indexOf("stocks") !== -1,
+        },
+        {
+          id: "bonds",
+          name: "Облигации",
+          description: "Долговые бумаги. Предсказуемый доход, низкий риск.",
+          risk_label: "🟢 Низкий",
+          highlighted: payload.instruments.indexOf("bonds") !== -1,
+        },
+        {
+          id: "etf",
+          name: "Фонды (ETF)",
+          description: "Готовые корзины из десятков бумаг. Диверсификация в одной покупке.",
+          risk_label: "🟡 Средний",
+          highlighted: payload.instruments.indexOf("etf") !== -1,
+        },
+        {
+          id: "currency",
+          name: "Валюта",
+          description: "Покупка долларов, евро и юаней на бирже по выгодному курсу.",
+          risk_label: "🟡 Средний",
+          highlighted: payload.instruments.indexOf("currency") !== -1,
+        },
+      ];
+
       var noviceSteps = [
-        buildStep(
-          1,
-          "🚀",
-          "Урок 1. Старт под вашу цель",
-          "Формируем безопасный старт под цель \"" + goalLabel + "\" и бюджет " + amountLabel + ".",
-          "Начинаем с фундамента и первого действия.",
-          [
-            "Определяем первый шаг без перегруза.",
-            "Собираем базовый план на первые 7 дней.",
+        {
+          kind: "lesson1_hero",
+          lesson: 1,
+          screen_id: "screen_1_1",
+          screen_number: 1,
+          gradient: "var(--gradient-lesson-1)",
+          emoji: "🚀",
+          title: "Инвестировать проще, чем кажется",
+          subtitle:
+            "Вы уже сделали первый шаг — открыли счёт. Теперь давайте разберёмся, что дальше.",
+          illustration_alt: "Путь от точки А к точке Б",
+          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
+        },
+        {
+          kind: "lesson1_myth",
+          lesson: 1,
+          screen_id: "screen_1_2",
+          screen_number: 2,
+          gradient: "var(--gradient-lesson-1)",
+          title: "Миф: нужны миллионы",
+          text: mythContent.text,
+          highlight: mythContent.highlight,
+          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
+        },
+        {
+          kind: "lesson1_steps",
+          lesson: 1,
+          screen_id: "screen_1_3",
+          screen_number: 3,
+          gradient: "var(--gradient-lesson-1)",
+          title: "Три шага к первой инвестиции",
+          steps: [
+            {
+              number: 1,
+              emoji: "💳",
+              title: "Пополните счёт",
+              description: firstStepText,
+            },
+            {
+              number: 2,
+              emoji: "🔍",
+              title: "Выберите инструмент",
+              description: "Мы поможем подобрать подходящий — после обучения",
+            },
+            {
+              number: 3,
+              emoji: "🛒",
+              title: "Купите",
+              description: "Одно нажатие — и вы инвестор",
+            },
           ],
-        ),
+          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
+        },
+        {
+          kind: "lesson1_cards",
+          lesson: 1,
+          screen_id: "screen_1_4",
+          screen_number: 4,
+          gradient: "var(--gradient-lesson-1)",
+          title: "Что можно купить?",
+          subtitle: "Основные классы активов на бирже",
+          cards: lessonOneCards,
+          goal_accent: goalAccent,
+          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
+        },
+        {
+          kind: "lesson1_cta",
+          lesson: 1,
+          screen_id: "screen_1_5",
+          screen_number: 5,
+          gradient: "var(--gradient-lesson-1)",
+          title: "Готовы начать?",
+          deeplink: "finamtrade://deposit",
+        },
         buildStep(
           2,
           "🛡️",
@@ -2878,11 +3225,13 @@
     state.inlineOnboarding.quizResult = null;
     state.inlineOnboarding.quizStartedAt = 0;
     state.inlineOnboarding.lastViewedStepKey = "";
+    state.inlineOnboarding.lesson1StartedAt = 0;
+    state.inlineOnboarding.lesson1Completed = false;
   }
 
   function startInlineOnboardingFlow(state, payload, targetRoute) {
     state.inlineOnboarding.isActive = true;
-    state.inlineOnboarding.awaitingStart = true;
+    state.inlineOnboarding.awaitingStart = false;
     state.inlineOnboarding.transitioningToLessons = false;
     state.inlineOnboarding.enteringLessons = false;
     state.inlineOnboarding.steps = buildInlineOnboardingSteps(payload);
@@ -2895,6 +3244,8 @@
     state.inlineOnboarding.quizResult = null;
     state.inlineOnboarding.quizStartedAt = 0;
     state.inlineOnboarding.lastViewedStepKey = "";
+    state.inlineOnboarding.lesson1StartedAt = 0;
+    state.inlineOnboarding.lesson1Completed = false;
   }
 
   function getStepLessonNumber(step, fallbackLesson) {
@@ -3033,6 +3384,7 @@
     contentRoot.innerHTML = "";
     contentRoot.classList.remove(
       "is-lesson",
+      "is-lesson1",
       "is-quiz-mode",
       "is-quiz-intro",
       "is-quiz-question",
@@ -3227,6 +3579,164 @@
       return;
     }
 
+    if (step.kind === "lesson1_hero") {
+      contentRoot.classList.add("is-lesson", "is-lesson1");
+      var heroRoot = createStoryNode("section", "segw__lesson1-screen segw__lesson1-screen--hero");
+      heroRoot.appendChild(createStoryNode("div", "segw__lesson1-emoji", step.emoji || "🚀"));
+      heroRoot.appendChild(
+        createStoryNode(
+          "h3",
+          "segw__lesson1-title",
+          step.title || "Инвестировать проще, чем кажется",
+        ),
+      );
+      heroRoot.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson1-subtitle",
+          step.subtitle ||
+            "Вы уже сделали первый шаг — открыли счёт. Теперь давайте разберёмся, что дальше.",
+        ),
+      );
+      var heroVisual = createStoryNode("div", "segw__lesson1-visual");
+      heroVisual.appendChild(
+        createStoryNode("span", "segw__lesson1-visual-text", step.illustration_alt || "Путь к цели"),
+      );
+      heroRoot.appendChild(heroVisual);
+      contentRoot.appendChild(heroRoot);
+      return;
+    }
+
+    if (step.kind === "lesson1_myth") {
+      contentRoot.classList.add("is-lesson", "is-lesson1");
+      var mythRoot = createStoryNode("section", "segw__lesson1-screen");
+      mythRoot.appendChild(
+        createStoryNode("h3", "segw__lesson1-title", step.title || "Миф: нужны миллионы"),
+      );
+      mythRoot.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson1-body",
+          step.text || "Начать можно с комфортной суммы и двигаться шаг за шагом.",
+        ),
+      );
+      var highlight = createStoryNode("div", "segw__lesson1-highlight");
+      highlight.appendChild(createStoryNode("span", "segw__lesson1-highlight-icon", "✓"));
+      highlight.appendChild(
+        createStoryNode("span", "segw__lesson1-highlight-text", step.highlight || "Старт возможен уже сейчас"),
+      );
+      mythRoot.appendChild(highlight);
+      var mythVisual = createStoryNode("div", "segw__lesson1-visual");
+      mythVisual.appendChild(
+        createStoryNode("span", "segw__lesson1-visual-text", "Миф перечёркнут, реальность с галочкой"),
+      );
+      mythRoot.appendChild(mythVisual);
+      contentRoot.appendChild(mythRoot);
+      return;
+    }
+
+    if (step.kind === "lesson1_steps") {
+      contentRoot.classList.add("is-lesson", "is-lesson1");
+      var stepsRoot = createStoryNode("section", "segw__lesson1-screen");
+      stepsRoot.appendChild(
+        createStoryNode("h3", "segw__lesson1-title", step.title || "Три шага к первой инвестиции"),
+      );
+      var stepCards = createStoryNode("div", "segw__lesson1-step-cards");
+      var flowSteps = Array.isArray(step.steps) ? step.steps : [];
+      for (var s = 0; s < flowSteps.length; s += 1) {
+        var item = flowSteps[s];
+        var card = createStoryNode("article", "segw__lesson1-step-card");
+        card.style.animationDelay = String(s * 150) + "ms";
+        var head = createStoryNode("div", "segw__lesson1-step-head");
+        head.appendChild(createStoryNode("span", "segw__lesson1-step-num", String(item.number || s + 1)));
+        head.appendChild(createStoryNode("span", "segw__lesson1-step-emoji", item.emoji || "•"));
+        head.appendChild(createStoryNode("strong", "segw__lesson1-step-title", item.title || "Шаг"));
+        card.appendChild(head);
+        card.appendChild(
+          createStoryNode(
+            "p",
+            "segw__lesson1-step-description",
+            item.description || "Описание шага",
+          ),
+        );
+        stepCards.appendChild(card);
+      }
+      stepsRoot.appendChild(stepCards);
+      contentRoot.appendChild(stepsRoot);
+      return;
+    }
+
+    if (step.kind === "lesson1_cards") {
+      contentRoot.classList.add("is-lesson", "is-lesson1");
+      var cardsRoot = createStoryNode("section", "segw__lesson1-screen");
+      cardsRoot.appendChild(createStoryNode("h3", "segw__lesson1-title", step.title || "Что можно купить?"));
+      cardsRoot.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson1-subtitle",
+          step.subtitle || "Основные классы активов на бирже",
+        ),
+      );
+
+      var cardsScroller = createStoryNode("div", "segw__lesson1-cards-scroller");
+      var cards = Array.isArray(step.cards) ? step.cards : [];
+      for (var c = 0; c < cards.length; c += 1) {
+        var cardData = cards[c];
+        var instrumentCard = createStoryNode(
+          "article",
+          "segw__lesson1-instrument-card" + (cardData.highlighted ? " is-highlighted" : ""),
+        );
+        var cardHead = createStoryNode("div", "segw__lesson1-instrument-head");
+        cardHead.appendChild(createStoryNode("strong", "", cardData.name || "Инструмент"));
+        if (cardData.highlighted) {
+          cardHead.appendChild(createStoryNode("span", "segw__lesson1-badge", "Вас интересует"));
+        }
+        instrumentCard.appendChild(cardHead);
+        instrumentCard.appendChild(
+          createStoryNode("p", "segw__lesson1-instrument-description", cardData.description || ""),
+        );
+        instrumentCard.appendChild(
+          createStoryNode("p", "segw__lesson1-instrument-risk", cardData.risk_label || ""),
+        );
+        cardsScroller.appendChild(instrumentCard);
+      }
+      cardsRoot.appendChild(cardsScroller);
+
+      var goalAccent = createStoryNode("div", "segw__lesson1-goal-accent", step.goal_accent || "");
+      cardsRoot.appendChild(goalAccent);
+      contentRoot.appendChild(cardsRoot);
+      return;
+    }
+
+    if (step.kind === "lesson1_cta") {
+      contentRoot.classList.add("is-lesson", "is-lesson1");
+      var ctaRoot = createStoryNode("section", "segw__lesson1-screen segw__lesson1-screen--cta");
+      ctaRoot.appendChild(createStoryNode("h3", "segw__lesson1-title", step.title || "Готовы начать?"));
+      var ctaVisual = createStoryNode("div", "segw__lesson1-visual");
+      ctaVisual.appendChild(createStoryNode("span", "segw__lesson1-visual-text", "Финишная линия"));
+      ctaRoot.appendChild(ctaVisual);
+
+      var ctaActions = createStoryNode("div", "segw__lesson1-cta-actions");
+      var depositButton = createStoryNode("button", "segw__lesson1-cta segw__lesson1-cta--primary", "Пополнить счёт");
+      depositButton.type = "button";
+      depositButton.setAttribute("data-action", "lesson1-deposit");
+      if (step.deeplink) {
+        depositButton.setAttribute("data-deeplink", step.deeplink);
+      }
+      var continueButton = createStoryNode(
+        "button",
+        "segw__lesson1-cta segw__lesson1-cta--secondary",
+        "Продолжить обучение",
+      );
+      continueButton.type = "button";
+      continueButton.setAttribute("data-action", "lesson1-continue");
+      ctaActions.appendChild(depositButton);
+      ctaActions.appendChild(continueButton);
+      ctaRoot.appendChild(ctaActions);
+      contentRoot.appendChild(ctaRoot);
+      return;
+    }
+
     contentRoot.classList.add("is-lesson");
     contentRoot.appendChild(createStoryNode("div", "segw__story-emoji", step.emoji || "📘"));
     contentRoot.appendChild(
@@ -3309,13 +3819,29 @@
         ? getQuizAnswer(inlineState, activeStep.question.id)
         : null;
     var isQuiz = isQuizStep(activeStep);
+    var isLesson1Step =
+      Boolean(activeStep && typeof activeStep.kind === "string") &&
+      activeStep.kind.indexOf("lesson1_") === 0;
+    var isLesson1Cta = activeStep.kind === "lesson1_cta";
     var activeStepKey =
       String(activeStep.kind || "lesson") +
       ":" +
       String(activeStep.question ? activeStep.question.id : inlineState.activeStepIndex);
 
     if (inlineState.lastViewedStepKey !== activeStepKey) {
-      if (activeStep.kind === "quiz_intro" && inlineState.payload) {
+      if (isLesson1Step && inlineState.payload && inlineState.payload.segment === "novice") {
+        if (!inlineState.lesson1StartedAt) {
+          inlineState.lesson1StartedAt = Date.now();
+          trackEvent("lesson_1_started", {
+            segment: inlineState.payload.segment,
+            amount_tier: inlineState.payload.amount_tier,
+          });
+        }
+        trackEvent("lesson_1_screen_viewed", {
+          screen_id: activeStep.screen_id || "lesson_1",
+          screen_number: activeStep.screen_number || 1,
+        });
+      } else if (activeStep.kind === "quiz_intro" && inlineState.payload) {
         if (!inlineState.quizStartedAt) {
           inlineState.quizStartedAt = Date.now();
           trackEvent("risk_quiz_started", {
@@ -3400,33 +3926,47 @@
     }
 
     if (refs.onboardingNext) {
-      if (inlineState.completed || (activeStep.kind === "quiz_question" && !quizAnswer)) {
+      if (
+        inlineState.completed ||
+        isLesson1Cta ||
+        (activeStep.kind === "quiz_question" && !quizAnswer)
+      ) {
         refs.onboardingNext.disabled = true;
       } else {
         refs.onboardingNext.disabled = false;
       }
     }
 
+    if (refs.onboardingFooter) {
+      refs.onboardingFooter.classList.toggle("segw__is-hidden", isLesson1Cta);
+    }
+
     if (refs.onboardingNextButton) {
-      refs.onboardingNextButton.classList.toggle("is-quiz-cta", isQuiz);
-      if (inlineState.completed) {
-        refs.onboardingNextButton.textContent = "Пройдено";
+      refs.onboardingNextButton.classList.toggle("segw__is-hidden", isLesson1Cta);
+      if (isLesson1Cta) {
+        refs.onboardingNextButton.textContent = "Выберите действие";
         refs.onboardingNextButton.disabled = true;
-      } else if (activeStep.kind === "quiz_intro") {
-        refs.onboardingNextButton.textContent = "Начать анкету →";
-        refs.onboardingNextButton.disabled = false;
-      } else if (activeStep.kind === "quiz_question") {
-        refs.onboardingNextButton.textContent = "Далее →";
-        refs.onboardingNextButton.disabled = !quizAnswer;
-      } else if (activeStep.kind === "quiz_result") {
-        refs.onboardingNextButton.textContent = "Продолжить обучение →";
-        refs.onboardingNextButton.disabled = false;
-      } else if (isLastStep) {
-        refs.onboardingNextButton.textContent = "Завершить маршрут";
-        refs.onboardingNextButton.disabled = false;
       } else {
-        refs.onboardingNextButton.textContent = "Далее";
-        refs.onboardingNextButton.disabled = false;
+        refs.onboardingNextButton.classList.toggle("is-quiz-cta", isQuiz);
+        if (inlineState.completed) {
+          refs.onboardingNextButton.textContent = "Пройдено";
+          refs.onboardingNextButton.disabled = true;
+        } else if (activeStep.kind === "quiz_intro") {
+          refs.onboardingNextButton.textContent = "Начать анкету →";
+          refs.onboardingNextButton.disabled = false;
+        } else if (activeStep.kind === "quiz_question") {
+          refs.onboardingNextButton.textContent = "Далее →";
+          refs.onboardingNextButton.disabled = !quizAnswer;
+        } else if (activeStep.kind === "quiz_result") {
+          refs.onboardingNextButton.textContent = "Продолжить обучение →";
+          refs.onboardingNextButton.disabled = false;
+        } else if (isLastStep) {
+          refs.onboardingNextButton.textContent = "Завершить маршрут";
+          refs.onboardingNextButton.disabled = false;
+        } else {
+          refs.onboardingNextButton.textContent = "Далее";
+          refs.onboardingNextButton.disabled = false;
+        }
       }
     }
 
@@ -3596,6 +4136,8 @@
         quizResult: null,
         quizStartedAt: 0,
         lastViewedStepKey: "",
+        lesson1StartedAt: 0,
+        lesson1Completed: false,
       },
     };
 
@@ -3626,6 +4168,7 @@
       onboardingHint: root.querySelector('[data-role="onboarding-hint"]'),
       onboardingPrev: root.querySelector('[data-action="onboarding-prev"]'),
       onboardingNext: root.querySelector('[data-action="onboarding-next"]'),
+      onboardingFooter: root.querySelector(".segw__story-footer"),
       onboardingNextButton: root.querySelector('[data-role="onboarding-next-label"]'),
       onboardingDone: root.querySelector('[data-role="onboarding-done"]'),
       onboardingRouteLink: root.querySelector('[data-role="onboarding-route-link"]'),
@@ -3832,6 +4375,89 @@
           selected_option: optionId,
           score: optionScore,
         });
+        render(root, refs, state);
+        return;
+      } else if (action === "lesson1-deposit") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+
+        var activeDepositStep = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (!activeDepositStep || activeDepositStep.kind !== "lesson1_cta") {
+          return;
+        }
+
+        var payloadForDeposit = state.inlineOnboarding.payload;
+        var deeplink = button.getAttribute("data-deeplink") || "finamtrade://deposit";
+        if (payloadForDeposit) {
+          trackEvent("lesson_1_deposit_cta_clicked", {
+            segment: payloadForDeposit.segment,
+            amount_tier: payloadForDeposit.amount_tier,
+          });
+          trackEvent("onboarding_deposit_cta_clicked", {
+            segment: payloadForDeposit.segment,
+            amount_tier: payloadForDeposit.amount_tier,
+          });
+        }
+
+        try {
+          window.location.href = deeplink;
+        } catch (error) {
+          if (window.console && typeof window.console.warn === "function") {
+            window.console.warn("[segmentation] deeplink navigation failed", error);
+          }
+        }
+        return;
+      } else if (action === "lesson1-continue") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+
+        var activeContinueStep = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (!activeContinueStep || activeContinueStep.kind !== "lesson1_cta") {
+          return;
+        }
+
+        var payloadForContinue = state.inlineOnboarding.payload;
+        if (payloadForContinue) {
+          trackEvent("lesson_1_continue_clicked", {
+            segment: payloadForContinue.segment,
+            amount_tier: payloadForContinue.amount_tier,
+          });
+        }
+
+        if (!state.inlineOnboarding.lesson1Completed) {
+          var lesson1TimeSpent = 0;
+          if (state.inlineOnboarding.lesson1StartedAt) {
+            lesson1TimeSpent = Math.max(
+              0,
+              Math.round((Date.now() - state.inlineOnboarding.lesson1StartedAt) / 1000),
+            );
+          }
+          if (payloadForContinue) {
+            trackEvent("lesson_1_completed", {
+              segment: payloadForContinue.segment,
+              amount_tier: payloadForContinue.amount_tier,
+              time_spent: lesson1TimeSpent,
+            });
+          }
+          state.inlineOnboarding.lesson1Completed = true;
+        }
+
+        state.inlineOnboarding.direction = 1;
+        var lesson1LastIndex = state.inlineOnboarding.steps.length - 1;
+        if (state.inlineOnboarding.activeStepIndex < lesson1LastIndex) {
+          state.inlineOnboarding.activeStepIndex += 1;
+        } else if (!state.inlineOnboarding.completed) {
+          state.inlineOnboarding.completed = true;
+          if (state.inlineOnboarding.payload) {
+            trackEvent("inline_onboarding_completed", {
+              segment: state.inlineOnboarding.payload.segment,
+              amount_tier: state.inlineOnboarding.payload.amount_tier,
+            });
+          }
+        }
+
         render(root, refs, state);
         return;
       } else if (action === "onboarding-prev") {
@@ -4222,7 +4848,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.17";
+  window.FinamSegmentationWidget.version = "1.0.18";
 
   ensureStyles();
   initExistingWidgets();
