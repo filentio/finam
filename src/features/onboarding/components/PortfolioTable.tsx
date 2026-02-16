@@ -34,15 +34,15 @@ export function PortfolioTable({ items }: PortfolioTableProps) {
 
 const thStyle: CSSProperties = {
   textAlign: "left",
-  fontSize: 12,
+  fontSize: 11,
   color: "rgba(255,255,255,0.72)",
   borderBottom: "1px solid rgba(255,255,255,0.22)",
-  padding: "8px 6px",
+  padding: "6px 4px",
 };
 
 const tdStyle: CSSProperties = {
-  fontSize: 13,
+  fontSize: 12,
   color: "rgba(255,255,255,0.9)",
   borderBottom: "1px solid rgba(255,255,255,0.12)",
-  padding: "8px 6px",
+  padding: "6px 4px",
 };

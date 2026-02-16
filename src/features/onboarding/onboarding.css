@@ -83,7 +83,7 @@
   flex-direction: column;
   overflow: hidden;
   padding-top: var(--space-1);
-  padding-bottom: 100px;
+  padding-bottom: 92px;
 }
 
 .ob-layout-screen {
@@ -450,7 +450,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 6px;
 }
 
 .ob-screen__title {
@@ -469,23 +469,23 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  gap: var(--space-1);
+  gap: 6px;
   align-content: center;
   overflow: hidden;
 }
 
 .ob-screen--scrollable .ob-screen__body {
-  overflow-y: auto;
-  align-content: start;
-  padding-right: 2px;
-  padding-bottom: 100px;
+  overflow: hidden;
+  align-content: center;
+  padding-right: 0;
+  padding-bottom: 0;
 }
 
 .ob-card {
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.1);
-  padding: var(--space-2);
+  padding: 12px;
 }
 
 .ob-card--stagger {
@@ -505,7 +505,7 @@
   margin: 0;
   padding-left: 18px;
   display: grid;
-  gap: 6px;
+  gap: 4px;
   color: rgba(255, 255, 255, 0.92);
   font-size: 14px;
 }
@@ -792,9 +792,9 @@
 
 .story-content {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
   padding: var(--space-3);
-  padding-bottom: 100px;
+  padding-bottom: 92px;
 }
 
 .story-footer {

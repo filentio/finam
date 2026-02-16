@@ -6,7 +6,7 @@ export function CalculatorScreen({
   calculatorOutput,
 }: CalculatorScreenProps) {
   return (
-    <ScreenShell title={screen.title} subtitle={screen.subtitle} scrollable>
+    <ScreenShell title={screen.title} subtitle={screen.subtitle}>
       <div style={{ display: "grid", gap: 8 }}>
         {Object.entries(calculatorOutput.tariffs).map(([name, values]) => (
           <article

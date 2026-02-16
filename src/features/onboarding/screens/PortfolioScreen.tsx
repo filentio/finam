@@ -24,7 +24,6 @@ export function PortfolioScreen({
     <ScreenShell
       title={screen.title}
       subtitle={`${screen.description_variants?.[segment] ?? `Пример на ${portfolio.total_amount_label}.`} Текущая раскладка: ${total.toLocaleString("ru-RU")} ₽`}
-      scrollable
     >
       <PieChart
         allocation={{

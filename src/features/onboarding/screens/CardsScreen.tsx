@@ -62,8 +62,8 @@ export function CardsScreen({
     : null;
 
   return (
-    <ScreenShell title={screen.title} subtitle={screen.subtitle} scrollable>
-      <div style={{ display: "grid", gap: 8 }}>
+    <ScreenShell title={screen.title} subtitle={screen.subtitle}>
+      <div style={{ display: "grid", gap: 6 }}>
         {configuredCards.map((card, index) => (
           <div
             key={card.key}
