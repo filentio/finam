@@ -1509,6 +1509,486 @@
   border: 1px solid rgba(255, 255, 255, 0.45);
 }
 
+.segw__lesson2-screen,
+.segw__lesson3-screen,
+.segw__lesson4-screen,
+.segw__lesson5-screen,
+.segw__lesson6-screen {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.segw__lesson2-screen--hero,
+.segw__lesson2-screen--cta,
+.segw__lesson3-screen--hero,
+.segw__lesson3-screen--cta,
+.segw__lesson4-screen--cta,
+.segw__lesson5-screen--hero,
+.segw__lesson5-screen--cta,
+.segw__lesson6-screen--hero,
+.segw__lesson6-screen--cta {
+  min-height: 100%;
+  align-content: center;
+  text-align: center;
+}
+
+.segw__lesson2-emoji,
+.segw__lesson3-emoji,
+.segw__lesson5-emoji,
+.segw__lesson6-emoji {
+  font-size: 48px;
+  text-align: center;
+}
+
+.segw__lesson2-title,
+.segw__lesson3-title,
+.segw__lesson4-title,
+.segw__lesson5-title,
+.segw__lesson6-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.segw__lesson2-subtitle,
+.segw__lesson3-subtitle,
+.segw__lesson4-subtitle,
+.segw__lesson5-subtitle,
+.segw__lesson6-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.segw__lesson2-text,
+.segw__lesson3-text,
+.segw__lesson4-text,
+.segw__lesson5-text,
+.segw__lesson6-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.segw__lesson2-quote {
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 22px;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.segw__lesson2-author {
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+}
+
+.segw__lesson2-shield {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto;
+  border-radius: 14px;
+  background: rgba(255, 215, 0, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.segw__lesson2-risk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.segw__lesson2-risk-card {
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  animation: segwQuizFadeIn 300ms ease both;
+}
+
+.segw__lesson2-risk-title {
+  color: var(--risk-color, #fff);
+  font-size: 15px;
+}
+
+.segw__lesson2-risk-text {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.35;
+}
+
+.segw__lesson2-rules {
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson2-rule {
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  gap: 10px;
+}
+
+.segw__lesson2-rule-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.segw__lesson2-rule-body p {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.segw__lesson2-tip {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 249, 196, 0.24);
+  border: 1px solid rgba(255, 249, 196, 0.65);
+  display: flex;
+  gap: 8px;
+  color: #fff;
+}
+
+.segw__lesson2-tip-icon {
+  flex: 0 0 auto;
+}
+
+.segw__lesson2-chart {
+  height: 120px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.segw__lesson2-chart-line {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.5), #fff);
+  position: relative;
+}
+
+.segw__lesson2-chart-line::before {
+  content: "";
+  position: absolute;
+  inset: -18px 0 -18px 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 12%,
+    rgba(255, 255, 255, 0.9) 20%,
+    transparent 28%,
+    rgba(255, 255, 255, 0.9) 48%,
+    transparent 56%,
+    rgba(255, 255, 255, 0.9) 78%,
+    transparent 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent);
+}
+
+.segw__lesson3-visual {
+  min-height: 110px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+}
+
+.segw__lesson3-pie,
+.segw__lesson4-pie {
+  width: 130px;
+  height: 130px;
+  border-radius: 999px;
+  margin: 0 auto;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.segw__lesson3-note,
+.segw__lesson4-note,
+.segw__lesson5-note,
+.segw__lesson6-note {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.segw__lesson3-portfolio-head {
+  margin: 0;
+  font-weight: 700;
+}
+
+.segw__lesson3-portfolio-table {
+  display: grid;
+  gap: 6px;
+}
+
+.segw__lesson3-portfolio-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  font-size: 13px;
+  animation: segwQuizFadeIn 300ms ease both;
+}
+
+.segw__lesson3-goal-advice {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.segw__lesson3-spectrum {
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson3-spectrum-row {
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: grid;
+  gap: 4px;
+}
+
+.segw__lesson4-profile-badge {
+  margin: 0 auto;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--profile-color, #4caf50) 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--profile-color, #4caf50) 70%, #fff 30%);
+}
+
+.segw__lesson4-breakdown {
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson4-row {
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.segw__lesson4-levels {
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson4-level-card {
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: grid;
+  gap: 4px;
+}
+
+.segw__lesson4-level-card p,
+.segw__lesson4-level-card small {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.segw__lesson5-top-list,
+.segw__lesson5-quiz-list,
+.segw__lesson5-faq {
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson5-top-card,
+.segw__lesson5-quiz-option,
+.segw__lesson5-faq-item {
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+}
+
+.segw__lesson5-top-card.is-primary {
+  border-color: rgba(76, 175, 80, 0.8);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.25);
+}
+
+.segw__lesson5-top-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.segw__lesson5-badge {
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(76, 175, 80, 0.22);
+  border: 1px solid rgba(76, 175, 80, 0.7);
+}
+
+.segw__lesson5-top-card p,
+.segw__lesson5-top-card small,
+.segw__lesson5-quiz-option p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.segw__lesson5-why {
+  font-size: 12px;
+}
+
+.segw__lesson5-quiz-option {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.segw__lesson5-quiz-option.is-selected {
+  border-color: rgba(76, 175, 80, 0.9);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.28);
+}
+
+.segw__lesson5-mismatch {
+  margin: 0;
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255, 221, 87, 0.22);
+  border: 1px solid rgba(255, 221, 87, 0.7);
+  color: #fff7cc;
+  font-size: 13px;
+}
+
+.segw__lesson5-faq-question {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.segw__lesson5-faq-answer {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.segw__lesson6-compare,
+.segw__lesson6-tariffs {
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson6-compare-row,
+.segw__lesson6-tariff-card {
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+.segw__lesson6-tariff-card p,
+.segw__lesson6-tariff-card small {
+  margin: 6px 0 0;
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+}
+
+.segw__lesson6-tariff-card.is-recommended {
+  border-color: rgba(255, 152, 0, 0.9);
+  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3);
+}
+
+.segw__lesson6-tariff-badge {
+  display: inline-flex;
+  margin-top: 6px;
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(255, 152, 0, 0.28);
+  border: 1px solid rgba(255, 152, 0, 0.8);
+}
+
+.segw__lesson6-calculator {
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson6-slider-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.segw__lesson6-slider {
+  width: 100%;
+}
+
+.segw__lesson6-calc-result {
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  display: grid;
+  gap: 4px;
+}
+
+.segw__lesson6-calc-result p,
+.segw__lesson6-calc-result strong {
+  margin: 0;
+  font-size: 13px;
+}
+
 .segw__onboarding-meta {
   position: relative;
   z-index: 6;
@@ -2110,6 +2590,380 @@
         { id: "c", text: "Подожду восстановления, ничего не буду делать", score: 3 },
         { id: "d", text: "Докуплю подешевевшие активы", score: 4 },
       ],
+    },
+  ];
+
+  var LESSON_2_RISK_CARDS = [
+    {
+      id: "market_risk",
+      emoji: "📉",
+      title: "Рыночный",
+      description:
+        "Цены на бирже могут падать. Это нормально — рынок всегда восстанавливается, но нужно время.",
+      color: "#FF5252",
+    },
+    {
+      id: "credit_risk",
+      emoji: "🏢",
+      title: "Кредитный",
+      description:
+        "Компания может обанкротиться. Поэтому не стоит вкладывать всё в одну бумагу.",
+      color: "#FF9800",
+    },
+    {
+      id: "currency_risk",
+      emoji: "🌍",
+      title: "Валютный",
+      description:
+        "Курс рубля может измениться. Это влияет на стоимость иностранных активов.",
+      color: "#2196F3",
+    },
+    {
+      id: "inflation_risk",
+      emoji: "🔥",
+      title: "Инфляционный",
+      description:
+        "Деньги на вкладе могут обесцениваться. Инвестиции помогают обогнать инфляцию.",
+      color: "#FFC107",
+    },
+  ];
+
+  var LESSON_2_SAFETY_BY_AMOUNT = {
+    up_to_300k: {
+      text:
+        "Прежде чем инвестировать, убедитесь, что у вас есть резерв на 3–6 месяцев расходов. Начните с небольшой суммы, которую не страшно потерять.",
+      tip: "Инвестируйте только свободные деньги",
+    },
+    "300k_2m": {
+      text:
+        "Даже с хорошим капиталом важно не инвестировать более 30% сбережений. Оставьте резерв на непредвиденные расходы.",
+      tip: "Не более 30% сбережений в инвестиции",
+    },
+    "2m_5m": {
+      text:
+        "С вашим капиталом ключевое правило — распределение по классам активов. Часть средств всегда должна быть в ликвидных инструментах.",
+      tip: "Распределите по классам активов",
+    },
+    more_5m: {
+      text:
+        "При значительном капитале рассмотрите хеджирование рисков через производные инструменты и международную диверсификацию.",
+      tip: "Рассмотрите хеджирование",
+    },
+  };
+
+  var LESSON_3_PORTFOLIOS_BY_AMOUNT = {
+    up_to_300k: {
+      name: "Стартовый",
+      total: "30 000 ₽",
+      instruments: [
+        { name: "ETF на индекс Мосбиржи", ticker: "TMOS", amount: "15 000 ₽", pct: "50%", type: "ETF" },
+        { name: "ОФЗ 26238", ticker: "SU26238", amount: "15 000 ₽", pct: "50%", type: "Облигация" },
+      ],
+      note: "💡 Всего 2 инструмента — просто и эффективно",
+    },
+    "300k_2m": {
+      name: "Базовый",
+      total: "500 000 ₽",
+      instruments: [
+        { name: "ETF на индекс Мосбиржи", ticker: "TMOS", amount: "150 000 ₽", pct: "30%", type: "ETF" },
+        { name: "ОФЗ 26238", ticker: "SU26238", amount: "150 000 ₽", pct: "30%", type: "Облигация" },
+        { name: "Сбербанк", ticker: "SBER", amount: "100 000 ₽", pct: "20%", type: "Акция" },
+        { name: "Корпоративные облигации", ticker: "RU000A1", amount: "100 000 ₽", pct: "20%", type: "Облигация" },
+      ],
+      note: "💡 4 инструмента — хорошая диверсификация",
+    },
+    "2m_5m": {
+      name: "Расширенный",
+      total: "2 000 000 ₽",
+      instruments: [
+        { name: "ETF на индекс Мосбиржи", ticker: "TMOS", amount: "400 000 ₽", pct: "20%", type: "ETF" },
+        { name: "ОФЗ 26238", ticker: "SU26238", amount: "400 000 ₽", pct: "20%", type: "Облигация" },
+        { name: "Сбербанк", ticker: "SBER", amount: "300 000 ₽", pct: "15%", type: "Акция" },
+        { name: "Лукойл", ticker: "LKOH", amount: "300 000 ₽", pct: "15%", type: "Акция" },
+        { name: "Корпоративные облигации", ticker: "RU000A1", amount: "300 000 ₽", pct: "15%", type: "Облигация" },
+        { name: "Золото (ETF)", ticker: "GOLD", amount: "300 000 ₽", pct: "15%", type: "Товарный" },
+      ],
+      note: "💡 6 инструментов — полноценная диверсификация",
+    },
+    more_5m: {
+      name: "Премиальный",
+      total: "5 000 000 ₽",
+      instruments: [
+        { name: "ETF на индекс Мосбиржи", ticker: "TMOS", amount: "750 000 ₽", pct: "15%", type: "ETF" },
+        { name: "ОФЗ 26238", ticker: "SU26238", amount: "750 000 ₽", pct: "15%", type: "Облигация" },
+        { name: "Сбербанк", ticker: "SBER", amount: "500 000 ₽", pct: "10%", type: "Акция" },
+        { name: "Лукойл", ticker: "LKOH", amount: "500 000 ₽", pct: "10%", type: "Акция" },
+        { name: "Яндекс", ticker: "YDEX", amount: "500 000 ₽", pct: "10%", type: "Акция" },
+        { name: "Корпоративные облигации", ticker: "RU000A1", amount: "500 000 ₽", pct: "10%", type: "Облигация" },
+        { name: "Золото (ETF)", ticker: "GOLD", amount: "500 000 ₽", pct: "10%", type: "Товарный" },
+        { name: "Доверительное управление", ticker: "DU_BALANCED", amount: "1 000 000 ₽", pct: "20%", type: "ДУ" },
+      ],
+      note: "💡 8 инструментов + ДУ — максимальная диверсификация",
+    },
+  };
+
+  var LESSON_3_GOAL_ADVICE = {
+    purchase:
+      "📌 Для накопления на покупку: увеличьте долю облигаций до 70% — предсказуемый доход к нужной дате.",
+    passive_income:
+      "📌 Для пассивного дохода: выбирайте дивидендные акции и облигации с купонами — регулярные выплаты.",
+    growth:
+      "📌 Для роста капитала: увеличьте долю акций до 60% — долгосрочный потенциал роста.",
+    preservation:
+      "📌 Для сохранения капитала: добавьте ОФЗ-ИН и золото — защита от инфляции.",
+  };
+
+  var LESSON_4_PROFILE_META = {
+    conservative: {
+      title: "Ваш профиль: Консервативный",
+      subtitle: "Приоритет — сохранение капитала и стабильный доход",
+      emoji: "🛡️",
+      color: "#2196F3",
+      name: "консервативного",
+    },
+    moderate: {
+      title: "Ваш профиль: Умеренный",
+      subtitle: "Баланс между ростом и защитой капитала",
+      emoji: "⚖️",
+      color: "#4CAF50",
+      name: "умеренного",
+    },
+    aggressive: {
+      title: "Ваш профиль: Агрессивный",
+      subtitle: "Приоритет — максимальный рост капитала",
+      emoji: "🚀",
+      color: "#FF9800",
+      name: "агрессивного",
+    },
+    ultra_aggressive: {
+      title: "Ваш профиль: Сверхагрессивный",
+      subtitle: "Готовность к высоким рискам ради высокой доходности",
+      emoji: "⚡",
+      color: "#F44336",
+      name: "сверхагрессивного",
+    },
+  };
+
+  var LESSON_5_TOP_BY_PROFILE_GOAL = {
+    conservative: {
+      purchase: [
+        {
+          name: "ОФЗ 26238",
+          ticker: "SU26238",
+          type: "Облигация",
+          description: "Государственные облигации — самый надёжный инструмент",
+          yield: "~10% годовых",
+          risk: "Минимальный",
+          why: "Предсказуемый доход к дате покупки",
+          min_amount: "1 000 ₽",
+          deeplink: "finamtrade://instrument/SU26238",
+        },
+        {
+          name: "Фонд облигаций SBGB",
+          ticker: "SBGB",
+          type: "ETF",
+          description: "Корзина из десятков облигаций в одной покупке",
+          yield: "~9% годовых",
+          risk: "Низкий",
+          why: "Диверсификация без лишних усилий",
+          min_amount: "500 ₽",
+          deeplink: "finamtrade://instrument/SBGB",
+        },
+        {
+          name: "Сбербанк (SBER)",
+          ticker: "SBER",
+          type: "Акция",
+          description: "Крупнейший банк России, дивидендная акция",
+          yield: "~5% дивиденды + рост",
+          risk: "Средний",
+          why: "Небольшая доля акций для роста",
+          min_amount: "300 ₽",
+          deeplink: "finamtrade://instrument/SBER",
+        },
+      ],
+      passive_income: [
+        {
+          name: "ОФЗ 26238",
+          ticker: "SU26238",
+          type: "Облигация",
+          description: "Государственные облигации с купонами",
+          yield: "~10% годовых",
+          risk: "Минимальный",
+          why: "Регулярные купонные выплаты",
+          min_amount: "1 000 ₽",
+          deeplink: "finamtrade://instrument/SU26238",
+        },
+        {
+          name: "Сбербанк (SBER)",
+          ticker: "SBER",
+          type: "Акция",
+          description: "Дивидендная акция с историей выплат",
+          yield: "~5% дивиденды",
+          risk: "Средний",
+          why: "Стабильные дивиденды 2 раза в год",
+          min_amount: "300 ₽",
+          deeplink: "finamtrade://instrument/SBER",
+        },
+        {
+          name: "Лукойл (LKOH)",
+          ticker: "LKOH",
+          type: "Акция",
+          description: "Нефтяная компания с высокими дивидендами",
+          yield: "~7% дивиденды",
+          risk: "Средний",
+          why: "Высокая дивидендная доходность",
+          min_amount: "6 000 ₽",
+          deeplink: "finamtrade://instrument/LKOH",
+        },
+      ],
+    },
+    moderate: {
+      growth: [
+        {
+          name: "ETF на индекс Мосбиржи (TMOS)",
+          ticker: "TMOS",
+          type: "ETF",
+          description: "Весь рынок в одной покупке",
+          yield: "~15% годовых (средняя)",
+          risk: "Средний",
+          why: "Диверсификация + рост",
+          min_amount: "500 ₽",
+          deeplink: "finamtrade://instrument/TMOS",
+        },
+        {
+          name: "Сбербанк (SBER)",
+          ticker: "SBER",
+          type: "Акция",
+          description: "Голубая фишка с потенциалом роста",
+          yield: "~5% дивиденды + рост",
+          risk: "Средний",
+          why: "Баланс между ростом и дивидендами",
+          min_amount: "300 ₽",
+          deeplink: "finamtrade://instrument/SBER",
+        },
+        {
+          name: "ОФЗ 26238",
+          ticker: "SU26238",
+          type: "Облигация",
+          description: "Стабилизатор портфеля",
+          yield: "~10% годовых",
+          risk: "Низкий",
+          why: "Снижение волатильности",
+          min_amount: "1 000 ₽",
+          deeplink: "finamtrade://instrument/SU26238",
+        },
+      ],
+    },
+    aggressive: {
+      growth: [
+        {
+          name: "ETF на индекс Мосбиржи (TMOS)",
+          ticker: "TMOS",
+          type: "ETF",
+          description: "Весь рынок в одной покупке",
+          yield: "~15% годовых (средняя)",
+          risk: "Средний",
+          why: "Диверсификация + рост",
+          min_amount: "500 ₽",
+          deeplink: "finamtrade://instrument/TMOS",
+        },
+        {
+          name: "Яндекс (YDEX)",
+          ticker: "YDEX",
+          type: "Акция",
+          description: "Лидер IT-сектора в России",
+          yield: "Потенциал роста",
+          risk: "Высокий",
+          why: "Рост капитала в долгосрочной перспективе",
+          min_amount: "3 000 ₽",
+          deeplink: "finamtrade://instrument/YDEX",
+        },
+        {
+          name: "Сбербанк (SBER)",
+          ticker: "SBER",
+          type: "Акция",
+          description: "Голубая фишка с потенциалом роста",
+          yield: "~5% дивиденды + рост",
+          risk: "Средний",
+          why: "Баланс между ростом и дивидендами",
+          min_amount: "300 ₽",
+          deeplink: "finamtrade://instrument/SBER",
+        },
+      ],
+    },
+    ultra_aggressive: {
+      growth: [
+        {
+          name: "Яндекс (YDEX)",
+          ticker: "YDEX",
+          type: "Акция",
+          description: "Акция роста с высоким потенциалом",
+          yield: "Потенциал роста",
+          risk: "Высокий",
+          why: "Фокус на рост капитала",
+          min_amount: "3 000 ₽",
+          deeplink: "finamtrade://instrument/YDEX",
+        },
+        {
+          name: "ETF на индекс Мосбиржи (TMOS)",
+          ticker: "TMOS",
+          type: "ETF",
+          description: "Широкая диверсификация по рынку",
+          yield: "~15% годовых (средняя)",
+          risk: "Средний",
+          why: "Ядро портфеля даже для активного профиля",
+          min_amount: "500 ₽",
+          deeplink: "finamtrade://instrument/TMOS",
+        },
+        {
+          name: "Акции роста (малая кап.)",
+          ticker: "GROWTH",
+          type: "Акция",
+          description: "Высокорисковые истории роста",
+          yield: "Высокий потенциал",
+          risk: "Очень высокий",
+          why: "Добавка к агрессивной стратегии",
+          min_amount: "2 000 ₽",
+          deeplink: "finamtrade://instrument/YDEX",
+        },
+      ],
+    },
+  };
+
+  var LESSON_6_TARIFFS = [
+    {
+      id: "basic",
+      name: "Базовый",
+      price: "0 ₽/мес",
+      commission: "Акции: 0,3% + 177 ₽ · Облигации: 0,3% + 177 ₽",
+      best_for: "Редкие сделки (1-2 в месяц)",
+      features: ["✓ Доступ к торгам", "✓ Мобильное приложение", "✗ Аналитика", "✗ Персональный менеджер"],
+    },
+    {
+      id: "investor",
+      name: "Инвестор",
+      price: "0 ₽/мес (при обороте 30 000 ₽), иначе 299 ₽/мес",
+      commission: "Акции: 0,3% · Облигации: 0,3%",
+      best_for: "Регулярные инвестиции",
+      features: ["✓ Доступ к торгам", "✓ Мобильное приложение", "✓ Базовая аналитика", "✓ Идеи от аналитиков"],
+      recommended: true,
+      badge: "Популярный",
+    },
+    {
+      id: "trader",
+      name: "Трейдер",
+      price: "3 000 ₽/мес",
+      commission: "Акции: 0,05% · Облигации: 0,04%",
+      best_for: "Частые сделки (10+ в месяц)",
+      features: ["✓ Расширенная аналитика", "✓ Маржинальная торговля", "✓ Идеи от аналитиков"],
+    },
+    {
+      id: "premium",
+      name: "Премиум",
+      price: "От 10 000 ₽/мес",
+      commission: "Акции: 0,04% · Облигации: 0,03%",
+      best_for: "Капитал от 5 млн ₽",
+      features: ["✓ Персональный менеджер", "✓ Доступ к IPO", "✓ Структурные продукты", "✓ ДУ"],
     },
   ];
 
@@ -2800,6 +3654,75 @@
       .join(", ");
   }
 
+  function getLesson5TopInstruments(riskProfile, goal) {
+    var byProfile = LESSON_5_TOP_BY_PROFILE_GOAL[riskProfile] || LESSON_5_TOP_BY_PROFILE_GOAL.moderate;
+    if (byProfile && Array.isArray(byProfile[goal])) {
+      return byProfile[goal];
+    }
+    if (byProfile && Array.isArray(byProfile.growth)) {
+      return byProfile.growth;
+    }
+    var fallbackProfile = LESSON_5_TOP_BY_PROFILE_GOAL.conservative;
+    if (fallbackProfile && Array.isArray(fallbackProfile[goal])) {
+      return fallbackProfile[goal];
+    }
+    return fallbackProfile.purchase || [];
+  }
+
+  function getRecommendedTariff(amountTier, riskProfile) {
+    if (amountTier === "more_5m") {
+      return {
+        tariff: "premium",
+        reason:
+          "С вашим капиталом доступны премиальные услуги: персональный менеджер, доступ к IPO и структурным продуктам.",
+      };
+    }
+
+    if (amountTier === "2m_5m") {
+      return {
+        tariff: "trader",
+        reason:
+          "Для активного управления капиталом этого размера оптимален тариф Трейдер — низкие комиссии и расширенная аналитика.",
+      };
+    }
+
+    if (riskProfile === "aggressive" || riskProfile === "ultra_aggressive") {
+      return {
+        tariff: "trader",
+        reason:
+          "Ваш агрессивный профиль предполагает частые сделки — тариф Трейдер сэкономит на комиссиях.",
+      };
+    }
+
+    return {
+      tariff: "investor",
+      reason:
+        "Для регулярных инвестиций без абонентской платы — оптимальный выбор для большинства инвесторов.",
+    };
+  }
+
+  function calculateTariffSavings(monthlyTrades, avgTradeAmount) {
+    var trades = Math.max(1, Number(monthlyTrades) || 1);
+    var amount = Math.max(5000, Number(avgTradeAmount) || 5000);
+    var basicDeal = amount * 0.003 + 177;
+    var investorDeal = amount * 0.003;
+    var basicAnnual = Math.round(basicDeal * trades * 12);
+    var investorAnnual = Math.round(investorDeal * trades * 12);
+    var savings = Math.max(0, basicAnnual - investorAnnual);
+    var savingsPct = basicAnnual > 0 ? Math.round((savings / basicAnnual) * 100) : 0;
+    return {
+      basic_annual_commission: basicAnnual,
+      investor_annual_commission: investorAnnual,
+      savings: savings,
+      savings_pct: savingsPct,
+    };
+  }
+
+  function formatMoney(value) {
+    var numberValue = Number(value) || 0;
+    return numberValue.toLocaleString("ru-RU") + " ₽";
+  }
+
   function getStoryGradient(segment, stepIndex) {
     var bySegment = {
       novice: [
@@ -2834,380 +3757,495 @@
   }
 
   function buildInlineOnboardingSteps(payload) {
-    var goalLabel = GOAL_LABELS[payload.investment_goal] || payload.investment_goal;
-    var amountLabel = AMOUNT_LABELS[payload.amount_tier] || payload.amount_tier;
-    var instrumentList = getInstrumentLabelList(payload.instruments);
-    var primaryInstrument =
-      payload.instruments && payload.instruments.length
-        ? INSTRUMENT_LABELS[payload.instruments[0]] || payload.instruments[0]
-        : "инструменты с низким порогом входа";
+    var amountTier = payload.amount_tier;
+    var goal = payload.investment_goal;
 
-    function buildStep(lesson, emoji, title, text, hint, points) {
-      return {
-        kind: "lesson",
-        lesson: lesson,
-        emoji: emoji,
-        title: title,
-        text: text,
-        hint: hint,
-        gradient: getStoryGradient(payload.segment, lesson - 1),
-        points: Array.isArray(points) ? points : [],
-      };
-    }
+    var mythContent = {
+      up_to_300k: {
+        text:
+          "Даже с 10 000 ₽ можно купить первые бумаги. Многие успешные инвесторы начинали с небольших сумм и постепенно наращивали портфель.",
+        highlight: "10 000 ₽ — достаточно для старта",
+      },
+      "300k_2m": {
+        text:
+          "С вашей суммой можно сразу собрать диверсифицированный портфель из нескольких инструментов. Это отличная стартовая позиция.",
+        highlight: "Ваша сумма позволяет сразу диверсифицировать",
+      },
+      "2m_5m": {
+        text:
+          "Ваш капитал открывает доступ ко всем основным стратегиям: от консервативных облигаций до доверительного управления.",
+        highlight: "Все основные стратегии доступны",
+      },
+      more_5m: {
+        text:
+          "С вашим капиталом доступны все стратегии, включая индивидуальные решения и персонального менеджера.",
+        highlight: "Включая индивидуальные стратегии и ДУ",
+      },
+    };
+    var lesson1Myth = mythContent[amountTier] || mythContent.up_to_300k;
+
+    var firstStepByAmount = {
+      up_to_300k: "Начните с комфортной суммы — от 10 000 ₽",
+      "300k_2m": "Переведите сумму, с которой хотите начать",
+      "2m_5m": "Переведите часть запланированной суммы",
+      more_5m: "Переведите первый транш для формирования портфеля",
+    };
+
+    var lessonOneCards = [
+      {
+        id: "stocks",
+        name: "Акции",
+        description: "Доли в компаниях. Могут расти в цене и платить дивиденды.",
+        risk_label: "🔴 Высокий",
+        highlighted: payload.instruments.indexOf("stocks") !== -1,
+      },
+      {
+        id: "bonds",
+        name: "Облигации",
+        description: "Долговые бумаги. Предсказуемый доход, низкий риск.",
+        risk_label: "🟢 Низкий",
+        highlighted: payload.instruments.indexOf("bonds") !== -1,
+      },
+      {
+        id: "etf",
+        name: "Фонды (ETF)",
+        description: "Готовые корзины из десятков бумаг. Диверсификация в одной покупке.",
+        risk_label: "🟡 Средний",
+        highlighted: payload.instruments.indexOf("etf") !== -1,
+      },
+      {
+        id: "currency",
+        name: "Валюта",
+        description: "Покупка долларов, евро и юаней на бирже по выгодному курсу.",
+        risk_label: "🟡 Средний",
+        highlighted: payload.instruments.indexOf("currency") !== -1,
+      },
+    ];
+
+    var safetyContent = LESSON_2_SAFETY_BY_AMOUNT[amountTier] || LESSON_2_SAFETY_BY_AMOUNT.up_to_300k;
+    var portfolioForAmount =
+      LESSON_3_PORTFOLIOS_BY_AMOUNT[amountTier] || LESSON_3_PORTFOLIOS_BY_AMOUNT.up_to_300k;
+    var goalAdvice = LESSON_3_GOAL_ADVICE[goal] || LESSON_3_GOAL_ADVICE.growth;
+
+    var lesson1 = [
+      {
+        kind: "lesson1_hero",
+        lesson: 1,
+        lesson_id: "lesson_1",
+        screen_id: "screen_1_1",
+        screen_number: 1,
+        gradient: "var(--gradient-lesson-1)",
+        emoji: "🚀",
+        title: "Инвестировать проще, чем кажется",
+        subtitle:
+          "Вы уже сделали первый шаг — открыли счёт. Теперь давайте разберёмся, что дальше.",
+        illustration_alt: "Путь от точки А к точке Б",
+      },
+      {
+        kind: "lesson1_myth",
+        lesson: 1,
+        lesson_id: "lesson_1",
+        screen_id: "screen_1_2",
+        screen_number: 2,
+        gradient: "var(--gradient-lesson-1)",
+        title: "Миф: нужны миллионы",
+        text: lesson1Myth.text,
+        highlight: lesson1Myth.highlight,
+      },
+      {
+        kind: "lesson1_steps",
+        lesson: 1,
+        lesson_id: "lesson_1",
+        screen_id: "screen_1_3",
+        screen_number: 3,
+        gradient: "var(--gradient-lesson-1)",
+        title: "Три шага к первой инвестиции",
+        steps: [
+          {
+            number: 1,
+            emoji: "💳",
+            title: "Пополните счёт",
+            description: firstStepByAmount[amountTier] || firstStepByAmount.up_to_300k,
+          },
+          {
+            number: 2,
+            emoji: "🔍",
+            title: "Выберите инструмент",
+            description: "Мы поможем подобрать подходящий — после обучения",
+          },
+          {
+            number: 3,
+            emoji: "🛒",
+            title: "Купите",
+            description: "Одно нажатие — и вы инвестор",
+          },
+        ],
+      },
+      {
+        kind: "lesson1_cards",
+        lesson: 1,
+        lesson_id: "lesson_1",
+        screen_id: "screen_1_4",
+        screen_number: 4,
+        gradient: "var(--gradient-lesson-1)",
+        title: "Что можно купить?",
+        subtitle: "Основные классы активов на бирже",
+        cards: lessonOneCards,
+        goal_accent: goalAdvice.replace(/^📌\s*/, ""),
+      },
+      {
+        kind: "lesson1_cta",
+        lesson: 1,
+        lesson_id: "lesson_1",
+        screen_id: "screen_1_5",
+        screen_number: 5,
+        gradient: "var(--gradient-lesson-1)",
+        title: "Готовы начать?",
+        deeplink: "finamtrade://deposit",
+      },
+    ];
+
+    var lesson2 = [
+      {
+        kind: "lesson2_hero",
+        lesson: 2,
+        lesson_id: "lesson_2",
+        screen_id: "screen_2_1",
+        screen_number: 1,
+        gradient: "var(--gradient-lesson-2)",
+        emoji: "🛡️",
+        title: "Главное правило инвестора",
+        quote:
+          "«Правило №1: никогда не теряйте деньги.\nПравило №2: никогда не забывайте правило №1»",
+        author: "Уоррен Баффет",
+      },
+      {
+        kind: "lesson2_risks",
+        lesson: 2,
+        lesson_id: "lesson_2",
+        screen_id: "screen_2_2",
+        screen_number: 2,
+        gradient: "var(--gradient-lesson-2)",
+        title: "Какие бывают риски?",
+        cards: LESSON_2_RISK_CARDS,
+      },
+      {
+        kind: "lesson2_management",
+        lesson: 2,
+        lesson_id: "lesson_2",
+        screen_id: "screen_2_3",
+        screen_number: 3,
+        gradient: "var(--gradient-lesson-2)",
+        title: "Как управлять рисками?",
+        text:
+          "Главный инструмент — диверсификация. Не кладите все яйца в одну корзину: распределяйте деньги между разными активами, секторами и странами.",
+        rules: [
+          { number: 1, title: "Разные активы", example: "Акции + облигации + фонды" },
+          { number: 2, title: "Разные секторы", example: "IT + финансы + энергетика" },
+          { number: 3, title: "Разные страны", example: "Россия + международные рынки" },
+        ],
+      },
+      {
+        kind: "lesson2_safety",
+        lesson: 2,
+        lesson_id: "lesson_2",
+        screen_id: "screen_2_4",
+        screen_number: 4,
+        gradient: "var(--gradient-lesson-2)",
+        title: "Правило подушки безопасности",
+        text: safetyContent.text,
+        tip: safetyContent.tip,
+      },
+      {
+        kind: "lesson2_market",
+        lesson: 2,
+        lesson_id: "lesson_2",
+        screen_id: "screen_2_5",
+        screen_number: 5,
+        gradient: "var(--gradient-lesson-2)",
+        title: "Что делать, если рынок падает?",
+        text:
+          "Рынок падает — это нормально. За последние 20 лет индекс Мосбиржи падал более чем на 20% пять раз, но каждый раз восстанавливался.",
+        market_rules: [
+          { number: 1, title: "Не паникуйте", description: "Не продавайте на дне — зафиксируете убыток" },
+          {
+            number: 2,
+            title: "Помните о горизонте",
+            description: "Если инвестируете на 3+ года — краткосрочные падения не важны",
+          },
+          {
+            number: 3,
+            title: "Падение = возможность",
+            description: "Опытные инвесторы докупают подешевевшие активы",
+          },
+        ],
+      },
+      {
+        kind: "lesson2_cta",
+        lesson: 2,
+        lesson_id: "lesson_2",
+        screen_id: "screen_2_6",
+        screen_number: 6,
+        gradient: "var(--gradient-lesson-2)",
+        title: "Теперь вы знаете, как защитить свои деньги",
+        subtitle: "В следующем уроке — как собрать свой первый портфель.",
+      },
+    ];
+
+    var lesson3Common = {
+      portfolio: portfolioForAmount,
+      goal_advice: goalAdvice,
+      subtitle:
+        payload.segment === "advanced"
+          ? "Вот пример оптимизированного портфеля для вашей суммы:"
+          : "Вот как может выглядеть ваш первый портфель:",
+    };
+
+    var lesson3Novice = [
+      {
+        kind: "lesson3_hero",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_1",
+        screen_number: 1,
+        gradient: "var(--gradient-lesson-3)",
+        emoji: "📊",
+        title: "Портфель — это не одна бумага",
+        subtitle:
+          "Инвестиционный портфель — это набор разных активов, которые работают вместе.",
+      },
+      {
+        kind: "lesson3_allocation",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_2",
+        screen_number: 2,
+        gradient: "var(--gradient-lesson-3)",
+        title: "Что такое аллокация?",
+      },
+      {
+        kind: "lesson3_portfolio",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_3",
+        screen_number: 3,
+        gradient: "var(--gradient-lesson-3)",
+        title: "Пример портфеля",
+        subtitle: lesson3Common.subtitle,
+        portfolio: lesson3Common.portfolio,
+        goal_advice: lesson3Common.goal_advice,
+      },
+      {
+        kind: "lesson3_spectrum",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_4",
+        screen_number: 4,
+        gradient: "var(--gradient-lesson-3)",
+        title: "Портфель зависит от вашего отношения к риску",
+        text:
+          "Каким должен быть именно ваш портфель? Это зависит от вашего отношения к риску. Сейчас мы определим его — это займёт всего 1 минуту.",
+      },
+      {
+        kind: "lesson3_cta",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_5",
+        screen_number: 5,
+        gradient: "var(--gradient-lesson-3)",
+        title: "Определим ваш риск-профиль",
+        subtitle: "4 вопроса, ~1 минута",
+        description:
+          "На основе ваших ответов мы подберём оптимальное распределение активов и рекомендуем подходящие инструменты.",
+      },
+    ];
+
+    var lesson3Advanced = [
+      {
+        kind: "lesson3_portfolio",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_3",
+        screen_number: 1,
+        gradient: "var(--gradient-lesson-3)",
+        title: "Пример портфеля",
+        subtitle: lesson3Common.subtitle,
+        portfolio: lesson3Common.portfolio,
+        goal_advice: lesson3Common.goal_advice,
+      },
+      {
+        kind: "lesson3_spectrum",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_4",
+        screen_number: 2,
+        gradient: "var(--gradient-lesson-3)",
+        title: "Портфель зависит от вашего отношения к риску",
+        text:
+          "Давайте уточним ваш риск-профиль, чтобы подобрать оптимальную аллокацию для вашей ситуации.",
+      },
+      {
+        kind: "lesson3_cta",
+        lesson: 3,
+        lesson_id: "lesson_3",
+        screen_id: "screen_3_5",
+        screen_number: 3,
+        gradient: "var(--gradient-lesson-3)",
+        title: "Определим ваш риск-профиль",
+        subtitle: "4 вопроса, ~1 минута",
+        description:
+          "На основе ваших ответов мы подберём оптимальное распределение активов и рекомендуем подходящие инструменты.",
+      },
+    ];
+
+    var lesson4 = [
+      {
+        kind: "lesson4_hero",
+        lesson: 4,
+        lesson_id: "lesson_4",
+        screen_id: "screen_4_1",
+        screen_number: 1,
+        gradient: "var(--gradient-lesson-5)",
+      },
+      {
+        kind: "lesson4_allocation",
+        lesson: 4,
+        lesson_id: "lesson_4",
+        screen_id: "screen_4_2",
+        screen_number: 2,
+        gradient: "var(--gradient-lesson-5)",
+      },
+      {
+        kind: "lesson4_levels",
+        lesson: 4,
+        lesson_id: "lesson_4",
+        screen_id: "screen_4_3",
+        screen_number: 3,
+        gradient: "var(--gradient-lesson-5)",
+      },
+      {
+        kind: "lesson4_portfolio",
+        lesson: 4,
+        lesson_id: "lesson_4",
+        screen_id: "screen_4_4",
+        screen_number: 4,
+        gradient: "var(--gradient-lesson-5)",
+      },
+      {
+        kind: "lesson4_cta",
+        lesson: 4,
+        lesson_id: "lesson_4",
+        screen_id: "screen_4_5",
+        screen_number: 5,
+        gradient: "var(--gradient-lesson-5)",
+        title: "Теперь вы знаете, как диверсифицировать портфель",
+        subtitle: "В следующем уроке — конкретные рекомендации, что купить первым.",
+      },
+    ];
+
+    var lesson5 = [
+      {
+        kind: "lesson5_hero",
+        lesson: 5,
+        lesson_id: "lesson_5",
+        screen_id: "screen_5_1",
+        screen_number: 1,
+        gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      },
+      {
+        kind: "lesson5_top3",
+        lesson: 5,
+        lesson_id: "lesson_5",
+        screen_id: "screen_5_2",
+        screen_number: 2,
+        gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      },
+      {
+        kind: "lesson5_quiz",
+        lesson: 5,
+        lesson_id: "lesson_5",
+        screen_id: "screen_5_3",
+        screen_number: 3,
+        gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      },
+      {
+        kind: "lesson5_howto",
+        lesson: 5,
+        lesson_id: "lesson_5",
+        screen_id: "screen_5_4",
+        screen_number: 4,
+        gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      },
+      {
+        kind: "lesson5_faq",
+        lesson: 5,
+        lesson_id: "lesson_5",
+        screen_id: "screen_5_5",
+        screen_number: 5,
+        gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      },
+      {
+        kind: "lesson5_cta",
+        lesson: 5,
+        lesson_id: "lesson_5",
+        screen_id: "screen_5_6",
+        screen_number: 6,
+        gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      },
+    ];
+
+    var lesson6 = [
+      {
+        kind: "lesson6_hero",
+        lesson: 6,
+        lesson_id: "lesson_6",
+        screen_id: "screen_6_1",
+        screen_number: 1,
+        gradient: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+      },
+      {
+        kind: "lesson6_intro",
+        lesson: 6,
+        lesson_id: "lesson_6",
+        screen_id: "screen_6_2",
+        screen_number: 2,
+        gradient: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+      },
+      {
+        kind: "lesson6_compare",
+        lesson: 6,
+        lesson_id: "lesson_6",
+        screen_id: "screen_6_3",
+        screen_number: 3,
+        gradient: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+      },
+      {
+        kind: "lesson6_recommendation",
+        lesson: 6,
+        lesson_id: "lesson_6",
+        screen_id: "screen_6_4",
+        screen_number: 4,
+        gradient: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+      },
+      {
+        kind: "lesson6_cta",
+        lesson: 6,
+        lesson_id: "lesson_6",
+        screen_id: "screen_6_5",
+        screen_number: 5,
+        gradient: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+      },
+    ];
 
     if (payload.segment === "novice") {
-      var mythByAmount = {
-        up_to_300k: {
-          text:
-            "Даже с 10 000 ₽ можно купить первые бумаги. Многие успешные инвесторы начинали с небольших сумм и постепенно наращивали портфель.",
-          highlight: "10 000 ₽ — достаточно для старта",
-        },
-        "300k_2m": {
-          text:
-            "С вашей суммой можно сразу собрать диверсифицированный портфель из нескольких инструментов. Это отличная стартовая позиция.",
-          highlight: "Ваша сумма позволяет сразу диверсифицировать",
-        },
-        "2m_5m": {
-          text:
-            "Ваш капитал открывает доступ ко всем основным стратегиям: от консервативных облигаций до доверительного управления.",
-          highlight: "Все основные стратегии доступны",
-        },
-        more_5m: {
-          text:
-            "С вашим капиталом доступны все стратегии, включая индивидуальные решения и персонального менеджера.",
-          highlight: "Включая индивидуальные стратегии и ДУ",
-        },
-      };
-      var mythContent = mythByAmount[payload.amount_tier] || mythByAmount.up_to_300k;
-
-      var firstStepByAmount = {
-        up_to_300k: "Начните с комфортной суммы — от 10 000 ₽",
-        "300k_2m": "Переведите сумму, с которой хотите начать",
-        "2m_5m": "Переведите часть запланированной суммы",
-        more_5m: "Переведите первый транш для формирования портфеля",
-      };
-      var firstStepText = firstStepByAmount[payload.amount_tier] || firstStepByAmount.up_to_300k;
-
-      var goalAccentByGoal = {
-        purchase:
-          "Для накопления на покупку лучше всего подходят облигации — предсказуемый доход к нужной дате.",
-        passive_income:
-          "Для пассивного дохода обратите внимание на дивидендные акции и купонные облигации.",
-        growth: "Для роста капитала основной инструмент — акции и ETF на индексы.",
-        preservation:
-          "Для сохранения капитала подойдут ОФЗ и фонды облигаций — защита от инфляции.",
-      };
-      var goalAccent = goalAccentByGoal[payload.investment_goal] || goalAccentByGoal.growth;
-
-      var lessonOneCards = [
-        {
-          id: "stocks",
-          name: "Акции",
-          description: "Доли в компаниях. Могут расти в цене и платить дивиденды.",
-          risk_label: "🔴 Высокий",
-          highlighted: payload.instruments.indexOf("stocks") !== -1,
-        },
-        {
-          id: "bonds",
-          name: "Облигации",
-          description: "Долговые бумаги. Предсказуемый доход, низкий риск.",
-          risk_label: "🟢 Низкий",
-          highlighted: payload.instruments.indexOf("bonds") !== -1,
-        },
-        {
-          id: "etf",
-          name: "Фонды (ETF)",
-          description: "Готовые корзины из десятков бумаг. Диверсификация в одной покупке.",
-          risk_label: "🟡 Средний",
-          highlighted: payload.instruments.indexOf("etf") !== -1,
-        },
-        {
-          id: "currency",
-          name: "Валюта",
-          description: "Покупка долларов, евро и юаней на бирже по выгодному курсу.",
-          risk_label: "🟡 Средний",
-          highlighted: payload.instruments.indexOf("currency") !== -1,
-        },
-      ];
-
-      var noviceSteps = [
-        {
-          kind: "lesson1_hero",
-          lesson: 1,
-          screen_id: "screen_1_1",
-          screen_number: 1,
-          gradient: "var(--gradient-lesson-1)",
-          emoji: "🚀",
-          title: "Инвестировать проще, чем кажется",
-          subtitle:
-            "Вы уже сделали первый шаг — открыли счёт. Теперь давайте разберёмся, что дальше.",
-          illustration_alt: "Путь от точки А к точке Б",
-          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
-        },
-        {
-          kind: "lesson1_myth",
-          lesson: 1,
-          screen_id: "screen_1_2",
-          screen_number: 2,
-          gradient: "var(--gradient-lesson-1)",
-          title: "Миф: нужны миллионы",
-          text: mythContent.text,
-          highlight: mythContent.highlight,
-          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
-        },
-        {
-          kind: "lesson1_steps",
-          lesson: 1,
-          screen_id: "screen_1_3",
-          screen_number: 3,
-          gradient: "var(--gradient-lesson-1)",
-          title: "Три шага к первой инвестиции",
-          steps: [
-            {
-              number: 1,
-              emoji: "💳",
-              title: "Пополните счёт",
-              description: firstStepText,
-            },
-            {
-              number: 2,
-              emoji: "🔍",
-              title: "Выберите инструмент",
-              description: "Мы поможем подобрать подходящий — после обучения",
-            },
-            {
-              number: 3,
-              emoji: "🛒",
-              title: "Купите",
-              description: "Одно нажатие — и вы инвестор",
-            },
-          ],
-          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
-        },
-        {
-          kind: "lesson1_cards",
-          lesson: 1,
-          screen_id: "screen_1_4",
-          screen_number: 4,
-          gradient: "var(--gradient-lesson-1)",
-          title: "Что можно купить?",
-          subtitle: "Основные классы активов на бирже",
-          cards: lessonOneCards,
-          goal_accent: goalAccent,
-          hint: "Тап по правой части — следующий экран, по левой — предыдущий.",
-        },
-        {
-          kind: "lesson1_cta",
-          lesson: 1,
-          screen_id: "screen_1_5",
-          screen_number: 5,
-          gradient: "var(--gradient-lesson-1)",
-          title: "Готовы начать?",
-          deeplink: "finamtrade://deposit",
-        },
-        buildStep(
-          2,
-          "🛡️",
-          "Урок 2. Защита первых инвестиций",
-          "Разбираем, как не потерять темп и не допустить типичных ошибок новичка.",
-          "Фокус на риск-контроле и дисциплине входа.",
-          [
-            "Лимиты по объему сделки на старте.",
-            "Правила: когда входить и когда ждать.",
-          ],
-        ),
-        buildStep(
-          3,
-          "🧩",
-          "Урок 3. Первый сбалансированный портфель",
-          "Опираемся на инструменты: " + instrumentList + ".",
-          "Формируем понятную структуру портфеля.",
-          [
-            "Распределяем доли под ваш горизонт.",
-            "Делаем акцент на " + primaryInstrument + ".",
-          ],
-        ),
-        buildStep(
-          4,
-          "📅",
-          "Урок 4. Регулярные пополнения",
-          "Создаем ритм пополнений, чтобы рост капитала был управляемым.",
-          "Минимизируем влияние эмоций на решения.",
-          [
-            "График пополнений и автоконтроль.",
-            "Пошаговый план покупок вместо одного входа.",
-          ],
-        ),
-        buildStep(
-          5,
-          "📉",
-          "Урок 5. Контроль просадки",
-          "Подключаем простые правила снижения риска без сложных формул.",
-          "Контроль риска в ежедневной практике.",
-          [
-            "Ограничения по убытку на позицию.",
-            "Порог пересмотра стратегии и фиксации прибыли.",
-          ],
-        ),
-        buildStep(
-          6,
-          "✅",
-          "Урок 6. План на 30 дней",
-          "Собираем персональный маршрут в понятный чек-лист внедрения.",
-          "Финальный урок перед самостоятельным режимом.",
-          [
-            "Чек-лист еженедельной проверки портфеля.",
-            "Готовый следующий шаг после онбординга.",
-          ],
-        ),
-      ];
-
-      return insertRiskQuizSteps(payload.segment, noviceSteps);
+      return insertRiskQuizSteps(payload.segment, lesson1.concat(lesson2, lesson3Novice, lesson4, lesson5, lesson6));
     }
 
     if (payload.segment === "advanced") {
-      var advancedSteps = [
-        buildStep(
-          1,
-          "📊",
-          "Урок 1. Ревизия структуры",
-          "Обновляем структуру под цель \"" + goalLabel + "\" и капитал " + amountLabel + ".",
-          "Быстрый аудит перед активными действиями.",
-          [
-            "Выявляем перекосы по классам активов.",
-            "Обновляем целевые доли портфеля.",
-          ],
-        ),
-        buildStep(
-          2,
-          "🛡️",
-          "Урок 2. Персональные риск-лимиты",
-          "Формируем рабочие лимиты по риску и просадке под текущий рынок.",
-          "Лимиты, которые реально соблюдать каждый день.",
-          [
-            "Ограничения по позиции и сектору.",
-            "Триггеры для частичной фиксации и выхода.",
-          ],
-        ),
-        buildStep(
-          3,
-          "🎯",
-          "Урок 3. Сценарии входа и выхода",
-          "Настраиваем сценарии под инструменты: " + instrumentList + ".",
-          "Сохраняем гибкость при росте волатильности.",
-          [
-            "План входа по частям вместо одной точки.",
-            "План фиксации прибыли и защитных действий.",
-          ],
-        ),
-        buildStep(
-          4,
-          "⚙️",
-          "Урок 4. Эффективность исполнения",
-          "Оптимизируем частоту сделок и комиссионную нагрузку.",
-          "Улучшаем результат без роста лишнего риска.",
-          [
-            "Контроль частоты сделок по KPI.",
-            "Снижение издержек на исполнение.",
-          ],
-        ),
-        buildStep(
-          5,
-          "📈",
-          "Урок 5. Ребалансировка",
-          "Фиксируем понятный регламент ребалансировки портфеля.",
-          "Портфель остается в целевой структуре.",
-          [
-            "Календарная и пороговая ребалансировка.",
-            "Правила возврата к целевым долям.",
-          ],
-        ),
-        buildStep(
-          6,
-          "🏁",
-          "Урок 6. План роста на квартал",
-          "Собираем персональный план действий на 90 дней.",
-          "Финальный модуль для устойчивого темпа роста.",
-          [
-            "Маршрут регулярной ревизии стратегии.",
-            "Следующий уровень после завершения курса.",
-          ],
-        ),
-      ];
-
-      return insertRiskQuizSteps(payload.segment, advancedSteps);
+      return insertRiskQuizSteps(payload.segment, lesson3Advanced.concat(lesson4, lesson6));
     }
 
-    var expertSteps = [
-      buildStep(
-        1,
-        "🧠",
-        "Урок 1. Экспресс-аудит стратегии",
-        "Проверяем соответствие текущего подхода цели \"" + goalLabel + "\".",
-        "Краткая диагностика ключевых зон роста.",
-        [
-          "Сверяем профиль риска и структуру активов.",
-          "Фиксируем приоритеты корректировки.",
-        ],
-      ),
-      buildStep(
-        2,
-        "🛡️",
-        "Урок 2. Риск-модель портфеля",
-        "Перенастраиваем риск-параметры под объем " + amountLabel + ".",
-        "Точные ограничения без потери гибкости.",
-        [
-          "Лимиты концентрации и допустимой просадки.",
-          "Правила обработки стресс-сценариев.",
-        ],
-      ),
-      buildStep(
-        3,
-        "📉",
-        "Урок 3. Стресс-тест и защита",
-        "Проверяем устойчивость к волатильности и шоковым движениям.",
-        "Сценарный подход к управлению портфелем.",
-        [
-          "Сценарии market drawdown и восстановление.",
-          "Реакции на рост корреляций между активами.",
-        ],
-      ),
-      buildStep(
-        4,
-        "⚖️",
-        "Урок 4. Ликвидность и хедж",
-        "Актуализируем инструменты ликвидности и защитные конструкции.",
-        "Контроль ликвидности на уровне портфеля.",
-        [
-          "План действий при снижении ликвидности.",
-          "Точечное хеджирование ключевых рисков.",
-        ],
-      ),
-      buildStep(
-        5,
-        "🤖",
-        "Урок 5. Автоматизация контроля",
-        "Собираем регулярный мониторинг и сигналы контроля.",
-        "Система, которая поддерживает дисциплину.",
-        [
-          "Авто-проверка порогов риска и структуры.",
-          "Шаблон еженедельного управленческого отчета.",
-        ],
-      ),
-      buildStep(
-        6,
-        "🚀",
-        "Урок 6. План внедрения",
-        "Финализируем маршрут внедрения по инструментам: " + instrumentList + ".",
-        "Переход в стабильный рабочий режим.",
-        [
-          "Порядок внедрения изменений без просадки темпа.",
-          "Следующий шаг после завершения онбординга.",
-        ],
-      ),
-    ];
-
-    return insertRiskQuizSteps(payload.segment, expertSteps);
+    return insertRiskQuizSteps(payload.segment, lesson6);
   }
 
   function resetInlineOnboardingState(state) {
@@ -3225,8 +4263,20 @@
     state.inlineOnboarding.quizResult = null;
     state.inlineOnboarding.quizStartedAt = 0;
     state.inlineOnboarding.lastViewedStepKey = "";
-    state.inlineOnboarding.lesson1StartedAt = 0;
-    state.inlineOnboarding.lesson1Completed = false;
+    state.inlineOnboarding.lessonState = {
+      startedAt: {},
+      completed: {},
+      investorType: null,
+      investorTypeMatch: null,
+      faqOpenId: null,
+      calculator: {
+        monthlyTrades: 4,
+        avgTradeAmount: 20000,
+      },
+      buyClicked: false,
+      tariffSelected: null,
+      onboardingCompleted: false,
+    };
   }
 
   function startInlineOnboardingFlow(state, payload, targetRoute) {
@@ -3244,8 +4294,122 @@
     state.inlineOnboarding.quizResult = null;
     state.inlineOnboarding.quizStartedAt = 0;
     state.inlineOnboarding.lastViewedStepKey = "";
-    state.inlineOnboarding.lesson1StartedAt = 0;
-    state.inlineOnboarding.lesson1Completed = false;
+    state.inlineOnboarding.lessonState = {
+      startedAt: {},
+      completed: {},
+      investorType: null,
+      investorTypeMatch: null,
+      faqOpenId: null,
+      calculator: {
+        monthlyTrades: 4,
+        avgTradeAmount: 20000,
+      },
+      buyClicked: false,
+      tariffSelected: null,
+      onboardingCompleted: false,
+    };
+  }
+
+  function getInlineRiskProfile(inlineState) {
+    if (inlineState && inlineState.quizResult && inlineState.quizResult.final_profile) {
+      return inlineState.quizResult.final_profile;
+    }
+    return null;
+  }
+
+  function ensureInlineLessonState(inlineState) {
+    if (!inlineState.lessonState) {
+      inlineState.lessonState = {
+        startedAt: {},
+        completed: {},
+        investorType: null,
+        investorTypeMatch: null,
+        faqOpenId: null,
+        calculator: {
+          monthlyTrades: 4,
+          avgTradeAmount: 20000,
+        },
+        buyClicked: false,
+        tariffSelected: null,
+        onboardingCompleted: false,
+      };
+    }
+    return inlineState.lessonState;
+  }
+
+  function trackLessonStarted(inlineState, step) {
+    if (!step || !step.lesson_id || !inlineState || !inlineState.payload) {
+      return;
+    }
+    var lessonState = ensureInlineLessonState(inlineState);
+    if (lessonState.startedAt[step.lesson_id]) {
+      return;
+    }
+
+    lessonState.startedAt[step.lesson_id] = Date.now();
+    var payload = inlineState.payload;
+    var eventPayload = {
+      segment: payload.segment,
+      amount_tier: payload.amount_tier,
+      goal: payload.investment_goal,
+    };
+
+    var riskProfile = getInlineRiskProfile(inlineState);
+    if (riskProfile) {
+      eventPayload.risk_profile = riskProfile;
+    }
+
+    trackEvent(step.lesson_id + "_started", eventPayload);
+  }
+
+  function trackLessonScreenViewed(inlineState, step) {
+    if (!step || !step.lesson_id) {
+      return;
+    }
+
+    var eventPayload = {
+      screen_id: step.screen_id || step.kind || step.lesson_id,
+      screen_number: step.screen_number || 1,
+    };
+    if (inlineState && inlineState.payload) {
+      eventPayload.segment = inlineState.payload.segment;
+    }
+    trackEvent(step.lesson_id + "_screen_viewed", eventPayload);
+  }
+
+  function trackLessonCompleted(inlineState, lessonId, extraPayload) {
+    if (!inlineState || !lessonId) {
+      return;
+    }
+    var lessonState = ensureInlineLessonState(inlineState);
+    if (lessonState.completed[lessonId]) {
+      return;
+    }
+
+    var startedAt = lessonState.startedAt[lessonId] || 0;
+    var spent = startedAt ? Math.max(0, Math.round((Date.now() - startedAt) / 1000)) : 0;
+    var payload = {
+      time_spent: spent,
+    };
+
+    if (inlineState.payload) {
+      payload.segment = inlineState.payload.segment;
+      payload.amount_tier = inlineState.payload.amount_tier;
+    }
+    var riskProfile = getInlineRiskProfile(inlineState);
+    if (riskProfile) {
+      payload.risk_profile = riskProfile;
+    }
+    if (extraPayload && typeof extraPayload === "object") {
+      for (var key in extraPayload) {
+        if (Object.prototype.hasOwnProperty.call(extraPayload, key)) {
+          payload[key] = extraPayload[key];
+        }
+      }
+    }
+
+    trackEvent(lessonId + "_completed", payload);
+    lessonState.completed[lessonId] = true;
   }
 
   function getStepLessonNumber(step, fallbackLesson) {
@@ -3380,6 +4544,14 @@
     if (!contentRoot || !step) {
       return;
     }
+
+    var lessonState = ensureInlineLessonState(inlineState || {});
+    var payload = inlineState && inlineState.payload ? inlineState.payload : null;
+    var riskProfile = getInlineRiskProfile(inlineState) || "moderate";
+    var allocation =
+      inlineState && inlineState.quizResult && inlineState.quizResult.allocation
+        ? inlineState.quizResult.allocation
+        : QUIZ_PROFILE_ALLOCATIONS[riskProfile] || QUIZ_PROFILE_ALLOCATIONS.moderate;
 
     contentRoot.innerHTML = "";
     contentRoot.classList.remove(
@@ -3737,6 +4909,838 @@
       return;
     }
 
+    if (step.kind === "lesson2_hero") {
+      contentRoot.classList.add("is-lesson", "is-lesson2");
+      var l2Hero = createStoryNode("section", "segw__lesson2-screen segw__lesson2-screen--hero");
+      l2Hero.appendChild(createStoryNode("div", "segw__lesson2-emoji", step.emoji || "🛡️"));
+      l2Hero.appendChild(createStoryNode("h3", "segw__lesson2-title", step.title || "Главное правило инвестора"));
+      var quote = createStoryNode("blockquote", "segw__lesson2-quote", step.quote || "");
+      l2Hero.appendChild(quote);
+      l2Hero.appendChild(createStoryNode("p", "segw__lesson2-author", step.author || "Уоррен Баффет"));
+      l2Hero.appendChild(createStoryNode("div", "segw__lesson2-shield", "🛡️"));
+      contentRoot.appendChild(l2Hero);
+      return;
+    }
+
+    if (step.kind === "lesson2_risks") {
+      contentRoot.classList.add("is-lesson", "is-lesson2");
+      var l2Risks = createStoryNode("section", "segw__lesson2-screen");
+      l2Risks.appendChild(createStoryNode("h3", "segw__lesson2-title", step.title || "Какие бывают риски?"));
+      var riskGrid = createStoryNode("div", "segw__lesson2-risk-grid");
+      var riskCards = Array.isArray(step.cards) ? step.cards : [];
+      for (var r = 0; r < riskCards.length; r += 1) {
+        var risk = riskCards[r];
+        var riskCard = createStoryNode("article", "segw__lesson2-risk-card");
+        riskCard.style.animationDelay = String(r * 100) + "ms";
+        riskCard.style.setProperty("--risk-color", risk.color || "#fff");
+        riskCard.appendChild(createStoryNode("div", "segw__lesson2-risk-emoji", risk.emoji || "•"));
+        riskCard.appendChild(createStoryNode("strong", "segw__lesson2-risk-title", risk.title || ""));
+        riskCard.appendChild(createStoryNode("p", "segw__lesson2-risk-text", risk.description || ""));
+        riskGrid.appendChild(riskCard);
+      }
+      l2Risks.appendChild(riskGrid);
+      contentRoot.appendChild(l2Risks);
+      return;
+    }
+
+    if (step.kind === "lesson2_management") {
+      contentRoot.classList.add("is-lesson", "is-lesson2");
+      var l2Manage = createStoryNode("section", "segw__lesson2-screen");
+      l2Manage.appendChild(
+        createStoryNode("h3", "segw__lesson2-title", step.title || "Как управлять рисками?"),
+      );
+      l2Manage.appendChild(createStoryNode("p", "segw__lesson2-text", step.text || ""));
+      var rules = createStoryNode("div", "segw__lesson2-rules");
+      var stepRules = Array.isArray(step.rules) ? step.rules : [];
+      for (var rr = 0; rr < stepRules.length; rr += 1) {
+        var rule = stepRules[rr];
+        var ruleCard = createStoryNode("article", "segw__lesson2-rule");
+        ruleCard.style.animationDelay = String(rr * 150) + "ms";
+        ruleCard.appendChild(createStoryNode("span", "segw__lesson2-rule-num", String(rule.number || rr + 1)));
+        var ruleBody = createStoryNode("div", "segw__lesson2-rule-body");
+        ruleBody.appendChild(createStoryNode("strong", "", rule.title || ""));
+        ruleBody.appendChild(createStoryNode("p", "", rule.example || ""));
+        ruleCard.appendChild(ruleBody);
+        rules.appendChild(ruleCard);
+      }
+      l2Manage.appendChild(rules);
+      contentRoot.appendChild(l2Manage);
+      return;
+    }
+
+    if (step.kind === "lesson2_safety") {
+      contentRoot.classList.add("is-lesson", "is-lesson2");
+      var l2Safety = createStoryNode("section", "segw__lesson2-screen");
+      l2Safety.appendChild(
+        createStoryNode("h3", "segw__lesson2-title", step.title || "Правило подушки безопасности"),
+      );
+      l2Safety.appendChild(createStoryNode("p", "segw__lesson2-text", step.text || ""));
+      var tip = createStoryNode("div", "segw__lesson2-tip");
+      tip.appendChild(createStoryNode("span", "segw__lesson2-tip-icon", "💡"));
+      tip.appendChild(createStoryNode("span", "", step.tip || ""));
+      l2Safety.appendChild(tip);
+      contentRoot.appendChild(l2Safety);
+      return;
+    }
+
+    if (step.kind === "lesson2_market") {
+      contentRoot.classList.add("is-lesson", "is-lesson2");
+      var l2Market = createStoryNode("section", "segw__lesson2-screen");
+      l2Market.appendChild(
+        createStoryNode("h3", "segw__lesson2-title", step.title || "Что делать, если рынок падает?"),
+      );
+      l2Market.appendChild(createStoryNode("p", "segw__lesson2-text", step.text || ""));
+      var chart = createStoryNode("div", "segw__lesson2-chart");
+      var chartLine = createStoryNode("div", "segw__lesson2-chart-line");
+      chart.appendChild(chartLine);
+      l2Market.appendChild(chart);
+      var marketRules = createStoryNode("div", "segw__lesson2-rules");
+      var mRules = Array.isArray(step.market_rules) ? step.market_rules : [];
+      for (var mr = 0; mr < mRules.length; mr += 1) {
+        var marketRule = mRules[mr];
+        var marketCard = createStoryNode("article", "segw__lesson2-rule");
+        marketCard.appendChild(createStoryNode("span", "segw__lesson2-rule-num", String(marketRule.number || mr + 1)));
+        var marketBody = createStoryNode("div", "segw__lesson2-rule-body");
+        marketBody.appendChild(createStoryNode("strong", "", marketRule.title || ""));
+        marketBody.appendChild(createStoryNode("p", "", marketRule.description || ""));
+        marketCard.appendChild(marketBody);
+        marketRules.appendChild(marketCard);
+      }
+      l2Market.appendChild(marketRules);
+      contentRoot.appendChild(l2Market);
+      return;
+    }
+
+    if (step.kind === "lesson2_cta") {
+      contentRoot.classList.add("is-lesson", "is-lesson2");
+      var l2Cta = createStoryNode("section", "segw__lesson2-screen segw__lesson2-screen--cta");
+      l2Cta.appendChild(createStoryNode("div", "segw__lesson2-emoji", "✅"));
+      l2Cta.appendChild(createStoryNode("h3", "segw__lesson2-title", step.title || ""));
+      l2Cta.appendChild(createStoryNode("p", "segw__lesson2-subtitle", step.subtitle || ""));
+      contentRoot.appendChild(l2Cta);
+      return;
+    }
+
+    if (step.kind === "lesson3_hero") {
+      contentRoot.classList.add("is-lesson", "is-lesson3");
+      var l3Hero = createStoryNode("section", "segw__lesson3-screen segw__lesson3-screen--hero");
+      l3Hero.appendChild(createStoryNode("div", "segw__lesson3-emoji", step.emoji || "📊"));
+      l3Hero.appendChild(createStoryNode("h3", "segw__lesson3-title", step.title || ""));
+      l3Hero.appendChild(createStoryNode("p", "segw__lesson3-subtitle", step.subtitle || ""));
+      l3Hero.appendChild(createStoryNode("div", "segw__lesson3-visual", "Пазл: акции, облигации, фонды, кэш"));
+      contentRoot.appendChild(l3Hero);
+      return;
+    }
+
+    if (step.kind === "lesson3_allocation") {
+      contentRoot.classList.add("is-lesson", "is-lesson3");
+      var l3Allocation = createStoryNode("section", "segw__lesson3-screen");
+      l3Allocation.appendChild(createStoryNode("h3", "segw__lesson3-title", step.title || "Что такое аллокация?"));
+      l3Allocation.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson3-text",
+          "Аллокация — это распределение денег между разными классами активов. Правильная аллокация снижает риски и повышает стабильность доходности.",
+        ),
+      );
+      var pie = createStoryNode("div", "segw__lesson3-pie");
+      pie.style.background =
+        "conic-gradient(#4CAF50 0 40%, #2196F3 40% 80%, #FF9800 80% 95%, #9E9E9E 95% 100%)";
+      l3Allocation.appendChild(pie);
+      l3Allocation.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson3-note",
+          "Это примерное распределение — ваш портфель будет зависеть от вашего отношения к риску.",
+        ),
+      );
+      contentRoot.appendChild(l3Allocation);
+      return;
+    }
+
+    if (step.kind === "lesson3_portfolio") {
+      contentRoot.classList.add("is-lesson", "is-lesson3");
+      var l3Portfolio = createStoryNode("section", "segw__lesson3-screen");
+      l3Portfolio.appendChild(createStoryNode("h3", "segw__lesson3-title", step.title || "Пример портфеля"));
+      l3Portfolio.appendChild(createStoryNode("p", "segw__lesson3-subtitle", step.subtitle || ""));
+      var portfolio = step.portfolio || {};
+      l3Portfolio.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson3-portfolio-head",
+          (portfolio.name || "Портфель") + " · " + (portfolio.total || ""),
+        ),
+      );
+      var table = createStoryNode("div", "segw__lesson3-portfolio-table");
+      var instrumentRows = Array.isArray(portfolio.instruments) ? portfolio.instruments : [];
+      for (var pr = 0; pr < instrumentRows.length; pr += 1) {
+        var instrument = instrumentRows[pr];
+        var row = createStoryNode("div", "segw__lesson3-portfolio-row");
+        row.style.animationDelay = String(pr * 100) + "ms";
+        row.appendChild(createStoryNode("span", "", instrument.ticker + " · " + instrument.name));
+        row.appendChild(createStoryNode("strong", "", instrument.pct + " · " + instrument.amount));
+        table.appendChild(row);
+      }
+      l3Portfolio.appendChild(table);
+      l3Portfolio.appendChild(createStoryNode("p", "segw__lesson3-note", portfolio.note || ""));
+      l3Portfolio.appendChild(createStoryNode("div", "segw__lesson3-goal-advice", step.goal_advice || ""));
+      contentRoot.appendChild(l3Portfolio);
+      return;
+    }
+
+    if (step.kind === "lesson3_spectrum") {
+      contentRoot.classList.add("is-lesson", "is-lesson3");
+      var l3Spectrum = createStoryNode("section", "segw__lesson3-screen");
+      l3Spectrum.appendChild(
+        createStoryNode("h3", "segw__lesson3-title", step.title || "Портфель зависит от вашего отношения к риску"),
+      );
+      l3Spectrum.appendChild(createStoryNode("p", "segw__lesson3-text", step.text || ""));
+      var spectrum = createStoryNode("div", "segw__lesson3-spectrum");
+      var profiles = [
+        { name: "Консервативный", visual: "🔵🔵🔵🔵🟢", stocks: 20, bonds: 80 },
+        { name: "Умеренный", visual: "🔵🔵🔵🟢🟢", stocks: 50, bonds: 50 },
+        { name: "Агрессивный", visual: "🔵🟢🟢🟢🟢", stocks: 80, bonds: 20 },
+      ];
+      for (var sp = 0; sp < profiles.length; sp += 1) {
+        var profile = profiles[sp];
+        var profileRow = createStoryNode("div", "segw__lesson3-spectrum-row");
+        profileRow.appendChild(createStoryNode("strong", "", profile.name));
+        profileRow.appendChild(createStoryNode("span", "", profile.visual));
+        profileRow.appendChild(createStoryNode("small", "", "Акции " + profile.stocks + "% · Облигации " + profile.bonds + "%"));
+        spectrum.appendChild(profileRow);
+      }
+      l3Spectrum.appendChild(spectrum);
+      l3Spectrum.appendChild(createStoryNode("p", "segw__lesson3-note", "Какой профиль ваш? Узнаем через 4 простых вопроса."));
+      contentRoot.appendChild(l3Spectrum);
+      return;
+    }
+
+    if (step.kind === "lesson3_cta") {
+      contentRoot.classList.add("is-lesson", "is-lesson3");
+      var l3Cta = createStoryNode("section", "segw__lesson3-screen segw__lesson3-screen--cta");
+      l3Cta.appendChild(createStoryNode("div", "segw__lesson3-emoji", "🧠"));
+      l3Cta.appendChild(createStoryNode("h3", "segw__lesson3-title", step.title || ""));
+      l3Cta.appendChild(createStoryNode("p", "segw__lesson3-subtitle", step.subtitle || ""));
+      l3Cta.appendChild(createStoryNode("p", "segw__lesson3-text", step.description || ""));
+      contentRoot.appendChild(l3Cta);
+      return;
+    }
+
+    if (step.kind === "lesson4_hero") {
+      contentRoot.classList.add("is-lesson", "is-lesson4");
+      var meta = LESSON_4_PROFILE_META[riskProfile] || LESSON_4_PROFILE_META.moderate;
+      var l4Hero = createStoryNode("section", "segw__lesson4-screen");
+      var badge = createStoryNode("div", "segw__lesson4-profile-badge", meta.emoji + " " + meta.title);
+      badge.style.setProperty("--profile-color", meta.color);
+      l4Hero.appendChild(badge);
+      l4Hero.appendChild(createStoryNode("p", "segw__lesson4-subtitle", meta.subtitle));
+      l4Hero.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson4-text",
+          "Теперь давайте разберёмся, как собрать портфель под ваш профиль.",
+        ),
+      );
+      contentRoot.appendChild(l4Hero);
+      return;
+    }
+
+    if (step.kind === "lesson4_allocation") {
+      contentRoot.classList.add("is-lesson", "is-lesson4");
+      var l4Allocation = createStoryNode("section", "segw__lesson4-screen");
+      l4Allocation.appendChild(createStoryNode("h3", "segw__lesson4-title", "Ваша рекомендуемая аллокация"));
+      l4Allocation.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson4-text",
+          "На основе вашего риск-профиля мы рекомендуем следующее распределение активов:",
+        ),
+      );
+      var l4Pie = createStoryNode("div", "segw__lesson4-pie");
+      var l4Stocks = allocation.stocks_pct || 0;
+      var l4Bonds = allocation.bonds_pct || 0;
+      var l4Alt = allocation.alternatives_pct || 0;
+      var l4Cash = allocation.cash_pct || 0;
+      l4Pie.style.background =
+        "conic-gradient(#4CAF50 0 " +
+        String(l4Stocks) +
+        "%, #2196F3 " +
+        String(l4Stocks) +
+        "% " +
+        String(l4Stocks + l4Bonds) +
+        "%, #FF9800 " +
+        String(l4Stocks + l4Bonds) +
+        "% " +
+        String(l4Stocks + l4Bonds + l4Alt) +
+        "%, #9E9E9E " +
+        String(l4Stocks + l4Bonds + l4Alt) +
+        "% 100%)";
+      l4Allocation.appendChild(l4Pie);
+      var l4Breakdown = createStoryNode("div", "segw__lesson4-breakdown");
+      var l4Rows = [
+        { label: "Акции", value: l4Stocks, desc: "Рост капитала" },
+        { label: "Облигации", value: l4Bonds, desc: "Стабильный доход" },
+        { label: "Альтернативы", value: l4Alt, desc: "Диверсификация" },
+        { label: "Кэш", value: l4Cash, desc: "Ликвидность" },
+      ];
+      for (var l4i = 0; l4i < l4Rows.length; l4i += 1) {
+        var l4RowData = l4Rows[l4i];
+        var l4Row = createStoryNode("div", "segw__lesson4-row");
+        l4Row.appendChild(createStoryNode("span", "", l4RowData.label + " · " + l4RowData.desc));
+        l4Row.appendChild(createStoryNode("strong", "", String(l4RowData.value) + "%"));
+        l4Breakdown.appendChild(l4Row);
+      }
+      l4Allocation.appendChild(l4Breakdown);
+      l4Allocation.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson4-note",
+          "Это базовая рекомендация. Точное распределение зависит от ваших целей и ситуации.",
+        ),
+      );
+      contentRoot.appendChild(l4Allocation);
+      return;
+    }
+
+    if (step.kind === "lesson4_levels") {
+      contentRoot.classList.add("is-lesson", "is-lesson4");
+      var l4Levels = createStoryNode("section", "segw__lesson4-screen");
+      l4Levels.appendChild(createStoryNode("h3", "segw__lesson4-title", "Три уровня диверсификации"));
+      l4Levels.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson4-text",
+          "Диверсификация — это не просто «купить разные бумаги». Это система из трёх уровней:",
+        ),
+      );
+      var levels = [
+        {
+          icon: "📊",
+          title: "По классам активов",
+          description: "Акции + облигации + фонды + альтернативы",
+          example: "Если акции падают, облигации могут расти",
+        },
+        {
+          icon: "🏭",
+          title: "По секторам экономики",
+          description: "IT + финансы + энергетика + потребительский сектор",
+          example: "Кризис в IT не затронет энергетику",
+        },
+        {
+          icon: "🌍",
+          title: "По географии",
+          description: "Россия + США + Европа + развивающиеся рынки",
+          example: "Санкции в России не влияют на американские акции",
+        },
+      ];
+      var levelList = createStoryNode("div", "segw__lesson4-levels");
+      for (var lv = 0; lv < levels.length; lv += 1) {
+        var level = levels[lv];
+        var levelCard = createStoryNode("article", "segw__lesson4-level-card");
+        levelCard.style.animationDelay = String(lv * 150) + "ms";
+        levelCard.appendChild(createStoryNode("strong", "", level.icon + " " + level.title));
+        levelCard.appendChild(createStoryNode("p", "", level.description));
+        levelCard.appendChild(createStoryNode("small", "", level.example));
+        levelList.appendChild(levelCard);
+      }
+      l4Levels.appendChild(levelList);
+      contentRoot.appendChild(l4Levels);
+      return;
+    }
+
+    if (step.kind === "lesson4_portfolio") {
+      contentRoot.classList.add("is-lesson", "is-lesson4");
+      var l4Meta = LESSON_4_PROFILE_META[riskProfile] || LESSON_4_PROFILE_META.moderate;
+      var l4BasePortfolio = LESSON_3_PORTFOLIOS_BY_AMOUNT[payload ? payload.amount_tier : "up_to_300k"] || LESSON_3_PORTFOLIOS_BY_AMOUNT.up_to_300k;
+      var l4Portfolio = createStoryNode("section", "segw__lesson4-screen");
+      l4Portfolio.appendChild(
+        createStoryNode(
+          "h3",
+          "segw__lesson4-title",
+          "Пример диверсифицированного портфеля для вашего профиля",
+        ),
+      );
+      l4Portfolio.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson4-subtitle",
+          "Портфель для " +
+            l4Meta.name +
+            " инвестора с суммой " +
+            (l4BasePortfolio.total || ""),
+        ),
+      );
+      var l4Table = createStoryNode("div", "segw__lesson4-breakdown");
+      var l4Instruments = Array.isArray(l4BasePortfolio.instruments) ? l4BasePortfolio.instruments : [];
+      for (var l4p = 0; l4p < l4Instruments.length; l4p += 1) {
+        var l4Instrument = l4Instruments[l4p];
+        var l4InstrumentRow = createStoryNode("div", "segw__lesson4-row");
+        l4InstrumentRow.appendChild(
+          createStoryNode("span", "", l4Instrument.ticker + " · " + l4Instrument.name),
+        );
+        l4InstrumentRow.appendChild(
+          createStoryNode("strong", "", l4Instrument.pct + " · " + l4Instrument.amount),
+        );
+        l4Table.appendChild(l4InstrumentRow);
+      }
+      l4Portfolio.appendChild(l4Table);
+      var l4Highlight = createStoryNode("div", "segw__lesson4-level-card");
+      l4Highlight.appendChild(
+        createStoryNode(
+          "strong",
+          "",
+          "Обратите внимание: в портфеле представлены все три уровня диверсификации",
+        ),
+      );
+      l4Highlight.appendChild(createStoryNode("p", "", "✓ Разные классы активов"));
+      l4Highlight.appendChild(createStoryNode("p", "", "✓ Разные секторы"));
+      l4Highlight.appendChild(createStoryNode("p", "", "✓ Разные страны (через ETF)"));
+      l4Portfolio.appendChild(l4Highlight);
+      contentRoot.appendChild(l4Portfolio);
+      return;
+    }
+
+    if (step.kind === "lesson4_cta") {
+      contentRoot.classList.add("is-lesson", "is-lesson4");
+      var l4Cta = createStoryNode("section", "segw__lesson4-screen segw__lesson4-screen--cta");
+      l4Cta.appendChild(createStoryNode("div", "segw__lesson2-emoji", "✅"));
+      l4Cta.appendChild(createStoryNode("h3", "segw__lesson4-title", step.title || ""));
+      l4Cta.appendChild(createStoryNode("p", "segw__lesson4-subtitle", step.subtitle || ""));
+      contentRoot.appendChild(l4Cta);
+      return;
+    }
+
+    if (step.kind === "lesson5_hero") {
+      contentRoot.classList.add("is-lesson", "is-lesson5");
+      var l5Hero = createStoryNode("section", "segw__lesson5-screen segw__lesson5-screen--hero");
+      l5Hero.appendChild(createStoryNode("div", "segw__lesson5-emoji", "🛒"));
+      l5Hero.appendChild(createStoryNode("h3", "segw__lesson5-title", "Готовы к первой покупке?"));
+      l5Hero.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson5-subtitle",
+          "Сейчас мы подберём конкретные инструменты под ваш профиль и цели.",
+        ),
+      );
+      contentRoot.appendChild(l5Hero);
+      return;
+    }
+
+    if (step.kind === "lesson5_top3") {
+      contentRoot.classList.add("is-lesson", "is-lesson5");
+      var top3 = getLesson5TopInstruments(riskProfile, payload ? payload.investment_goal : "growth");
+      var l5Top = createStoryNode("section", "segw__lesson5-screen");
+      l5Top.appendChild(createStoryNode("h3", "segw__lesson5-title", "Топ-3 инструмента для вашего профиля"));
+      l5Top.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson5-subtitle",
+          "На основе вашего профиля и цели " + (GOAL_LABELS[payload ? payload.investment_goal : "growth"] || ""),
+        ),
+      );
+      var topCards = createStoryNode("div", "segw__lesson5-top-list");
+      for (var t3 = 0; t3 < top3.length; t3 += 1) {
+        var topItem = top3[t3];
+        var topCard = createStoryNode("article", "segw__lesson5-top-card");
+        if (t3 === 0) {
+          topCard.classList.add("is-primary");
+        }
+        var topHead = createStoryNode("div", "segw__lesson5-top-head");
+        topHead.appendChild(createStoryNode("strong", "", topItem.name + " (" + topItem.ticker + ")"));
+        if (t3 === 0) {
+          topHead.appendChild(createStoryNode("span", "segw__lesson5-badge", "№1 для вас"));
+        }
+        topCard.appendChild(topHead);
+        topCard.appendChild(createStoryNode("p", "", topItem.description));
+        topCard.appendChild(
+          createStoryNode("small", "", topItem.yield + " · " + topItem.risk + " · от " + topItem.min_amount),
+        );
+        topCard.appendChild(createStoryNode("p", "segw__lesson5-why", "Почему: " + topItem.why));
+        topCards.appendChild(topCard);
+      }
+      l5Top.appendChild(topCards);
+      l5Top.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson5-note",
+          "Это базовые рекомендации. Точный выбор зависит от вашей ситуации.",
+        ),
+      );
+      contentRoot.appendChild(l5Top);
+      return;
+    }
+
+    if (step.kind === "lesson5_quiz") {
+      contentRoot.classList.add("is-lesson", "is-lesson5");
+      var l5Quiz = createStoryNode("section", "segw__lesson5-screen");
+      l5Quiz.appendChild(createStoryNode("h3", "segw__lesson5-title", "Какой вы инвестор?"));
+      l5Quiz.appendChild(
+        createStoryNode("p", "segw__lesson5-subtitle", "Выберите вариант, который вам ближе:"),
+      );
+      var quizOptions = [
+        { id: "cautious", emoji: "🛡️", title: "Осторожный", description: "Предпочитаю надёжность, готов к меньшей доходности" },
+        { id: "balanced", emoji: "⚖️", title: "Сбалансированный", description: "Хочу баланс между риском и доходностью" },
+        { id: "active", emoji: "🚀", title: "Активный", description: "Готов к риску ради высокой доходности" },
+      ];
+      var quizList = createStoryNode("div", "segw__lesson5-quiz-list");
+      for (var qo = 0; qo < quizOptions.length; qo += 1) {
+        var quizOption = quizOptions[qo];
+        var quizButton = createStoryNode(
+          "button",
+          "segw__lesson5-quiz-option" + (lessonState.investorType === quizOption.id ? " is-selected" : ""),
+        );
+        quizButton.type = "button";
+        quizButton.setAttribute("data-action", "lesson5-investor-select");
+        quizButton.setAttribute("data-value", quizOption.id);
+        quizButton.appendChild(createStoryNode("strong", "", quizOption.emoji + " " + quizOption.title));
+        quizButton.appendChild(createStoryNode("p", "", quizOption.description));
+        quizList.appendChild(quizButton);
+      }
+      l5Quiz.appendChild(quizList);
+      l5Quiz.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson5-note",
+          "Это не влияет на ваш риск-профиль, просто помогает уточнить рекомендации.",
+        ),
+      );
+      if (lessonState.investorTypeMatch === false) {
+        l5Quiz.appendChild(
+          createStoryNode(
+            "p",
+            "segw__lesson5-mismatch",
+            "Ваш выбор отличается от результата анкеты. При желании вы можете пройти анкету риска заново.",
+          ),
+        );
+      }
+      contentRoot.appendChild(l5Quiz);
+      return;
+    }
+
+    if (step.kind === "lesson5_howto") {
+      contentRoot.classList.add("is-lesson", "is-lesson5");
+      var l5Howto = createStoryNode("section", "segw__lesson5-screen");
+      l5Howto.appendChild(createStoryNode("h3", "segw__lesson5-title", "Как совершить первую покупку"));
+      l5Howto.appendChild(
+        createStoryNode("p", "segw__lesson5-subtitle", "Это проще, чем кажется — всего 4 шага:"),
+      );
+      var purchaseSteps = [
+        { emoji: "🔍", title: "Найдите инструмент", text: "В каталоге или через поиск по тикеру (например, SBER)" },
+        { emoji: "💰", title: "Укажите сумму", text: "Введите сумму или количество бумаг" },
+        { emoji: "✅", title: "Проверьте заявку", text: "Убедитесь, что всё правильно" },
+        { emoji: "🎉", title: "Подтвердите покупку", text: "Одно нажатие — и вы инвестор!" },
+      ];
+      var howtoList = createStoryNode("div", "segw__lesson5-top-list");
+      for (var hs = 0; hs < purchaseSteps.length; hs += 1) {
+        var purchase = purchaseSteps[hs];
+        var purchaseCard = createStoryNode("article", "segw__lesson5-top-card");
+        purchaseCard.style.animationDelay = String(hs * 150) + "ms";
+        purchaseCard.appendChild(createStoryNode("strong", "", purchase.emoji + " " + purchase.title));
+        purchaseCard.appendChild(createStoryNode("p", "", purchase.text));
+        howtoList.appendChild(purchaseCard);
+      }
+      l5Howto.appendChild(howtoList);
+      contentRoot.appendChild(l5Howto);
+      return;
+    }
+
+    if (step.kind === "lesson5_faq") {
+      contentRoot.classList.add("is-lesson", "is-lesson5");
+      var l5Faq = createStoryNode("section", "segw__lesson5-screen");
+      l5Faq.appendChild(createStoryNode("h3", "segw__lesson5-title", "Частые вопросы новичков"));
+      var faqItems = [
+        {
+          id: "when_buy",
+          q: "Когда лучше покупать?",
+          a: "Для долгосрочных инвестиций время входа не критично. Главное — начать. Опытные инвесторы используют стратегию усреднения: покупают регулярно небольшими суммами.",
+        },
+        {
+          id: "lose_more",
+          q: "Можно ли потерять больше, чем вложил?",
+          a: "Нет, при покупке акций и облигаций вы можете потерять максимум вложенную сумму. Убыток больше 100% возможен только при использовании кредитного плеча.",
+        },
+        {
+          id: "when_sell",
+          q: "Когда продавать?",
+          a: "Зависит от вашей цели. Если инвестируете на 3+ года — краткосрочные колебания не важны. Продавайте, когда достигли цели или изменились обстоятельства.",
+        },
+        {
+          id: "check_daily",
+          q: "Нужно ли следить за рынком каждый день?",
+          a: "Нет. Для долгосрочных инвестиций достаточно проверять портфель раз в месяц. Частая проверка может привести к эмоциональным решениям.",
+        },
+      ];
+      var faqList = createStoryNode("div", "segw__lesson5-faq");
+      for (var fq = 0; fq < faqItems.length; fq += 1) {
+        var faq = faqItems[fq];
+        var faqRow = createStoryNode("article", "segw__lesson5-faq-item");
+        var faqButton = createStoryNode("button", "segw__lesson5-faq-question", faq.q);
+        faqButton.type = "button";
+        faqButton.setAttribute("data-action", "lesson5-faq-toggle");
+        faqButton.setAttribute("data-question-id", faq.id);
+        faqRow.appendChild(faqButton);
+        if (lessonState.faqOpenId === faq.id) {
+          faqRow.appendChild(createStoryNode("p", "segw__lesson5-faq-answer", faq.a));
+        }
+        faqList.appendChild(faqRow);
+      }
+      l5Faq.appendChild(faqList);
+      contentRoot.appendChild(l5Faq);
+      return;
+    }
+
+    if (step.kind === "lesson5_cta") {
+      contentRoot.classList.add("is-lesson", "is-lesson5");
+      var l5Top3 = getLesson5TopInstruments(riskProfile, payload ? payload.investment_goal : "growth");
+      var firstInstrument = l5Top3[0] || {
+        name: "ETF на индекс Мосбиржи",
+        ticker: "TMOS",
+        type: "ETF",
+        yield: "~15% годовых",
+        min_amount: "500 ₽",
+        deeplink: "finamtrade://instrument/TMOS",
+      };
+      var l5Cta = createStoryNode("section", "segw__lesson5-screen segw__lesson5-screen--cta");
+      l5Cta.appendChild(createStoryNode("h3", "segw__lesson5-title", "Готовы к первой покупке?"));
+      l5Cta.appendChild(
+        createStoryNode("p", "segw__lesson5-subtitle", "Рекомендуем начать с " + firstInstrument.name),
+      );
+      var instrumentPreview = createStoryNode(
+        "div",
+        "segw__lesson5-top-card is-primary",
+        firstInstrument.ticker + " · " + firstInstrument.type,
+      );
+      instrumentPreview.appendChild(
+        createStoryNode("p", "", firstInstrument.yield + " · минимум " + firstInstrument.min_amount),
+      );
+      l5Cta.appendChild(instrumentPreview);
+      var l5Actions = createStoryNode("div", "segw__lesson1-cta-actions");
+      var buyButton = createStoryNode(
+        "button",
+        "segw__lesson1-cta segw__lesson1-cta--primary",
+        "Купить " + firstInstrument.ticker,
+      );
+      buyButton.type = "button";
+      buyButton.setAttribute("data-action", "lesson5-buy");
+      buyButton.setAttribute("data-deeplink", firstInstrument.deeplink);
+      buyButton.setAttribute("data-instrument", firstInstrument.ticker);
+      var continueL5 = createStoryNode(
+        "button",
+        "segw__lesson1-cta segw__lesson1-cta--secondary",
+        "Продолжить обучение",
+      );
+      continueL5.type = "button";
+      continueL5.setAttribute("data-action", "lesson5-continue");
+      l5Actions.appendChild(buyButton);
+      l5Actions.appendChild(continueL5);
+      l5Cta.appendChild(l5Actions);
+      contentRoot.appendChild(l5Cta);
+      return;
+    }
+
+    if (step.kind === "lesson6_hero") {
+      contentRoot.classList.add("is-lesson", "is-lesson6");
+      var l6Hero = createStoryNode("section", "segw__lesson6-screen segw__lesson6-screen--hero");
+      l6Hero.appendChild(createStoryNode("div", "segw__lesson6-emoji", "💳"));
+      l6Hero.appendChild(createStoryNode("h3", "segw__lesson6-title", "Последний шаг перед покупкой"));
+      l6Hero.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson6-subtitle",
+          "Выбор тарифа влияет на комиссии. Давайте подберём оптимальный для вас.",
+        ),
+      );
+      contentRoot.appendChild(l6Hero);
+      return;
+    }
+
+    if (step.kind === "lesson6_intro") {
+      contentRoot.classList.add("is-lesson", "is-lesson6");
+      var l6Intro = createStoryNode("section", "segw__lesson6-screen");
+      l6Intro.appendChild(createStoryNode("h3", "segw__lesson6-title", "Что такое тариф?"));
+      l6Intro.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson6-text",
+          "Тариф определяет размер комиссий за сделки, доступ к аналитике и дополнительные сервисы. Правильный выбор тарифа может сэкономить тысячи рублей в год.",
+        ),
+      );
+      var compare = createStoryNode("div", "segw__lesson6-compare");
+      compare.appendChild(createStoryNode("div", "segw__lesson6-compare-row", "Базовый: 177 ₽"));
+      compare.appendChild(createStoryNode("div", "segw__lesson6-compare-row", "Инвестор: 30 ₽"));
+      compare.appendChild(createStoryNode("div", "segw__lesson6-compare-row", "Трейдер: 5 ₽"));
+      l6Intro.appendChild(compare);
+      l6Intro.appendChild(createStoryNode("p", "segw__lesson6-note", "Экономия до 172 ₽ на одной сделке"));
+      contentRoot.appendChild(l6Intro);
+      return;
+    }
+
+    if (step.kind === "lesson6_compare") {
+      contentRoot.classList.add("is-lesson", "is-lesson6");
+      var l6Compare = createStoryNode("section", "segw__lesson6-screen");
+      l6Compare.appendChild(createStoryNode("h3", "segw__lesson6-title", "Сравнение тарифов"));
+      l6Compare.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson6-subtitle",
+          "Выберите тариф, который подходит вашему стилю инвестирования",
+        ),
+      );
+      var tariffsWrap = createStoryNode("div", "segw__lesson6-tariffs");
+      for (var tr = 0; tr < LESSON_6_TARIFFS.length; tr += 1) {
+        var tariff = LESSON_6_TARIFFS[tr];
+        var tariffCard = createStoryNode(
+          "article",
+          "segw__lesson6-tariff-card" + (tariff.recommended ? " is-recommended" : ""),
+        );
+        tariffCard.appendChild(createStoryNode("strong", "", tariff.name + " · " + tariff.price));
+        if (tariff.badge) {
+          tariffCard.appendChild(createStoryNode("span", "segw__lesson6-tariff-badge", tariff.badge));
+        }
+        tariffCard.appendChild(createStoryNode("p", "", tariff.commission));
+        tariffCard.appendChild(createStoryNode("small", "", tariff.best_for));
+        tariffsWrap.appendChild(tariffCard);
+      }
+      l6Compare.appendChild(tariffsWrap);
+      contentRoot.appendChild(l6Compare);
+      return;
+    }
+
+    if (step.kind === "lesson6_recommendation") {
+      contentRoot.classList.add("is-lesson", "is-lesson6");
+      var recommendation = getRecommendedTariff(
+        payload ? payload.amount_tier : "up_to_300k",
+        riskProfile,
+      );
+      var l6Recommendation = createStoryNode("section", "segw__lesson6-screen");
+      l6Recommendation.appendChild(createStoryNode("h3", "segw__lesson6-title", "Какой тариф вам подходит?"));
+      l6Recommendation.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson6-subtitle",
+          "Рекомендуем тариф: " + (recommendation.tariff || "investor").toUpperCase(),
+        ),
+      );
+      l6Recommendation.appendChild(createStoryNode("p", "segw__lesson6-text", recommendation.reason));
+
+      var calc = lessonState.calculator || { monthlyTrades: 4, avgTradeAmount: 20000 };
+      var calcResult = calculateTariffSavings(calc.monthlyTrades, calc.avgTradeAmount);
+      var calculator = createStoryNode("div", "segw__lesson6-calculator");
+      calculator.appendChild(createStoryNode("p", "segw__lesson6-note", "Калькулятор экономии"));
+
+      var tradesLabel = createStoryNode("label", "segw__lesson6-slider-label", "Сделок в месяц: " + String(calc.monthlyTrades));
+      var tradesRange = createStoryNode("input", "segw__lesson6-slider");
+      tradesRange.type = "range";
+      tradesRange.min = "1";
+      tradesRange.max = "20";
+      tradesRange.value = String(calc.monthlyTrades);
+      tradesRange.setAttribute("data-action", "lesson6-slider");
+      tradesRange.setAttribute("data-field", "monthly_trades");
+
+      var amountLabel = createStoryNode(
+        "label",
+        "segw__lesson6-slider-label",
+        "Средняя сумма сделки: " + formatMoney(calc.avgTradeAmount),
+      );
+      var amountRange = createStoryNode("input", "segw__lesson6-slider");
+      amountRange.type = "range";
+      amountRange.min = "5000";
+      amountRange.max = "100000";
+      amountRange.step = "5000";
+      amountRange.value = String(calc.avgTradeAmount);
+      amountRange.setAttribute("data-action", "lesson6-slider");
+      amountRange.setAttribute("data-field", "avg_trade_amount");
+
+      var result = createStoryNode("div", "segw__lesson6-calc-result");
+      result.appendChild(
+        createStoryNode(
+          "p",
+          "",
+          "Базовый: " + formatMoney(calcResult.basic_annual_commission) + " / год",
+        ),
+      );
+      result.appendChild(
+        createStoryNode(
+          "p",
+          "",
+          "Инвестор: " + formatMoney(calcResult.investor_annual_commission) + " / год",
+        ),
+      );
+      result.appendChild(
+        createStoryNode(
+          "strong",
+          "",
+          "Экономия: " + formatMoney(calcResult.savings) + " (" + String(calcResult.savings_pct) + "%)",
+        ),
+      );
+
+      calculator.appendChild(tradesLabel);
+      calculator.appendChild(tradesRange);
+      calculator.appendChild(amountLabel);
+      calculator.appendChild(amountRange);
+      calculator.appendChild(result);
+      l6Recommendation.appendChild(calculator);
+      contentRoot.appendChild(l6Recommendation);
+      return;
+    }
+
+    if (step.kind === "lesson6_cta") {
+      contentRoot.classList.add("is-lesson", "is-lesson6");
+      var l6RecommendationState = getRecommendedTariff(
+        payload ? payload.amount_tier : "up_to_300k",
+        riskProfile,
+      );
+      var tariffId = l6RecommendationState.tariff;
+      var tariffCardData = null;
+      for (var tf = 0; tf < LESSON_6_TARIFFS.length; tf += 1) {
+        if (LESSON_6_TARIFFS[tf].id === tariffId) {
+          tariffCardData = LESSON_6_TARIFFS[tf];
+          break;
+        }
+      }
+      if (!tariffCardData) {
+        tariffCardData = LESSON_6_TARIFFS[1];
+      }
+
+      var l6Cta = createStoryNode("section", "segw__lesson6-screen segw__lesson6-screen--cta");
+      l6Cta.appendChild(
+        createStoryNode("h3", "segw__lesson6-title", "Подключите тариф " + tariffCardData.name),
+      );
+      l6Cta.appendChild(createStoryNode("p", "segw__lesson6-subtitle", tariffCardData.price));
+      l6Cta.appendChild(createStoryNode("p", "segw__lesson6-text", l6RecommendationState.reason));
+      var l6Actions = createStoryNode("div", "segw__lesson1-cta-actions");
+      var connect = createStoryNode(
+        "button",
+        "segw__lesson1-cta segw__lesson1-cta--primary",
+        "Подключить " + tariffCardData.name,
+      );
+      connect.type = "button";
+      connect.setAttribute("data-action", "lesson6-connect-tariff");
+      connect.setAttribute("data-tariff-id", tariffCardData.id);
+      connect.setAttribute("data-deeplink", "finamtrade://tariff/" + tariffCardData.id);
+      var compareTariffs = createStoryNode(
+        "button",
+        "segw__lesson1-cta segw__lesson1-cta--secondary",
+        "Выбрать другой тариф",
+      );
+      compareTariffs.type = "button";
+      compareTariffs.setAttribute("data-action", "lesson6-open-tariffs");
+      compareTariffs.setAttribute("data-deeplink", "finamtrade://tariffs");
+      var complete = createStoryNode(
+        "button",
+        "segw__lesson1-cta segw__lesson1-cta--secondary",
+        "Завершить обучение",
+      );
+      complete.type = "button";
+      complete.setAttribute("data-action", "lesson6-complete");
+      l6Actions.appendChild(connect);
+      l6Actions.appendChild(compareTariffs);
+      l6Actions.appendChild(complete);
+      l6Cta.appendChild(l6Actions);
+      contentRoot.appendChild(l6Cta);
+      return;
+    }
+
     contentRoot.classList.add("is-lesson");
     contentRoot.appendChild(createStoryNode("div", "segw__story-emoji", step.emoji || "📘"));
     contentRoot.appendChild(
@@ -3777,21 +5781,11 @@
     }
 
     if (refs.routePrep) {
-      if (inlineState.awaitingStart && inlineState.payload) {
-        refs.routePrep.classList.remove("is-hidden");
-        refs.routePrep.classList.toggle("is-exiting", inlineState.transitioningToLessons);
-        if (refs.routePrepText) {
-          refs.routePrepText.textContent =
-            ROUTE_PREP_TEXT_BY_SEGMENT[inlineState.payload.segment] ||
-            "Подготовили персональный маршрут обучения.";
-        }
-      } else {
-        refs.routePrep.classList.add("is-hidden");
-        refs.routePrep.classList.remove("is-exiting");
-      }
+      refs.routePrep.classList.add("is-hidden");
+      refs.routePrep.classList.remove("is-exiting");
     }
     if (refs.routePrepStart) {
-      refs.routePrepStart.disabled = inlineState.transitioningToLessons;
+      refs.routePrepStart.disabled = false;
     }
 
     if (inlineState.awaitingStart) {
@@ -3814,34 +5808,44 @@
     var isLastStep = inlineState.activeStepIndex === maxStepIndex;
     var hasExternalLink = hasConfiguredExternalOnboarding() && Boolean(inlineState.targetRoute);
     var progressState = getStoryProgressState(inlineState.steps, inlineState.activeStepIndex);
+    var lessonState = ensureInlineLessonState(inlineState);
     var quizAnswer =
       activeStep.kind === "quiz_question" && activeStep.question
         ? getQuizAnswer(inlineState, activeStep.question.id)
         : null;
+    var lesson5InvestorType = lessonState.investorType;
     var isQuiz = isQuizStep(activeStep);
-    var isLesson1Step =
-      Boolean(activeStep && typeof activeStep.kind === "string") &&
-      activeStep.kind.indexOf("lesson1_") === 0;
-    var isLesson1Cta = activeStep.kind === "lesson1_cta";
-    var activeStepKey =
-      String(activeStep.kind || "lesson") +
-      ":" +
-      String(activeStep.question ? activeStep.question.id : inlineState.activeStepIndex);
+    var isActionOnlyStep =
+      activeStep.kind === "lesson1_cta" ||
+      activeStep.kind === "lesson5_cta" ||
+      activeStep.kind === "lesson6_cta";
+    var activeStepKey = String(activeStep.screen_id || activeStep.kind || "lesson") + ":" + String(inlineState.activeStepIndex);
 
     if (inlineState.lastViewedStepKey !== activeStepKey) {
-      if (isLesson1Step && inlineState.payload && inlineState.payload.segment === "novice") {
-        if (!inlineState.lesson1StartedAt) {
-          inlineState.lesson1StartedAt = Date.now();
-          trackEvent("lesson_1_started", {
-            segment: inlineState.payload.segment,
-            amount_tier: inlineState.payload.amount_tier,
+      if (activeStep.lesson_id) {
+        trackLessonStarted(inlineState, activeStep);
+        trackLessonScreenViewed(inlineState, activeStep);
+
+        if (activeStep.kind === "lesson3_portfolio") {
+          trackEvent("lesson_3_portfolio_viewed", {
+            amount_tier: inlineState.payload ? inlineState.payload.amount_tier : undefined,
+            portfolio_name:
+              activeStep.portfolio && activeStep.portfolio.name ? activeStep.portfolio.name : undefined,
+            instruments_count:
+              activeStep.portfolio && Array.isArray(activeStep.portfolio.instruments)
+                ? activeStep.portfolio.instruments.length
+                : 0,
+          });
+        } else if (activeStep.kind === "lesson4_portfolio") {
+          var rp = getInlineRiskProfile(inlineState);
+          trackEvent("lesson_4_portfolio_viewed", {
+            risk_profile: rp || "unknown",
+            amount_tier: inlineState.payload ? inlineState.payload.amount_tier : undefined,
           });
         }
-        trackEvent("lesson_1_screen_viewed", {
-          screen_id: activeStep.screen_id || "lesson_1",
-          screen_number: activeStep.screen_number || 1,
-        });
-      } else if (activeStep.kind === "quiz_intro" && inlineState.payload) {
+      }
+
+      if (activeStep.kind === "quiz_intro" && inlineState.payload) {
         if (!inlineState.quizStartedAt) {
           inlineState.quizStartedAt = Date.now();
           trackEvent("risk_quiz_started", {
@@ -3928,8 +5932,9 @@
     if (refs.onboardingNext) {
       if (
         inlineState.completed ||
-        isLesson1Cta ||
-        (activeStep.kind === "quiz_question" && !quizAnswer)
+        isActionOnlyStep ||
+        (activeStep.kind === "quiz_question" && !quizAnswer) ||
+        (activeStep.kind === "lesson5_quiz" && !lesson5InvestorType)
       ) {
         refs.onboardingNext.disabled = true;
       } else {
@@ -3938,12 +5943,12 @@
     }
 
     if (refs.onboardingFooter) {
-      refs.onboardingFooter.classList.toggle("segw__is-hidden", isLesson1Cta);
+      refs.onboardingFooter.classList.toggle("segw__is-hidden", isActionOnlyStep);
     }
 
     if (refs.onboardingNextButton) {
-      refs.onboardingNextButton.classList.toggle("segw__is-hidden", isLesson1Cta);
-      if (isLesson1Cta) {
+      refs.onboardingNextButton.classList.toggle("segw__is-hidden", isActionOnlyStep);
+      if (isActionOnlyStep) {
         refs.onboardingNextButton.textContent = "Выберите действие";
         refs.onboardingNextButton.disabled = true;
       } else {
@@ -3960,11 +5965,20 @@
         } else if (activeStep.kind === "quiz_result") {
           refs.onboardingNextButton.textContent = "Продолжить обучение →";
           refs.onboardingNextButton.disabled = false;
+        } else if (activeStep.kind === "lesson3_cta") {
+          refs.onboardingNextButton.textContent = "Пройти анкету →";
+          refs.onboardingNextButton.disabled = false;
+        } else if (activeStep.kind === "lesson2_cta" || activeStep.kind === "lesson4_cta") {
+          refs.onboardingNextButton.textContent = "Продолжить обучение →";
+          refs.onboardingNextButton.disabled = false;
+        } else if (activeStep.kind === "lesson5_quiz") {
+          refs.onboardingNextButton.textContent = "Далее →";
+          refs.onboardingNextButton.disabled = !lesson5InvestorType;
         } else if (isLastStep) {
           refs.onboardingNextButton.textContent = "Завершить маршрут";
           refs.onboardingNextButton.disabled = false;
         } else {
-          refs.onboardingNextButton.textContent = "Далее";
+          refs.onboardingNextButton.textContent = "Далее →";
           refs.onboardingNextButton.disabled = false;
         }
       }
@@ -4136,8 +6150,20 @@
         quizResult: null,
         quizStartedAt: 0,
         lastViewedStepKey: "",
-        lesson1StartedAt: 0,
-        lesson1Completed: false,
+        lessonState: {
+          startedAt: {},
+          completed: {},
+          investorType: null,
+          investorTypeMatch: null,
+          faqOpenId: null,
+          calculator: {
+            monthlyTrades: 4,
+            avgTradeAmount: 20000,
+          },
+          buyClicked: false,
+          tariffSelected: null,
+          onboardingCompleted: false,
+        },
       },
     };
 
@@ -4426,23 +6452,7 @@
           });
         }
 
-        if (!state.inlineOnboarding.lesson1Completed) {
-          var lesson1TimeSpent = 0;
-          if (state.inlineOnboarding.lesson1StartedAt) {
-            lesson1TimeSpent = Math.max(
-              0,
-              Math.round((Date.now() - state.inlineOnboarding.lesson1StartedAt) / 1000),
-            );
-          }
-          if (payloadForContinue) {
-            trackEvent("lesson_1_completed", {
-              segment: payloadForContinue.segment,
-              amount_tier: payloadForContinue.amount_tier,
-              time_spent: lesson1TimeSpent,
-            });
-          }
-          state.inlineOnboarding.lesson1Completed = true;
-        }
+        trackLessonCompleted(state.inlineOnboarding, "lesson_1");
 
         state.inlineOnboarding.direction = 1;
         var lesson1LastIndex = state.inlineOnboarding.steps.length - 1;
@@ -4458,6 +6468,148 @@
           }
         }
 
+        render(root, refs, state);
+        return;
+      } else if (action === "lesson5-investor-select") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+        var activeLesson5Quiz = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (!activeLesson5Quiz || activeLesson5Quiz.kind !== "lesson5_quiz") {
+          return;
+        }
+        var selectedType = value;
+        if (!selectedType) {
+          return;
+        }
+        var lessonState = ensureInlineLessonState(state.inlineOnboarding);
+        lessonState.investorType = selectedType;
+        var riskProfileForMatch = getInlineRiskProfile(state.inlineOnboarding);
+        var isMatch =
+          (selectedType === "cautious" && riskProfileForMatch === "conservative") ||
+          (selectedType === "balanced" && riskProfileForMatch === "moderate") ||
+          (selectedType === "active" &&
+            (riskProfileForMatch === "aggressive" || riskProfileForMatch === "ultra_aggressive"));
+        lessonState.investorTypeMatch = isMatch;
+        trackEvent("lesson_5_investor_type_selected", {
+          selected: selectedType,
+          risk_profile: riskProfileForMatch || "unknown",
+          match: isMatch,
+        });
+        render(root, refs, state);
+        return;
+      } else if (action === "lesson5-faq-toggle") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+        var activeLesson5Faq = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (!activeLesson5Faq || activeLesson5Faq.kind !== "lesson5_faq") {
+          return;
+        }
+        var questionId = button.getAttribute("data-question-id");
+        if (!questionId) {
+          return;
+        }
+        var lessonStateFaq = ensureInlineLessonState(state.inlineOnboarding);
+        lessonStateFaq.faqOpenId = lessonStateFaq.faqOpenId === questionId ? null : questionId;
+        trackEvent("lesson_5_faq_expanded", { question_id: questionId });
+        render(root, refs, state);
+        return;
+      } else if (action === "lesson5-buy") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+        var activeLesson5Cta = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (!activeLesson5Cta || activeLesson5Cta.kind !== "lesson5_cta") {
+          return;
+        }
+        var deeplinkBuy = button.getAttribute("data-deeplink");
+        var instrumentTicker = button.getAttribute("data-instrument") || "UNKNOWN";
+        var lessonStateBuy = ensureInlineLessonState(state.inlineOnboarding);
+        lessonStateBuy.buyClicked = true;
+        trackEvent("lesson_5_buy_clicked", {
+          instrument: instrumentTicker,
+          risk_profile: getInlineRiskProfile(state.inlineOnboarding) || "unknown",
+        });
+        if (deeplinkBuy) {
+          try {
+            window.location.href = deeplinkBuy;
+          } catch (error) {
+            if (window.console && typeof window.console.warn === "function") {
+              window.console.warn("[segmentation] lesson5 buy deeplink failed", error);
+            }
+          }
+        }
+        return;
+      } else if (action === "lesson5-continue") {
+        if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+          return;
+        }
+        var activeLesson5Continue = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+        if (!activeLesson5Continue || activeLesson5Continue.kind !== "lesson5_cta") {
+          return;
+        }
+        trackEvent("lesson_5_continue_clicked");
+        trackLessonCompleted(state.inlineOnboarding, "lesson_5", {
+          buy_clicked: ensureInlineLessonState(state.inlineOnboarding).buyClicked ? 1 : 0,
+        });
+        state.inlineOnboarding.direction = 1;
+        state.inlineOnboarding.activeStepIndex = Math.min(
+          state.inlineOnboarding.activeStepIndex + 1,
+          state.inlineOnboarding.steps.length - 1,
+        );
+        render(root, refs, state);
+        return;
+      } else if (action === "lesson6-connect-tariff") {
+        var tariffId = button.getAttribute("data-tariff-id") || "investor";
+        var deeplinkTariff = button.getAttribute("data-deeplink");
+        var lessonStateTariff = ensureInlineLessonState(state.inlineOnboarding);
+        lessonStateTariff.tariffSelected = tariffId;
+        trackEvent("lesson_6_tariff_selected", {
+          tariff: tariffId,
+          recommended: 1,
+          amount_tier: state.inlineOnboarding.payload
+            ? state.inlineOnboarding.payload.amount_tier
+            : undefined,
+        });
+        if (deeplinkTariff) {
+          try {
+            window.location.href = deeplinkTariff;
+          } catch (error) {
+            if (window.console && typeof window.console.warn === "function") {
+              window.console.warn("[segmentation] lesson6 tariff deeplink failed", error);
+            }
+          }
+        }
+        return;
+      } else if (action === "lesson6-open-tariffs") {
+        trackEvent("lesson_6_tariff_comparison_opened", {});
+        var deeplinkAllTariffs = button.getAttribute("data-deeplink");
+        if (deeplinkAllTariffs) {
+          try {
+            window.location.href = deeplinkAllTariffs;
+          } catch (error) {
+            if (window.console && typeof window.console.warn === "function") {
+              window.console.warn("[segmentation] lesson6 all tariffs deeplink failed", error);
+            }
+          }
+        }
+        return;
+      } else if (action === "lesson6-complete") {
+        var lessonStateComplete = ensureInlineLessonState(state.inlineOnboarding);
+        trackLessonCompleted(state.inlineOnboarding, "lesson_6", {
+          tariff_selected: lessonStateComplete.tariffSelected || "none",
+        });
+        if (!lessonStateComplete.onboardingCompleted) {
+          trackEvent("onboarding_completed", {
+            segment: state.inlineOnboarding.payload
+              ? state.inlineOnboarding.payload.segment
+              : undefined,
+            tariff_selected: lessonStateComplete.tariffSelected || "none",
+          });
+          lessonStateComplete.onboardingCompleted = true;
+        }
+        state.inlineOnboarding.completed = true;
         render(root, refs, state);
         return;
       } else if (action === "onboarding-prev") {
@@ -4491,7 +6643,28 @@
         state.inlineOnboarding.direction = 1;
         var activeInlineStep = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
         if (activeInlineStep) {
-          if (activeInlineStep.kind === "quiz_intro") {
+          if (activeInlineStep.kind === "lesson2_cta") {
+            trackEvent("lesson_2_continue_clicked", {});
+            trackLessonCompleted(state.inlineOnboarding, "lesson_2");
+          } else if (activeInlineStep.kind === "lesson3_cta") {
+            trackEvent("risk_quiz_started_from_lesson_3", {
+              segment: state.inlineOnboarding.payload
+                ? state.inlineOnboarding.payload.segment
+                : undefined,
+            });
+            trackLessonCompleted(state.inlineOnboarding, "lesson_3");
+          } else if (activeInlineStep.kind === "lesson4_cta") {
+            trackEvent("lesson_4_continue_clicked", {
+              risk_profile: getInlineRiskProfile(state.inlineOnboarding) || "unknown",
+            });
+            trackLessonCompleted(state.inlineOnboarding, "lesson_4");
+          } else if (activeInlineStep.kind === "lesson5_quiz") {
+            var lessonStateForQuiz = ensureInlineLessonState(state.inlineOnboarding);
+            if (!lessonStateForQuiz.investorType) {
+              render(root, refs, state);
+              return;
+            }
+          } else if (activeInlineStep.kind === "quiz_intro") {
             trackEvent("risk_quiz_intro_completed");
           } else if (activeInlineStep.kind === "quiz_question" && activeInlineStep.question) {
             var activeAnswer = getQuizAnswer(state.inlineOnboarding, activeInlineStep.question.id);
@@ -4641,6 +6814,53 @@
       }
 
       state.segment = calculateSegment(state.qualifiedInvestor, state.experience);
+      render(root, refs, state);
+    });
+
+    root.addEventListener("input", function (event) {
+      var target = event.target;
+      if (!target || target.tagName !== "INPUT") {
+        return;
+      }
+      if (target.getAttribute("data-action") !== "lesson6-slider") {
+        return;
+      }
+      if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
+        return;
+      }
+      var activeStep = state.inlineOnboarding.steps[state.inlineOnboarding.activeStepIndex];
+      if (!activeStep || activeStep.kind !== "lesson6_recommendation") {
+        return;
+      }
+      var field = target.getAttribute("data-field");
+      var value = Number(target.value);
+      if (!field || !isFinite(value)) {
+        return;
+      }
+      var lessonState = ensureInlineLessonState(state.inlineOnboarding);
+      if (!lessonState.calculator) {
+        lessonState.calculator = {
+          monthlyTrades: 4,
+          avgTradeAmount: 20000,
+        };
+      }
+      if (field === "monthly_trades") {
+        lessonState.calculator.monthlyTrades = Math.round(value);
+      } else if (field === "avg_trade_amount") {
+        lessonState.calculator.avgTradeAmount = Math.round(value);
+      } else {
+        return;
+      }
+
+      var calcResult = calculateTariffSavings(
+        lessonState.calculator.monthlyTrades,
+        lessonState.calculator.avgTradeAmount,
+      );
+      trackEvent("lesson_6_calculator_used", {
+        monthly_trades: lessonState.calculator.monthlyTrades,
+        avg_trade_amount: lessonState.calculator.avgTradeAmount,
+        savings: calcResult.savings,
+      });
       render(root, refs, state);
     });
 
@@ -4848,7 +7068,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.18";
+  window.FinamSegmentationWidget.version = "1.0.19";
 
   ensureStyles();
   initExistingWidgets();
