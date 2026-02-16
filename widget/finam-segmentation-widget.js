@@ -766,7 +766,7 @@
 }
 
 .segw__onboarding {
-  margin-top: 16px;
+  margin-top: 0;
 }
 
 .segw__onboarding.is-hidden {
@@ -856,24 +856,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #000;
-  padding: 20px;
-  border-radius: 20px;
+  min-height: 100dvh;
+  background: transparent;
+  padding: 0;
 }
 
 .segw__story-frame {
   width: 100%;
   max-width: 430px;
-  height: 100vh;
-  max-height: 100vh;
-  min-height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 100dvh;
   margin: 0 auto;
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 0;
   color: #fff;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.52);
+  box-shadow: none;
   background: var(--gradient-lesson-1);
   transition: background var(--transition-base);
   display: flex;
@@ -884,7 +883,6 @@
   display: flex;
   gap: 4px;
   padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -892,60 +890,15 @@
 
 .segw__story-progress-segment {
   flex: 1 1 0;
-  height: 3px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 999px;
-  overflow: hidden;
+  transition: background var(--transition-base);
 }
 
-.segw__story-progress-fill {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: #fff;
-  border-radius: inherit;
-  transition: width var(--transition-base);
-}
-
-.segw__story-progress-segment.is-done .segw__story-progress-fill {
-  width: 100%;
-}
-
-.segw__story-progress-segment.is-active .segw__story-progress-fill {
-  background: #fff;
-}
-
-.segw__story-progress-segment.is-active {
-  background: rgba(255, 255, 255, 0.5);
-}
-
+.segw__story-progress-segment.is-active,
 .segw__story-progress-segment.is-done {
   background: #fff;
-}
-
-.segw__story-header {
-  position: relative;
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px 0;
-}
-
-.segw__story-close {
-  border: 0;
-  background: rgba(0, 0, 0, 0.25);
-  color: #fff;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
 }
 
 .segw__story-content {
@@ -955,15 +908,15 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
-  padding: var(--space-2);
-  padding-bottom: 100px;
+  padding: 24px;
+  padding-bottom: 170px;
   overflow-y: auto;
 }
 
 .segw__story-content.is-lesson {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .segw__story-content.is-quiz-mode {
@@ -1339,8 +1292,8 @@
 .segw__lesson1-visual {
   min-height: 124px;
   border-radius: 16px;
-  border: 1px dashed rgba(255, 255, 255, 0.42);
-  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1713,8 +1666,8 @@
 .segw__lesson3-visual {
   min-height: 110px;
   border-radius: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.42);
-  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  background: rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1990,32 +1943,28 @@
 }
 
 .segw__onboarding-meta {
-  position: relative;
-  z-index: 6;
   margin: 0;
-  padding: 8px 20px 0;
-  color: rgba(255, 255, 255, 0.82);
+  padding: 0 0 6px;
+  color: rgba(255, 255, 255, 0.78);
   text-align: center;
   font-size: 13px;
 }
 
 .segw__story-hint {
-  position: relative;
-  z-index: 6;
   margin: 0;
-  padding: 4px 20px 12px;
+  padding: 0 0 12px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 12px;
 }
 
 .segw__story-tapzones {
   position: absolute;
   z-index: 4;
-  top: 46px;
+  top: 30px;
   left: 0;
   right: 0;
-  bottom: 86px;
+  bottom: 162px;
   display: flex;
 }
 
@@ -2039,20 +1988,33 @@
   bottom: 0;
   margin-top: auto;
   z-index: 8;
-  padding: var(--space-2);
+  padding: 16px 24px;
   padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.86), rgba(0, 0, 0, 0));
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0));
 }
 
 .segw__story-next {
   width: 100%;
   border: 0;
   min-height: 52px;
+  border-radius: 16px;
+  padding: 0 18px;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all var(--transition-base);
+}
+
+.segw__story-next:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .segw__story-next.is-quiz-cta {
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.24);
   color: #fff;
   box-shadow: none;
 }
@@ -2062,6 +2024,8 @@
 }
 
 .segw__story-next:disabled {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
   opacity: 0.55;
   cursor: not-allowed;
 }
@@ -2156,11 +2120,16 @@
 }
 
 @media (min-width: 768px) {
+  .segw__story-wrapper {
+    padding: 20px;
+  }
+
   .segw__story-frame {
-    min-height: min(90vh, 932px);
-    height: min(90vh, 932px);
-    max-height: 90vh;
-    border-radius: 20px;
+    min-height: min(100dvh, 932px);
+    height: min(100dvh, 932px);
+    max-height: 932px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.52);
   }
 }
 
@@ -2181,7 +2150,7 @@
     min-height: auto;
     padding: 0;
     border-radius: 0;
-    background: #000;
+    background: transparent;
   }
 
   .segw__story-frame {
@@ -2241,19 +2210,7 @@
     <div class="segw__story-wrapper">
       <article class="segw__story-frame" data-role="story-frame">
         <div class="segw__story-progress" data-role="story-progress"></div>
-        <div class="segw__story-header">
-          <p class="segw__onboarding-kicker" data-role="onboarding-title">Персональный онбординг</p>
-          <button type="button" class="segw__story-close" data-action="restart-segmentation" aria-label="Закрыть онбординг">
-            ×
-          </button>
-        </div>
-
         <div class="segw__story-content" data-role="story-content"></div>
-
-        <p class="segw__onboarding-meta" data-role="onboarding-counter">Урок 1 из 6</p>
-        <p class="segw__story-hint" data-role="onboarding-hint">
-          Тап по правой части — следующий экран, по левой — предыдущий.
-        </p>
 
         <div class="segw__story-tapzones">
           <button
@@ -2271,8 +2228,12 @@
         </div>
 
         <div class="segw__story-footer">
-          <button type="button" class="segw__story-next segw__btn-primary" data-action="onboarding-next" data-role="onboarding-next-label">
-            Далее
+          <p class="segw__onboarding-meta" data-role="onboarding-counter">Урок 1 из 6</p>
+          <p class="segw__story-hint" data-role="onboarding-hint">
+            Тап по правой части — следующий экран, по левой — предыдущий.
+          </p>
+          <button type="button" class="segw__story-next" data-action="onboarding-next" data-role="onboarding-next-label">
+            Далее →
           </button>
         </div>
       </article>
@@ -4507,20 +4468,11 @@
     for (var i = 0; i < totalSegments; i += 1) {
       var segment = document.createElement("span");
       segment.className = "segw__story-progress-segment";
-      var fillWidth = "0%";
-
       if (i < currentSegment) {
         segment.classList.add("is-done");
-        fillWidth = "100%";
       } else if (i === currentSegment) {
         segment.classList.add("is-active");
-        fillWidth = String(Math.round(progress * 100)) + "%";
       }
-
-      var fill = document.createElement("span");
-      fill.className = "segw__story-progress-fill";
-      fill.style.width = fillWidth;
-      segment.appendChild(fill);
       progressRoot.appendChild(segment);
     }
   }
@@ -5895,12 +5847,6 @@
       renderStoryStepContent(refs.storyContent, activeStep, inlineState);
     }
 
-    if (refs.onboardingTitle && inlineState.payload) {
-      refs.onboardingTitle.textContent = isQuiz
-        ? "Анкета риск-профиля"
-        : ONBOARDING_PLAN_LABELS[inlineState.payload.segment];
-    }
-
     if (refs.onboardingCounter) {
       if (isQuiz) {
         refs.onboardingCounter.textContent =
@@ -6189,7 +6135,6 @@
       storyFrame: root.querySelector('[data-role="story-frame"]'),
       storyProgress: root.querySelector('[data-role="story-progress"]'),
       storyContent: root.querySelector('[data-role="story-content"]'),
-      onboardingTitle: root.querySelector('[data-role="onboarding-title"]'),
       onboardingCounter: root.querySelector('[data-role="onboarding-counter"]'),
       onboardingHint: root.querySelector('[data-role="onboarding-hint"]'),
       onboardingPrev: root.querySelector('[data-action="onboarding-prev"]'),
@@ -7068,7 +7013,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.19";
+  window.FinamSegmentationWidget.version = "1.0.20";
 
   ensureStyles();
   initExistingWidgets();
