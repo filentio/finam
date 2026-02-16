@@ -909,10 +909,10 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 8px;
-  padding: 24px;
-  padding-bottom: 170px;
-  overflow-y: auto;
+  gap: 6px;
+  padding: 16px;
+  padding-bottom: 152px;
+  overflow: hidden;
 }
 
 .segw__story-content.is-lesson {
@@ -1381,10 +1381,10 @@
 
 .segw__lesson1-cards-scroller {
   display: grid;
-  gap: 10px;
-  max-height: 340px;
-  overflow-y: auto;
-  padding-right: 2px;
+  gap: 8px;
+  max-height: none;
+  overflow: hidden;
+  padding-right: 0;
 }
 
 .segw__lesson1-instrument-card {
@@ -1468,8 +1468,8 @@
 .segw__lesson5-screen,
 .segw__lesson6-screen {
   display: grid;
-  gap: 12px;
-  align-content: start;
+  gap: 8px;
+  align-content: center;
 }
 
 .segw__lesson2-screen--hero,
@@ -1500,7 +1500,7 @@
 .segw__lesson5-title,
 .segw__lesson6-title {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1.2;
 }
 
@@ -1510,7 +1510,7 @@
 .segw__lesson5-subtitle,
 .segw__lesson6-subtitle {
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -1520,18 +1520,18 @@
 .segw__lesson5-text,
 .segw__lesson6-text {
   margin: 0;
-  font-size: 15px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.4;
   color: rgba(255, 255, 255, 0.9);
 }
 
 .segw__lesson2-quote {
   margin: 0;
-  padding: 12px;
+  padding: 10px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 22px;
+  font-size: 20px;
   font-style: italic;
   line-height: 1.35;
 }
@@ -1558,12 +1558,12 @@
 .segw__lesson2-risk-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .segw__lesson2-risk-card {
   border-radius: 12px;
-  padding: 10px;
+  padding: 8px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.28);
   animation: segwQuizFadeIn 300ms ease both;
@@ -1583,16 +1583,16 @@
 
 .segw__lesson2-rules {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .segw__lesson2-rule {
   border-radius: 12px;
-  padding: 10px;
+  padding: 8px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.28);
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .segw__lesson2-rule-num {
@@ -1706,8 +1706,8 @@
 .segw__lesson3-portfolio-row {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 7px 8px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.28);
@@ -1726,12 +1726,12 @@
 
 .segw__lesson3-spectrum {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .segw__lesson3-spectrum-row {
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 7px 8px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.28);
   display: grid;
@@ -1749,28 +1749,28 @@
 
 .segw__lesson4-breakdown {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .segw__lesson4-row {
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 7px 8px;
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   font-size: 13px;
 }
 
 .segw__lesson4-levels {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .segw__lesson4-level-card {
   border-radius: 10px;
-  padding: 10px;
+  padding: 8px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.28);
   display: grid;
@@ -1788,14 +1788,14 @@
 .segw__lesson5-quiz-list,
 .segw__lesson5-faq {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .segw__lesson5-top-card,
 .segw__lesson5-quiz-option,
 .segw__lesson5-faq-item {
   border-radius: 12px;
-  padding: 10px;
+  padding: 8px;
   background: rgba(255, 255, 255, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.42);
 }
@@ -1874,13 +1874,13 @@
 .segw__lesson6-compare,
 .segw__lesson6-tariffs {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .segw__lesson6-compare-row,
 .segw__lesson6-tariff-card {
   border-radius: 10px;
-  padding: 10px;
+  padding: 8px;
   background: rgba(0, 0, 0, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.34);
   color: #fff;
@@ -1911,11 +1911,11 @@
 
 .segw__lesson6-calculator {
   border-radius: 12px;
-  padding: 10px;
+  padding: 8px;
   background: rgba(0, 0, 0, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.32);
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .segw__lesson6-slider-label {
@@ -1929,7 +1929,7 @@
 
 .segw__lesson6-calc-result {
   border-radius: 10px;
-  padding: 8px;
+  padding: 6px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.26);
   display: grid;
@@ -7013,7 +7013,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.20";
+  window.FinamSegmentationWidget.version = "1.0.22";
 
   ensureStyles();
   initExistingWidgets();
