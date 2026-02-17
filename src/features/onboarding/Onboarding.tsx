@@ -34,6 +34,7 @@ interface OnboardingProps {
   userId: string;
   dosInput: Partial<DOSInput>;
   onComplete?: () => void;
+  onClose?: () => void;
 }
 
 const OWN_CTA_SCREEN_TYPES = new Set<ScreenConfig["type"]>(["cta"]);
@@ -77,7 +78,7 @@ function getDisplayProgress(progress: ProgressInfo, routePreparationDone: boolea
   return progress;
 }
 
-function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
+function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingProps) {
   const {
     state,
     progress,
@@ -356,6 +357,13 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
         (answer) => answer.question_id === currentQuizQuestion.id,
       )
     : undefined;
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
+    pauseOnboarding();
+  };
 
   const handleNext = () => {
     if (!currentStep) {
@@ -427,6 +435,8 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
       screen,
       onNext: handleNext,
       onPrev: handlePrev,
+      screenIndex: state.current_screen_index + 1,
+      screenCount: screens.length,
     };
 
     switch (screen.type) {
@@ -587,7 +597,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
         transitionPreset="lesson_to_lesson"
         direction={1}
         transitionKey={`route-prep-${transition.key}`}
-        onClose={pauseOnboarding}
+        onClose={handleClose}
         onPrev={() => undefined}
         onNext={() => {
           setTransition((prevTransition) => ({
@@ -636,7 +646,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
         transitionPreset={transition.preset}
         direction={transition.direction}
         transitionKey={`${transition.key}:fallback`}
-        onClose={pauseOnboarding}
+        onClose={handleClose}
         onPrev={handlePrev}
         onNext={() => dispatch({ type: "NEXT_STEP" })}
         nextLabel="Продолжить"
@@ -664,7 +674,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
       transitionPreset={transition.preset}
       direction={transition.direction}
       transitionKey={`${transition.key}:${state.current_step_index}:${state.current_screen_index}`}
-      onClose={pauseOnboarding}
+      onClose={handleClose}
       onPrev={handlePrev}
       onNext={handleNext}
       nextLabel={nextLabel}

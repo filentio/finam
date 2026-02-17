@@ -21,7 +21,9 @@ export type Instrument =
   | "bonds"
   | "trust_management"
   | "ipo"
-  | "currency";
+  | "currency"
+  | "structured"
+  | "derivatives";
 
 export interface SegmentationState {
   qualifiedInvestor: boolean | null;

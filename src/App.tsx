@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SegmentationForm } from "./components/SegmentationForm";
 import { StageProgress } from "./components/StageProgress";
 import { Onboarding } from "./features/onboarding/Onboarding";
@@ -14,6 +14,12 @@ interface PendingOnboarding {
   source: string;
   segment: SegmentationPayload["segment"];
 }
+
+type ExternalSegment =
+  | SegmentationPayload["segment"]
+  | "learning"
+  | "experienced"
+  | "qualified";
 
 interface ClientPreset {
   id: string;
@@ -71,6 +77,60 @@ function mapSegmentationToDosInput(payload: SegmentationPayload): DOSInput {
   };
 }
 
+function normalizeExternalSegment(
+  rawSegment: string | null,
+): SegmentationPayload["segment"] | null {
+  if (!rawSegment) {
+    return null;
+  }
+
+  const value = rawSegment.toLowerCase() as ExternalSegment;
+  if (value === "novice") {
+    return "novice";
+  }
+  if (value === "learning" || value === "advanced") {
+    return "advanced";
+  }
+  if (value === "experienced" || value === "qualified" || value === "expert") {
+    return "expert";
+  }
+  return null;
+}
+
+function getDefaultInputBySegment(segment: SegmentationPayload["segment"]): DOSInput {
+  const noviceInput = CLIENT_PRESETS.find((preset) => preset.id === "novice_starter")?.dosInput;
+  const advancedInput = CLIENT_PRESETS.find((preset) => preset.id === "advanced_base")?.dosInput;
+  const expertInput = CLIENT_PRESETS.find((preset) => preset.id === "expert_premium")?.dosInput;
+
+  if (!noviceInput || !advancedInput || !expertInput) {
+    return {
+      qualified_investor: false,
+      experience: "none",
+      investment_amount: "up_to_300k",
+      investment_goal: "purchase",
+      instruments: ["etf", "bonds"],
+    };
+  }
+
+  if (segment === "advanced") {
+    return advancedInput;
+  }
+  if (segment === "expert") {
+    return expertInput;
+  }
+  return noviceInput;
+}
+
+function replaceSegmentParam(segment: SegmentationPayload["segment"] | null): void {
+  const url = new URL(window.location.href);
+  if (segment) {
+    url.searchParams.set("segment", segment);
+  } else {
+    url.searchParams.delete("segment");
+  }
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+}
+
 function App() {
   const [mode, setMode] = useState<AppMode>("segmentation");
   const [userId, setUserId] = useState<string>("demo-user-custom");
@@ -79,13 +139,23 @@ function App() {
   const [sessionKey, setSessionKey] = useState(0);
   const [completed, setCompleted] = useState(false);
 
+  const resetToSegmentation = () => {
+    setCompleted(false);
+    setPendingOnboarding(null);
+    setOnboardingInput(null);
+    setMode("segmentation");
+    replaceSegmentParam(null);
+  };
+
   const prepareOnboarding = (input: DOSInput, source: string) => {
+    const segment = determineSegment(input);
     setCompleted(false);
     setPendingOnboarding({
       input,
       source,
-      segment: determineSegment(input),
+      segment,
     });
+    replaceSegmentParam(segment);
     setMode("summary");
   };
 
@@ -108,6 +178,22 @@ function App() {
     setMode("onboarding");
   };
 
+  useEffect(() => {
+    const routeSegment = normalizeExternalSegment(
+      new URLSearchParams(window.location.search).get("segment"),
+    );
+    if (!routeSegment) {
+      return;
+    }
+    setPendingOnboarding({
+      input: getDefaultInputBySegment(routeSegment),
+      source: "url",
+      segment: routeSegment,
+    });
+    replaceSegmentParam(routeSegment);
+    setMode("summary");
+  }, []);
+
   if (mode === "onboarding" && onboardingInput) {
     return (
       <main className="app-shell app-shell--flow">
@@ -118,13 +204,14 @@ function App() {
           key={sessionKey}
           userId={userId}
           dosInput={onboardingInput}
+          onClose={resetToSegmentation}
           onComplete={() => setCompleted(true)}
         />
         {completed ? (
           <button
             type="button"
             className="flow-exit"
-            onClick={() => setMode("segmentation")}
+            onClick={resetToSegmentation}
           >
             Вернуться к анкете
           </button>
@@ -134,6 +221,13 @@ function App() {
   }
 
   if (mode === "summary" && pendingOnboarding) {
+    const lessonCountLabel =
+      pendingOnboarding.segment === "expert"
+        ? "2 практических урока"
+        : pendingOnboarding.segment === "advanced"
+          ? "5 уроков по инвестированию"
+          : "6 уроков по инвестированию";
+
     return (
       <main className="app-shell app-shell--flow">
         <div className="flow-stage-progress">
@@ -150,7 +244,7 @@ function App() {
             <div className="summary-screen__steps">
               <div className="summary-screen__step">
                 <span>1</span>
-                <span>6 уроков по инвестированию</span>
+                <span>{lessonCountLabel}</span>
               </div>
               <div className="summary-screen__step">
                 <span>2</span>
@@ -165,7 +259,7 @@ function App() {
             <button type="button" className="summary-screen__cta" onClick={startOnboarding}>
               Начать обучение
             </button>
-            <button type="button" className="summary-screen__back" onClick={() => setMode("segmentation")}>
+            <button type="button" className="summary-screen__back" onClick={resetToSegmentation}>
               Вернуться к анкете
             </button>
           </div>

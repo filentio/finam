@@ -1,6 +1,7 @@
 import { usePersonalization } from "../hooks/usePersonalization";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
+import { Disclaimer } from "../../../components/Disclaimer";
 
 export function ContentScreen({ screen }: BaseScreenProps) {
   const { getContentVariantObject } = usePersonalization();
@@ -36,11 +37,7 @@ export function ContentScreen({ screen }: BaseScreenProps) {
           ))}
         </ul>
       ) : null}
-      {hasYieldNumbers ? (
-        <p className="ob-screen__disclaimer">
-          * Прошлая доходность не гарантирует будущую. Данные носят информационный характер.
-        </p>
-      ) : null}
+      {hasYieldNumbers ? <Disclaimer /> : null}
     </ScreenShell>
   );
 }

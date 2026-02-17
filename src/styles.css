@@ -9,6 +9,12 @@
   line-height: 1.4;
   color: #1d2734;
   background: #f6f8fb;
+  --font-size-xs: 0.625rem;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 0.875rem;
+  --font-size-lg: 1rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
 }
 
 *,
@@ -742,11 +748,34 @@ body {
   background: var(--finam-accent-light);
   color: var(--finam-text-primary);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  animation: segStoryOptionSelect 200ms ease;
 }
 
 .seg-story__multi-mark {
   font-size: 1rem;
   line-height: 1;
+}
+
+.seg-story__option-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.seg-story__option-hint {
+  font-size: 12px;
+  color: var(--finam-text-secondary);
+}
+
+@keyframes segStoryOptionSelect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .seg-story__footer {

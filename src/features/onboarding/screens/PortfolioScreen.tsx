@@ -4,6 +4,7 @@ import { PortfolioTable } from "../components/PortfolioTable";
 import { usePersonalization } from "../hooks/usePersonalization";
 import type { PortfolioScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
+import { Disclaimer } from "../../../components/Disclaimer";
 
 export function PortfolioScreen({
   screen,
@@ -42,6 +43,7 @@ export function PortfolioScreen({
           Ещё {hiddenItemsCount} инструментов в полной версии портфеля.
         </p>
       ) : null}
+      <Disclaimer />
     </ScreenShell>
   );
 }

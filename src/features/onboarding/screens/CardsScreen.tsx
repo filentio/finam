@@ -3,6 +3,7 @@ import { usePersonalization } from "../hooks/usePersonalization";
 import type { CardItem, Instrument, InstrumentCardConfig } from "../types/onboarding";
 import type { CardsScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
+import { Disclaimer } from "../../../components/Disclaimer";
 
 const CARDS: InstrumentCardConfig[] = [
   {
@@ -60,6 +61,10 @@ export function CardsScreen({
   const goalAccent = screen.content_variants?.by_goal
     ? getContentVariantObject(screen.content_variants.by_goal, "goal")
     : null;
+  const hasYieldNumbers = configuredCards.some((card) =>
+    /(\d+[.,]?\d*\s*%|доходност|годов)/i.test(`${card.title} ${card.description}`),
+  );
+  const showDisclaimer = hasYieldNumbers || screen.screen_id === "4_2";
 
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
@@ -92,6 +97,7 @@ export function CardsScreen({
           {goalAccent.text}
         </div>
       ) : null}
+      {showDisclaimer ? <Disclaimer /> : null}
     </ScreenShell>
   );
 }

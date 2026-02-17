@@ -42,13 +42,14 @@ interface SegmentationStepConfig {
 }
 
 const QUALIFIED_OPTIONS: SegmentationOption[] = [
-  { value: "true", label: "Да, являюсь квалифицированным инвестором" },
-  { value: "false", label: "Нет, не являюсь квалифицированным инвестором" },
+  { value: "true", label: "Да" },
+  { value: "false", label: "Нет" },
+  { value: "unknown", label: "Не знаю" },
 ];
 
 const EXPERIENCE_OPTIONS: SegmentationOption[] = [
   { value: "none", label: "Нет опыта" },
-  { value: "less_1y", label: "Менее 1 года" },
+  { value: "less_1y", label: "До 1 года" },
   { value: "1_3y", label: "1–3 года" },
   { value: "3_5y", label: "3–5 лет" },
   { value: "more_5y", label: "Более 5 лет" },
@@ -69,12 +70,30 @@ const GOAL_OPTIONS: SegmentationOption[] = [
 ];
 
 const INSTRUMENT_OPTIONS: SegmentationOption[] = [
-  { value: "etf", label: "ETF" },
-  { value: "stocks", label: "Акции" },
-  { value: "bonds", label: "Облигации" },
-  { value: "trust_management", label: "Доверительное управление" },
-  { value: "ipo", label: "IPO" },
-  { value: "currency", label: "Валюта" },
+  {
+    value: "etf",
+    label: "Фонды (ETF, ПИФ)",
+    hint: "Готовые портфели из разных активов.",
+  },
+  { value: "stocks", label: "Акции", hint: "Доли в компаниях." },
+  {
+    value: "trust_management",
+    label: "Доверительное управление",
+    hint: "Профессионал управляет вашими инвестициями.",
+  },
+  { value: "bonds", label: "Облигации", hint: "Долговые бумаги с фиксированным доходом." },
+  { value: "ipo", label: "IPO", hint: "Первичное размещение акций компаний." },
+  { value: "currency", label: "Валюта", hint: "Покупка/продажа иностранных валют." },
+  {
+    value: "structured",
+    label: "Структурные продукты",
+    hint: "Комбинация инструментов с заданным уровнем риска.",
+  },
+  {
+    value: "derivatives",
+    label: "Фьючерсы и опционы",
+    hint: "Производные инструменты для опытных инвесторов.",
+  },
 ];
 
 const PROGRESS_SEGMENTS_TOTAL = 7;
@@ -124,8 +143,9 @@ function getSteps(): SegmentationStepConfig[] {
   const steps: SegmentationStepConfig[] = [
     {
       id: "qualified",
-      title: "Являетесь ли вы квалифицированным инвестором?",
-      subtitle: "Этот ответ влияет на глубину вашего персонального маршрута.",
+      title: "Есть ли у вас статус квалифицированного инвестора?",
+      subtitle:
+        "Это статус с доступом к сложным инструментам. Если не уверены, обычно его нет.",
       options: QUALIFIED_OPTIONS,
     },
     {
@@ -137,14 +157,15 @@ function getSteps(): SegmentationStepConfig[] {
     {
       id: "amount",
       title: "Какую сумму вы планируете инвестировать?",
-      subtitle: "Подберём подходящий формат обучения и примеры портфелей.",
+      subtitle: "Это поможет подобрать инструменты. Ответ ни к чему не обязывает.",
       options: AMOUNT_OPTIONS,
     },
     {
       id: "goal",
       title: "Ваша главная инвестиционная цель",
-      subtitle: "Контент будет адаптирован под выбранный приоритет.",
+      subtitle: "Можно выбрать несколько вариантов.",
       options: GOAL_OPTIONS,
+      multiple: true,
     },
     {
       id: "instruments",
@@ -196,6 +217,7 @@ function buildPayload(state: SegmentationState): SegmentationPayload | null {
 
 export function SegmentationForm({ onComplete }: SegmentationFormProps) {
   const [state, setState] = useState<SegmentationState>(INITIAL_STATE);
+  const [selectedGoals, setSelectedGoals] = useState<InvestmentGoal[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
   const [resultPayload, setResultPayload] = useState<SegmentationPayload | null>(null);
   const [direction, setDirection] = useState<1 | -1>(1);
@@ -235,6 +257,8 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
   };
 
   const handleStepValueChange = (stepId: SegmentationStepId, rawValue: string) => {
+    trackEvent("segmentation_answer", { question: stepId, answer: rawValue });
+
     if (stepId === "qualified") {
       const value = rawValue === "true";
       updateState({ qualifiedInvestor: value, experience: value ? null : state.experience });
@@ -255,8 +279,15 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
 
     if (stepId === "goal") {
       const value = rawValue as InvestmentGoal;
-      trackEvent("goal_selected", { goal: value });
-      updateState({ goal: value });
+      setSelectedGoals((previousGoals) => {
+        const exists = previousGoals.includes(value);
+        const nextGoals = exists
+          ? previousGoals.filter((goal) => goal !== value)
+          : [...previousGoals, value];
+        trackEvent("goal_selected", { goal: value, selected: !exists });
+        updateState({ goal: nextGoals[0] ?? null });
+        return nextGoals;
+      });
       return;
     }
 
@@ -289,7 +320,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
       return state.amountTier !== null;
     }
     if (stepId === "goal") {
-      return state.goal !== null;
+      return selectedGoals.length > 0;
     }
     return state.instruments.length > 0;
   };
@@ -305,7 +336,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
       return state.amountTier === optionValue;
     }
     if (stepId === "goal") {
-      return state.goal === optionValue;
+      return selectedGoals.includes(optionValue as InvestmentGoal);
     }
     return state.instruments.includes(optionValue as Instrument);
   };
@@ -360,6 +391,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
 
   const handleReset = () => {
     setState(INITIAL_STATE);
+    setSelectedGoals([]);
     setResultPayload(null);
     setDirection(-1);
     setCurrentStepIndex(-1);
@@ -459,9 +491,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
             <div className="seg-story__question-content">
               <p className="seg-story__block-title">{STEP_BLOCK_TITLE[currentStep.id]}</p>
               <h2 className="seg-story__question-title">{currentStep.title}</h2>
-              {currentStep.multiple ? (
-                <p className="seg-story__question-subtitle">{currentStep.subtitle}</p>
-              ) : null}
+              <p className="seg-story__question-subtitle">{currentStep.subtitle}</p>
 
               <div
                 className={`seg-story__options ${
@@ -488,7 +518,10 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
                         {isOptionSelected(currentStep.id, option.value) ? "✓" : "☐"}
                       </span>
                     ) : null}
-                    <span>{option.label}</span>
+                    <span className="seg-story__option-copy">
+                      <span>{option.label}</span>
+                      {option.hint ? <span className="seg-story__option-hint">{option.hint}</span> : null}
+                    </span>
                   </button>
                 ))}
               </div>

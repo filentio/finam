@@ -12,6 +12,8 @@ export interface BaseScreenProps {
   screen: ScreenConfig;
   onNext: () => void;
   onPrev: () => void;
+  screenIndex?: number;
+  screenCount?: number;
 }
 
 export interface CardsScreenProps extends BaseScreenProps {

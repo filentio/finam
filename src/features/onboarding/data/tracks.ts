@@ -13,18 +13,18 @@ export const TRACKS: Record<Segment, TrackStep[]> = {
     { type: "first_purchase" },
   ],
   advanced: [
-    { type: "lesson", lesson_id: "lesson_3", variant: "short" },
+    { type: "lesson", lesson_id: "lesson_2", variant: "full" },
+    { type: "lesson", lesson_id: "lesson_3", variant: "full" },
     { type: "risk_quiz" },
     { type: "risk_result" },
     { type: "lesson", lesson_id: "lesson_4", variant: "full" },
+    { type: "lesson", lesson_id: "lesson_5", variant: "full" },
     { type: "lesson", lesson_id: "lesson_6", variant: "full" },
     { type: "first_purchase" },
   ],
   expert: [
-    { type: "risk_quiz" },
-    { type: "risk_result" },
+    { type: "lesson", lesson_id: "lesson_5", variant: "full" },
     { type: "lesson", lesson_id: "lesson_6", variant: "expert" },
-    { type: "personal_recommendations" },
     { type: "first_purchase" },
   ],
 };
