@@ -455,7 +455,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
                 <p className="seg-story__question-subtitle">{currentStep.subtitle}</p>
               ) : null}
 
-              <div className="seg-story__options">
+              <div className="seg-story__options" role="listbox" aria-label={currentStep.title}>
                 {currentStep.options.map((option) => (
                   <button
                     key={option.value}
@@ -464,6 +464,8 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
                       isOptionSelected(currentStep.id, option.value) ? "is-selected" : ""
                     }`}
                     onClick={() => handleStepValueChange(currentStep.id, option.value)}
+                    aria-pressed={isOptionSelected(currentStep.id, option.value)}
+                    role="option"
                   >
                     {currentStep.multiple ? (
                       <span className="seg-story__multi-mark">

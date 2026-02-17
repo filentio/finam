@@ -1,4 +1,5 @@
 import { usePersonalization } from "../hooks/usePersonalization";
+import { openDeeplink } from "../../../lib/navigation";
 import type { CTAConfig } from "../types/onboarding";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
@@ -11,7 +12,7 @@ export function CTAScreen({ screen, onNext, onPrev }: BaseScreenProps) {
     if (cta.action === "deeplink") {
       const target = getDeeplink(cta.deeplink ?? "", cta.deeplink_variants);
       if (target) {
-        window.location.hash = target;
+        openDeeplink(target);
       }
       return;
     }

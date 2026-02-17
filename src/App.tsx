@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { SegmentationForm } from "./components/SegmentationForm";
+import { StageProgress } from "./components/StageProgress";
 import { Onboarding } from "./features/onboarding/Onboarding";
+import { determineSegment } from "./features/onboarding/hooks/useSegmentation";
 import type { DOSInput } from "./features/onboarding/types/onboarding";
 import type { SegmentationPayload } from "./types/segmentation";
 import "./styles/tokens.css";
@@ -76,12 +78,23 @@ function App() {
     setOnboardingInput(input);
     setUserId(`demo-user-${source}-${Date.now()}`);
     setSessionKey((value) => value + 1);
+    localStorage.setItem(
+      "finam_segment",
+      JSON.stringify({
+        segment: determineSegment(input),
+        dos_input: input,
+        timestamp: Date.now(),
+      }),
+    );
     setMode("onboarding");
   };
 
   if (mode === "onboarding" && onboardingInput) {
     return (
       <main className="app-shell app-shell--flow">
+        <div className="flow-stage-progress">
+          <StageProgress currentStage={3} />
+        </div>
         <Onboarding
           key={sessionKey}
           userId={userId}
@@ -103,6 +116,7 @@ function App() {
 
   return (
     <main className="app-shell">
+      <StageProgress currentStage={1} />
       <section className="demo-panel">
         <div className="demo-panel__header">
           <div>
@@ -131,6 +145,14 @@ function App() {
 
       <SegmentationForm
         onComplete={(payload) => {
+          localStorage.setItem(
+            "finam_segment",
+            JSON.stringify({
+              segment: payload.segment,
+              profile: payload,
+              timestamp: Date.now(),
+            }),
+          );
           startOnboarding(mapSegmentationToDosInput(payload), "custom");
         }}
       />

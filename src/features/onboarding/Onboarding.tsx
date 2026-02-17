@@ -71,34 +71,10 @@ function getStepBackground(step: TrackStep | undefined): string {
 }
 
 function getDisplayProgress(progress: ProgressInfo, routePreparationDone: boolean): ProgressInfo {
-  if (progress.totalSteps === 0) {
+  if (!routePreparationDone || progress.totalSteps === 0) {
     return progress;
   }
-
-  const totalSteps = progress.totalSteps + 1;
-
-  if (!routePreparationDone) {
-    return {
-      ...progress,
-      totalSteps,
-      completedSteps: 0,
-      currentStepIndex: 0,
-      currentStepProgress: 0,
-      overallProgress: 0,
-      currentStepLabel: "Подготовка маршрута",
-    };
-  }
-
-  const overallProgress = (progress.currentStepIndex + 1 + progress.currentStepProgress) / totalSteps;
-
-  return {
-    ...progress,
-    totalSteps,
-    completedSteps: Math.min(totalSteps, progress.completedSteps + 1),
-    currentStepIndex: progress.currentStepIndex + 1,
-    currentStepProgress: progress.currentStepProgress,
-    overallProgress,
-  };
+  return progress;
 }
 
 function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
@@ -124,7 +100,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
   const startedTrackedRef = useRef(false);
   const completedTrackedRef = useRef(false);
   const lastViewedScreenRef = useRef<string | null>(null);
-  const [routePreparationDone, setRoutePreparationDone] = useState(false);
+  const [routePreparationDone, setRoutePreparationDone] = useState(true);
   const [transition, setTransition] = useState<{
     preset: TransitionPreset;
     direction: 1 | -1;
@@ -192,7 +168,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
 
   useEffect(() => {
     if (state.status === "not_started") {
-      setRoutePreparationDone(false);
+      setRoutePreparationDone(true);
       previousPositionRef.current = { stepIndex: -1, screenIndex: -1, stepType: null };
       lastViewedScreenRef.current = null;
     }
@@ -630,6 +606,34 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
             setRoutePreparationDone(true);
           }}
         />
+      </OnboardingLayout>
+    );
+  }
+
+  if (routePreparationDone && !currentScreen) {
+    return (
+      <OnboardingLayout
+        progress={layoutProgress}
+        stepLabel={layoutStepLabel}
+        background={stepBackground}
+        transitionPreset={transition.preset}
+        direction={transition.direction}
+        transitionKey={`${transition.key}:fallback`}
+        onClose={pauseOnboarding}
+        onPrev={handlePrev}
+        onNext={() => dispatch({ type: "NEXT_STEP" })}
+        nextLabel="Продолжить"
+        nextDisabled={false}
+        showFooter
+        enableTapNavigation={false}
+        emphasizeNext={false}
+        quizMode={isRiskQuizFlow}
+      >
+        <section className="ob-route-prep">
+          <div className="ob-route-prep__icon">⚠️</div>
+          <h2>Экран временно недоступен</h2>
+          <p>Перейдём к следующему шагу маршрута.</p>
+        </section>
       </OnboardingLayout>
     );
   }

@@ -36,6 +36,8 @@ body {
   max-width: none;
   padding: 0;
   min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .flow-exit {
@@ -49,6 +51,43 @@ body {
   border-radius: 12px;
   padding: 8px 12px;
   cursor: pointer;
+}
+
+.flow-stage-progress {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  width: min(420px, calc(100% - 20px));
+  pointer-events: none;
+}
+
+.stage-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.stage-progress__item {
+  display: grid;
+  gap: 6px;
+}
+
+.stage-progress__label {
+  color: #6b7280;
+}
+
+.stage-progress__bar {
+  height: 4px;
+  border-radius: 999px;
+  background: #d6deec;
+  transition: background-color 0.2s ease;
+}
+
+.stage-progress__bar.is-active {
+  background: var(--finam-primary);
 }
 
 .demo-panel {
@@ -360,8 +399,9 @@ body {
 .seg-story__frame {
   width: 100%;
   max-width: 430px;
-  min-height: min(932px, 100dvh);
-  height: min(932px, 100dvh);
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
   border-radius: 24px;
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   color: #fff;
@@ -386,6 +426,11 @@ body {
   font-size: 30px;
   line-height: 1;
   cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   transition: opacity 0.2s ease;
 }
@@ -422,9 +467,9 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 8px 24px 24px;
+  padding: 6px 20px 18px;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
   animation-duration: 300ms;
   animation-fill-mode: both;
   animation-timing-function: ease-out;
@@ -467,19 +512,19 @@ body {
 }
 
 .seg-story__intro-emoji {
-  font-size: 64px;
-  margin-bottom: 18px;
+  font-size: 56px;
+  margin-bottom: 14px;
 }
 
 .seg-story__intro-title {
-  margin: 0 0 10px;
-  font-size: 30px;
+  margin: 0 0 8px;
+  font-size: 26px;
   line-height: 1.2;
 }
 
 .seg-story__intro-subtitle {
-  margin: 0 0 20px;
-  font-size: 18px;
+  margin: 0 0 14px;
+  font-size: 16px;
   color: rgba(255, 255, 255, 0.82);
 }
 
@@ -489,8 +534,8 @@ body {
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
-  padding: 18px;
-  margin-bottom: 18px;
+  padding: 14px;
+  margin-bottom: 14px;
 }
 
 .seg-story__intro-benefits {
@@ -498,7 +543,7 @@ body {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 12px;
+  gap: 8px;
   text-align: left;
 }
 
@@ -509,7 +554,7 @@ body {
 }
 
 .seg-story__intro-time {
-  margin: 0 0 18px;
+  margin: 0 0 12px;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.65);
 }
@@ -518,6 +563,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-height: 0;
 }
 
@@ -531,8 +577,8 @@ body {
 }
 
 .seg-story__question-title {
-  margin: 0 0 14px;
-  font-size: 24px;
+  margin: 0 0 10px;
+  font-size: 22px;
   line-height: 1.25;
 }
 
@@ -545,8 +591,8 @@ body {
 .seg-story__options {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: auto;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .seg-story__option {
@@ -556,7 +602,7 @@ body {
   gap: 10px;
   border: 0;
   border-radius: 16px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
   color: #fff;
@@ -583,8 +629,9 @@ body {
 .seg-story__footer {
   position: sticky;
   bottom: 0;
-  margin-top: 12px;
-  padding-top: 14px;
+  flex-shrink: 0;
+  margin-top: 8px;
+  padding-top: 10px;
   background: linear-gradient(to top, rgba(0, 102, 255, 0.16), rgba(0, 102, 255, 0));
 }
 
@@ -620,13 +667,13 @@ body {
 }
 
 .seg-story__result-emoji {
-  font-size: 64px;
-  margin-bottom: 18px;
+  font-size: 56px;
+  margin-bottom: 14px;
 }
 
 .seg-story__result-title {
-  margin: 0 0 20px;
-  font-size: 30px;
+  margin: 0 0 14px;
+  font-size: 26px;
   line-height: 1.2;
 }
 
@@ -636,8 +683,8 @@ body {
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
-  padding: 18px;
-  margin-bottom: 20px;
+  padding: 14px;
+  margin-bottom: 14px;
   text-align: left;
 }
 

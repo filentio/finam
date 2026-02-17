@@ -76,7 +76,7 @@ export function OnboardingLayout({
                 type="button"
                 className="ob-layout-close"
                 onClick={onClose}
-                aria-label="Поставить на паузу"
+                aria-label="Закрыть обучение"
               >
                 ×
               </button>

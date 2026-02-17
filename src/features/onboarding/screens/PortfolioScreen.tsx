@@ -19,6 +19,8 @@ export function PortfolioScreen({
     .filter((item) => item.type === "bond")
     .reduce((sum, item) => sum + item.share_pct, 0);
   const alternatives = Math.max(0, 100 - stocks - bonds);
+  const visibleItems = portfolio.items.slice(0, 5);
+  const hiddenItemsCount = Math.max(0, portfolio.items.length - visibleItems.length);
 
   return (
     <ScreenShell
@@ -34,7 +36,12 @@ export function PortfolioScreen({
         }}
       />
       <GoalOverlay overlay={overlay} />
-      <PortfolioTable items={portfolio.items} />
+      <PortfolioTable items={visibleItems} />
+      {hiddenItemsCount > 0 ? (
+        <p className="ob-screen__subtitle">
+          Ещё {hiddenItemsCount} инструментов в полной версии портфеля.
+        </p>
+      ) : null}
     </ScreenShell>
   );
 }

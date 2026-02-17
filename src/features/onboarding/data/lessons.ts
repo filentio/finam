@@ -50,7 +50,6 @@ const LESSON_1: LessonConfig = {
       title: "Три шага к первой инвестиции",
       items: [
         {
-          icon: "💳",
           title: "Пополните счёт",
           description_variants: {
             up_to_300k: "Начните с комфортной суммы — от 10 000 ₽.",
@@ -60,12 +59,10 @@ const LESSON_1: LessonConfig = {
           },
         },
         {
-          icon: "🔍",
           title: "Выберите инструмент",
           description: "Мы поможем подобрать подходящий — после обучения.",
         },
         {
-          icon: "🛒",
           title: "Купите",
           description: "Одно нажатие — и вы инвестор.",
         },

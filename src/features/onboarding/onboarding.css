@@ -1,6 +1,6 @@
 .ob-layout-root {
   min-height: 100dvh;
-  background: #000;
+  background: var(--bg-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,7 +35,7 @@
   z-index: 7;
   display: grid;
   gap: var(--space-1);
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0));
   padding-bottom: 4px;
 }
 
@@ -51,7 +51,7 @@
   font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(30, 41, 59, 0.68);
   font-weight: 600;
 }
 
@@ -59,16 +59,16 @@
   letter-spacing: 0;
   text-transform: none;
   font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
 }
 
 .ob-layout-close {
   border: 0;
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.28);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text-primary);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -83,7 +83,7 @@
   flex-direction: column;
   overflow: hidden;
   padding-top: var(--space-1);
-  padding-bottom: 92px;
+  padding-bottom: 88px;
 }
 
 .ob-layout-screen {
@@ -181,7 +181,7 @@
   top: 56px;
   left: 0;
   right: 0;
-  bottom: 86px;
+  bottom: 82px;
   z-index: 2;
   display: flex;
 }
@@ -208,7 +208,7 @@
   z-index: 8;
   padding: var(--space-2);
   padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.84), rgba(0, 0, 0, 0));
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0));
 }
 
 .ob-layout-frame--quiz .ob-progress__meta {
@@ -236,6 +236,7 @@
   font-size: var(--text-base);
   font-weight: 700;
   cursor: pointer;
+  box-shadow: none;
   transition: transform var(--transition-fast), box-shadow var(--transition-base);
 }
 

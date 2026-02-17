@@ -9,6 +9,8 @@ export function ProgressBar({ progress }: ProgressBarProps) {
     return null;
   }
 
+  const progressPercent = Math.round(Math.max(0, Math.min(progress.overallProgress, 1)) * 100);
+
   const segments = Array.from({ length: progress.totalSteps }, (_, index) => {
     if (index < progress.currentStepIndex) {
       return 1;
@@ -20,7 +22,14 @@ export function ProgressBar({ progress }: ProgressBarProps) {
   });
 
   return (
-    <div className="ob-progress">
+    <div
+      className="ob-progress"
+      role="progressbar"
+      aria-valuenow={progressPercent}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Прогресс урока: ${progressPercent}%`}
+    >
       <div className="ob-progress__segments">
         {segments.map((fill, index) => (
           <div
@@ -48,7 +57,7 @@ export function ProgressBar({ progress }: ProgressBarProps) {
 
       <div className="ob-progress__meta">
         <span>{progress.currentStepLabel}</span>
-        <span>{Math.round(progress.overallProgress * 100)}%</span>
+        <span>{progressPercent}%</span>
       </div>
     </div>
   );
