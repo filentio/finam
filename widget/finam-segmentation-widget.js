@@ -30,18 +30,18 @@
   --finam-primary-hover: #1447c4;
   --bg-base: #ffffff;
   --bg-elevated: #f8f9fa;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
+  --text-primary: #111111;
+  --text-secondary: #555555;
   --text-inverse: #ffffff;
   --space-1: 8px;
   --space-2: 16px;
   --space-3: 24px;
   --space-4: 32px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
+  --radius-sm: 16px;
+  --radius-md: 16px;
   --radius-lg: 16px;
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
   --gradient-lesson-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-lesson-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -341,36 +341,42 @@
   margin-top: 0;
   display: flex;
   justify-content: center;
-  padding: 8px 0;
+  width: 100%;
+  padding: 0 16px;
 }
 
 .segw__seg-story-frame {
   width: 100%;
-  max-width: 430px;
-  min-height: 932px;
-  height: 932px;
-  border-radius: 24px;
+  max-width: 480px;
+  min-height: 100svh;
+  height: 100svh;
+  border-radius: 16px;
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   color: #fff;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.25);
+  box-shadow: none;
 }
 
 .segw__seg-story-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px 8px;
+  padding: 16px 16px 8px;
 }
 
 .segw__seg-story-close {
   border: 0;
   background: transparent;
   color: #fff;
-  font-size: 30px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
   line-height: 1;
   cursor: pointer;
   transition: opacity var(--transition-fast);
@@ -409,8 +415,8 @@
 .segw__seg-story-content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  padding: 8px 24px 24px;
+  overflow: hidden;
+  padding: 8px 16px 16px;
   display: flex;
   flex-direction: column;
 }
@@ -426,22 +432,22 @@
 @keyframes segwSegSlideNext {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
 @keyframes segwSegSlidePrev {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
@@ -519,52 +525,65 @@
 }
 
 .segw__seg-question-title {
-  margin: 0 0 14px;
-  font-size: 28px;
-  line-height: 1.25;
+  margin: 0 0 16px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .segw__seg-question-subtitle {
-  margin: 0 0 10px;
-  color: rgba(255, 255, 255, 0.74);
-  font-size: 16px;
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .segw__seg-options {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   margin-top: auto;
 }
 
 .segw__seg-option {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(17, 17, 17, 0.14);
   border-radius: 16px;
-  min-height: 56px;
-  padding: 14px 16px;
+  min-height: 48px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
   text-align: center;
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
-  font-size: 17px;
+  background: #fff;
+  color: #111;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
 }
 
 .segw__seg-option:hover {
-  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.segw__seg-option:active {
+  transform: scale(0.98);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
 }
 
 .segw__seg-option.is-selected {
-  background: #fff;
-  border-color: #fff;
-  color: #2f9adf;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
+  background: var(--segw-primary-soft);
+  border-color: var(--segw-primary);
+  color: #111;
+  box-shadow: 0 0 0 1px rgba(26, 86, 219, 0.2), 0 4px 12px rgba(26, 86, 219, 0.16);
+}
+
+.segw__seg-option:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .segw__seg-option.is-multiple {
@@ -605,7 +624,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 14px 24px 24px;
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
   background: linear-gradient(to top, rgba(0, 107, 235, 0.22), rgba(0, 107, 235, 0));
 }
 
@@ -614,7 +634,7 @@
   width: 100%;
   border: 0;
   border-radius: 16px;
-  min-height: 52px;
+  min-height: 48px;
   padding: 0 18px;
   background: rgba(255, 255, 255, 0.3);
   color: #fff;
@@ -628,6 +648,12 @@
 .segw__seg-story-next:hover,
 .segw__seg-cta:hover {
   background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.segw__seg-story-next:active,
+.segw__seg-cta:active {
+  transform: scale(0.98);
 }
 
 .segw__seg-story-next:disabled {
@@ -769,6 +795,8 @@
   margin-top: 0;
   display: flex;
   justify-content: center;
+  width: 100%;
+  padding: 0 16px;
 }
 
 .segw__onboarding.is-hidden {
@@ -859,21 +887,21 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 100dvh;
+  min-height: 100svh;
   background: transparent;
   padding: 0;
 }
 
 .segw__story-frame {
   width: 100%;
-  max-width: 430px;
-  height: 100dvh;
-  max-height: 100dvh;
-  min-height: 100dvh;
+  max-width: 480px;
+  height: 100svh;
+  max-height: 100svh;
+  min-height: 100svh;
   margin: 0 auto;
   position: relative;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 16px;
   color: #fff;
   box-shadow: none;
   background: var(--gradient-lesson-1);
@@ -912,9 +940,9 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 6px;
+  gap: 8px;
   padding: 16px;
-  padding-bottom: 138px;
+  padding-bottom: 128px;
   overflow: hidden;
 }
 
@@ -1017,19 +1045,25 @@
 
 .segw__quiz-option {
   border: 2px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   padding: var(--space-2);
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
   font-size: var(--text-base);
   text-align: center;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
 }
 
 .segw__quiz-option:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.02);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.segw__quiz-option:active {
+  transform: scale(0.98);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
 }
 
 .segw__quiz-option.is-selected {
@@ -1187,32 +1221,32 @@
 }
 
 .segw__story-content.is-enter-next {
-  animation: segwStorySlideNext var(--transition-base);
+  animation: segwStorySlideNext 200ms ease;
 }
 
 .segw__story-content.is-enter-prev {
-  animation: segwStorySlidePrev var(--transition-base);
+  animation: segwStorySlidePrev 200ms ease;
 }
 
 @keyframes segwStorySlideNext {
   from {
     opacity: 0;
-    transform: translateX(36px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
 @keyframes segwStorySlidePrev {
   from {
     opacity: 0;
-    transform: translateX(-36px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
@@ -1257,7 +1291,7 @@
 
 .segw__lesson1-screen {
   display: grid;
-  gap: 14px;
+  gap: 8px;
   align-content: start;
 }
 
@@ -1912,6 +1946,92 @@
   border: 1px solid rgba(255, 152, 0, 0.8);
 }
 
+.segw__onboarding-step-title,
+.segw__quiz-intro-title,
+.segw__quiz-result-title,
+.segw__lesson1-title,
+.segw__lesson2-title,
+.segw__lesson3-title,
+.segw__lesson4-title,
+.segw__lesson5-title,
+.segw__lesson6-title {
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.segw__quiz-question-title {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.segw__onboarding-step-text,
+.segw__quiz-result-description,
+.segw__quiz-allocation-title,
+.segw__lesson1-subtitle,
+.segw__lesson1-body,
+.segw__lesson2-text,
+.segw__lesson3-text,
+.segw__lesson4-text,
+.segw__lesson5-text,
+.segw__lesson6-text {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.segw__seg-question-subtitle,
+.segw__quiz-question-block-title,
+.segw__lesson2-subtitle,
+.segw__lesson3-subtitle,
+.segw__lesson4-subtitle,
+.segw__lesson5-subtitle,
+.segw__lesson6-subtitle,
+.segw__story-hint {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.segw__seg-story-frame,
+.segw__story-frame,
+.segw__seg-option,
+.segw__seg-story-next,
+.segw__seg-cta,
+.segw__story-next,
+.segw__seg-intro-card,
+.segw__seg-result-card,
+.segw__seg-track-item,
+.segw__onboarding-points li,
+.segw__quiz-benefits,
+.segw__quiz-option,
+.segw__quiz-result-badge,
+.segw__quiz-allocation-card,
+.segw__lesson1-visual,
+.segw__lesson1-highlight,
+.segw__lesson1-step-card,
+.segw__lesson1-instrument-card,
+.segw__lesson1-goal-accent,
+.segw__lesson1-cta,
+.segw__lesson2-quote,
+.segw__lesson2-risk-card,
+.segw__lesson2-rule,
+.segw__lesson2-tip,
+.segw__lesson2-chart,
+.segw__lesson3-visual,
+.segw__lesson3-portfolio-row,
+.segw__lesson3-goal-advice,
+.segw__lesson3-spectrum-row,
+.segw__lesson4-row,
+.segw__lesson4-level-card,
+.segw__lesson5-top-card,
+.segw__lesson5-quiz-option,
+.segw__lesson5-faq-item,
+.segw__lesson5-mismatch,
+.segw__lesson6-compare-row,
+.segw__lesson6-tariff-card {
+  border-radius: 16px;
+}
+
 .segw__lesson6-calculator {
   border-radius: 12px;
   padding: 8px;
@@ -1991,7 +2111,7 @@
   bottom: 0;
   margin-top: auto;
   z-index: 8;
-  padding: 12px 20px;
+  padding: 16px;
   padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
   background: linear-gradient(to top, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
 }
@@ -1999,7 +2119,7 @@
 .segw__story-next {
   width: 100%;
   border: 0;
-  min-height: 52px;
+  min-height: 48px;
   border-radius: 16px;
   padding: 0 18px;
   background: rgba(255, 255, 255, 0.3);
@@ -2013,6 +2133,11 @@
 
 .segw__story-next:hover {
   background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.segw__story-next:active {
+  transform: scale(0.98);
 }
 
 .segw__story-next.is-quiz-cta {
@@ -2117,24 +2242,24 @@
   }
 
   .segw__story-frame {
-    min-height: min(100dvh, 932px);
-    height: min(100dvh, 932px);
-    max-height: 100dvh;
-    border-radius: 0;
+    min-height: 100svh;
+    height: 100svh;
+    max-height: 100svh;
+    border-radius: 16px;
     box-shadow: none;
   }
 }
 
 @media (max-width: 720px) {
   .segw__questionnaire {
-    padding: 0;
+    padding: 0 16px;
   }
 
   .segw__seg-story-frame {
     max-width: none;
-    min-height: 100dvh;
-    height: 100dvh;
-    border-radius: 0;
+    min-height: 100svh;
+    height: 100svh;
+    border-radius: 16px;
     box-shadow: none;
   }
 
@@ -2147,9 +2272,9 @@
 
   .segw__story-frame {
     max-width: none;
-    border-radius: 0;
-    min-height: 100dvh;
-    height: 100dvh;
+    border-radius: 16px;
+    min-height: 100svh;
+    height: 100svh;
   }
 
   .segw__onboarding-footer {
@@ -3411,6 +3536,11 @@
     }
 
     progressRoot.innerHTML = "";
+    progressRoot.setAttribute("role", "progressbar");
+    progressRoot.setAttribute("aria-label", "Прогресс анкеты");
+    progressRoot.setAttribute("aria-valuemin", "1");
+    progressRoot.setAttribute("aria-valuemax", String(SEGMENTATION_TOTAL_SEGMENTS));
+    progressRoot.setAttribute("aria-valuenow", String(progressIndex + 1));
     for (var i = 0; i < SEGMENTATION_TOTAL_SEGMENTS; i += 1) {
       var segment = document.createElement("span");
       segment.className = "segw__seg-story-progress-segment";
@@ -3452,6 +3582,14 @@
       refs.segNextButton.textContent = "Далее →";
     }
 
+    var screenKey = "intro";
+    if (flow.resultPayload) {
+      screenKey = "result";
+    } else if (flow.stepIndex >= 0 && flow.stepIndex < SEGMENTATION_STORY_ORDER.length) {
+      screenKey = "question:" + String(flow.stepIndex);
+    }
+
+    var shouldAnimate = flow.lastRenderedScreenKey !== screenKey;
     refs.segContent.innerHTML = "";
     refs.segContent.classList.remove(
       "is-enter-next",
@@ -3460,7 +3598,9 @@
       "is-question",
       "is-result",
     );
-    refs.segContent.classList.add(flow.direction >= 0 ? "is-enter-next" : "is-enter-prev");
+    if (shouldAnimate) {
+      refs.segContent.classList.add(flow.direction >= 0 ? "is-enter-next" : "is-enter-prev");
+    }
 
     if (flow.resultPayload) {
       refs.segContent.classList.add("is-result");
@@ -3503,6 +3643,7 @@
       startButton.setAttribute("data-action", "seg-start-onboarding");
       resultWrap.appendChild(startButton);
       refs.segContent.appendChild(resultWrap);
+      flow.lastRenderedScreenKey = screenKey;
       return;
     }
 
@@ -3541,6 +3682,7 @@
       introButton.setAttribute("data-action", "seg-next");
       introWrap.appendChild(introButton);
       refs.segContent.appendChild(introWrap);
+      flow.lastRenderedScreenKey = screenKey;
       return;
     }
 
@@ -3559,6 +3701,8 @@
     }
 
     var optionsWrap = createStoryNode("div", "segw__seg-options");
+    optionsWrap.setAttribute("role", stepConfig.multiple ? "group" : "radiogroup");
+    optionsWrap.setAttribute("aria-label", stepConfig.title);
     var options = Array.isArray(stepConfig.options) ? stepConfig.options : [];
     for (var o = 0; o < options.length; o += 1) {
       var option = options[o];
@@ -3567,6 +3711,8 @@
       optionButton.type = "button";
       optionButton.setAttribute("data-action", stepConfig.action);
       optionButton.setAttribute("data-value", option.value);
+      optionButton.setAttribute("role", stepConfig.multiple ? "checkbox" : "radio");
+      optionButton.setAttribute("aria-pressed", isSelected ? "true" : "false");
       if (isSelected) {
         optionButton.classList.add("is-selected");
       }
@@ -3593,6 +3739,43 @@
       }
 
     refs.segContent.appendChild(questionWrap);
+    flow.lastRenderedScreenKey = screenKey;
+  }
+
+  function refreshSegmentationStepUI(refs, state) {
+    if (!refs.segContent) {
+      return;
+    }
+
+    var flow = state.segmentationFlow;
+    if (flow.resultPayload || flow.stepIndex < 0 || flow.stepIndex >= SEGMENTATION_STORY_ORDER.length) {
+      return;
+    }
+
+    var stepId = SEGMENTATION_STORY_ORDER[flow.stepIndex];
+    var stepConfig = SEGMENTATION_STORY_STEPS[stepId];
+    if (!stepConfig) {
+      return;
+    }
+
+    var optionButtons = refs.segContent.querySelectorAll(".segw__seg-option[data-action][data-value]");
+    for (var i = 0; i < optionButtons.length; i += 1) {
+      var button = optionButtons[i];
+      var value = button.getAttribute("data-value");
+      var isSelected = isSegmentationOptionSelected(state, stepId, value || "");
+      button.classList.toggle("is-selected", isSelected);
+      button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      if (stepConfig.multiple) {
+        var check = button.querySelector(".segw__seg-option-check");
+        if (check) {
+          check.textContent = isSelected ? "✓" : "☐";
+        }
+      }
+    }
+
+    if (refs.segNextButton) {
+      refs.segNextButton.disabled = !isSegmentationStepAnswered(state, stepId);
+    }
   }
 
   function getInstrumentLabelList(instruments) {
@@ -4216,6 +4399,7 @@
     state.inlineOnboarding.quizResult = null;
     state.inlineOnboarding.quizStartedAt = 0;
     state.inlineOnboarding.lastViewedStepKey = "";
+    state.inlineOnboarding.lastRenderedStepIndex = -1;
     state.inlineOnboarding.lessonState = {
       startedAt: {},
       completed: {},
@@ -4247,6 +4431,7 @@
     state.inlineOnboarding.quizResult = null;
     state.inlineOnboarding.quizStartedAt = 0;
     state.inlineOnboarding.lastViewedStepKey = "";
+    state.inlineOnboarding.lastRenderedStepIndex = -1;
     state.inlineOnboarding.lessonState = {
       startedAt: {},
       completed: {},
@@ -4456,6 +4641,11 @@
     }
 
     progressRoot.innerHTML = "";
+    progressRoot.setAttribute("role", "progressbar");
+    progressRoot.setAttribute("aria-label", "Прогресс обучения");
+    progressRoot.setAttribute("aria-valuemin", "1");
+    progressRoot.setAttribute("aria-valuemax", String(totalSegments));
+    progressRoot.setAttribute("aria-valuenow", String(currentSegment + 1));
 
     for (var i = 0; i < totalSegments; i += 1) {
       var segment = document.createElement("span");
@@ -4560,6 +4750,8 @@
         "div",
         "segw__quiz-options" + (question.layout === "horizontal" ? " segw__quiz-options--horizontal" : ""),
       );
+      optionsRoot.setAttribute("role", "listbox");
+      optionsRoot.setAttribute("aria-label", question.question || "Варианты ответа");
       var options = Array.isArray(question.options) ? question.options : [];
       var selected = getQuizAnswer(inlineState, question.id);
 
@@ -4576,6 +4768,11 @@
         optionButton.setAttribute("data-question-id", question.id);
         optionButton.setAttribute("data-option-id", option.id);
         optionButton.setAttribute("data-option-score", String(option.score));
+        optionButton.setAttribute("role", "option");
+        optionButton.setAttribute(
+          "aria-pressed",
+          selected && selected.selected_option === option.id ? "true" : "false",
+        );
         optionsRoot.appendChild(optionButton);
       }
 
@@ -5831,12 +6028,16 @@
     }
 
     if (refs.storyContent) {
+      var shouldAnimateStep = inlineState.lastRenderedStepIndex !== inlineState.activeStepIndex;
       refs.storyContent.classList.remove("is-enter-next", "is-enter-prev");
-      void refs.storyContent.offsetWidth;
-      refs.storyContent.classList.add(
-        inlineState.direction < 0 ? "is-enter-prev" : "is-enter-next",
-      );
+      if (shouldAnimateStep) {
+        void refs.storyContent.offsetWidth;
+        refs.storyContent.classList.add(
+          inlineState.direction < 0 ? "is-enter-prev" : "is-enter-next",
+        );
+      }
       renderStoryStepContent(refs.storyContent, activeStep, inlineState);
+      inlineState.lastRenderedStepIndex = inlineState.activeStepIndex;
     }
 
     if (refs.onboardingCounter) {
@@ -6072,6 +6273,7 @@
         resultPayload: null,
         targetRoute: "",
         inlineMode: true,
+        lastRenderedScreenKey: "",
       },
       inlineOnboarding: {
         isActive: false,
@@ -6088,6 +6290,7 @@
         quizResult: null,
         quizStartedAt: 0,
         lastViewedStepKey: "",
+        lastRenderedStepIndex: -1,
         lessonState: {
           startedAt: {},
           completed: {},
@@ -6150,6 +6353,7 @@
 
       var action = button.getAttribute("data-action");
       var value = button.getAttribute("data-value");
+      var shouldSoftUpdateSegmentation = false;
 
       if (action === "seg-reset") {
         state.qualifiedInvestor = null;
@@ -6163,6 +6367,7 @@
         state.segmentationFlow.resultPayload = null;
         state.segmentationFlow.targetRoute = "";
         state.segmentationFlow.inlineMode = true;
+        state.segmentationFlow.lastRenderedScreenKey = "";
         resetInlineOnboardingState(state);
         if (refs.result) {
           refs.result.classList.add("is-hidden");
@@ -6247,13 +6452,6 @@
             segment: resultPayload.segment,
             amount_tier: resultPayload.amount_tier,
           });
-
-          var scrollTarget = refs.routePrep || refs.onboarding;
-          if (scrollTarget && typeof scrollTarget.scrollIntoView === "function") {
-            setTimeout(function () {
-              scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 30);
-          }
           render(root, refs, state);
           return;
         }
@@ -6289,12 +6487,6 @@
           state.inlineOnboarding.direction = 1;
           state.inlineOnboarding.activeStepIndex = 0;
           render(root, refs, state);
-
-          if (refs.onboarding && typeof refs.onboarding.scrollIntoView === "function") {
-            setTimeout(function () {
-              refs.onboarding.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 30);
-          }
 
           setTimeout(function () {
             if (!state.inlineOnboarding.isActive) {
@@ -6338,7 +6530,19 @@
           selected_option: optionId,
           score: optionScore,
         });
-        render(root, refs, state);
+        if (refs.storyContent) {
+          var selector = '.segw__quiz-option[data-question-id="' + questionId + '"]';
+          var quizButtons = refs.storyContent.querySelectorAll(selector);
+          for (var qb = 0; qb < quizButtons.length; qb += 1) {
+            var quizButton = quizButtons[qb];
+            var isActive = quizButton.getAttribute("data-option-id") === optionId;
+            quizButton.classList.toggle("is-selected", isActive);
+            quizButton.setAttribute("aria-pressed", isActive ? "true" : "false");
+          }
+        }
+        if (refs.onboardingNextButton) {
+          refs.onboardingNextButton.disabled = false;
+        }
         return;
       } else if (action === "lesson1-deposit") {
         if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
@@ -6675,6 +6879,7 @@
         state.segmentationFlow.inlineMode = true;
         state.segmentationFlow.direction = -1;
         state.segmentationFlow.stepIndex = 0;
+        state.segmentationFlow.lastRenderedScreenKey = "";
         if (refs.result) {
           refs.result.classList.add("is-hidden");
         }
@@ -6685,14 +6890,18 @@
         return;
       } else if (action === "qualified") {
         state.qualifiedInvestor = value === "true";
+        shouldSoftUpdateSegmentation = true;
       } else if (action === "experience") {
         state.experience = value;
+        shouldSoftUpdateSegmentation = true;
       } else if (action === "amount") {
         state.amountTier = value;
         trackEvent("amount_selected", { amount_tier: value });
+        shouldSoftUpdateSegmentation = true;
       } else if (action === "goal") {
         state.goal = value;
         trackEvent("goal_selected", { goal: value });
+        shouldSoftUpdateSegmentation = true;
       } else if (action === "instrument") {
         var existingIndex = state.instruments.indexOf(value);
         if (existingIndex === -1) {
@@ -6700,6 +6909,7 @@
         } else {
           state.instruments.splice(existingIndex, 1);
         }
+        shouldSoftUpdateSegmentation = true;
       } else if (action === "continue") {
         var payload = buildPayload(state);
         if (!payload) {
@@ -6727,13 +6937,6 @@
             segment: payload.segment,
             amount_tier: payload.amount_tier,
           });
-
-          var scrollTarget = refs.routePrep || refs.onboarding;
-          if (scrollTarget && typeof scrollTarget.scrollIntoView === "function") {
-            setTimeout(function () {
-              scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 30);
-          }
         } else {
           resetInlineOnboardingState(state);
         }
@@ -6751,6 +6954,16 @@
       }
 
       state.segment = calculateSegment(state.qualifiedInvestor, state.experience);
+      if (
+        shouldSoftUpdateSegmentation &&
+        !state.inlineOnboarding.isActive &&
+        !state.segmentationFlow.resultPayload &&
+        state.segmentationFlow.stepIndex >= 0 &&
+        state.segmentationFlow.stepIndex < SEGMENTATION_STORY_ORDER.length
+      ) {
+        refreshSegmentationStepUI(refs, state);
+        return;
+      }
       render(root, refs, state);
     });
 
@@ -7005,7 +7218,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.23";
+  window.FinamSegmentationWidget.version = "1.0.24";
 
   ensureStyles();
   initExistingWidgets();
