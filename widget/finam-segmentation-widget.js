@@ -767,6 +767,8 @@
 
 .segw__onboarding {
   margin-top: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .segw__onboarding.is-hidden {
@@ -856,6 +858,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: 100dvh;
   background: transparent;
   padding: 0;
@@ -911,7 +914,7 @@
   justify-content: flex-start;
   gap: 6px;
   padding: 16px;
-  padding-bottom: 152px;
+  padding-bottom: 138px;
   overflow: hidden;
 }
 
@@ -1944,18 +1947,18 @@
 
 .segw__onboarding-meta {
   margin: 0;
-  padding: 0 0 6px;
+  padding: 0 0 4px;
   color: rgba(255, 255, 255, 0.78);
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .segw__story-hint {
   margin: 0;
-  padding: 0 0 12px;
+  padding: 0 0 10px;
   text-align: center;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .segw__story-tapzones {
@@ -1964,7 +1967,7 @@
   top: 30px;
   left: 0;
   right: 0;
-  bottom: 162px;
+  bottom: 146px;
   display: flex;
 }
 
@@ -1988,9 +1991,9 @@
   bottom: 0;
   margin-top: auto;
   z-index: 8;
-  padding: 16px 24px;
+  padding: 12px 20px;
   padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0));
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
 }
 
 .segw__story-next {
@@ -2068,22 +2071,11 @@
 }
 
 .segw__onboarding-done {
-  margin: 12px 0 0;
-  color: #1f6f44;
-  background: #ecf8f0;
-  border: 1px solid #bfe4cb;
-  border-radius: 10px;
-  padding: 9px 10px;
-  font-size: 0.87rem;
+  display: none !important;
 }
 
 .segw__onboarding-footer {
-  margin-top: 12px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  display: none !important;
 }
 
 .segw__onboarding-footer .segw__route--ghost {
@@ -2121,15 +2113,15 @@
 
 @media (min-width: 768px) {
   .segw__story-wrapper {
-    padding: 20px;
+    padding: 0;
   }
 
   .segw__story-frame {
     min-height: min(100dvh, 932px);
     height: min(100dvh, 932px);
-    max-height: 932px;
-    border-radius: 24px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.52);
+    max-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 
@@ -7013,7 +7005,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.22";
+  window.FinamSegmentationWidget.version = "1.0.23";
 
   ensureStyles();
   initExistingWidgets();
