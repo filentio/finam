@@ -888,7 +888,7 @@
   justify-content: center;
   width: 100%;
   min-height: 100svh;
-  background: transparent;
+  background: #fff;
   padding: 0;
 }
 
@@ -902,10 +902,27 @@
   position: relative;
   overflow: hidden;
   border-radius: 16px;
-  color: #fff;
+  color: #111;
+  opacity: 1;
   box-shadow: none;
-  background: var(--gradient-lesson-1);
-  transition: background var(--transition-base);
+  background: #fff;
+  transition: none;
+  display: block;
+}
+
+.segw__story-background-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #fff;
+}
+
+.segw__story-content-layer {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -2168,8 +2185,14 @@
 }
 
 .segw__story-frame {
-  background: linear-gradient(180deg, #f8fbff 0%, #edf3fb 100%) !important;
+  background: #fff !important;
   color: #111;
+  opacity: 1 !important;
+}
+
+.segw__story-background-layer {
+  background: #fff;
+  pointer-events: none;
 }
 
 .segw__story-progress-segment {
@@ -2182,7 +2205,8 @@
 }
 
 .segw__story-footer {
-  background: linear-gradient(to top, rgba(248, 251, 255, 0.98), rgba(248, 251, 255, 0.68));
+  background: #fff;
+  border-top: 1px solid #dbe3f0;
 }
 
 .segw__story-next,
@@ -2217,6 +2241,7 @@
 .segw__story-frame .segw__quiz-intro-title,
 .segw__story-frame .segw__quiz-result-title,
 .segw__story-frame .segw__quiz-question-title,
+.segw__story-frame .segw__lesson1-title,
 .segw__story-frame .segw__lesson2-title,
 .segw__story-frame .segw__lesson3-title,
 .segw__story-frame .segw__lesson4-title,
@@ -2229,11 +2254,17 @@
 .segw__story-frame .segw__quiz-intro-subtitle,
 .segw__story-frame .segw__quiz-question-block-title,
 .segw__story-frame .segw__quiz-result-description,
+.segw__story-frame .segw__lesson1-subtitle,
+.segw__story-frame .segw__lesson1-body,
 .segw__story-frame .segw__lesson2-subtitle,
 .segw__story-frame .segw__lesson3-subtitle,
 .segw__story-frame .segw__lesson4-subtitle,
 .segw__story-frame .segw__lesson5-subtitle,
 .segw__story-frame .segw__lesson6-subtitle,
+.segw__story-frame .segw__lesson1-visual-text,
+.segw__story-frame .segw__lesson1-step-description,
+.segw__story-frame .segw__lesson1-instrument-description,
+.segw__story-frame .segw__lesson1-instrument-risk,
 .segw__story-frame .segw__lesson2-text,
 .segw__story-frame .segw__lesson3-text,
 .segw__story-frame .segw__lesson4-text,
@@ -2247,6 +2278,7 @@
 }
 
 .segw__story-frame .segw__quiz-question-block-title,
+.segw__story-frame .segw__lesson1-subtitle,
 .segw__story-frame .segw__lesson2-subtitle,
 .segw__story-frame .segw__lesson3-subtitle,
 .segw__story-frame .segw__lesson4-subtitle,
@@ -2281,6 +2313,10 @@
 .segw__story-frame .segw__lesson6-tariff-card,
 .segw__story-frame .segw__lesson6-calculator,
 .segw__story-frame .segw__lesson6-calc-result,
+.segw__story-frame .segw__lesson1-visual,
+.segw__story-frame .segw__lesson1-step-card,
+.segw__story-frame .segw__lesson1-instrument-card,
+.segw__story-frame .segw__lesson1-goal-accent,
 .segw__story-frame .segw__lesson3-portfolio-row,
 .segw__story-frame .segw__lesson4-row,
 .segw__story-frame .segw__lesson4-level-card,
@@ -2291,6 +2327,16 @@
   padding: 16px;
   background: #fff;
   border: 1px solid #dbe3f0;
+  color: #111;
+}
+
+.segw__story-frame .segw__lesson1-highlight {
+  background: #e8f5e9;
+  border: 1px solid #75c987;
+  color: #111;
+}
+
+.segw__story-frame .segw__lesson1-highlight-text {
   color: #111;
 }
 
@@ -2598,7 +2644,7 @@
     min-height: auto;
     padding: 0;
     border-radius: 0;
-    background: transparent;
+    background: #fff;
   }
 
   .segw__story-frame {
@@ -2657,33 +2703,36 @@
   <section class="segw__onboarding is-hidden" data-role="onboarding">
     <div class="segw__story-wrapper">
       <article class="segw__story-frame" data-role="story-frame">
-        <div class="segw__story-progress" data-role="story-progress"></div>
-        <p class="segw__story-top-label" data-role="story-top-label">Урок 1 из 6</p>
-        <div class="segw__story-content" data-role="story-content"></div>
+        <div class="segw__story-background-layer" aria-hidden="true"></div>
+        <div class="segw__story-content-layer">
+          <div class="segw__story-progress" data-role="story-progress"></div>
+          <p class="segw__story-top-label" data-role="story-top-label">Урок 1 из 6</p>
+          <div class="segw__story-content" data-role="story-content"></div>
 
-        <div class="segw__story-tapzones">
-          <button
-            type="button"
-            class="segw__story-tap segw__story-tap--prev"
-            data-action="onboarding-prev"
-            aria-label="Предыдущий экран"
-          ></button>
-          <button
-            type="button"
-            class="segw__story-tap segw__story-tap--next"
-            data-action="onboarding-next"
-            aria-label="Следующий экран"
-          ></button>
-        </div>
+          <div class="segw__story-tapzones">
+            <button
+              type="button"
+              class="segw__story-tap segw__story-tap--prev"
+              data-action="onboarding-prev"
+              aria-label="Предыдущий экран"
+            ></button>
+            <button
+              type="button"
+              class="segw__story-tap segw__story-tap--next"
+              data-action="onboarding-next"
+              aria-label="Следующий экран"
+            ></button>
+          </div>
 
-        <div class="segw__story-footer">
-          <p class="segw__onboarding-meta" data-role="onboarding-counter">Урок 1 из 6</p>
-          <p class="segw__story-hint" data-role="onboarding-hint">
-            Тап по правой части — следующий экран, по левой — предыдущий.
-          </p>
-          <button type="button" class="segw__story-next" data-action="onboarding-next" data-role="onboarding-next-label">
-            Далее →
-          </button>
+          <div class="segw__story-footer">
+            <p class="segw__onboarding-meta" data-role="onboarding-counter">Урок 1 из 6</p>
+            <p class="segw__story-hint" data-role="onboarding-hint">
+              Тап по правой части — следующий экран, по левой — предыдущий.
+            </p>
+            <button type="button" class="segw__story-next" data-action="onboarding-next" data-role="onboarding-next-label">
+              Далее →
+            </button>
+          </div>
         </div>
       </article>
     </div>
