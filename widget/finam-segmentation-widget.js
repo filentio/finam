@@ -37,6 +37,7 @@
   --space-2: 16px;
   --space-3: 24px;
   --space-4: 32px;
+  --app-bottom-bar: 0px;
   --radius-sm: 16px;
   --radius-md: 16px;
   --radius-lg: 16px;
@@ -923,17 +924,26 @@
   z-index: 1;
   min-height: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.segw__story-header-layout {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 8px;
+  padding: 16px 16px 8px;
+  background: #fff;
 }
 
 .segw__story-progress {
   display: flex;
   gap: 4px;
-  padding: 12px 16px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .segw__story-progress-segment {
@@ -951,7 +961,7 @@
 
 .segw__story-content {
   position: relative;
-  z-index: 5;
+  z-index: 2;
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -959,8 +969,8 @@
   justify-content: flex-start;
   gap: 8px;
   padding: 16px;
-  padding-bottom: 128px;
-  overflow: hidden;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .segw__story-content.is-lesson {
@@ -974,7 +984,7 @@
 }
 
 .segw__story-content.is-quiz-intro {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .segw__quiz-intro-emoji {
@@ -1314,8 +1324,8 @@
 
 .segw__lesson1-screen--hero,
 .segw__lesson1-screen--cta {
-  min-height: 100%;
-  align-content: center;
+  min-height: auto;
+  align-content: start;
 }
 
 .segw__lesson1-emoji {
@@ -1522,8 +1532,8 @@
 .segw__lesson5-screen,
 .segw__lesson6-screen {
   display: grid;
-  gap: 8px;
-  align-content: center;
+  gap: 16px;
+  align-content: start;
 }
 
 .segw__lesson2-screen--hero,
@@ -1535,8 +1545,8 @@
 .segw__lesson5-screen--cta,
 .segw__lesson6-screen--hero,
 .segw__lesson6-screen--cta {
-  min-height: 100%;
-  align-content: center;
+  min-height: auto;
+  align-content: start;
   text-align: center;
 }
 
@@ -2100,11 +2110,11 @@
 
 .segw__story-tapzones {
   position: absolute;
-  z-index: 4;
-  top: 30px;
+  z-index: 1;
+  top: 72px;
   left: 0;
   right: 0;
-  bottom: 146px;
+  bottom: 112px;
   display: flex;
 }
 
@@ -2124,13 +2134,13 @@
 }
 
 .segw__story-footer {
-  position: sticky;
-  bottom: 0;
-  margin-top: auto;
-  z-index: 8;
-  padding: 16px;
-  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
-  background: linear-gradient(to top, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+  position: relative;
+  margin-top: 0;
+  z-index: 3;
+  padding: 8px 16px 0;
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--app-bottom-bar) + 16px);
+  background: #fff;
+  border-top: 1px solid #dbe3f0;
 }
 
 .segw__story-next {
@@ -2177,7 +2187,7 @@
 
 .segw__story-top-label {
   margin: 0;
-  padding: 0 16px 8px;
+  padding: 0;
   font-size: 14px;
   line-height: 1.5;
   font-weight: 600;
@@ -2338,6 +2348,13 @@
 
 .segw__story-frame .segw__lesson1-highlight-text {
   color: #111;
+}
+
+.segw__story-frame .segw__lesson1-visual,
+.segw__story-frame .segw__lesson2-quote {
+  max-height: 320px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .segw__story-frame .segw__lesson5-top-card p,
@@ -2536,7 +2553,7 @@
 }
 
 .segw__onboarding.is-entering .segw__story-frame {
-  animation: segwLessonsEnter var(--transition-slow) both;
+  animation: none;
 }
 
 @keyframes segwLessonsEnter {
@@ -2641,7 +2658,7 @@
   }
 
   .segw__story-wrapper {
-    min-height: auto;
+    min-height: 100svh;
     padding: 0;
     border-radius: 0;
     background: #fff;
@@ -2705,8 +2722,10 @@
       <article class="segw__story-frame" data-role="story-frame">
         <div class="segw__story-background-layer" aria-hidden="true"></div>
         <div class="segw__story-content-layer">
-          <div class="segw__story-progress" data-role="story-progress"></div>
-          <p class="segw__story-top-label" data-role="story-top-label">Урок 1 из 6</p>
+          <div class="segw__story-header-layout">
+            <div class="segw__story-progress" data-role="story-progress"></div>
+            <p class="segw__story-top-label" data-role="story-top-label">Урок 1 из 6</p>
+          </div>
           <div class="segw__story-content" data-role="story-content"></div>
 
           <div class="segw__story-tapzones">
@@ -6461,6 +6480,9 @@
       var shouldAnimateStep = inlineState.lastRenderedStepIndex !== inlineState.activeStepIndex;
       refs.storyContent.classList.remove("is-enter-next", "is-enter-prev");
       if (shouldAnimateStep) {
+        refs.storyContent.scrollTop = 0;
+      }
+      if (shouldAnimateStep) {
         void refs.storyContent.offsetWidth;
         refs.storyContent.classList.add(
           inlineState.direction < 0 ? "is-enter-prev" : "is-enter-next",
@@ -7687,7 +7709,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.25";
+  window.FinamSegmentationWidget.version = "1.0.26";
 
   ensureStyles();
   initExistingWidgets();
