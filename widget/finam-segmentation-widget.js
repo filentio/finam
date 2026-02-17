@@ -3410,38 +3410,38 @@
 
   var LESSON_6_TARIFFS = [
     {
-      id: "basic",
-      name: "Базовый",
+      id: "long_term_portfolio",
+      name: "Долгосрочный портфель",
       price: "0 ₽/мес",
-      commission: "Акции: 0,3% + 177 ₽ · Облигации: 0,3% + 177 ₽",
-      best_for: "Редкие сделки (1-2 в месяц)",
-      features: ["✓ Доступ к торгам", "✓ Мобильное приложение", "✗ Аналитика", "✗ Персональный менеджер"],
+      commission: "Покупка: 0% · Продажа: 0,28%",
+      best_for: "Для долгосрочного удержания бумаг",
+      features: ["✓ Без абонплаты", "✓ Бесплатная покупка", "✓ Подходит для долгого горизонта"],
     },
     {
       id: "investor",
       name: "Инвестор",
-      price: "0 ₽/мес (при обороте 30 000 ₽), иначе 299 ₽/мес",
-      commission: "Акции: 0,3% · Облигации: 0,3%",
-      best_for: "Регулярные инвестиции",
-      features: ["✓ Доступ к торгам", "✓ Мобильное приложение", "✓ Базовая аналитика", "✓ Идеи от аналитиков"],
+      price: "200 ₽/мес",
+      commission: "Акции/облигации: 0,035%",
+      best_for: "Для регулярных сделок и объёмов",
+      features: ["✓ Низкая комиссия", "✓ Подходит для активного инвестора", "✓ Базовая аналитика"],
       recommended: true,
-      badge: "Популярный",
+      badge: "Оптимальный",
     },
     {
-      id: "trader",
-      name: "Трейдер",
-      price: "3 000 ₽/мес",
-      commission: "Акции: 0,05% · Облигации: 0,04%",
-      best_for: "Частые сделки (10+ в месяц)",
-      features: ["✓ Расширенная аналитика", "✓ Маржинальная торговля", "✓ Идеи от аналитиков"],
+      id: "strateg",
+      name: "Стратег",
+      price: "0 ₽/мес",
+      commission: "Акции: 0,05% (мин. 50 ₽)",
+      best_for: "Для сделок без фиксированной абонплаты",
+      features: ["✓ Без абонплаты", "✓ Предсказуемый минимум комиссии", "✓ Подходит для умеренной активности"],
     },
     {
-      id: "premium",
-      name: "Премиум",
-      price: "От 10 000 ₽/мес",
-      commission: "Акции: 0,04% · Облигации: 0,03%",
-      best_for: "Капитал от 5 млн ₽",
-      features: ["✓ Персональный менеджер", "✓ Доступ к IPO", "✓ Структурные продукты", "✓ ДУ"],
+      id: "single_day",
+      name: "Единый дневной",
+      price: "177 ₽/мес",
+      commission: "Акции: 0,0354% (мин. 41,3 ₽)",
+      best_for: "Для активной внутридневной торговли",
+      features: ["✓ Низкая ставка", "✓ Подходит для частых сделок", "✓ Прозрачный минимум"],
     },
   ];
 
@@ -4246,46 +4246,58 @@
   function getRecommendedTariff(amountTier, riskProfile) {
     if (amountTier === "more_5m") {
       return {
-        tariff: "premium",
+        tariff: "investor",
+        label: "Инвестор",
         reason:
-          "С вашим капиталом доступны премиальные услуги: персональный менеджер, доступ к IPO и структурным продуктам.",
+          "Для крупных объёмов обычно выгоднее низкая ставка 0,035% даже с абонплатой 200 ₽/мес.",
       };
     }
 
     if (amountTier === "2m_5m") {
       return {
-        tariff: "trader",
+        tariff: "investor",
+        label: "Инвестор",
         reason:
-          "Для активного управления капиталом этого размера оптимален тариф Трейдер — низкие комиссии и расширенная аналитика.",
+          "При таком капитале тариф Инвестор чаще всего даёт лучшую итоговую комиссию.",
       };
     }
 
     if (riskProfile === "aggressive" || riskProfile === "ultra_aggressive") {
+      if (amountTier === "up_to_300k") {
+        return {
+          tariff: "strateg",
+          label: "Стратег",
+          reason:
+            "Для активного стиля без фиксированной абонплаты удобно начать со Стратега.",
+        };
+      }
       return {
-        tariff: "trader",
+        tariff: "single_day",
+        label: "Единый дневной",
         reason:
-          "Ваш агрессивный профиль предполагает частые сделки — тариф Трейдер сэкономит на комиссиях.",
+          "При активных сделках Единый дневной может быть выгоднее за счёт ставки 0,0354%.",
       };
     }
 
     return {
-      tariff: "investor",
+      tariff: "long_term_portfolio",
+      label: "Долгосрочный портфель",
       reason:
-        "Для регулярных инвестиций без абонентской платы — оптимальный выбор для большинства инвесторов.",
+        "Для спокойных долгосрочных инвестиций без частых продаж подходит тариф Долгосрочный портфель.",
     };
   }
 
   function calculateTariffSavings(monthlyTrades, avgTradeAmount) {
     var trades = Math.max(1, Number(monthlyTrades) || 1);
     var amount = Math.max(5000, Number(avgTradeAmount) || 5000);
-    var basicDeal = amount * 0.003 + 177;
-    var investorDeal = amount * 0.003;
-    var basicAnnual = Math.round(basicDeal * trades * 12);
-    var investorAnnual = Math.round(investorDeal * trades * 12);
-    var savings = Math.max(0, basicAnnual - investorAnnual);
-    var savingsPct = basicAnnual > 0 ? Math.round((savings / basicAnnual) * 100) : 0;
+    var longTermDeal = amount * 0.0028;
+    var investorDeal = amount * 0.00035;
+    var longTermAnnual = Math.round(longTermDeal * trades * 12);
+    var investorAnnual = Math.round(investorDeal * trades * 12 + 200 * 12);
+    var savings = Math.max(0, longTermAnnual - investorAnnual);
+    var savingsPct = longTermAnnual > 0 ? Math.round((savings / longTermAnnual) * 100) : 0;
     return {
-      basic_annual_commission: basicAnnual,
+      long_term_annual_commission: longTermAnnual,
       investor_annual_commission: investorAnnual,
       savings: savings,
       savings_pct: savingsPct,
@@ -6156,11 +6168,36 @@
         ),
       );
       var compare = createStoryNode("div", "segw__lesson6-compare");
-      compare.appendChild(createStoryNode("div", "segw__lesson6-compare-row", "Базовый: 177 ₽"));
-      compare.appendChild(createStoryNode("div", "segw__lesson6-compare-row", "Инвестор: 30 ₽"));
-      compare.appendChild(createStoryNode("div", "segw__lesson6-compare-row", "Трейдер: 5 ₽"));
+      compare.appendChild(
+        createStoryNode(
+          "div",
+          "segw__lesson6-compare-row",
+          "Долгосрочный портфель: 0 ₽/мес · покупка 0% · продажа 0,28%",
+        ),
+      );
+      compare.appendChild(
+        createStoryNode(
+          "div",
+          "segw__lesson6-compare-row",
+          "Инвестор: 200 ₽/мес · акции/облигации 0,035%",
+        ),
+      );
+      compare.appendChild(
+        createStoryNode(
+          "div",
+          "segw__lesson6-compare-row",
+          "Стратег: 0 ₽/мес · акции 0,05% (мин. 50 ₽)",
+        ),
+      );
+      compare.appendChild(
+        createStoryNode(
+          "div",
+          "segw__lesson6-compare-row",
+          "Единый дневной: 177 ₽/мес · акции 0,0354% (мин. 41,3 ₽)",
+        ),
+      );
       l6Intro.appendChild(compare);
-      l6Intro.appendChild(createStoryNode("p", "segw__lesson6-note", "Экономия до 172 ₽ на одной сделке"));
+      l6Intro.appendChild(createStoryNode("p", "segw__lesson6-note", "Проверьте тариф под ваш стиль торговли."));
       contentRoot.appendChild(l6Intro);
       return;
     }
@@ -6208,7 +6245,7 @@
         createStoryNode(
           "p",
           "segw__lesson6-subtitle",
-          "Рекомендуем тариф: " + (recommendation.tariff || "investor").toUpperCase(),
+          "Рекомендуем тариф: " + (recommendation.label || recommendation.tariff || "Инвестор"),
         ),
       );
       l6Recommendation.appendChild(createStoryNode("p", "segw__lesson6-text", recommendation.reason));
@@ -6246,7 +6283,7 @@
         createStoryNode(
           "p",
           "",
-          "Базовый: " + formatMoney(calcResult.basic_annual_commission) + " / год",
+          "Долгосрочный портфель: " + formatMoney(calcResult.long_term_annual_commission) + " / год",
         ),
       );
       result.appendChild(
@@ -7709,7 +7746,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.26";
+  window.FinamSegmentationWidget.version = "1.0.27";
 
   ensureStyles();
   initExistingWidgets();
