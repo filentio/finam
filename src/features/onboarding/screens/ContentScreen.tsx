@@ -20,6 +20,9 @@ export function ContentScreen({ screen }: BaseScreenProps) {
 
   const activeVariant = amountVariant ?? goalVariant ?? segmentVariant ?? riskVariant;
   const text = activeVariant?.text ?? screen.content;
+  const hasYieldNumbers = [text, activeVariant?.highlight, ...((screen.key_points ?? []) as string[])].some(
+    (entry) => Boolean(entry && /(\d+[.,]?\d*\s*%|доходност|годов)/i.test(entry)),
+  );
 
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
@@ -32,6 +35,11 @@ export function ContentScreen({ screen }: BaseScreenProps) {
             <li key={point}>{point}</li>
           ))}
         </ul>
+      ) : null}
+      {hasYieldNumbers ? (
+        <p className="ob-screen__disclaimer">
+          * Прошлая доходность не гарантирует будущую. Данные носят информационный характер.
+        </p>
       ) : null}
     </ScreenShell>
   );

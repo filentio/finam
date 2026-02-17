@@ -224,6 +224,12 @@ export interface TariffCalculatorInput {
   avg_trade_amount: number;
 }
 
+export type TariffId =
+  | "long-term"
+  | "investor"
+  | "strategist"
+  | "unified-daily";
+
 export interface TariffTotals {
   monthly_fee: number;
   commission_total: number;
@@ -231,19 +237,19 @@ export interface TariffTotals {
 }
 
 export interface TariffCalculatorOutput {
-  tariffs: {
-    investor: TariffTotals;
-    trader: TariffTotals;
-    premium: TariffTotals;
-  };
-  recommended: "investor" | "trader" | "premium";
+  tariffs: Record<TariffId, TariffTotals>;
+  recommended: TariffId;
 }
 
 export interface TariffRate {
+  id: TariffId;
+  name: string;
   monthly_fee: number;
-  commission_rate: number;
+  buy_commission_rate: number;
+  sell_commission_rate: number;
   min_commission: number;
-  min_portfolio?: number;
+  description: string;
+  best_for: string;
 }
 
 export interface OnboardingState {

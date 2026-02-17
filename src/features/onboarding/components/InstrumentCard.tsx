@@ -13,6 +13,12 @@ const RISK_COLORS: Record<InstrumentCardProps["riskLevel"], string> = {
   high: "#c13f3f",
 };
 
+const RISK_LABELS: Record<InstrumentCardProps["riskLevel"], string> = {
+  low: "Низкий риск",
+  medium: "Средний риск",
+  high: "Высокий риск",
+};
+
 export function InstrumentCard({
   title,
   description,
@@ -39,7 +45,7 @@ export function InstrumentCard({
             fontWeight: 600,
           }}
         >
-          Риск: {riskLevel}
+          {RISK_LABELS[riskLevel]}
         </span>
       </div>
       <p style={{ margin: 0, color: "rgba(255,255,255,0.82)", fontSize: 13 }}>{description}</p>

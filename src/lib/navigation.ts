@@ -3,14 +3,5 @@ export function openDeeplink(url: string): void {
     return;
   }
 
-  if (
-    url.startsWith("deeplink://") ||
-    url.startsWith("finam://") ||
-    url.startsWith("finamtrade://")
-  ) {
-    window.location.href = url;
-    return;
-  }
-
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.location.href = url;
 }

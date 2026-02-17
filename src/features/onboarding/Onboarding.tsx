@@ -38,24 +38,24 @@ interface OnboardingProps {
 
 const OWN_CTA_SCREEN_TYPES = new Set<ScreenConfig["type"]>(["cta"]);
 const QUIZ_TOTAL_SEGMENTS = 6;
-const QUIZ_GRADIENT = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+const QUIZ_GRADIENT = "var(--finam-bg-primary)";
+const TAP_HINT_STORAGE_KEY = "finam_onboarding_tip_shown";
 
 const LESSON_BACKGROUNDS: Record<string, string> = {
-  lesson_1: "var(--gradient-lesson-1)",
-  lesson_2: "var(--gradient-lesson-2)",
-  lesson_3: "var(--gradient-lesson-3)",
-  lesson_4: "var(--gradient-lesson-4)",
-  lesson_5: "var(--gradient-lesson-5)",
-  lesson_6: "var(--gradient-lesson-6)",
+  lesson_1: "var(--finam-bg-primary)",
+  lesson_2: "var(--finam-bg-primary)",
+  lesson_3: "var(--finam-bg-primary)",
+  lesson_4: "var(--finam-bg-primary)",
+  lesson_5: "var(--finam-bg-primary)",
+  lesson_6: "var(--finam-bg-primary)",
 };
 
 const STEP_BACKGROUNDS: Record<StepType, string> = {
-  lesson: "linear-gradient(180deg, rgba(26, 86, 219, 0.9) 0%, #1a1a1a 100%)",
+  lesson: "var(--finam-bg-primary)",
   risk_quiz: QUIZ_GRADIENT,
   risk_result: QUIZ_GRADIENT,
-  first_purchase: "linear-gradient(180deg, rgba(8, 145, 178, 0.9) 0%, #1a1a1a 100%)",
-  personal_recommendations:
-    "linear-gradient(180deg, rgba(124, 58, 237, 0.9) 0%, #1a1a1a 100%)",
+  first_purchase: "var(--finam-bg-primary)",
+  personal_recommendations: "var(--finam-bg-primary)",
 };
 
 function getStepBackground(step: TrackStep | undefined): string {
@@ -101,6 +101,12 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
   const completedTrackedRef = useRef(false);
   const lastViewedScreenRef = useRef<string | null>(null);
   const [routePreparationDone, setRoutePreparationDone] = useState(true);
+  const [tipShown, setTipShown] = useState<boolean>(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.localStorage.getItem(TAP_HINT_STORAGE_KEY) === "1";
+  });
   const [transition, setTransition] = useState<{
     preset: TransitionPreset;
     direction: 1 | -1;
@@ -121,11 +127,19 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
   });
 
   useEffect(() => {
-    if (state.status !== "not_started") {
+    if (state.status !== "not_started" && state.user_id === userId) {
       return;
     }
     startOnboarding(userId, normalizeDOSInput(dosInput));
-  }, [dosInput, startOnboarding, state.status, userId]);
+  }, [dosInput, startOnboarding, state.status, state.user_id, userId]);
+
+  useEffect(() => {
+    if (tipShown || state.current_screen_index <= 0) {
+      return;
+    }
+    setTipShown(true);
+    window.localStorage.setItem(TAP_HINT_STORAGE_KEY, "1");
+  }, [state.current_screen_index, tipShown]);
 
   useEffect(() => {
     if (state.status === "in_progress" && state.user_id && !startedTrackedRef.current) {
@@ -511,7 +525,9 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
         <section className="ob-layout-frame" style={{ background: STEP_BACKGROUNDS.first_purchase }}>
           <div className="ob-layout-safe">
             <section className="ob-route-prep">
-              <div className="ob-route-prep__icon">✅</div>
+              <div className="ob-complete-check" aria-hidden="true">
+                ✓
+              </div>
               <h2>Маршрут завершён</h2>
               <p>Вы прошли онбординг. Можно перейти к первому действию в приложении.</p>
             </section>
@@ -588,6 +604,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
         }}
         showFooter={false}
         enableTapNavigation={false}
+        showTapHint={false}
         quizMode={false}
       >
         <RoutePreparationScreen
@@ -627,6 +644,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
         showFooter
         enableTapNavigation={false}
         emphasizeNext={false}
+        showTapHint={false}
         quizMode={isRiskQuizFlow}
       >
         <section className="ob-route-prep">
@@ -654,6 +672,7 @@ function OnboardingFlow({ userId, dosInput, onComplete }: OnboardingProps) {
       showFooter={showFooter}
       enableTapNavigation={enableTapNavigation}
       emphasizeNext={emphasizeNext}
+      showTapHint={enableTapNavigation && !isRiskQuizFlow && !tipShown}
       quizMode={isRiskQuizFlow}
     >
       {currentScreen ? renderScreen(currentScreen) : null}

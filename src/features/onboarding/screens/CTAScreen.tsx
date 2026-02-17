@@ -27,13 +27,14 @@ export function CTAScreen({ screen, onNext, onPrev }: BaseScreenProps) {
 
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
-      <div className="ob-inline-actions" style={{ flexDirection: "column" }}>
+      <div className="ob-inline-actions ob-inline-actions--stack">
         {ctas.map((cta) => (
           <button
             key={cta.label}
             type="button"
             onClick={() => handleCTA(cta)}
             className={cta.type === "primary" ? "is-primary" : "is-secondary"}
+            aria-label={cta.label}
           >
             {cta.label}
           </button>
@@ -41,10 +42,10 @@ export function CTAScreen({ screen, onNext, onPrev }: BaseScreenProps) {
       </div>
 
       <div className="ob-inline-actions">
-        <button className="is-secondary" type="button" onClick={onPrev}>
+        <button className="is-secondary" type="button" onClick={onPrev} aria-label="Вернуться назад">
           Назад
         </button>
-        <button className="is-primary" type="button" onClick={onNext}>
+        <button className="is-primary" type="button" onClick={onNext} aria-label="Пропустить шаг">
           Пропустить
         </button>
       </div>

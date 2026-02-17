@@ -11,6 +11,8 @@ export function QuizScreen({ question, selectedOptionId, onSelectOption }: QuizS
             ? "ob-quiz-options--horizontal"
             : ""
         }`}
+        role="radiogroup"
+        aria-label={question.question}
       >
         {question.options.map((option) => {
           const selected = selectedOptionId === option.id;
@@ -27,6 +29,9 @@ export function QuizScreen({ question, selectedOptionId, onSelectOption }: QuizS
               }
               className={`ob-quiz-option ${selected ? "is-selected ob-quiz-option--selecting" : ""}`}
               data-testid="quiz-option"
+              role="radio"
+              aria-checked={selected}
+              aria-label={option.text}
             >
               {option.text}
             </button>

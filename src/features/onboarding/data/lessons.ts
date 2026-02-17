@@ -375,7 +375,7 @@ const LESSON_5: LessonConfig = {
       screen_id: "5_2",
       type: "tariff",
       title: "Сравнение тарифов",
-      subtitle: "Инвестор, Трейдер, Премиум.",
+      subtitle: "Долгосрочный портфель, Инвестор, Стратег, Единый дневной.",
     },
     {
       screen_id: "5_3",

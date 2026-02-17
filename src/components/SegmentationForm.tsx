@@ -377,6 +377,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
         ? STEP_PROGRESS_INDEX[currentStep.id]
         : 0;
   const progressLabel = `${progressIndex + 1}/${PROGRESS_SEGMENTS_TOTAL}`;
+  const progressPercent = Math.round(((progressIndex + 1) / PROGRESS_SEGMENTS_TOTAL) * 100);
   const segmentView = resultPayload ? SEGMENT_PRESENTATION[resultPayload.segment] : null;
   const questionScreenKey = currentStep ? `question-${currentStep.id}` : "question-empty";
 
@@ -388,14 +389,21 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
             type="button"
             className="seg-story__close"
             onClick={handleReset}
-            aria-label="Сбросить анкету"
+            aria-label="Закрыть"
           >
             ×
           </button>
           <span className="seg-story__counter">{progressLabel}</span>
         </header>
 
-        <div className="seg-story__progress">
+        <div
+          className="seg-story__progress"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progressPercent}
+          aria-label="Прогресс анкеты сегментации"
+        >
           {Array.from({ length: PROGRESS_SEGMENTS_TOTAL }).map((_, index) => (
             <span
               key={index}
@@ -455,7 +463,13 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
                 <p className="seg-story__question-subtitle">{currentStep.subtitle}</p>
               ) : null}
 
-              <div className="seg-story__options" role="listbox" aria-label={currentStep.title}>
+              <div
+                className={`seg-story__options ${
+                  currentStep.options.length >= 6 ? "seg-story__options--dense" : ""
+                }`}
+                role={currentStep.multiple ? "group" : "radiogroup"}
+                aria-label={currentStep.title}
+              >
                 {currentStep.options.map((option) => (
                   <button
                     key={option.value}
@@ -465,7 +479,9 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
                     }`}
                     onClick={() => handleStepValueChange(currentStep.id, option.value)}
                     aria-pressed={isOptionSelected(currentStep.id, option.value)}
-                    role="option"
+                    role={currentStep.multiple ? "checkbox" : "radio"}
+                    aria-checked={isOptionSelected(currentStep.id, option.value)}
+                    aria-label={option.label}
                   >
                     {currentStep.multiple ? (
                       <span className="seg-story__multi-mark">
@@ -484,6 +500,7 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
                 className="seg-story__ghost-btn"
                 disabled={nextDisabled}
                 onClick={handleNext}
+                aria-label="Перейти к следующему шагу"
               >
                 Далее →
               </button>

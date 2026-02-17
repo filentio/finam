@@ -24,6 +24,7 @@ interface OnboardingLayoutProps {
   enableTapNavigation?: boolean;
   emphasizeNext?: boolean;
   quizMode?: boolean;
+  showTapHint?: boolean;
   children: ReactNode;
 }
 
@@ -59,6 +60,7 @@ export function OnboardingLayout({
   enableTapNavigation = true,
   emphasizeNext = false,
   quizMode = false,
+  showTapHint = false,
   children,
 }: OnboardingLayoutProps) {
   const isScreenCounter = /^\d+\/\d+$/.test(stepLabel);
@@ -112,11 +114,17 @@ export function OnboardingLayout({
 
           {showFooter ? (
             <footer className={`ob-layout-footer ${quizMode ? "ob-layout-footer--quiz" : ""}`}>
+              {showTapHint ? (
+                <p className="ob-layout-hint">
+                  Тап по правой части — следующий экран, по левой — предыдущий.
+                </p>
+              ) : null}
               <button
                 type="button"
                 className={`ob-layout-next btn-primary ${emphasizeNext ? "ob-layout-next--glow" : ""}`}
                 onClick={onNext}
                 disabled={nextDisabled}
+                aria-label="Перейти к следующему шагу"
               >
                 {nextLabel}
               </button>

@@ -63,6 +63,11 @@ export function CardsScreen({
 
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
+      <div className="ob-cards-legend">
+        <span className="ob-cards-legend__item is-interest">Вас интересует</span>
+        <span className="ob-cards-legend__item is-medium">Средний риск</span>
+        <span className="ob-cards-legend__item is-high">Высокий риск</span>
+      </div>
       <div style={{ display: "grid", gap: 6 }}>
         {configuredCards.map((card, index) => (
           <div

@@ -1,28 +1,28 @@
-import { TARIFF_RATES } from "../data/tariffs";
+import { FINAM_TARIFFS, TARIFF_ORDER } from "../data/tariffs";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
 
 export function TariffScreen({ screen }: BaseScreenProps) {
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
-      <div style={{ display: "grid", gap: 8 }}>
-        {Object.entries(TARIFF_RATES).map(([name, rate]) => (
-          <article
-            key={name}
-            style={{
-              border: "1px solid rgba(255,255,255,0.22)",
-              borderRadius: 12,
-              background: "rgba(255,255,255,0.12)",
-              padding: 10,
-            }}
-          >
-            <h4 style={{ margin: 0, textTransform: "capitalize" }}>{name}</h4>
-            <p style={{ margin: "6px 0 0", fontSize: 13, color: "rgba(255,255,255,0.82)" }}>
-              Абонплата: {rate.monthly_fee} ₽ • Комиссия: {(rate.commission_rate * 100).toFixed(3)}
-              %
-            </p>
-          </article>
-        ))}
+      <div className="ob-tariff-grid">
+        {TARIFF_ORDER.map((tariffId) => {
+          const tariff = FINAM_TARIFFS[tariffId];
+          return (
+            <article key={tariff.id} className="ob-card ob-tariff-card">
+              <h4 className="ob-tariff-card__title">{tariff.name}</h4>
+              <p className="ob-tariff-card__meta">
+                Абонплата: {tariff.monthly_fee} ₽/мес
+              </p>
+              <p className="ob-tariff-card__meta">
+                Покупка: {(tariff.buy_commission_rate * 100).toFixed(3)}% • Продажа:{" "}
+                {(tariff.sell_commission_rate * 100).toFixed(3)}%
+                {tariff.min_commission > 0 ? ` • Мин: ${tariff.min_commission} ₽` : ""}
+              </p>
+              <p className="ob-tariff-card__description">{tariff.description}</p>
+            </article>
+          );
+        })}
       </div>
     </ScreenShell>
   );

@@ -1,4 +1,4 @@
-import { useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import type { Dispatch } from "react";
 import { LESSONS_BY_ID } from "../data/lessons";
 import { RISK_QUIZ_QUESTIONS } from "../data/riskQuiz";
@@ -16,6 +16,14 @@ import type {
 } from "../types/onboarding";
 
 const nowIso = () => new Date().toISOString();
+
+const STORAGE_KEYS = {
+  STATE: "finam_onboarding_state",
+  CURRENT_LESSON: "finam_onboarding_lesson",
+  CURRENT_SCREEN: "finam_onboarding_screen",
+  COMPLETED_LESSONS: "finam_onboarding_completed",
+  STAGE: "finam_onboarding_stage",
+} as const;
 
 const EMPTY_DOS: DOSInput = {
   qualified_investor: false,
@@ -41,6 +49,42 @@ export const initialOnboardingState: OnboardingState = {
   total_time_sec: 0,
   last_active_at: "",
 };
+
+function restoreOnboardingState(initialState: OnboardingState): OnboardingState {
+  if (typeof window === "undefined") {
+    return initialState;
+  }
+
+  const raw = window.localStorage.getItem(STORAGE_KEYS.STATE);
+  if (!raw) {
+    return initialState;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<OnboardingState>;
+    if (!parsed || typeof parsed !== "object") {
+      return initialState;
+    }
+
+    if (!Array.isArray(parsed.track) || typeof parsed.status !== "string") {
+      return initialState;
+    }
+
+    return {
+      ...initialState,
+      ...parsed,
+      dos_input: {
+        ...initialState.dos_input,
+        ...(parsed.dos_input ?? {}),
+      },
+      completed_steps: Array.isArray(parsed.completed_steps) ? parsed.completed_steps : [],
+      completed_lessons: Array.isArray(parsed.completed_lessons) ? parsed.completed_lessons : [],
+      track: parsed.track,
+    };
+  } catch {
+    return initialState;
+  }
+}
 
 function getStepId(step: TrackStep): string {
   if (step.type === "lesson") {
@@ -369,7 +413,43 @@ export function useOnboardingState(): {
   dispatch: Dispatch<OnboardingAction>;
   progress: ProgressInfo;
 } {
-  const [state, dispatch] = useReducer(onboardingReducer, initialOnboardingState);
+  const [state, dispatch] = useReducer(
+    onboardingReducer,
+    initialOnboardingState,
+    restoreOnboardingState,
+  );
   const progress = useMemo(() => calculateProgress(state), [state]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (state.status === "not_started") {
+      window.localStorage.removeItem(STORAGE_KEYS.STATE);
+      window.localStorage.removeItem(STORAGE_KEYS.CURRENT_LESSON);
+      window.localStorage.removeItem(STORAGE_KEYS.CURRENT_SCREEN);
+      window.localStorage.removeItem(STORAGE_KEYS.COMPLETED_LESSONS);
+      window.localStorage.removeItem(STORAGE_KEYS.STAGE);
+      return;
+    }
+
+    window.localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(state));
+    window.localStorage.setItem(STORAGE_KEYS.CURRENT_SCREEN, String(state.current_screen_index));
+    window.localStorage.setItem(
+      STORAGE_KEYS.COMPLETED_LESSONS,
+      JSON.stringify(state.completed_lessons),
+    );
+
+    const currentStep = state.track[state.current_step_index];
+    const lessonOrStage = currentStep?.lesson_id ?? currentStep?.type ?? "";
+    if (lessonOrStage) {
+      window.localStorage.setItem(STORAGE_KEYS.CURRENT_LESSON, lessonOrStage);
+    }
+
+    const stage = state.status === "completed" ? "completed" : currentStep?.type ?? "onboarding";
+    window.localStorage.setItem(STORAGE_KEYS.STAGE, stage);
+  }, [state]);
+
   return { state, dispatch, progress };
 }

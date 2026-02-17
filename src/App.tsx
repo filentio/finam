@@ -8,7 +8,12 @@ import type { SegmentationPayload } from "./types/segmentation";
 import "./styles/tokens.css";
 import "./styles/components.css";
 
-type AppMode = "segmentation" | "onboarding";
+type AppMode = "segmentation" | "summary" | "onboarding";
+interface PendingOnboarding {
+  input: DOSInput;
+  source: string;
+  segment: SegmentationPayload["segment"];
+}
 
 interface ClientPreset {
   id: string;
@@ -32,7 +37,7 @@ const CLIENT_PRESETS: ClientPreset[] = [
   },
   {
     id: "advanced_base",
-    label: "Продвинутый · Базовый",
+    label: "Продвинутый · Оптимальный",
     description: "Опыт 1–3 года, 300к–2м, рост капитала",
     dosInput: {
       qualified_investor: false,
@@ -44,7 +49,7 @@ const CLIENT_PRESETS: ClientPreset[] = [
   },
   {
     id: "expert_premium",
-    label: "Эксперт · Премиальный",
+    label: "Эксперт · Крупный капитал",
     description: "Квалифицированный инвестор, более 5м",
     dosInput: {
       qualified_investor: true,
@@ -70,18 +75,32 @@ function App() {
   const [mode, setMode] = useState<AppMode>("segmentation");
   const [userId, setUserId] = useState<string>("demo-user-custom");
   const [onboardingInput, setOnboardingInput] = useState<DOSInput | null>(null);
+  const [pendingOnboarding, setPendingOnboarding] = useState<PendingOnboarding | null>(null);
   const [sessionKey, setSessionKey] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  const startOnboarding = (input: DOSInput, source: string) => {
+  const prepareOnboarding = (input: DOSInput, source: string) => {
     setCompleted(false);
+    setPendingOnboarding({
+      input,
+      source,
+      segment: determineSegment(input),
+    });
+    setMode("summary");
+  };
+
+  const startOnboarding = () => {
+    if (!pendingOnboarding) {
+      return;
+    }
+    const { input, source, segment } = pendingOnboarding;
     setOnboardingInput(input);
     setUserId(`demo-user-${source}-${Date.now()}`);
     setSessionKey((value) => value + 1);
     localStorage.setItem(
       "finam_segment",
       JSON.stringify({
-        segment: determineSegment(input),
+        segment,
         dos_input: input,
         timestamp: Date.now(),
       }),
@@ -114,6 +133,47 @@ function App() {
     );
   }
 
+  if (mode === "summary" && pendingOnboarding) {
+    return (
+      <main className="app-shell app-shell--flow">
+        <div className="flow-stage-progress">
+          <StageProgress currentStage={2} />
+        </div>
+        <section className="summary-screen">
+          <div className="summary-screen__card">
+            <div className="summary-screen__icon" aria-hidden="true">
+              🚀
+            </div>
+            <h2>Ваш план обучения</h2>
+            <p>Мы подготовили персональную программу для вашего профиля.</p>
+
+            <div className="summary-screen__steps">
+              <div className="summary-screen__step">
+                <span>1</span>
+                <span>6 уроков по инвестированию</span>
+              </div>
+              <div className="summary-screen__step">
+                <span>2</span>
+                <span>Анкета инвест-профиля</span>
+              </div>
+              <div className="summary-screen__step">
+                <span>3</span>
+                <span>Персональные рекомендации</span>
+              </div>
+            </div>
+
+            <button type="button" className="summary-screen__cta" onClick={startOnboarding}>
+              Начать обучение
+            </button>
+            <button type="button" className="summary-screen__back" onClick={() => setMode("segmentation")}>
+              Вернуться к анкете
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="app-shell">
       <StageProgress currentStage={1} />
@@ -134,7 +194,7 @@ function App() {
               key={preset.id}
               type="button"
               className="preset-card"
-              onClick={() => startOnboarding(preset.dosInput, preset.id)}
+              onClick={() => prepareOnboarding(preset.dosInput, preset.id)}
             >
               <strong>{preset.label}</strong>
               <span>{preset.description}</span>
@@ -153,7 +213,7 @@ function App() {
               timestamp: Date.now(),
             }),
           );
-          startOnboarding(mapSegmentationToDosInput(payload), "custom");
+          prepareOnboarding(mapSegmentationToDosInput(payload), "custom");
         }}
       />
     </main>
