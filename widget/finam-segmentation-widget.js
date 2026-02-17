@@ -31,7 +31,7 @@
   --bg-base: #ffffff;
   --bg-elevated: #f8f9fa;
   --text-primary: #111111;
-  --text-secondary: #555555;
+  --text-secondary: #444444;
   --text-inverse: #ffffff;
   --space-1: 8px;
   --space-2: 16px;
@@ -2158,6 +2158,337 @@
   cursor: not-allowed;
 }
 
+.segw__story-top-label {
+  margin: 0;
+  padding: 0 16px 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: #444;
+}
+
+.segw__story-frame {
+  background: linear-gradient(180deg, #f8fbff 0%, #edf3fb 100%) !important;
+  color: #111;
+}
+
+.segw__story-progress-segment {
+  background: rgba(17, 17, 17, 0.15);
+}
+
+.segw__story-progress-segment.is-active,
+.segw__story-progress-segment.is-done {
+  background: #1a56db;
+}
+
+.segw__story-footer {
+  background: linear-gradient(to top, rgba(248, 251, 255, 0.98), rgba(248, 251, 255, 0.68));
+}
+
+.segw__story-next,
+.segw__story-next.is-quiz-cta {
+  background: #1a56db;
+  color: #fff;
+  min-height: 48px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(26, 86, 219, 0.26);
+}
+
+.segw__story-next:hover,
+.segw__story-next.is-quiz-cta:hover {
+  background: #1447c4;
+}
+
+.segw__story-next:disabled {
+  background: #9eb6eb;
+  color: #fff;
+  opacity: 0.65;
+}
+
+.segw__onboarding-meta {
+  color: #444;
+}
+
+.segw__story-hint {
+  color: #444;
+}
+
+.segw__story-frame .segw__onboarding-step-title,
+.segw__story-frame .segw__quiz-intro-title,
+.segw__story-frame .segw__quiz-result-title,
+.segw__story-frame .segw__quiz-question-title,
+.segw__story-frame .segw__lesson2-title,
+.segw__story-frame .segw__lesson3-title,
+.segw__story-frame .segw__lesson4-title,
+.segw__story-frame .segw__lesson5-title,
+.segw__story-frame .segw__lesson6-title {
+  color: #111;
+}
+
+.segw__story-frame .segw__onboarding-step-text,
+.segw__story-frame .segw__quiz-intro-subtitle,
+.segw__story-frame .segw__quiz-question-block-title,
+.segw__story-frame .segw__quiz-result-description,
+.segw__story-frame .segw__lesson2-subtitle,
+.segw__story-frame .segw__lesson3-subtitle,
+.segw__story-frame .segw__lesson4-subtitle,
+.segw__story-frame .segw__lesson5-subtitle,
+.segw__story-frame .segw__lesson6-subtitle,
+.segw__story-frame .segw__lesson2-text,
+.segw__story-frame .segw__lesson3-text,
+.segw__story-frame .segw__lesson4-text,
+.segw__story-frame .segw__lesson5-text,
+.segw__story-frame .segw__lesson6-text,
+.segw__story-frame .segw__lesson3-note,
+.segw__story-frame .segw__lesson4-note,
+.segw__story-frame .segw__lesson5-note,
+.segw__story-frame .segw__lesson6-note {
+  color: #444;
+}
+
+.segw__story-frame .segw__quiz-question-block-title,
+.segw__story-frame .segw__lesson2-subtitle,
+.segw__story-frame .segw__lesson3-subtitle,
+.segw__story-frame .segw__lesson4-subtitle,
+.segw__story-frame .segw__lesson5-subtitle,
+.segw__story-frame .segw__lesson6-subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.segw__story-frame .segw__lesson1-cta-actions,
+.segw__story-frame .segw__lesson5-top-list,
+.segw__story-frame .segw__lesson5-quiz-list,
+.segw__story-frame .segw__lesson5-faq,
+.segw__story-frame .segw__lesson6-compare,
+.segw__story-frame .segw__lesson6-tariffs {
+  gap: 8px;
+}
+
+.segw__story-frame .segw__lesson2-screen,
+.segw__story-frame .segw__lesson3-screen,
+.segw__story-frame .segw__lesson4-screen,
+.segw__story-frame .segw__lesson5-screen,
+.segw__story-frame .segw__lesson6-screen {
+  gap: 16px;
+}
+
+.segw__story-frame .segw__lesson5-top-card,
+.segw__story-frame .segw__lesson5-quiz-option,
+.segw__story-frame .segw__lesson5-faq-item,
+.segw__story-frame .segw__lesson6-compare-row,
+.segw__story-frame .segw__lesson6-tariff-card,
+.segw__story-frame .segw__lesson6-calculator,
+.segw__story-frame .segw__lesson6-calc-result,
+.segw__story-frame .segw__lesson3-portfolio-row,
+.segw__story-frame .segw__lesson4-row,
+.segw__story-frame .segw__lesson4-level-card,
+.segw__story-frame .segw__lesson3-goal-advice,
+.segw__story-frame .segw__lesson3-spectrum-row,
+.segw__story-frame .segw__lesson5-mismatch {
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #dbe3f0;
+  color: #111;
+}
+
+.segw__story-frame .segw__lesson5-top-card p,
+.segw__story-frame .segw__lesson5-top-card small,
+.segw__story-frame .segw__lesson5-quiz-option p,
+.segw__story-frame .segw__lesson6-tariff-card p,
+.segw__story-frame .segw__lesson6-tariff-card small,
+.segw__story-frame .segw__lesson6-slider-label,
+.segw__story-frame .segw__lesson6-calc-result p,
+.segw__story-frame .segw__lesson2-author,
+.segw__story-frame .segw__lesson2-risk-text,
+.segw__story-frame .segw__lesson4-level-card p,
+.segw__story-frame .segw__lesson4-level-card small {
+  color: #444;
+}
+
+.segw__story-frame .segw__lesson2-risk-title,
+.segw__story-frame .segw__lesson2-tip {
+  color: #111;
+}
+
+.segw__story-frame .segw__lesson5-quiz-option {
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.segw__story-frame .segw__lesson5-quiz-option:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.segw__story-frame .segw__lesson5-quiz-option.is-selected {
+  border-color: #1a56db;
+  background: #eef4ff;
+  box-shadow: 0 0 0 1px rgba(26, 86, 219, 0.2);
+}
+
+.segw__story-frame .segw__lesson5-mismatch {
+  background: #fff9e8;
+  border-color: #f7d78d;
+  color: #5a4300;
+}
+
+.segw__story-frame .segw__lesson5-faq-item {
+  padding: 0;
+  overflow: hidden;
+  transition: box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+
+.segw__story-frame .segw__lesson5-faq-item:hover {
+  border-color: #c8d5eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.segw__story-frame .segw__lesson5-faq-item.is-open {
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.segw__story-frame .segw__lesson5-faq-question {
+  min-height: 48px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+}
+
+.segw__story-frame .segw__lesson5-faq-question-text {
+  display: inline-block;
+}
+
+.segw__story-frame .segw__lesson5-faq-chevron {
+  flex: 0 0 auto;
+  font-size: 18px;
+  line-height: 1;
+  color: #444;
+  transition: transform 200ms ease;
+}
+
+.segw__story-frame .segw__lesson5-faq-item.is-open .segw__lesson5-faq-chevron {
+  transform: rotate(180deg);
+}
+
+.segw__story-frame .segw__lesson5-faq-answer {
+  margin: 0;
+  padding: 0 16px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  color: #444;
+  transition: max-height 200ms ease, opacity 200ms ease, padding 200ms ease;
+}
+
+.segw__story-frame .segw__lesson5-faq-item.is-open .segw__lesson5-faq-answer {
+  max-height: 220px;
+  opacity: 1;
+  padding: 0 16px 16px;
+}
+
+.segw__story-frame .segw__lesson1-cta {
+  min-height: 48px;
+  border-radius: 16px;
+  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, border-color 200ms ease;
+}
+
+.segw__story-frame .segw__lesson1-cta--primary {
+  background: #1a56db;
+  color: #fff;
+}
+
+.segw__story-frame .segw__lesson1-cta--primary:hover {
+  background: #1447c4;
+}
+
+.segw__story-frame .segw__lesson1-cta--secondary {
+  background: #fff;
+  color: #111;
+  border: 1px solid #c8d5eb;
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.segw__story-frame .segw__lesson1-cta--secondary:hover {
+  border-color: #1a56db;
+  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.16);
+}
+
+.segw__story-frame .segw__lesson1-cta--secondary:disabled {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.segw__story-frame .segw__lesson1-cta:active {
+  transform: scale(0.98);
+}
+
+.segw__story-frame .segw__lesson5-hero-note {
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #dbe3f0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.segw__story-frame .segw__quiz-benefits,
+.segw__story-frame .segw__quiz-result-badge,
+.segw__story-frame .segw__quiz-allocation-card {
+  background: #fff;
+  border: 1px solid #dbe3f0;
+  color: #111;
+}
+
+.segw__story-frame .segw__quiz-benefits-title,
+.segw__story-frame .segw__quiz-benefit-item,
+.segw__story-frame .segw__quiz-allocation-item,
+.segw__story-frame .segw__quiz-allocation-value,
+.segw__story-frame .segw__quiz-allocation-breakdown {
+  color: #444;
+}
+
+.segw__story-frame .segw__quiz-option {
+  background: #fff;
+  color: #111;
+  border: 1px solid #dbe3f0;
+}
+
+.segw__story-frame .segw__quiz-option:hover {
+  background: #f7f9ff;
+}
+
+.segw__story-frame .segw__quiz-option.is-selected {
+  background: #eef4ff;
+  border-color: #1a56db;
+  color: #1a56db;
+}
+
+.segw__seg-story-next,
+.segw__seg-cta {
+  background: #1a56db;
+  color: #fff;
+}
+
+.segw__seg-story-next:hover,
+.segw__seg-cta:hover {
+  background: #1447c4;
+}
+
 .segw__onboarding.is-entering .segw__story-frame {
   animation: segwLessonsEnter var(--transition-slow) both;
 }
@@ -2327,6 +2658,7 @@
     <div class="segw__story-wrapper">
       <article class="segw__story-frame" data-role="story-frame">
         <div class="segw__story-progress" data-role="story-progress"></div>
+        <p class="segw__story-top-label" data-role="story-top-label">Урок 1 из 6</p>
         <div class="segw__story-content" data-role="story-content"></div>
 
         <div class="segw__story-tapzones">
@@ -3775,6 +4107,44 @@
 
     if (refs.segNextButton) {
       refs.segNextButton.disabled = !isSegmentationStepAnswered(state, stepId);
+    }
+  }
+
+  function refreshLesson5QuizUI(contentRoot, selectedType, isMatch) {
+    if (!contentRoot) {
+      return;
+    }
+
+    var options = contentRoot.querySelectorAll(".segw__lesson5-quiz-option[data-value]");
+    for (var i = 0; i < options.length; i += 1) {
+      var option = options[i];
+      var value = option.getAttribute("data-value");
+      var isSelected = selectedType && value === selectedType;
+      option.classList.toggle("is-selected", Boolean(isSelected));
+      option.setAttribute("aria-pressed", isSelected ? "true" : "false");
+    }
+
+    var mismatch = contentRoot.querySelector('[data-role="lesson5-mismatch"]');
+    if (mismatch) {
+      mismatch.classList.toggle("segw__is-hidden", isMatch !== false);
+    }
+  }
+
+  function refreshLesson5FaqUI(contentRoot, openId) {
+    if (!contentRoot) {
+      return;
+    }
+
+    var rows = contentRoot.querySelectorAll(".segw__lesson5-faq-item[data-question-id]");
+    for (var i = 0; i < rows.length; i += 1) {
+      var row = rows[i];
+      var rowId = row.getAttribute("data-question-id");
+      var isOpen = Boolean(openId) && rowId === openId;
+      row.classList.toggle("is-open", isOpen);
+      var trigger = row.querySelector(".segw__lesson5-faq-question");
+      if (trigger) {
+        trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      }
     }
   }
 
@@ -5463,6 +5833,13 @@
           "Сейчас мы подберём конкретные инструменты под ваш профиль и цели.",
         ),
       );
+      l5Hero.appendChild(
+        createStoryNode(
+          "p",
+          "segw__lesson5-hero-note",
+          "Дальше: 1) выберем инструмент, 2) разберем частые вопросы, 3) подключим подходящий тариф.",
+        ),
+      );
       contentRoot.appendChild(l5Hero);
       return;
     }
@@ -5526,13 +5903,15 @@
       var quizList = createStoryNode("div", "segw__lesson5-quiz-list");
       for (var qo = 0; qo < quizOptions.length; qo += 1) {
         var quizOption = quizOptions[qo];
+        var isInvestorOptionSelected = lessonState.investorType === quizOption.id;
         var quizButton = createStoryNode(
           "button",
-          "segw__lesson5-quiz-option" + (lessonState.investorType === quizOption.id ? " is-selected" : ""),
+          "segw__lesson5-quiz-option" + (isInvestorOptionSelected ? " is-selected" : ""),
         );
         quizButton.type = "button";
         quizButton.setAttribute("data-action", "lesson5-investor-select");
         quizButton.setAttribute("data-value", quizOption.id);
+        quizButton.setAttribute("aria-pressed", isInvestorOptionSelected ? "true" : "false");
         quizButton.appendChild(createStoryNode("strong", "", quizOption.emoji + " " + quizOption.title));
         quizButton.appendChild(createStoryNode("p", "", quizOption.description));
         quizList.appendChild(quizButton);
@@ -5545,15 +5924,13 @@
           "Это не влияет на ваш риск-профиль, просто помогает уточнить рекомендации.",
         ),
       );
-      if (lessonState.investorTypeMatch === false) {
-        l5Quiz.appendChild(
-          createStoryNode(
-            "p",
-            "segw__lesson5-mismatch",
-            "Ваш выбор отличается от результата анкеты. При желании вы можете пройти анкету риска заново.",
-          ),
-        );
-      }
+      var mismatch = createStoryNode(
+        "p",
+        "segw__lesson5-mismatch" + (lessonState.investorTypeMatch === false ? "" : " segw__is-hidden"),
+        "Ваш выбор отличается от результата анкеты. При желании вы можете пройти анкету риска заново.",
+      );
+      mismatch.setAttribute("data-role", "lesson5-mismatch");
+      l5Quiz.appendChild(mismatch);
       contentRoot.appendChild(l5Quiz);
       return;
     }
@@ -5614,15 +5991,19 @@
       var faqList = createStoryNode("div", "segw__lesson5-faq");
       for (var fq = 0; fq < faqItems.length; fq += 1) {
         var faq = faqItems[fq];
+        var isFaqOpen = lessonState.faqOpenId === faq.id;
         var faqRow = createStoryNode("article", "segw__lesson5-faq-item");
-        var faqButton = createStoryNode("button", "segw__lesson5-faq-question", faq.q);
+        faqRow.setAttribute("data-question-id", faq.id);
+        faqRow.classList.toggle("is-open", isFaqOpen);
+        var faqButton = createStoryNode("button", "segw__lesson5-faq-question");
         faqButton.type = "button";
         faqButton.setAttribute("data-action", "lesson5-faq-toggle");
         faqButton.setAttribute("data-question-id", faq.id);
+        faqButton.setAttribute("aria-expanded", isFaqOpen ? "true" : "false");
+        faqButton.appendChild(createStoryNode("span", "segw__lesson5-faq-question-text", faq.q));
+        faqButton.appendChild(createStoryNode("span", "segw__lesson5-faq-chevron", "▾"));
         faqRow.appendChild(faqButton);
-        if (lessonState.faqOpenId === faq.id) {
-          faqRow.appendChild(createStoryNode("p", "segw__lesson5-faq-answer", faq.a));
-        }
+        faqRow.appendChild(createStoryNode("p", "segw__lesson5-faq-answer", faq.a));
         faqList.appendChild(faqRow);
       }
       l5Faq.appendChild(faqList);
@@ -6023,8 +6404,8 @@
       progressState.progress,
     );
 
-    if (refs.storyFrame && activeStep.gradient) {
-      refs.storyFrame.style.background = activeStep.gradient;
+    if (refs.storyFrame) {
+      refs.storyFrame.style.removeProperty("background");
     }
 
     if (refs.storyContent) {
@@ -6046,6 +6427,22 @@
           String(progressState.currentSegment + 1) + "/" + String(progressState.totalSegments);
       } else {
         refs.onboardingCounter.textContent =
+          "Урок " +
+          String(progressState.currentSegment + 1) +
+          " из " +
+          String(progressState.totalSegments);
+      }
+    }
+
+    if (refs.storyTopLabel) {
+      if (isQuiz) {
+        refs.storyTopLabel.textContent =
+          "Шаг " +
+          String(progressState.currentSegment + 1) +
+          " из " +
+          String(progressState.totalSegments);
+      } else {
+        refs.storyTopLabel.textContent =
           "Урок " +
           String(progressState.currentSegment + 1) +
           " из " +
@@ -6329,6 +6726,7 @@
       onboarding: root.querySelector('[data-role="onboarding"]'),
       storyFrame: root.querySelector('[data-role="story-frame"]'),
       storyProgress: root.querySelector('[data-role="story-progress"]'),
+      storyTopLabel: root.querySelector('[data-role="story-top-label"]'),
       storyContent: root.querySelector('[data-role="story-content"]'),
       onboardingCounter: root.querySelector('[data-role="onboarding-counter"]'),
       onboardingHint: root.querySelector('[data-role="onboarding-hint"]'),
@@ -6637,7 +7035,13 @@
           risk_profile: riskProfileForMatch || "unknown",
           match: isMatch,
         });
-        render(root, refs, state);
+        refreshLesson5QuizUI(refs.storyContent, selectedType, isMatch);
+        if (refs.onboardingNext) {
+          refs.onboardingNext.disabled = false;
+        }
+        if (refs.onboardingNextButton) {
+          refs.onboardingNextButton.disabled = false;
+        }
         return;
       } else if (action === "lesson5-faq-toggle") {
         if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
@@ -6654,7 +7058,7 @@
         var lessonStateFaq = ensureInlineLessonState(state.inlineOnboarding);
         lessonStateFaq.faqOpenId = lessonStateFaq.faqOpenId === questionId ? null : questionId;
         trackEvent("lesson_5_faq_expanded", { question_id: questionId });
-        render(root, refs, state);
+        refreshLesson5FaqUI(refs.storyContent, lessonStateFaq.faqOpenId);
         return;
       } else if (action === "lesson5-buy") {
         if (!state.inlineOnboarding.isActive || !state.inlineOnboarding.steps.length) {
@@ -6738,6 +7142,9 @@
         return;
       } else if (action === "lesson6-complete") {
         var lessonStateComplete = ensureInlineLessonState(state.inlineOnboarding);
+        trackEvent("lesson_6_complete_clicked", {
+          tariff_selected: lessonStateComplete.tariffSelected || "none",
+        });
         trackLessonCompleted(state.inlineOnboarding, "lesson_6", {
           tariff_selected: lessonStateComplete.tariffSelected || "none",
         });
@@ -6751,6 +7158,19 @@
           lessonStateComplete.onboardingCompleted = true;
         }
         state.inlineOnboarding.completed = true;
+        state.inlineOnboarding.isActive = false;
+        state.inlineOnboarding.awaitingStart = false;
+        state.inlineOnboarding.transitioningToLessons = false;
+        state.inlineOnboarding.enteringLessons = false;
+        state.inlineOnboarding.lastRenderedStepIndex = -1;
+        root.dispatchEvent(
+          new CustomEvent("onboarding:completed", {
+            detail: {
+              segment: state.inlineOnboarding.payload ? state.inlineOnboarding.payload.segment : undefined,
+              tariff_selected: lessonStateComplete.tariffSelected || "none",
+            },
+          }),
+        );
         render(root, refs, state);
         return;
       } else if (action === "onboarding-prev") {
@@ -7218,7 +7638,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.24";
+  window.FinamSegmentationWidget.version = "1.0.25";
 
   ensureStyles();
   initExistingWidgets();
