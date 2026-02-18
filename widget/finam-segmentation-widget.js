@@ -49,12 +49,20 @@
 
   var WIDGET_CSS = `
 .segw {
-  --finam-primary: #1a56db;
-  --finam-primary-hover: #1447c4;
-  --bg-base: #ffffff;
-  --bg-elevated: #f8f9fa;
-  --text-primary: #111111;
-  --text-secondary: #444444;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #2f5bcc;
+  --primary-hover: #274cae;
+  --success: #3bb273;
+  --border: #e5e7eb;
+  --finam-primary: var(--primary);
+  --finam-primary-hover: var(--primary-hover);
+  --bg-base: var(--surface);
+  --bg-elevated: #f9fbff;
+  --text-primary: var(--text);
+  --text-secondary: var(--muted);
   --text-inverse: #ffffff;
   --space-1: 8px;
   --space-2: 16px;
@@ -67,17 +75,17 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-  --gradient-lesson-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-lesson-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --gradient-lesson-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --gradient-lesson-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-  --gradient-lesson-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  --gradient-lesson-6: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-  --segw-bg: transparent;
+  --gradient-lesson-1: var(--bg);
+  --gradient-lesson-2: var(--bg);
+  --gradient-lesson-3: var(--bg);
+  --gradient-lesson-4: var(--bg);
+  --gradient-lesson-5: var(--bg);
+  --gradient-lesson-6: var(--bg);
+  --segw-bg: var(--bg);
   --segw-card: var(--bg-base);
-  --segw-line: #e6eaf2;
+  --segw-line: var(--border);
   --segw-primary: var(--finam-primary);
-  --segw-primary-soft: rgba(26, 86, 219, 0.08);
+  --segw-primary-soft: rgba(47, 91, 204, 0.08);
   --segw-text: var(--text-primary);
   --segw-muted: var(--text-secondary);
   --segw-viewport-height: 100svh;
@@ -2885,6 +2893,244 @@
     justify-content: center;
   }
 }
+
+/* Unified onboarding design system */
+.segw,
+.segw__story-wrapper,
+.segw__questionnaire,
+.segw__onboarding {
+  background: var(--bg) !important;
+}
+
+.segw__questionnaire,
+.segw__onboarding {
+  width: 100%;
+  padding: 0 16px;
+}
+
+.segw__seg-story-frame,
+.segw__story-frame {
+  max-width: 480px;
+  margin: 0 auto;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+}
+
+.segw__seg-story-header,
+.segw__story-header-layout {
+  padding: 16px;
+  gap: 8px;
+  background: var(--surface);
+}
+
+.segw__seg-story-progress,
+.segw__story-progress {
+  padding: 0 16px 8px;
+  gap: 4px;
+}
+
+.segw__seg-story-progress-segment,
+.segw__story-progress-segment {
+  height: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--border) !important;
+}
+
+.segw__seg-story-progress-segment.is-done,
+.segw__story-progress-segment.is-active,
+.segw__story-progress-segment.is-done {
+  background: var(--primary) !important;
+}
+
+.segw__seg-story-content,
+.segw__story-content {
+  padding: 16px;
+  gap: 16px;
+}
+
+.segw__seg-story-close,
+.segw__story-close {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+}
+
+.segw__seg-story-counter,
+.segw__story-top-label,
+.segw__onboarding-meta,
+.segw__story-hint {
+  color: var(--muted);
+}
+
+.segw__seg-intro-title,
+.segw__seg-result-title,
+.segw__onboarding-step-title,
+.segw__quiz-intro-title,
+.segw__quiz-result-title,
+.segw__lesson1-title,
+.segw__lesson2-title,
+.segw__lesson3-title,
+.segw__lesson4-title,
+.segw__lesson5-title,
+.segw__lesson6-title {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--text) !important;
+}
+
+.segw__seg-intro-subtitle,
+.segw__seg-question-subtitle,
+.segw__onboarding-step-text,
+.segw__quiz-question-block-title,
+.segw__quiz-result-description,
+.segw__lesson1-subtitle,
+.segw__lesson1-body,
+.segw__lesson2-text,
+.segw__lesson3-text,
+.segw__lesson4-text,
+.segw__lesson5-text,
+.segw__lesson6-text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--muted) !important;
+}
+
+.segw__seg-block-title,
+.segw__lesson2-subtitle,
+.segw__lesson3-subtitle,
+.segw__lesson4-subtitle,
+.segw__lesson5-subtitle,
+.segw__lesson6-subtitle {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted) !important;
+}
+
+.segw__seg-intro-card,
+.segw__seg-result-card,
+.segw__quiz-benefits,
+.segw__quiz-option,
+.segw__quiz-result-badge,
+.segw__quiz-allocation-card,
+.segw__lesson1-visual,
+.segw__lesson1-highlight,
+.segw__lesson1-step-card,
+.segw__lesson1-instrument-card,
+.segw__lesson1-goal-accent,
+.segw__lesson2-quote,
+.segw__lesson2-risk-card,
+.segw__lesson2-rule,
+.segw__lesson2-tip,
+.segw__lesson2-chart,
+.segw__lesson3-visual,
+.segw__lesson3-portfolio-row,
+.segw__lesson3-goal-advice,
+.segw__lesson3-spectrum-row,
+.segw__lesson4-row,
+.segw__lesson4-level-card,
+.segw__lesson5-top-card,
+.segw__lesson5-quiz-option,
+.segw__lesson5-faq-item,
+.segw__lesson5-mismatch,
+.segw__lesson6-compare-row,
+.segw__lesson6-tariff-card,
+.segw__lesson6-calculator,
+.segw__lesson6-calc-result,
+.segw__route-prep-card,
+.segw__tariff {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.05);
+  padding: 16px;
+}
+
+.segw__seg-story-footer,
+.segw__story-footer {
+  background: var(--surface) !important;
+  border-top: 1px solid var(--border);
+  padding: 12px 16px 0;
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--app-bottom-bar) + 12px);
+}
+
+.segw__seg-story-next,
+.segw__seg-cta,
+.segw__story-next,
+.segw__story-next.is-quiz-cta,
+.segw__lesson1-cta--primary,
+.segw__btn-primary {
+  background: var(--primary) !important;
+  color: #fff !important;
+  min-height: 50px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+.segw__seg-story-next:hover,
+.segw__seg-cta:hover,
+.segw__story-next:hover,
+.segw__story-next.is-quiz-cta:hover,
+.segw__lesson1-cta--primary:hover,
+.segw__btn-primary:hover {
+  background: var(--primary-hover) !important;
+}
+
+.segw__lesson1-cta--secondary,
+.segw__btn-secondary,
+.segw__route--ghost {
+  min-height: 50px;
+  border-radius: 16px;
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  border: 1px solid rgba(47, 91, 204, 0.35) !important;
+}
+
+.segw__seg-story-next:disabled,
+.segw__story-next:disabled {
+  opacity: 0.65;
+  background: #9bb2ec !important;
+  color: #fff !important;
+}
+
+.segw__lesson1-highlight-icon,
+.segw__quiz-result-badge-name,
+.segw__lesson6-tariff-badge {
+  background: rgba(59, 178, 115, 0.14) !important;
+  color: var(--success) !important;
+  border-color: rgba(59, 178, 115, 0.35) !important;
+}
+
+@media (min-width: 481px) {
+  .segw__questionnaire,
+  .segw__onboarding {
+    padding: 24px;
+  }
+  .segw__seg-story-frame,
+  .segw__story-frame {
+    max-width: 520px;
+  }
+  .segw__seg-intro-title,
+  .segw__seg-result-title,
+  .segw__onboarding-step-title,
+  .segw__quiz-intro-title,
+  .segw__quiz-result-title,
+  .segw__lesson1-title,
+  .segw__lesson2-title,
+  .segw__lesson3-title,
+  .segw__lesson4-title,
+  .segw__lesson5-title,
+  .segw__lesson6-title {
+    font-size: 24px;
+  }
+}
 `;
 
   var WIDGET_HTML = `
@@ -3119,7 +3365,7 @@
 
   var INLINE_STORY_TOTAL_SEGMENTS = 6;
   var QUIZ_TOTAL_SEGMENTS = 6;
-  var QUIZ_THEME_GRADIENT = "var(--gradient-lesson-1)";
+  var QUIZ_THEME_GRADIENT = "var(--surface)";
   var QUIZ_PROFILE_ORDER = ["conservative", "moderate", "aggressive", "ultra_aggressive"];
   var QUIZ_PROFILE_PRESENTATION = {
     conservative: {
@@ -4513,36 +4759,7 @@
   }
 
   function getStoryGradient(segment, stepIndex) {
-    var bySegment = {
-      novice: [
-        "var(--gradient-lesson-1)",
-        "var(--gradient-lesson-2)",
-        "var(--gradient-lesson-3)",
-        "var(--gradient-lesson-4)",
-        "var(--gradient-lesson-5)",
-        "var(--gradient-lesson-6)",
-      ],
-      advanced: [
-        "var(--gradient-lesson-4)",
-        "var(--gradient-lesson-5)",
-        "var(--gradient-lesson-6)",
-        "var(--gradient-lesson-1)",
-        "var(--gradient-lesson-2)",
-        "var(--gradient-lesson-3)",
-      ],
-      expert: [
-        "var(--gradient-lesson-6)",
-        "var(--gradient-lesson-2)",
-        "var(--gradient-lesson-4)",
-        "var(--gradient-lesson-1)",
-        "var(--gradient-lesson-5)",
-        "var(--gradient-lesson-3)",
-      ],
-    };
-
-    var palette = bySegment[segment] || bySegment.novice;
-    var index = typeof stepIndex === "number" ? stepIndex : 0;
-    return palette[index] || palette[palette.length - 1];
+    return "var(--surface)";
   }
 
   function buildInlineOnboardingSteps(payload) {
@@ -8151,7 +8368,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.37";
+  window.FinamSegmentationWidget.version = "1.0.38";
 
   ensureStyles();
   initExistingWidgets();
