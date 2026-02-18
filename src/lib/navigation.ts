@@ -1,0 +1,1 @@
+export { openDeeplink } from "./deeplink";

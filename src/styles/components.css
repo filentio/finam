@@ -1,0 +1,171 @@
+.btn-primary,
+.ob-primary-button {
+  background: var(--finam-primary);
+  color: var(--text-inverse);
+  min-height: 50px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.btn-primary:hover,
+.ob-primary-button:hover {
+  background: var(--finam-primary-hover);
+}
+
+.btn-primary:active,
+.ob-primary-button:active {
+  transform: scale(0.985);
+}
+
+.btn-primary:disabled,
+.ob-primary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary:focus-visible,
+.ob-primary-button:focus-visible,
+.btn-secondary:focus-visible,
+.ob-secondary-button:focus-visible,
+.choice-card:focus-visible {
+  outline: 2px solid rgba(47, 91, 204, 0.45);
+  outline-offset: 2px;
+}
+
+.btn-secondary,
+.ob-secondary-button {
+  background: transparent;
+  color: var(--finam-primary);
+  min-height: 50px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  font-weight: 600;
+  border: 1px solid var(--finam-accent-border);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.btn-secondary:hover,
+.ob-secondary-button:hover {
+  border-color: var(--finam-primary);
+  color: var(--finam-primary);
+  background: rgba(47, 91, 204, 0.06);
+}
+
+.choice-card {
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.choice-card:hover {
+  border-color: #cbd5e1;
+  background: var(--bg-elevated);
+}
+
+.choice-card.selected {
+  border-color: var(--finam-primary);
+  background: rgba(47, 91, 204, 0.08);
+  box-shadow: 0 0 0 3px rgba(47, 91, 204, 0.1);
+}
+
+.choice-card .radio-indicator {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-soft);
+  border-radius: 50%;
+  position: relative;
+  transition: all var(--transition-base);
+  flex: 0 0 auto;
+}
+
+.choice-card.selected .radio-indicator {
+  border-color: var(--finam-primary);
+  background: var(--finam-primary);
+}
+
+.choice-card.selected .radio-indicator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.choice-card--multiple .radio-indicator {
+  border-radius: 6px;
+}
+
+.choice-card--multiple.selected .radio-indicator::after {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.text-heading-1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.text-heading-2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.text-heading-3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: var(--text-base);
+  font-weight: 400;
+}
+
+.text-body-sm {
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.text-caption {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+

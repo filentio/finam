@@ -1,1 +1,172 @@
+# Segmentation Form (DOC → Segment Engine)
 
+Standalone React + TypeScript implementation of a client segmentation questionnaire.
+
+## Run
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+## Implemented requirements
+
+- Component architecture:
+  - `SegmentationForm`
+    - `QualifiedBlock`
+    - `ExperienceBlock`
+    - `AmountBlock`
+    - `GoalBlock`
+    - `InstrumentsBlock`
+    - `ResultPreview`
+- Segmentation algorithm in `src/engine/calculateSegment.ts`
+- Amount tiers for onboarding personalization
+- JSON payload generation after submit
+- UX states and validation rules for Continue button
+- `navigateToOnboarding(segment, amountTier)` with segment-based route map
+- Event tracking stubs in `src/analytics/trackEvent.ts`:
+  - `segmentation_started`
+  - `segmentation_completed`
+  - `segment_novice` / `segment_advanced` / `segment_expert`
+  - `amount_selected`
+  - `goal_selected`
+
+## Embed into page constructor (HTML block)
+
+If you need to mount the segmentation form directly inside a constructor widget
+(like on your screenshot), use:
+
+- `embed/segmentation-widget.html`
+
+Copy the full snippet into your HTML block.
+
+Optional callbacks for integration:
+
+```html
+<script>
+  window.navigateToOnboarding = function (segment, amountTier) {
+    // your project router
+  };
+
+  window.onSegmentationComplete = function (payload) {
+    // send payload to backend / CRM
+  };
+</script>
+```
+
+### Split by constructor fields (HTML / CSS / JS)
+
+If your constructor has separate fields, use:
+
+- HTML field: `embed/segmentation-widget.snippet.html`
+- CSS field: `embed/segmentation-widget.snippet.css`
+- JS field: `embed/segmentation-widget.snippet.js`
+
+The JS file auto-initializes widgets on page load and also exposes
+`window.initAllSegmentationWidgets()` for manual re-init after dynamic rendering.
+
+## Single-script CDN widget (no HTML/CSS in constructor)
+
+If you want the same integration style as tariff widget, use one script:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/filentio/finam@<COMMIT_SHA>/widget/finam-segmentation-widget.js?v=1"></script>
+```
+
+The script injects widget HTML + CSS automatically and mounts where the script tag is placed.
+
+Optional target mount:
+
+```html
+<script
+  src="https://cdn.jsdelivr.net/gh/filentio/finam@<COMMIT_SHA>/widget/finam-segmentation-widget.js?v=1"
+  data-target="#segmentation-widget-container"
+></script>
+```
+
+Optional segment URL mapping (recommended for production routing):
+
+```html
+<script
+  src="https://cdn.jsdelivr.net/gh/filentio/finam@<COMMIT_SHA>/widget/finam-segmentation-widget.js?v=1"
+  data-target="#segmentation-widget-container"
+  data-onboarding-novice-url="/education/full-course/"
+  data-onboarding-advanced-url="/education/short-course/"
+  data-onboarding-expert-url="/education/expert-track/"
+></script>
+```
+
+Notes:
+
+- By default widget runs a single in-widget flow:
+  анкета -> карточка результата -> встроенные шаги онбординга (без перехода на другую страницу).
+- Inline онбординг отображается в формате stories: мобильный фрейм, 6-сегментный прогресс-бар,
+  навигация по тап-зонам (левая/правая части экрана) и slide-анимации между экранами.
+- В stories добавлен sticky footer с CTA-кнопкой (всегда видна внизу) и
+  градиентной подложкой для читаемости.
+- Перед stories показывается transition-экран:
+  "Мы подобрали для вас персональный маршрут" -> "Начать обучение" с плавным переходом.
+- Внутри inline stories рендерятся полноценные уроки (6 экранов с контентом и практическими пунктами).
+- В inline-флоу добавлена stories-анкета риск-профиля:
+  intro + Q5–Q8 + result (6 сегментов), отдельный quiz-прогресс, результат с аллокацией и
+  analytics-события `risk_quiz_*`.
+- To force external redirect mode, set `data-onboarding-mode="external"`.
+- If `data-onboarding-mode="auto"`, widget switches to external only when onboarding URLs are configured.
+- In external mode fallback uses a safe hash navigation
+  (`#finam-segmentation-onboarding?segment=...&amountTier=...`) to avoid hard redirects and route conflicts.
+- Legacy global `window.navigateToOnboarding(...)` is disabled by default to prevent accidental conflicts.
+- To enable legacy callback explicitly: `data-use-global-navigate="true"`.
+- If third-party analytics scripts throw runtime/CORS errors, you can disable widget tracking hooks:
+  `data-disable-tracking="true"`.
+- You can define a common onboarding page URL via `data-onboarding-url="https://..."`.
+  Widget will append `segment` and `amountTier` query params automatically.
+- To open onboarding in a new tab, set `data-open-in-new-tab="true"`.
+
+Public API:
+
+- `window.FinamSegmentationWidget.mount(target, { replace?: boolean })`
+- `window.FinamSegmentationWidget.initAll()`
+
+Optional callbacks:
+
+```html
+<script>
+  window.navigateToOnboarding = function (segment, amountTier) {
+    // your app routing logic
+  };
+
+  window.onSegmentationComplete = function (payload) {
+    // send payload to CRM/API
+  };
+</script>
+```
+
+## Onboarding module scaffold (from technical spec)
+
+Added a dedicated feature module:
+
+- `src/features/onboarding/Onboarding.tsx`
+- `src/features/onboarding/OnboardingContext.tsx`
+- `src/features/onboarding/hooks/*`
+- `src/features/onboarding/screens/*`
+- `src/features/onboarding/components/*`
+- `src/features/onboarding/data/*`
+- `src/features/onboarding/types/onboarding.ts`
+
+Implemented in code:
+
+- DOS typing, segmentation and amount tier mapping
+- Track builder (`novice/advanced/expert`)
+- Reducer-based onboarding state machine
+- Risk scoring engine (DOS + Q5–Q8) with self-assessment cap
+- Risk quiz stories flow aligned with design spec:
+  intro + 4 questions + result (6 segments), sticky CTA footer,
+  gradient quiz theme, slide transitions, and dedicated analytics events
+- Personalization helpers (content variants, highlighted instruments, portfolio/goal overlays)
+- Base screen/component scaffolding for onboarding flow

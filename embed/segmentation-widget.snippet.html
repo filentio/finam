@@ -1,0 +1,153 @@
+<div data-segmentation-widget class="segw">
+  <header class="segw__header">
+    <p class="segw__eyebrow">DOC → Segment Engine</p>
+    <h2>Анкета сегментации клиента</h2>
+    <p class="segw__description">
+      Заполните анкету, чтобы получить персональный маршрут онбординга.
+    </p>
+  </header>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Являетесь ли вы квалифицированным инвестором?</h3>
+    <div class="segw__grid segw__grid--2">
+      <button type="button" class="segw__option" data-action="qualified" data-value="true">
+        Да <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="qualified" data-value="false">
+        Нет <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section segw__experience" data-role="experience-section">
+    <h3 class="segw__title">Какой у вас опыт инвестирования?</h3>
+    <div class="segw__grid">
+      <button type="button" class="segw__option" data-action="experience" data-value="none">
+        Нет опыта <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="experience" data-value="less_1y">
+        Менее 1 года <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="experience" data-value="1_3y">
+        1–3 года <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="experience" data-value="3_5y">
+        3–5 лет <span class="segw__option-mark">○</span>
+      </button>
+      <button
+        type="button"
+        class="segw__option segw__option--wide"
+        data-action="experience"
+        data-value="more_5y"
+      >
+        Более 5 лет <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Какую сумму вы планируете инвестировать?</h3>
+    <div class="segw__grid">
+      <button type="button" class="segw__option" data-action="amount" data-value="up_to_300k">
+        До 300 000 ₽ <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="amount" data-value="300k_2m">
+        300 000 – 2 млн ₽ <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="amount" data-value="2m_5m">
+        2 – 5 млн ₽ <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="amount" data-value="more_5m">
+        Более 5 млн ₽ <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Ваша главная цель инвестирования</h3>
+    <div class="segw__grid">
+      <button type="button" class="segw__option" data-action="goal" data-value="purchase">
+        Накопление <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="goal" data-value="passive_income">
+        Пассивный доход <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="goal" data-value="growth">
+        Рост капитала <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="goal" data-value="preservation">
+        Сохранение <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Какие инструменты вам интересны?</h3>
+    <p class="segw__hint">Можно выбрать несколько вариантов.</p>
+    <div class="segw__grid">
+      <button type="button" class="segw__option" data-action="instrument" data-value="etf">
+        ETF <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="stocks">
+        Акции <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="bonds">
+        Облигации <span class="segw__option-mark">□</span>
+      </button>
+      <button
+        type="button"
+        class="segw__option"
+        data-action="instrument"
+        data-value="trust_management"
+      >
+        Доверительное управление <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="ipo">
+        IPO <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="currency">
+        Валюта <span class="segw__option-mark">□</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__submit">
+    <div class="segw__segment">
+      <span>Сегмент:</span>
+      <strong class="segw__segment-chip" data-role="segment-chip">не определён</strong>
+    </div>
+    <button type="button" class="segw__continue" data-action="continue" disabled>
+      Получить персональный маршрут
+    </button>
+  </section>
+
+  <section class="segw__result is-hidden" data-role="result">
+    <div class="segw__tariff">
+      <p class="segw__tariff-caption">Ваш маршрут онбординга</p>
+      <h3 class="segw__tariff-title" data-role="plan-title">—</h3>
+      <ul class="segw__tariff-list">
+        <li>
+          <span class="segw__label">Сегмент</span>
+          <span class="segw__value" data-role="segment-value">—</span>
+        </li>
+        <li>
+          <span class="segw__label">Сумма</span>
+          <span class="segw__value" data-role="amount-value">—</span>
+        </li>
+        <li>
+          <span class="segw__label">Цель</span>
+          <span class="segw__value" data-role="goal-value">—</span>
+        </li>
+        <li>
+          <span class="segw__label">Инструменты</span>
+          <span class="segw__value" data-role="instruments-value">—</span>
+        </li>
+      </ul>
+      <a href="#" class="segw__route" data-role="route-link">Перейти к онбордингу</a>
+      <details class="segw__json">
+        <summary>Показать JSON payload</summary>
+        <pre data-role="json"></pre>
+      </details>
+    </div>
+  </section>
+</div>

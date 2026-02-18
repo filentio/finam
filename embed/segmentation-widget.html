@@ -1,0 +1,808 @@
+<!--
+  Copy this whole snippet into your page-builder HTML block.
+  Optional global callbacks:
+  - window.navigateToOnboarding(segment, amountTier)
+  - window.onSegmentationComplete(payload)
+-->
+<style>
+  .segw {
+    --segw-bg: transparent;
+    --segw-card: #ffffff;
+    --segw-line: #e6eaf2;
+    --segw-primary: #2f5fcc;
+    --segw-primary-soft: rgba(47, 95, 204, 0.08);
+    --segw-text: #1d2734;
+    --segw-muted: #5a6778;
+    font-family:
+      Inter,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    color: var(--segw-text);
+    background: var(--segw-bg);
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .segw * {
+    box-sizing: border-box;
+  }
+
+  .segw__header {
+    margin-bottom: 18px;
+  }
+
+  .segw__header h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  .segw__eyebrow {
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--segw-primary);
+    font-weight: 600;
+  }
+
+  .segw__description {
+    margin: 0;
+    color: var(--segw-muted);
+    font-size: 0.93rem;
+  }
+
+  .segw__section {
+    border: 1px solid var(--segw-line);
+    background: var(--segw-card);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 24px;
+  }
+
+  .segw__title {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .segw__hint {
+    margin: -2px 0 10px;
+    color: var(--segw-muted);
+    font-size: 0.86rem;
+  }
+
+  .segw__grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .segw__option {
+    min-height: 56px;
+    width: 100%;
+    border: 1px solid var(--segw-line);
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+    color: inherit;
+    text-align: left;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition:
+      transform 0.08s ease,
+      box-shadow 0.18s ease,
+      border-color 0.18s ease,
+      background-color 0.18s ease;
+  }
+
+  .segw__option:hover {
+    border-color: rgba(47, 95, 204, 0.45);
+    box-shadow: 0 14px 28px rgba(16, 24, 40, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .segw__option:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 16px rgba(16, 24, 40, 0.1);
+  }
+
+  .segw__option:focus-visible {
+    outline: 3px solid rgba(47, 95, 204, 0.25);
+    outline-offset: 2px;
+  }
+
+  .segw__option.is-selected {
+    border-color: var(--segw-primary);
+    border-width: 2px;
+    background: var(--segw-primary-soft);
+    box-shadow: 0 12px 26px rgba(47, 95, 204, 0.14);
+  }
+
+  .segw__option-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--segw-primary);
+    background: rgba(47, 95, 204, 0.1);
+    border: 1px solid rgba(47, 95, 204, 0.2);
+    flex: 0 0 auto;
+  }
+
+  .segw__option.is-selected .segw__option-mark {
+    background: var(--segw-primary);
+    color: #fff;
+    border-color: var(--segw-primary);
+  }
+
+  .segw__option--wide {
+    grid-column: 1 / -1;
+  }
+
+  .segw__experience {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    margin-top: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition:
+      max-height 0.35s ease,
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      margin 0.2s ease;
+  }
+
+  .segw__experience.is-open {
+    max-height: 520px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 24px;
+    pointer-events: auto;
+  }
+
+  .segw__submit {
+    margin-top: 24px;
+    border: 1px solid var(--segw-line);
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .segw__segment {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--segw-muted);
+    font-size: 0.92rem;
+  }
+
+  .segw__segment-chip {
+    border: 1px solid #d8e2f2;
+    background: #f6f8fb;
+    border-radius: 999px;
+    padding: 6px 10px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 13px;
+    color: #3d4b5c;
+  }
+
+  .segw__segment-chip.is-active {
+    border-color: rgba(47, 95, 204, 0.35);
+    background: rgba(47, 95, 204, 0.1);
+    color: #1f3a73;
+  }
+
+  .segw__continue {
+    border: 0;
+    background: var(--segw-primary);
+    color: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .segw__continue:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.15);
+  }
+
+  .segw__result {
+    margin-top: 24px;
+  }
+
+  .segw__result.is-hidden {
+    display: none;
+  }
+
+  .segw__tariff {
+    border-radius: 14px;
+    background: linear-gradient(160deg, #1f4bb7, #3c77ea);
+    color: #fff;
+    padding: 14px;
+  }
+
+  .segw__tariff-caption {
+    margin: 0 0 6px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.9;
+  }
+
+  .segw__tariff-title {
+    margin: 0 0 10px;
+    font-size: 1.18rem;
+  }
+
+  .segw__tariff-list {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
+
+  .segw__tariff-list li {
+    display: grid;
+    gap: 2px;
+  }
+
+  .segw__label {
+    opacity: 0.75;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .segw__value {
+    font-weight: 600;
+  }
+
+  .segw__route {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #fff;
+    color: #194199;
+    font-weight: 600;
+  }
+
+  .segw__json {
+    margin: 10px 0 0;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .segw__json summary {
+    cursor: pointer;
+    padding: 8px 10px;
+    font-size: 0.83rem;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .segw__json pre {
+    margin: 0;
+    padding: 10px;
+    background: rgba(18, 28, 53, 0.48);
+    overflow: auto;
+    font-size: 0.73rem;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 720px) {
+    .segw__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .segw__submit {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .segw__continue {
+      width: 100%;
+    }
+  }
+</style>
+
+<div data-segmentation-widget class="segw">
+  <header class="segw__header">
+    <p class="segw__eyebrow">DOC → Segment Engine</p>
+    <h2>Анкета сегментации клиента</h2>
+    <p class="segw__description">
+      Заполните анкету, чтобы получить персональный маршрут онбординга.
+    </p>
+  </header>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Являетесь ли вы квалифицированным инвестором?</h3>
+    <div class="segw__grid segw__grid--2" data-group="qualified">
+      <button type="button" class="segw__option" data-action="qualified" data-value="true">
+        Да <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="qualified" data-value="false">
+        Нет <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section segw__experience" data-role="experience-section">
+    <h3 class="segw__title">Какой у вас опыт инвестирования?</h3>
+    <div class="segw__grid" data-group="experience">
+      <button type="button" class="segw__option" data-action="experience" data-value="none">
+        Нет опыта <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="experience" data-value="less_1y">
+        Менее 1 года <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="experience" data-value="1_3y">
+        1–3 года <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="experience" data-value="3_5y">
+        3–5 лет <span class="segw__option-mark">○</span>
+      </button>
+      <button
+        type="button"
+        class="segw__option segw__option--wide"
+        data-action="experience"
+        data-value="more_5y"
+      >
+        Более 5 лет <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Какую сумму вы планируете инвестировать?</h3>
+    <div class="segw__grid" data-group="amount">
+      <button type="button" class="segw__option" data-action="amount" data-value="up_to_300k">
+        До 300 000 ₽ <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="amount" data-value="300k_2m">
+        300 000 – 2 млн ₽ <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="amount" data-value="2m_5m">
+        2 – 5 млн ₽ <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="amount" data-value="more_5m">
+        Более 5 млн ₽ <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Ваша главная цель инвестирования</h3>
+    <div class="segw__grid" data-group="goal">
+      <button type="button" class="segw__option" data-action="goal" data-value="purchase">
+        Накопление <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="goal" data-value="passive_income">
+        Пассивный доход <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="goal" data-value="growth">
+        Рост капитала <span class="segw__option-mark">○</span>
+      </button>
+      <button type="button" class="segw__option" data-action="goal" data-value="preservation">
+        Сохранение <span class="segw__option-mark">○</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__section">
+    <h3 class="segw__title">Какие инструменты вам интересны?</h3>
+    <p class="segw__hint">Можно выбрать несколько вариантов.</p>
+    <div class="segw__grid" data-group="instruments">
+      <button type="button" class="segw__option" data-action="instrument" data-value="etf">
+        ETF <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="stocks">
+        Акции <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="bonds">
+        Облигации <span class="segw__option-mark">□</span>
+      </button>
+      <button
+        type="button"
+        class="segw__option"
+        data-action="instrument"
+        data-value="trust_management"
+      >
+        Доверительное управление <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="ipo">
+        IPO <span class="segw__option-mark">□</span>
+      </button>
+      <button type="button" class="segw__option" data-action="instrument" data-value="currency">
+        Валюта <span class="segw__option-mark">□</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="segw__submit">
+    <div class="segw__segment">
+      <span>Сегмент:</span>
+      <strong class="segw__segment-chip" data-role="segment-chip">не определён</strong>
+    </div>
+    <button type="button" class="segw__continue" data-action="continue" disabled>
+      Получить персональный маршрут
+    </button>
+  </section>
+
+  <section class="segw__result is-hidden" data-role="result">
+    <div class="segw__tariff">
+      <p class="segw__tariff-caption">Ваш маршрут онбординга</p>
+      <h3 class="segw__tariff-title" data-role="plan-title">—</h3>
+      <ul class="segw__tariff-list">
+        <li>
+          <span class="segw__label">Сегмент</span>
+          <span class="segw__value" data-role="segment-value">—</span>
+        </li>
+        <li>
+          <span class="segw__label">Сумма</span>
+          <span class="segw__value" data-role="amount-value">—</span>
+        </li>
+        <li>
+          <span class="segw__label">Цель</span>
+          <span class="segw__value" data-role="goal-value">—</span>
+        </li>
+        <li>
+          <span class="segw__label">Инструменты</span>
+          <span class="segw__value" data-role="instruments-value">—</span>
+        </li>
+      </ul>
+      <a href="#" class="segw__route" data-role="route-link">Перейти к онбордингу</a>
+      <details class="segw__json">
+        <summary>Показать JSON payload</summary>
+        <pre data-role="json"></pre>
+      </details>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function () {
+    var script = document.currentScript;
+    var root = script && script.previousElementSibling;
+
+    if (!root || !root.hasAttribute("data-segmentation-widget")) {
+      return;
+    }
+
+    var EXPERIENCE_LABELS = {
+      none: "Нет опыта",
+      less_1y: "Менее 1 года",
+      "1_3y": "1–3 года",
+      "3_5y": "3–5 лет",
+      more_5y: "Более 5 лет",
+    };
+
+    var AMOUNT_LABELS = {
+      up_to_300k: "До 300 000 ₽",
+      "300k_2m": "300 000 – 2 млн ₽",
+      "2m_5m": "2 – 5 млн ₽",
+      more_5m: "Более 5 млн ₽",
+    };
+
+    var GOAL_LABELS = {
+      purchase: "Накопление",
+      passive_income: "Пассивный доход",
+      growth: "Рост капитала",
+      preservation: "Сохранение",
+    };
+
+    var INSTRUMENT_LABELS = {
+      etf: "ETF",
+      stocks: "Акции",
+      bonds: "Облигации",
+      trust_management: "Доверительное управление",
+      ipo: "IPO",
+      currency: "Валюта",
+    };
+
+    var SEGMENT_LABELS = {
+      novice: "Новичок",
+      advanced: "Продвинутый",
+      expert: "Эксперт",
+    };
+
+    var ONBOARDING_PLAN_LABELS = {
+      novice: "Полный курс",
+      advanced: "Сокращённый курс",
+      expert: "Минимальный маршрут + анкета риска",
+    };
+
+    var ONBOARDING_ROUTE_BY_SEGMENT = {
+      novice: "/onboarding/full-course",
+      advanced: "/onboarding/short-course",
+      expert: "/onboarding/minimal-risk-form",
+    };
+
+    var state = {
+      qualifiedInvestor: null,
+      experience: null,
+      amountTier: null,
+      goal: null,
+      instruments: [],
+      segment: null,
+    };
+
+    var refs = {
+      experienceSection: root.querySelector('[data-role="experience-section"]'),
+      segmentChip: root.querySelector('[data-role="segment-chip"]'),
+      continueButton: root.querySelector('[data-action="continue"]'),
+      result: root.querySelector('[data-role="result"]'),
+      planTitle: root.querySelector('[data-role="plan-title"]'),
+      segmentValue: root.querySelector('[data-role="segment-value"]'),
+      amountValue: root.querySelector('[data-role="amount-value"]'),
+      goalValue: root.querySelector('[data-role="goal-value"]'),
+      instrumentsValue: root.querySelector('[data-role="instruments-value"]'),
+      routeLink: root.querySelector('[data-role="route-link"]'),
+      json: root.querySelector('[data-role="json"]'),
+    };
+
+    function calculateSegment(qualifiedInvestor, experience) {
+      if (qualifiedInvestor === null) {
+        return null;
+      }
+
+      if (qualifiedInvestor === true) {
+        return "expert";
+      }
+
+      if (experience === "none" || experience === "less_1y") {
+        return "novice";
+      }
+
+      if (experience === "1_3y" || experience === "3_5y") {
+        return "advanced";
+      }
+
+      if (experience === "more_5y") {
+        return "expert";
+      }
+
+      return null;
+    }
+
+    function trackEvent(eventName, payload) {
+      var safePayload = payload || {};
+
+      if (Array.isArray(window.dataLayer)) {
+        window.dataLayer.push(
+          Object.assign(
+            {
+              event: eventName,
+            },
+            safePayload,
+          ),
+        );
+      }
+
+      if (typeof window.gtag === "function") {
+        window.gtag("event", eventName, safePayload);
+      }
+
+      if (window.console && typeof window.console.info === "function") {
+        window.console.info("[segmentation]", eventName, safePayload);
+      }
+    }
+
+    function canContinue() {
+      if (state.qualifiedInvestor === null) {
+        return false;
+      }
+
+      if (state.amountTier === null || state.goal === null) {
+        return false;
+      }
+
+      if (!state.instruments.length) {
+        return false;
+      }
+
+      if (state.qualifiedInvestor === false && state.experience === null) {
+        return false;
+      }
+
+      return state.segment !== null;
+    }
+
+    function buildPayload() {
+      if (!canContinue()) {
+        return null;
+      }
+
+      return {
+        qualified_investor: state.qualifiedInvestor,
+        experience: state.experience || "more_5y",
+        segment: state.segment,
+        amount_tier: state.amountTier,
+        investment_goal: state.goal,
+        instruments: state.instruments.slice(),
+      };
+    }
+
+    function navigateToOnboarding(segment, amountTier) {
+      var baseRoute = ONBOARDING_ROUTE_BY_SEGMENT[segment];
+      var target = baseRoute + "?amountTier=" + encodeURIComponent(amountTier);
+
+      if (typeof window.navigateToOnboarding === "function") {
+        window.navigateToOnboarding(segment, amountTier);
+      } else {
+        window.location.hash = target;
+      }
+
+      return target;
+    }
+
+    function updateOptionStates() {
+      var buttons = root.querySelectorAll("[data-action]");
+
+      for (var i = 0; i < buttons.length; i += 1) {
+        var button = buttons[i];
+        var action = button.getAttribute("data-action");
+        var value = button.getAttribute("data-value");
+        var isSelected = false;
+
+        if (action === "qualified") {
+          isSelected = String(state.qualifiedInvestor) === value;
+        } else if (action === "experience") {
+          isSelected = state.experience === value;
+        } else if (action === "amount") {
+          isSelected = state.amountTier === value;
+        } else if (action === "goal") {
+          isSelected = state.goal === value;
+        } else if (action === "instrument") {
+          isSelected = state.instruments.indexOf(value) !== -1;
+        }
+
+        if (isSelected) {
+          button.classList.add("is-selected");
+        } else {
+          button.classList.remove("is-selected");
+        }
+
+        var mark = button.querySelector(".segw__option-mark");
+        if (mark) {
+          if (action === "instrument") {
+            mark.textContent = isSelected ? "✓" : "□";
+          } else {
+            mark.textContent = isSelected ? "●" : "○";
+          }
+        }
+      }
+    }
+
+    function render() {
+      var showExperience = state.qualifiedInvestor === false;
+
+      if (showExperience) {
+        refs.experienceSection.classList.add("is-open");
+      } else {
+        refs.experienceSection.classList.remove("is-open");
+      }
+
+      if (state.segment) {
+        refs.segmentChip.textContent = SEGMENT_LABELS[state.segment];
+        refs.segmentChip.classList.add("is-active");
+      } else {
+        refs.segmentChip.textContent = "не определён";
+        refs.segmentChip.classList.remove("is-active");
+      }
+
+      refs.continueButton.disabled = !canContinue();
+      updateOptionStates();
+    }
+
+    function showTariffCard(payload, targetRoute) {
+      refs.result.classList.remove("is-hidden");
+      refs.planTitle.textContent = ONBOARDING_PLAN_LABELS[payload.segment];
+      refs.segmentValue.textContent = SEGMENT_LABELS[payload.segment];
+      refs.amountValue.textContent = AMOUNT_LABELS[payload.amount_tier];
+      refs.goalValue.textContent = GOAL_LABELS[payload.investment_goal];
+      refs.instrumentsValue.textContent = payload.instruments
+        .map(function (instrument) {
+          return INSTRUMENT_LABELS[instrument] || instrument;
+        })
+        .join(", ");
+      refs.routeLink.href = targetRoute;
+      refs.routeLink.textContent = "Перейти к онбордингу";
+      refs.json.textContent = JSON.stringify(payload, null, 2);
+    }
+
+    root.addEventListener("click", function (event) {
+      var button = event.target.closest("button[data-action]");
+      if (!button || !root.contains(button)) {
+        return;
+      }
+
+      var action = button.getAttribute("data-action");
+      var value = button.getAttribute("data-value");
+
+      if (action === "qualified") {
+        var nextValue = value === "true";
+        state.qualifiedInvestor = nextValue;
+        if (nextValue === true) {
+          state.experience = null;
+        }
+      } else if (action === "experience") {
+        state.experience = value;
+      } else if (action === "amount") {
+        state.amountTier = value;
+        trackEvent("amount_selected", { amount_tier: value });
+      } else if (action === "goal") {
+        state.goal = value;
+        trackEvent("goal_selected", { goal: value });
+      } else if (action === "instrument") {
+        var currentIndex = state.instruments.indexOf(value);
+        if (currentIndex === -1) {
+          state.instruments.push(value);
+        } else {
+          state.instruments.splice(currentIndex, 1);
+        }
+      } else if (action === "continue") {
+        var payload = buildPayload();
+
+        if (!payload) {
+          return;
+        }
+
+        trackEvent("segmentation_completed", {
+          segment: payload.segment,
+          amount_tier: payload.amount_tier,
+        });
+        trackEvent("segment_" + payload.segment, {
+          amount_tier: payload.amount_tier,
+        });
+
+        var targetRoute = navigateToOnboarding(payload.segment, payload.amount_tier);
+        showTariffCard(payload, targetRoute);
+
+        if (typeof window.onSegmentationComplete === "function") {
+          window.onSegmentationComplete(payload);
+        }
+
+        root.dispatchEvent(
+          new CustomEvent("segmentation:completed", {
+            detail: {
+              payload: payload,
+              targetRoute: targetRoute,
+            },
+          }),
+        );
+      }
+
+      state.segment = calculateSegment(state.qualifiedInvestor, state.experience);
+      render();
+    });
+
+    trackEvent("segmentation_started");
+    render();
+  })();
+</script>
