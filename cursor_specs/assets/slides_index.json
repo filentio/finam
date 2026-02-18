@@ -1,0 +1,192 @@
+[
+  {
+    "index": 1,
+    "slide_id": "s01_start",
+    "file": "cursor_specs/assets/slides/01_s01_start.png"
+  },
+  {
+    "index": 2,
+    "slide_id": "s02_navigation_menu",
+    "file": "cursor_specs/assets/slides/02_s02_navigation_menu.png"
+  },
+  {
+    "index": 3,
+    "slide_id": "s02a_start_intro",
+    "file": "cursor_specs/assets/slides/03_s02a_start_intro.png"
+  },
+  {
+    "index": 4,
+    "slide_id": "s02_reality",
+    "file": "cursor_specs/assets/slides/04_s02_reality.png"
+  },
+  {
+    "index": 5,
+    "slide_id": "s03_goals",
+    "file": "cursor_specs/assets/slides/05_s03_goals.png"
+  },
+  {
+    "index": 6,
+    "slide_id": "s04_concepts",
+    "file": "cursor_specs/assets/slides/06_s04_concepts.png"
+  },
+  {
+    "index": 7,
+    "slide_id": "s05_deposit",
+    "file": "cursor_specs/assets/slides/07_s05_deposit.png"
+  },
+  {
+    "index": 8,
+    "slide_id": "s06_first_buy",
+    "file": "cursor_specs/assets/slides/08_s06_first_buy.png"
+  },
+  {
+    "index": 9,
+    "slide_id": "s06a_purchase_steps",
+    "file": "cursor_specs/assets/slides/09_s06a_purchase_steps.png"
+  },
+  {
+    "index": 10,
+    "slide_id": "s07_rules_updated",
+    "file": "cursor_specs/assets/slides/10_s07_rules_updated.png"
+  },
+  {
+    "index": 11,
+    "slide_id": "s08_instruments_updated",
+    "file": "cursor_specs/assets/slides/11_s08_instruments_updated.png"
+  },
+  {
+    "index": 12,
+    "slide_id": "s09_choice_updated",
+    "file": "cursor_specs/assets/slides/12_s09_choice_updated.png"
+  },
+  {
+    "index": 13,
+    "slide_id": "s10_courses",
+    "file": "cursor_specs/assets/slides/13_s10_courses.png"
+  },
+  {
+    "index": 14,
+    "slide_id": "s11_portfolio_intro",
+    "file": "cursor_specs/assets/slides/14_s11_portfolio_intro.png"
+  },
+  {
+    "index": 15,
+    "slide_id": "s12_principles",
+    "file": "cursor_specs/assets/slides/15_s12_principles.png"
+  },
+  {
+    "index": 16,
+    "slide_id": "s13_structure",
+    "file": "cursor_specs/assets/slides/16_s13_structure.png"
+  },
+  {
+    "index": 17,
+    "slide_id": "s14_balance",
+    "file": "cursor_specs/assets/slides/17_s14_balance.png"
+  },
+  {
+    "index": 18,
+    "slide_id": "s15_risks_intro",
+    "file": "cursor_specs/assets/slides/18_s15_risks_intro.png"
+  },
+  {
+    "index": 19,
+    "slide_id": "s16_risk_types",
+    "file": "cursor_specs/assets/slides/19_s16_risk_types.png"
+  },
+  {
+    "index": 20,
+    "slide_id": "s14a_portfolio_cta",
+    "file": "cursor_specs/assets/slides/20_s14a_portfolio_cta.png"
+  },
+  {
+    "index": 21,
+    "slide_id": "s17_protection",
+    "file": "cursor_specs/assets/slides/21_s17_protection.png"
+  },
+  {
+    "index": 22,
+    "slide_id": "s18_reliable",
+    "file": "cursor_specs/assets/slides/22_s18_reliable.png"
+  },
+  {
+    "index": 23,
+    "slide_id": "s19_bonds",
+    "file": "cursor_specs/assets/slides/23_s19_bonds.png"
+  },
+  {
+    "index": 24,
+    "slide_id": "s20_capital_protection",
+    "file": "cursor_specs/assets/slides/24_s20_capital_protection.png"
+  },
+  {
+    "index": 25,
+    "slide_id": "s21_tariff_intro",
+    "file": "cursor_specs/assets/slides/25_s21_tariff_intro.png"
+  },
+  {
+    "index": 26,
+    "slide_id": "s22_tariff_long",
+    "file": "cursor_specs/assets/slides/26_s22_tariff_long.png"
+  },
+  {
+    "index": 27,
+    "slide_id": "s20a_risks_cta",
+    "file": "cursor_specs/assets/slides/27_s20a_risks_cta.png"
+  },
+  {
+    "index": 28,
+    "slide_id": "s23_tariff_strateg",
+    "file": "cursor_specs/assets/slides/28_s23_tariff_strateg.png"
+  },
+  {
+    "index": 29,
+    "slide_id": "s24_tariff_investor",
+    "file": "cursor_specs/assets/slides/29_s24_tariff_investor.png"
+  },
+  {
+    "index": 30,
+    "slide_id": "s25_trust_management",
+    "file": "cursor_specs/assets/slides/30_s25_trust_management.png"
+  },
+  {
+    "index": 31,
+    "slide_id": "s26_diversification_intro",
+    "file": "cursor_specs/assets/slides/31_s26_diversification_intro.png"
+  },
+  {
+    "index": 32,
+    "slide_id": "s27_what_is_div",
+    "file": "cursor_specs/assets/slides/32_s27_what_is_div.png"
+  },
+  {
+    "index": 33,
+    "slide_id": "s25a_tariff_cta",
+    "file": "cursor_specs/assets/slides/33_s25a_tariff_cta.png"
+  },
+  {
+    "index": 34,
+    "slide_id": "s28_asset_allocation",
+    "file": "cursor_specs/assets/slides/34_s28_asset_allocation.png"
+  },
+  {
+    "index": 35,
+    "slide_id": "s29_why_works",
+    "file": "cursor_specs/assets/slides/35_s29_why_works.png"
+  },
+  {
+    "index": 36,
+    "slide_id": "s30_example",
+    "file": "cursor_specs/assets/slides/36_s30_example.png"
+  },
+  {
+    "index": 37,
+    "slide_id": "s31_cta",
+    "file": "cursor_specs/assets/slides/37_s31_cta.png"
+  },
+  {
+    "index": 38,
+    "slide_id": "s30a_diversification_cta",
+    "file": "cursor_specs/assets/slides/38_s30a_diversification_cta.png"
+  }
+]
