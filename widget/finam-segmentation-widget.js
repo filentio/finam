@@ -6802,10 +6802,7 @@
     }
 
     var rect = root.getBoundingClientRect();
-    var topOffset =
-      rect && isFinite(rect.top)
-        ? Math.max(0, Math.min(24, rect.top))
-        : 0;
+    var topOffset = rect && isFinite(rect.top) ? Math.max(0, rect.top) : 0;
     var availableHeight = Math.max(1, Math.round(viewportHeight - topOffset));
     root.style.setProperty("--segw-viewport-height", availableHeight + "px");
   }
@@ -7834,7 +7831,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.30";
+  window.FinamSegmentationWidget.version = "1.0.31";
 
   ensureStyles();
   initExistingWidgets();
