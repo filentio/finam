@@ -13,6 +13,10 @@
     onboardingMode: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-mode") : null,
     openInNewTab:
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-open-in-new-tab") === "true",
+    fullscreen:
+      SCRIPT_REF &&
+      (SCRIPT_REF.getAttribute("data-fullscreen") === "true" ||
+        SCRIPT_REF.getAttribute("data-segw-fullscreen") === "true"),
     onboardingBaseUrl: SCRIPT_REF
       ? SCRIPT_REF.getAttribute("data-onboarding-url") ||
         SCRIPT_REF.getAttribute("data-onboarding-base-url")
@@ -7751,6 +7755,25 @@
       return null;
     }
 
+    if (WIDGET_OPTIONS.fullscreen) {
+      targetElement.style.position = "fixed";
+      targetElement.style.inset = "0";
+      targetElement.style.width = "100vw";
+      targetElement.style.height = "100vh";
+      targetElement.style.maxHeight = "100vh";
+      targetElement.style.margin = "0";
+      targetElement.style.padding = "0";
+      targetElement.style.overflow = "hidden";
+      targetElement.style.zIndex = "2147483000";
+      if (document.documentElement) {
+        document.documentElement.style.overflow = "hidden";
+      }
+      if (document.body) {
+        document.body.style.margin = "0";
+        document.body.style.overflow = "hidden";
+      }
+    }
+
     if (replaceContent) {
       targetElement.innerHTML = "";
     }
@@ -7951,7 +7974,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.33";
+  window.FinamSegmentationWidget.version = "1.0.34";
 
   ensureStyles();
   initExistingWidgets();
