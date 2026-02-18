@@ -720,6 +720,70 @@
   padding: 0 14px;
 }
 
+.segw.segw--compact .segw__seg-story-header {
+  padding: 10px 12px 6px;
+}
+
+.segw.segw--compact .segw__seg-story-progress {
+  padding: 0 12px 6px;
+}
+
+.segw.segw--compact .segw__seg-story-content {
+  padding: 6px 12px 10px;
+}
+
+.segw.segw--compact .segw__seg-intro-emoji,
+.segw.segw--compact .segw__seg-result-emoji {
+  font-size: 46px;
+  margin-bottom: 10px;
+}
+
+.segw.segw--compact .segw__seg-intro-title,
+.segw.segw--compact .segw__seg-result-title {
+  margin-bottom: 8px;
+  font-size: 24px;
+}
+
+.segw.segw--compact .segw__seg-intro-subtitle {
+  margin-bottom: 10px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.segw.segw--compact .segw__seg-intro-card,
+.segw.segw--compact .segw__seg-result-card {
+  margin-bottom: 10px;
+  padding: 12px;
+}
+
+.segw.segw--compact .segw__seg-benefits {
+  gap: 8px;
+}
+
+.segw.segw--compact .segw__seg-benefits li {
+  font-size: 14px;
+}
+
+.segw.segw--compact .segw__seg-intro-time {
+  margin-bottom: 8px;
+}
+
+.segw.segw--compact .segw__seg-story-footer {
+  padding: 10px 12px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.segw.segw--compact .segw__seg-story-next,
+.segw.segw--compact .segw__seg-cta {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+.segw.segw--tight .segw__seg-intro-card,
+.segw.segw--tight .segw__seg-intro-time {
+  display: none;
+}
+
 .segw__questionnaire.is-hidden {
   display: none;
 }
@@ -2240,6 +2304,49 @@
   background: #9eb6eb;
   color: #fff;
   opacity: 0.65;
+}
+
+.segw.segw--compact .segw__story-header-layout {
+  padding: 10px 12px 6px;
+  gap: 6px;
+}
+
+.segw.segw--compact .segw__story-content {
+  padding: 10px 12px;
+}
+
+.segw.segw--compact .segw__story-footer {
+  padding: 6px 12px 0;
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--app-bottom-bar) + 12px);
+}
+
+.segw.segw--compact .segw__story-next {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+.segw.segw--compact .segw__onboarding-step-title,
+.segw.segw--compact .segw__quiz-intro-title,
+.segw.segw--compact .segw__quiz-result-title,
+.segw.segw--compact .segw__lesson1-title,
+.segw.segw--compact .segw__lesson2-title,
+.segw.segw--compact .segw__lesson3-title,
+.segw.segw--compact .segw__lesson4-title,
+.segw.segw--compact .segw__lesson5-title,
+.segw.segw--compact .segw__lesson6-title {
+  font-size: 20px;
+}
+
+.segw.segw--compact .segw__onboarding-step-text,
+.segw.segw--compact .segw__lesson1-subtitle,
+.segw.segw--compact .segw__lesson1-body,
+.segw.segw--compact .segw__lesson2-text,
+.segw.segw--compact .segw__lesson3-text,
+.segw.segw--compact .segw__lesson4-text,
+.segw.segw--compact .segw__lesson5-text,
+.segw.segw--compact .segw__lesson6-text {
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 .segw__onboarding-meta {
@@ -6814,6 +6921,10 @@
     root.style.height = availableHeight + "px";
     root.style.maxHeight = availableHeight + "px";
     root.style.overflow = "hidden";
+    if (root.classList) {
+      root.classList.toggle("segw--compact", availableHeight <= 620);
+      root.classList.toggle("segw--tight", availableHeight <= 520);
+    }
   }
 
   function bindViewportHeight(root) {
@@ -7840,7 +7951,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.32";
+  window.FinamSegmentationWidget.version = "1.0.33";
 
   ensureStyles();
   initExistingWidgets();
