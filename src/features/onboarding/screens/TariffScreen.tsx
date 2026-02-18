@@ -1,13 +1,29 @@
-import { FINAM_TARIFFS, TARIFF_ORDER } from "../data/tariffs";
+import {
+  CALCULATOR_DEFAULTS,
+  calculateTariffCosts,
+  FINAM_TARIFFS,
+  TARIFF_ORDER,
+} from "../data/tariffs";
 import { usePersonalization } from "../hooks/usePersonalization";
-import type { TariffId } from "../types/onboarding";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
 
 export function TariffScreen({ screen }: BaseScreenProps) {
-  const { segment } = usePersonalization();
-  const recommendedTariff: TariffId =
-    segment === "expert" ? "strategist" : segment === "advanced" ? "investor" : "long-term";
+  const { segment, amountTier } = usePersonalization();
+
+  const portfolioAmountMap = {
+    starter: 30_000,
+    base: 500_000,
+    extended: 2_000_000,
+    premium: 5_000_000,
+  } as const;
+  const portfolioAmount = portfolioAmountMap[amountTier];
+  const tradesPerMonth = CALCULATOR_DEFAULTS[segment].trades_per_month ?? 2;
+  const recommendedTariff = calculateTariffCosts({
+    portfolio_amount: portfolioAmount,
+    trades_per_month: tradesPerMonth,
+    avg_trade_amount: portfolioAmount / 10,
+  }).recommended;
 
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>

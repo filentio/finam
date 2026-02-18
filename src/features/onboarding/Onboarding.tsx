@@ -615,7 +615,9 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
           <div className="ob-layout-safe">
             <section className="ob-route-prep">
               <div className="ob-complete-check" aria-hidden="true">
-                ✓
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 12.5L10 17L19 8" />
+                </svg>
               </div>
               <h2>Маршрут завершён</h2>
               <p>Вы прошли онбординг. Можно перейти к первому действию в приложении.</p>
@@ -680,7 +682,15 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
                       setShowHub(false);
                     }}
                   >
-                    <span className="ob-hub__lesson-mark">{isCompleted ? "✓" : lesson.stepIndex + 1}</span>
+                    <span className="ob-hub__lesson-mark">
+                      {isCompleted ? (
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M5 12.5L10 17L19 8" />
+                        </svg>
+                      ) : (
+                        lesson.stepIndex + 1
+                      )}
+                    </span>
                     <span className="ob-hub__lesson-body">
                       <strong>{lesson.lessonTitle}</strong>
                       <small>

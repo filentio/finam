@@ -8,7 +8,7 @@ export type TransitionPreset =
   | "quiz_enter"
   | "result_enter";
 
-interface OnboardingLayoutProps {
+interface StepLayoutProps {
   progress: ProgressInfo;
   stepLabel: string;
   background: string;
@@ -44,7 +44,7 @@ function getTransitionClass(preset: TransitionPreset, direction: 1 | -1): string
   return "ob-transition--result-enter";
 }
 
-export function OnboardingLayout({
+export function StepLayout({
   progress,
   stepLabel,
   background,
@@ -62,13 +62,13 @@ export function OnboardingLayout({
   quizMode = false,
   showTapHint = false,
   children,
-}: OnboardingLayoutProps) {
+}: StepLayoutProps) {
   const isScreenCounter = /^\d+\/\d+$/.test(stepLabel);
 
   return (
     <div className="ob-layout-root">
       <section className={`ob-layout-frame ${quizMode ? "ob-layout-frame--quiz" : ""}`} style={{ background }}>
-        <div className="ob-layout-safe">
+        <div className={`ob-layout-safe ${showFooter ? "ob-layout-safe--with-footer" : ""}`}>
           <header className="ob-layout-header">
             <div className="ob-layout-header__top">
               <p className={`ob-layout-step-label ${isScreenCounter ? "ob-layout-step-label--counter" : ""}`}>
@@ -86,31 +86,33 @@ export function OnboardingLayout({
             <ProgressBar progress={progress} />
           </header>
 
-          <div className="ob-layout-screen-wrap">
-            <div
-              key={transitionKey}
-              className={`ob-layout-screen ${getTransitionClass(transitionPreset, direction)}`}
-            >
-              {children}
+          <div className={`ob-layout-content ${showFooter ? "ob-layout-content--with-footer" : ""}`}>
+            <div className="ob-layout-screen-wrap">
+              <div
+                key={transitionKey}
+                className={`ob-layout-screen ${getTransitionClass(transitionPreset, direction)}`}
+              >
+                {children}
+              </div>
             </div>
-          </div>
 
-          {enableTapNavigation ? (
-            <div className="ob-layout-tap-zones" aria-hidden="true">
-              <button
-                type="button"
-                className="ob-layout-tap-zone ob-layout-tap-zone--prev"
-                onClick={onPrev}
-                tabIndex={-1}
-              />
-              <button
-                type="button"
-                className="ob-layout-tap-zone ob-layout-tap-zone--next"
-                onClick={onNext}
-                tabIndex={-1}
-              />
-            </div>
-          ) : null}
+            {enableTapNavigation ? (
+              <div className="ob-layout-tap-zones" aria-hidden="true">
+                <button
+                  type="button"
+                  className="ob-layout-tap-zone ob-layout-tap-zone--prev"
+                  onClick={onPrev}
+                  tabIndex={-1}
+                />
+                <button
+                  type="button"
+                  className="ob-layout-tap-zone ob-layout-tap-zone--next"
+                  onClick={onNext}
+                  tabIndex={-1}
+                />
+              </div>
+            ) : null}
+          </div>
 
           {showFooter ? (
             <footer className={`ob-layout-footer ${quizMode ? "ob-layout-footer--quiz" : ""}`}>
@@ -135,4 +137,6 @@ export function OnboardingLayout({
     </div>
   );
 }
+
+export const OnboardingLayout = StepLayout;
 

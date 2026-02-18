@@ -9,6 +9,17 @@ export function CTAScreen({ screen, onNext, onPrev }: BaseScreenProps) {
   const { getDeeplink } = usePersonalization();
   const ctas = screen.cta ?? [{ label: "Продолжить", type: "primary", action: "next_screen" }];
 
+  const getVisualType = (cta: CTAConfig): "primary" | "secondary" => {
+    const normalized = cta.label.toLowerCase();
+    if (normalized.includes("купить")) {
+      return "primary";
+    }
+    if (normalized.includes("продолж")) {
+      return "secondary";
+    }
+    return cta.type === "primary" ? "primary" : "secondary";
+  };
+
   const handleCTA = (cta: CTAConfig) => {
     if (cta.action === "deeplink") {
       const target = getDeeplink(cta.deeplink ?? "", cta.deeplink_variants);
@@ -37,7 +48,7 @@ export function CTAScreen({ screen, onNext, onPrev }: BaseScreenProps) {
             key={cta.label}
             type="button"
             onClick={() => handleCTA(cta)}
-            className={cta.type === "primary" ? "is-primary" : "is-secondary"}
+            className={getVisualType(cta) === "primary" ? "is-primary" : "is-secondary"}
             aria-label={cta.label}
           >
             {cta.label}

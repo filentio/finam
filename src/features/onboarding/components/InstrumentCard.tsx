@@ -8,9 +8,9 @@ interface InstrumentCardProps {
 }
 
 const RISK_COLORS: Record<InstrumentCardProps["riskLevel"], string> = {
-  low: "#2d8b57",
-  medium: "#b87e14",
-  high: "#c13f3f",
+  low: "var(--ob-risk-low)",
+  medium: "var(--ob-risk-medium)",
+  high: "var(--ob-risk-high)",
 };
 
 const RISK_LABELS: Record<InstrumentCardProps["riskLevel"], string> = {
@@ -26,29 +26,17 @@ export function InstrumentCard({
   highlighted = false,
 }: InstrumentCardProps) {
   return (
-    <article
-      style={{
-        borderRadius: 12,
-        border: `1px solid ${highlighted ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.22)"}`,
-        background: highlighted ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.1)",
-        padding: 10,
-        display: "grid",
-        gap: 6,
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-        <h4 style={{ margin: 0, fontSize: 16 }}>{title}</h4>
+    <article className={`ob-instrument-card ${highlighted ? "is-highlighted" : ""}`}>
+      <div className="ob-instrument-card__head">
+        <h4 className="ob-instrument-card__title">{title}</h4>
         <span
-          style={{
-            color: RISK_COLORS[riskLevel],
-            fontSize: 12,
-            fontWeight: 600,
-          }}
+          className="ob-instrument-card__risk"
+          style={{ color: RISK_COLORS[riskLevel] }}
         >
           {RISK_LABELS[riskLevel]}
         </span>
       </div>
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.82)", fontSize: 13 }}>{description}</p>
+      <p className="ob-instrument-card__description">{description}</p>
       {highlighted ? <HighlightBadge /> : null}
     </article>
   );

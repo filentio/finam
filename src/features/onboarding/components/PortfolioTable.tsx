@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import type { PortfolioItem } from "../types/onboarding";
 
 interface PortfolioTableProps {
@@ -7,23 +6,23 @@ interface PortfolioTableProps {
 
 export function PortfolioTable({ items }: PortfolioTableProps) {
   return (
-    <div style={{ overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <div className="ob-portfolio-table-wrap">
+      <table className="ob-portfolio-table">
         <thead>
           <tr>
-            <th style={thStyle}>Инструмент</th>
-            <th style={thStyle}>Тикер</th>
-            <th style={thStyle}>Сумма</th>
-            <th style={thStyle}>Доля</th>
+            <th className="ob-portfolio-table__th">Инструмент</th>
+            <th className="ob-portfolio-table__th">Тикер</th>
+            <th className="ob-portfolio-table__th">Сумма</th>
+            <th className="ob-portfolio-table__th">Доля</th>
           </tr>
         </thead>
         <tbody>
           {items.map((item) => (
             <tr key={`${item.ticker}-${item.deeplink}`}>
-              <td style={tdStyle}>{item.instrument}</td>
-              <td style={tdStyle}>{item.ticker}</td>
-              <td style={tdStyle}>{item.amount.toLocaleString("ru-RU")} ₽</td>
-              <td style={tdStyle}>{item.share_pct}%</td>
+              <td className="ob-portfolio-table__td">{item.instrument}</td>
+              <td className="ob-portfolio-table__td">{item.ticker}</td>
+              <td className="ob-portfolio-table__td">{item.amount.toLocaleString("ru-RU")} ₽</td>
+              <td className="ob-portfolio-table__td">{item.share_pct}%</td>
             </tr>
           ))}
         </tbody>
@@ -31,18 +30,3 @@ export function PortfolioTable({ items }: PortfolioTableProps) {
     </div>
   );
 }
-
-const thStyle: CSSProperties = {
-  textAlign: "left",
-  fontSize: 11,
-  color: "rgba(255,255,255,0.72)",
-  borderBottom: "1px solid rgba(255,255,255,0.22)",
-  padding: "6px 4px",
-};
-
-const tdStyle: CSSProperties = {
-  fontSize: 12,
-  color: "rgba(255,255,255,0.9)",
-  borderBottom: "1px solid rgba(255,255,255,0.12)",
-  padding: "6px 4px",
-};

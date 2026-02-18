@@ -6,15 +6,17 @@ export function HeroScreen({ screen, screenCount = 1 }: BaseScreenProps) {
 
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
-      <div className="ob-hero-meta" aria-label="Метаданные урока">
-        <span>~{estimatedMinutes} мин</span>
-        <span>{screenCount} экранов</span>
-      </div>
-      {screen.visual ? (
-        <div className="ob-route-prep__icon" aria-hidden="true">
-          {screen.visual}
+      <div className="ob-hero-content">
+        <div className="ob-hero-meta" aria-label="Метаданные урока">
+          <span>~{estimatedMinutes} мин</span>
+          <span>{screenCount} экранов</span>
         </div>
-      ) : null}
+        {screen.visual ? (
+          <div className="ob-route-prep__icon" aria-hidden="true">
+            {screen.visual}
+          </div>
+        ) : null}
+      </div>
     </ScreenShell>
   );
 }

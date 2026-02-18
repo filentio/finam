@@ -23,7 +23,7 @@ export function SpectrumScreen({ screen }: BaseScreenProps) {
 
   return (
     <ScreenShell title={screen.title} subtitle={leadText ?? screen.subtitle}>
-      <div style={{ display: "grid", gap: 8 }}>
+      <div className="ob-risk-cards">
         {Object.entries(DESCRIPTIONS).map(([profile, description]) => (
           <RiskCard
             key={profile}

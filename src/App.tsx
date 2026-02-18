@@ -243,7 +243,7 @@ function App() {
             <div className="summary-screen__icon" aria-hidden="true">
               🚀
             </div>
-            <h2>Ваш план обучения</h2>
+            <h2>Ваш путь определён</h2>
             <p>Мы подготовили персональную программу для вашего профиля.</p>
 
             <div className="summary-screen__steps">

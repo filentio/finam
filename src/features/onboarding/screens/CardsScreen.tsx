@@ -83,7 +83,7 @@ export function CardsScreen({
         <span className="ob-cards-legend__item is-medium">Средний риск</span>
         <span className="ob-cards-legend__item is-high">Высокий риск</span>
       </div>
-      <div style={{ display: "grid", gap: 6 }}>
+      <div className="ob-cards-list">
         {configuredCards.map((card, index) => (
           <div
             key={card.key}
@@ -103,9 +103,7 @@ export function CardsScreen({
         ))}
       </div>
       {goalAccent?.text ? (
-        <div className="ob-card" style={{ color: "rgba(255,255,255,0.9)", fontSize: 13 }}>
-          {goalAccent.text}
-        </div>
+        <div className="ob-card ob-goal-accent">{goalAccent.text}</div>
       ) : null}
       {showDisclaimer ? <Disclaimer /> : null}
     </ScreenShell>

@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import type { RiskProfile } from "../types/onboarding";
 import { ScreenShell } from "./ScreenShell";
 
-const CONFETTI_COLORS = ["#ffffff", "#7dd3fc", "#86efac", "#fde047", "#fca5a5", "#c4b5fd"];
+const CONFETTI_COLORS = ["#93c5fd", "#60a5fa", "#86efac", "#fde047", "#fca5a5", "#c4b5fd"];
 
 interface ProfilePresentation {
   name: string;
