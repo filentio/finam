@@ -57,6 +57,7 @@
   --segw-primary-soft: rgba(26, 86, 219, 0.08);
   --segw-text: var(--text-primary);
   --segw-muted: var(--text-secondary);
+  --segw-viewport-height: 100svh;
   font-family:
     Inter,
     system-ui,
@@ -349,8 +350,9 @@
 .segw__seg-story-frame {
   width: 100%;
   max-width: 480px;
-  min-height: 100svh;
-  height: 100svh;
+  min-height: var(--segw-viewport-height);
+  height: var(--segw-viewport-height);
+  max-height: var(--segw-viewport-height);
   border-radius: 16px;
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   color: #fff;
@@ -888,7 +890,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 100svh;
+  min-height: var(--segw-viewport-height);
+  height: var(--segw-viewport-height);
   background: #fff;
   padding: 0;
 }
@@ -896,9 +899,9 @@
 .segw__story-frame {
   width: 100%;
   max-width: 480px;
-  height: 100svh;
-  max-height: 100svh;
-  min-height: 100svh;
+  height: var(--segw-viewport-height);
+  max-height: var(--segw-viewport-height);
+  min-height: var(--segw-viewport-height);
   margin: 0 auto;
   position: relative;
   overflow: hidden;
@@ -2636,9 +2639,9 @@
   }
 
   .segw__story-frame {
-    min-height: 100svh;
-    height: 100svh;
-    max-height: 100svh;
+    min-height: var(--segw-viewport-height);
+    height: var(--segw-viewport-height);
+    max-height: var(--segw-viewport-height);
     border-radius: 16px;
     box-shadow: none;
   }
@@ -2651,14 +2654,16 @@
 
   .segw__seg-story-frame {
     max-width: none;
-    min-height: 100svh;
-    height: 100svh;
+    min-height: var(--segw-viewport-height);
+    height: var(--segw-viewport-height);
+    max-height: var(--segw-viewport-height);
     border-radius: 16px;
     box-shadow: none;
   }
 
   .segw__story-wrapper {
-    min-height: 100svh;
+    min-height: var(--segw-viewport-height);
+    height: var(--segw-viewport-height);
     padding: 0;
     border-radius: 0;
     background: #fff;
@@ -2667,8 +2672,9 @@
   .segw__story-frame {
     max-width: none;
     border-radius: 16px;
-    min-height: 100svh;
-    height: 100svh;
+    min-height: var(--segw-viewport-height);
+    height: var(--segw-viewport-height);
+    max-height: var(--segw-viewport-height);
   }
 
   .segw__onboarding-footer {
@@ -6759,11 +6765,84 @@
     }
   }
 
+  function getSegwViewportHeight() {
+    if (
+      window.visualViewport &&
+      typeof window.visualViewport.height === "number" &&
+      isFinite(window.visualViewport.height) &&
+      window.visualViewport.height > 0
+    ) {
+      return window.visualViewport.height;
+    }
+
+    if (typeof window.innerHeight === "number" && isFinite(window.innerHeight) && window.innerHeight > 0) {
+      return window.innerHeight;
+    }
+
+    if (
+      document.documentElement &&
+      typeof document.documentElement.clientHeight === "number" &&
+      isFinite(document.documentElement.clientHeight) &&
+      document.documentElement.clientHeight > 0
+    ) {
+      return document.documentElement.clientHeight;
+    }
+
+    return 0;
+  }
+
+  function applyViewportHeight(root) {
+    if (!root || !root.style || typeof root.getBoundingClientRect !== "function") {
+      return;
+    }
+
+    var viewportHeight = getSegwViewportHeight();
+    if (!viewportHeight) {
+      return;
+    }
+
+    var rect = root.getBoundingClientRect();
+    var topOffset = rect && isFinite(rect.top) ? Math.max(0, rect.top) : 0;
+    var availableHeight = Math.max(1, Math.round(viewportHeight - topOffset));
+    root.style.setProperty("--segw-viewport-height", availableHeight + "px");
+  }
+
+  function bindViewportHeight(root) {
+    if (!root || root.__segwViewportBound) {
+      return;
+    }
+    root.__segwViewportBound = true;
+
+    var rafId = 0;
+    var schedule = function () {
+      if (rafId) {
+        return;
+      }
+      rafId = window.requestAnimationFrame(function () {
+        rafId = 0;
+        applyViewportHeight(root);
+      });
+    };
+
+    applyViewportHeight(root);
+    window.addEventListener("resize", schedule);
+    window.addEventListener("orientationchange", schedule);
+    window.addEventListener("scroll", schedule, { passive: true });
+    if (
+      window.visualViewport &&
+      typeof window.visualViewport.addEventListener === "function"
+    ) {
+      window.visualViewport.addEventListener("resize", schedule);
+      window.visualViewport.addEventListener("scroll", schedule);
+    }
+  }
+
   function initWidget(root) {
     if (!root || root.getAttribute("data-segw-initialized") === "true") {
       return root;
     }
     root.setAttribute("data-segw-initialized", "true");
+    bindViewportHeight(root);
 
     var state = {
       qualifiedInvestor: null,
@@ -7746,7 +7825,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.27";
+  window.FinamSegmentationWidget.version = "1.0.28";
 
   ensureStyles();
   initExistingWidgets();
