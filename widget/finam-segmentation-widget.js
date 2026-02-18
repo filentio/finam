@@ -1,7 +1,27 @@
 (function () {
   "use strict";
 
-  var SCRIPT_REF = document.currentScript || null;
+  function resolveScriptRef() {
+    if (document.currentScript) {
+      return document.currentScript;
+    }
+
+    var scripts = document.getElementsByTagName("script");
+    for (var i = scripts.length - 1; i >= 0; i -= 1) {
+      var src = scripts[i].getAttribute("src") || "";
+      if (src.indexOf("finam-segmentation-widget.js") !== -1) {
+        return scripts[i];
+      }
+    }
+
+    return null;
+  }
+
+  function readBoolAttr(script, attrName) {
+    return Boolean(script && script.getAttribute(attrName) === "true");
+  }
+
+  var SCRIPT_REF = resolveScriptRef();
   var STYLE_ID = "finam-segmentation-widget-style-v1";
   var SCRIPT_MOUNTED_ATTR = "data-segw-mounted";
   var WIDGET_ROOT_ATTR = "data-segmentation-widget";
@@ -13,10 +33,9 @@
     onboardingMode: SCRIPT_REF ? SCRIPT_REF.getAttribute("data-onboarding-mode") : null,
     openInNewTab:
       SCRIPT_REF && SCRIPT_REF.getAttribute("data-open-in-new-tab") === "true",
-    fullscreen:
-      SCRIPT_REF &&
-      (SCRIPT_REF.getAttribute("data-fullscreen") === "true" ||
-        SCRIPT_REF.getAttribute("data-segw-fullscreen") === "true"),
+    fullscreen: readBoolAttr(SCRIPT_REF, "data-fullscreen") || readBoolAttr(SCRIPT_REF, "data-segw-fullscreen"),
+    disableFullscreen:
+      readBoolAttr(SCRIPT_REF, "data-disable-fullscreen") || readBoolAttr(SCRIPT_REF, "data-segw-disable-fullscreen"),
     onboardingBaseUrl: SCRIPT_REF
       ? SCRIPT_REF.getAttribute("data-onboarding-url") ||
         SCRIPT_REF.getAttribute("data-onboarding-base-url")
@@ -786,6 +805,33 @@
 .segw.segw--tight .segw__seg-intro-card,
 .segw.segw--tight .segw__seg-intro-time {
   display: none;
+}
+
+.segw.segw--ultra-tight .segw__seg-story-header {
+  padding: 8px 10px 4px;
+}
+
+.segw.segw--ultra-tight .segw__seg-story-progress {
+  padding: 0 10px 4px;
+}
+
+.segw.segw--ultra-tight .segw__seg-story-content {
+  padding: 4px 10px 8px;
+}
+
+.segw.segw--ultra-tight .segw__seg-intro-title,
+.segw.segw--ultra-tight .segw__seg-result-title {
+  font-size: 22px;
+}
+
+.segw.segw--ultra-tight .segw__seg-intro-subtitle {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.segw.segw--ultra-tight .segw__seg-story-footer {
+  padding: 8px 10px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
 }
 
 .segw__questionnaire.is-hidden {
@@ -2351,6 +2397,24 @@
 .segw.segw--compact .segw__lesson6-text {
   font-size: 15px;
   line-height: 1.4;
+}
+
+.segw.segw--ultra-tight .segw__story-header-layout {
+  padding: 8px 10px 4px;
+}
+
+.segw.segw--ultra-tight .segw__story-content {
+  padding: 8px 10px;
+}
+
+.segw.segw--ultra-tight .segw__story-footer {
+  padding: 4px 10px 0;
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--app-bottom-bar) + 10px);
+}
+
+.segw.segw--ultra-tight .segw__story-next {
+  min-height: 42px;
+  font-size: 14px;
 }
 
 .segw__onboarding-meta {
@@ -6926,8 +6990,9 @@
     root.style.maxHeight = availableHeight + "px";
     root.style.overflow = "hidden";
     if (root.classList) {
-      root.classList.toggle("segw--compact", availableHeight <= 620);
-      root.classList.toggle("segw--tight", availableHeight <= 520);
+      root.classList.toggle("segw--compact", availableHeight <= 700);
+      root.classList.toggle("segw--tight", availableHeight <= 620);
+      root.classList.toggle("segw--ultra-tight", availableHeight <= 540);
     }
   }
 
@@ -7750,12 +7815,33 @@
     return root;
   }
 
+  function shouldMountFullscreen(targetElement) {
+    if (WIDGET_OPTIONS.disableFullscreen) {
+      return false;
+    }
+
+    if (WIDGET_OPTIONS.fullscreen) {
+      return true;
+    }
+
+    var isDefaultHost = Boolean(targetElement && targetElement.id === "finam-segmentation-widget");
+    if (!isDefaultHost) {
+      return false;
+    }
+
+    var viewportWidth =
+      (window.visualViewport && window.visualViewport.width) ||
+      window.innerWidth ||
+      (document.documentElement ? document.documentElement.clientWidth : 0);
+    return viewportWidth > 0 && viewportWidth <= 768;
+  }
+
   function mountInto(targetElement, replaceContent) {
     if (!targetElement) {
       return null;
     }
 
-    if (WIDGET_OPTIONS.fullscreen) {
+    if (shouldMountFullscreen(targetElement)) {
       targetElement.style.position = "fixed";
       targetElement.style.inset = "0";
       targetElement.style.width = "100vw";
@@ -7974,7 +8060,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.34";
+  window.FinamSegmentationWidget.version = "1.0.35";
 
   ensureStyles();
   initExistingWidgets();
