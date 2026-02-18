@@ -9,6 +9,8 @@ import { getVisibleScreens } from "./hooks/useOnboardingState";
 import { usePersonalization } from "./hooks/usePersonalization";
 import { normalizeDOSInput } from "./hooks/useSegmentation";
 import { OnboardingLayout, type TransitionPreset } from "./components/OnboardingLayout";
+import { PrimaryButton } from "./components/PrimaryButton";
+import { SuccessState } from "./components/SuccessState";
 import { HeroScreen } from "./screens/HeroScreen";
 import { ContentScreen } from "./screens/ContentScreen";
 import { StepsScreen } from "./screens/StepsScreen";
@@ -598,9 +600,9 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
               <div className="ob-route-prep__icon">⏸️</div>
               <h2>Обучение на паузе</h2>
               <p>Продолжим с того же места, где вы остановились.</p>
-              <button type="button" className="btn-primary" onClick={() => dispatch({ type: "RESUME" })}>
+              <PrimaryButton onClick={() => dispatch({ type: "RESUME" })}>
                 Продолжить
-              </button>
+              </PrimaryButton>
             </section>
           </div>
         </section>
@@ -613,15 +615,10 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
       <div className="ob-layout-root">
         <section className="ob-layout-frame" style={{ background: STEP_BACKGROUNDS.first_purchase }}>
           <div className="ob-layout-safe">
-            <section className="ob-route-prep">
-              <div className="ob-complete-check" aria-hidden="true">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 12.5L10 17L19 8" />
-                </svg>
-              </div>
-              <h2>Маршрут завершён</h2>
-              <p>Вы прошли онбординг. Можно перейти к первому действию в приложении.</p>
-            </section>
+            <SuccessState
+              title="Маршрут завершён"
+              description="Вы прошли онбординг. Можно перейти к первому действию в приложении."
+            />
           </div>
         </section>
       </div>
@@ -704,8 +701,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
             </div>
 
             <footer className="ob-hub__footer">
-              <button
-                type="button"
+              <PrimaryButton
                 className="ob-layout-next"
                 onClick={() => {
                   if (nextLesson) {
@@ -718,7 +714,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
                 }}
               >
                 {completedLessonsCount === 0 ? "Начать обучение" : "Продолжить"}
-              </button>
+              </PrimaryButton>
             </footer>
           </div>
         </section>

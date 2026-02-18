@@ -8,10 +8,10 @@ export function PieChart({ allocation }: PieChartProps) {
   const { stocks_pct, bonds_pct, alternatives_pct, cash_pct } = allocation;
 
   const gradient = `conic-gradient(
-    #60a5fa 0 ${stocks_pct}%,
-    #34d399 ${stocks_pct}% ${stocks_pct + bonds_pct}%,
-    #fbbf24 ${stocks_pct + bonds_pct}% ${stocks_pct + bonds_pct + alternatives_pct}%,
-    #c4b5fd ${stocks_pct + bonds_pct + alternatives_pct}% ${stocks_pct + bonds_pct + alternatives_pct + cash_pct}%
+    #2F5BCC 0 ${stocks_pct}%,
+    #3BB273 ${stocks_pct}% ${stocks_pct + bonds_pct}%,
+    #95A8DB ${stocks_pct + bonds_pct}% ${stocks_pct + bonds_pct + alternatives_pct}%,
+    #C9D3EE ${stocks_pct + bonds_pct + alternatives_pct}% ${stocks_pct + bonds_pct + alternatives_pct + cash_pct}%
   )`;
 
   return (

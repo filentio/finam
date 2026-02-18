@@ -54,11 +54,6 @@ export function ProgressBar({ progress }: ProgressBarProps) {
           </div>
         ))}
       </div>
-
-      <div className="ob-progress__meta">
-        <span>{progress.currentStepLabel}</span>
-        <span>{progressPercent}%</span>
-      </div>
     </div>
   );
 }

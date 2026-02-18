@@ -1,4 +1,5 @@
 import type { Segment } from "../types/onboarding";
+import { PrimaryButton } from "../components/PrimaryButton";
 
 interface RoutePreparationScreenProps {
   segment: Segment;
@@ -21,9 +22,9 @@ export function RoutePreparationScreen({ segment, onStart }: RoutePreparationScr
       </div>
       <h2>Мы подобрали для вас персональный маршрут</h2>
       <p>{SEGMENT_DESCRIPTION[segment]}</p>
-      <button type="button" className="btn-primary" onClick={onStart}>
+      <PrimaryButton onClick={onStart}>
         Начать обучение
-      </button>
+      </PrimaryButton>
     </section>
   );
 }

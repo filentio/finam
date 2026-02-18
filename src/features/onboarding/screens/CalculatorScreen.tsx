@@ -1,4 +1,5 @@
 import { FINAM_TARIFFS, TARIFF_ORDER } from "../data/tariffs";
+import { StepCard } from "../components/StepCard";
 import type { CalculatorScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
 
@@ -13,9 +14,10 @@ export function CalculatorScreen({
           const values = calculatorOutput.tariffs[tariffId];
           const isRecommended = calculatorOutput.recommended === tariffId;
           return (
-            <article
+            <StepCard
               key={tariffId}
-              className={`ob-card ob-calculator-card ${isRecommended ? "is-recommended" : ""}`}
+              as="article"
+              className={`ob-calculator-card ${isRecommended ? "is-recommended" : ""}`}
             >
               <h4 className="ob-tariff-card__title">{FINAM_TARIFFS[tariffId].name}</h4>
               <p className="ob-tariff-card__meta">
@@ -27,7 +29,7 @@ export function CalculatorScreen({
               <p className="ob-tariff-card__total">
                 Итого за год: {values.total.toLocaleString("ru-RU")} ₽
               </p>
-            </article>
+            </StepCard>
           );
         })}
       </div>

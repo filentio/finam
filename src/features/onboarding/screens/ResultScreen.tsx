@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import type { RiskProfile } from "../types/onboarding";
 import { ScreenShell } from "./ScreenShell";
 
-const CONFETTI_COLORS = ["#93c5fd", "#60a5fa", "#86efac", "#fde047", "#fca5a5", "#c4b5fd"];
+const CONFETTI_COLORS = ["#2F5BCC", "#5F7EDD", "#8EA4E9", "#3BB273", "#8FD8B7", "#C8D3F2"];
 
 interface ProfilePresentation {
   name: string;
@@ -18,25 +18,25 @@ function getProfilePresentation(profile: RiskProfile): ProfilePresentation {
     conservative: {
       name: "Консервативный",
       emoji: "🛡️",
-      color: "#2196F3",
+      color: "#2F5BCC",
       description: "Приоритет — сохранение капитала и стабильный доход.",
     },
     moderate: {
       name: "Умеренный",
       emoji: "⚖️",
-      color: "#4CAF50",
+      color: "#3BB273",
       description: "Баланс между ростом и защитой капитала.",
     },
     aggressive: {
       name: "Агрессивный",
       emoji: "🚀",
-      color: "#FF9800",
+      color: "#5F7EDD",
       description: "Приоритет — максимальный рост капитала.",
     },
     ultra_aggressive: {
       name: "Сверхагрессивный",
       emoji: "⚡",
-      color: "#F44336",
+      color: "#274FB1",
       description: "Готовность к высоким рискам ради высокой доходности.",
     },
   };

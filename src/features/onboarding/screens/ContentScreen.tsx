@@ -1,4 +1,5 @@
 import { usePersonalization } from "../hooks/usePersonalization";
+import { StepCard } from "../components/StepCard";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
 import { Disclaimer } from "../../../components/Disclaimer";
@@ -28,8 +29,12 @@ export function ContentScreen({ screen }: BaseScreenProps) {
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
       {text ? <p className="ob-screen__subtitle">{text}</p> : null}
-      {activeVariant?.highlight ? <p className="ob-card">{activeVariant.highlight}</p> : null}
-      {activeVariant?.tip ? <p className="ob-screen__subtitle">💡 {activeVariant.tip}</p> : null}
+      {activeVariant?.highlight ? <StepCard as="div">{activeVariant.highlight}</StepCard> : null}
+      {activeVariant?.tip ? (
+        <StepCard as="div" className="ob-content-tip">
+          💡 {activeVariant.tip}
+        </StepCard>
+      ) : null}
       {screen.key_points?.length ? (
         <ul className="ob-points">
           {screen.key_points.slice(0, 4).map((point) => (

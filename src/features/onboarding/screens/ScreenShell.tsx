@@ -4,6 +4,7 @@ interface ScreenShellProps {
   title: string;
   subtitle?: string;
   scrollable?: boolean;
+  centered?: boolean;
   className?: string;
   children: ReactNode;
 }
@@ -12,12 +13,16 @@ export function ScreenShell({
   title,
   subtitle,
   scrollable = false,
+  centered = false,
   className,
   children,
 }: ScreenShellProps) {
   const classes = ["ob-screen"];
   if (scrollable) {
     classes.push("ob-screen--scrollable");
+  }
+  if (centered) {
+    classes.push("ob-screen--centered");
   }
   if (className) {
     classes.push(className);

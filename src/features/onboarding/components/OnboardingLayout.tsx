@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { ProgressBar } from "./ProgressBar";
 import type { ProgressInfo } from "../types/onboarding";
+import { OnboardingHeader } from "./OnboardingHeader";
+import { PrimaryButton } from "./PrimaryButton";
 
 export type TransitionPreset =
   | "screen_to_screen"
@@ -63,28 +64,11 @@ export function StepLayout({
   showTapHint = false,
   children,
 }: StepLayoutProps) {
-  const isScreenCounter = /^\d+\/\d+$/.test(stepLabel);
-
   return (
     <div className="ob-layout-root">
       <section className={`ob-layout-frame ${quizMode ? "ob-layout-frame--quiz" : ""}`} style={{ background }}>
         <div className={`ob-layout-safe ${showFooter ? "ob-layout-safe--with-footer" : ""}`}>
-          <header className="ob-layout-header">
-            <div className="ob-layout-header__top">
-              <p className={`ob-layout-step-label ${isScreenCounter ? "ob-layout-step-label--counter" : ""}`}>
-                {stepLabel}
-              </p>
-              <button
-                type="button"
-                className="ob-layout-close"
-                onClick={onClose}
-                aria-label="Закрыть обучение"
-              >
-                ×
-              </button>
-            </div>
-            <ProgressBar progress={progress} />
-          </header>
+          <OnboardingHeader progress={progress} stepLabel={stepLabel} onClose={onClose} />
 
           <div className={`ob-layout-content ${showFooter ? "ob-layout-content--with-footer" : ""}`}>
             <div className="ob-layout-screen-wrap">
@@ -121,15 +105,14 @@ export function StepLayout({
                   Тап по правой части — следующий экран, по левой — предыдущий.
                 </p>
               ) : null}
-              <button
-                type="button"
-                className={`ob-layout-next btn-primary ${emphasizeNext ? "ob-layout-next--glow" : ""}`}
+              <PrimaryButton
+                className={`ob-layout-next ${emphasizeNext ? "ob-layout-next--glow" : ""}`}
                 onClick={onNext}
                 disabled={nextDisabled}
                 aria-label="Перейти к следующему шагу"
               >
                 {nextLabel}
-              </button>
+              </PrimaryButton>
             </footer>
           ) : null}
         </div>

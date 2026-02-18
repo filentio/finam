@@ -5,6 +5,7 @@ import {
   TARIFF_ORDER,
 } from "../data/tariffs";
 import { usePersonalization } from "../hooks/usePersonalization";
+import { StepCard } from "../components/StepCard";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
 
@@ -32,7 +33,7 @@ export function TariffScreen({ screen }: BaseScreenProps) {
           const tariff = FINAM_TARIFFS[tariffId];
           const isRecommended = tariffId === recommendedTariff;
           return (
-            <article key={tariff.id} className="ob-card ob-tariff-card">
+            <StepCard key={tariff.id} as="article" className="ob-tariff-card">
               <h4 className="ob-tariff-card__title">
                 {tariff.name}
                 {isRecommended ? <span className="ob-tariff-card__badge">⭐ Рекомендуем</span> : null}
@@ -46,7 +47,7 @@ export function TariffScreen({ screen }: BaseScreenProps) {
                 {tariff.min_commission > 0 ? ` • Мин: ${tariff.min_commission} ₽` : ""}
               </p>
               <p className="ob-tariff-card__description">{tariff.description}</p>
-            </article>
+            </StepCard>
           );
         })}
       </div>

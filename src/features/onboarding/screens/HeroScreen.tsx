@@ -5,7 +5,7 @@ export function HeroScreen({ screen, screenCount = 1 }: BaseScreenProps) {
   const estimatedMinutes = Math.max(1, Math.ceil(screenCount * 0.5));
 
   return (
-    <ScreenShell title={screen.title} subtitle={screen.subtitle}>
+    <ScreenShell title={screen.title} subtitle={screen.subtitle} centered>
       <div className="ob-hero-content">
         <div className="ob-hero-meta" aria-label="Метаданные урока">
           <span>~{estimatedMinutes} мин</span>

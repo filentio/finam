@@ -7,12 +7,6 @@ interface InstrumentCardProps {
   highlighted?: boolean;
 }
 
-const RISK_COLORS: Record<InstrumentCardProps["riskLevel"], string> = {
-  low: "var(--ob-risk-low)",
-  medium: "var(--ob-risk-medium)",
-  high: "var(--ob-risk-high)",
-};
-
 const RISK_LABELS: Record<InstrumentCardProps["riskLevel"], string> = {
   low: "Низкий риск",
   medium: "Средний риск",
@@ -26,13 +20,10 @@ export function InstrumentCard({
   highlighted = false,
 }: InstrumentCardProps) {
   return (
-    <article className={`ob-instrument-card ${highlighted ? "is-highlighted" : ""}`}>
+    <article className={`ob-instrument-card ob-step-card ${highlighted ? "is-highlighted" : ""}`}>
       <div className="ob-instrument-card__head">
         <h4 className="ob-instrument-card__title">{title}</h4>
-        <span
-          className="ob-instrument-card__risk"
-          style={{ color: RISK_COLORS[riskLevel] }}
-        >
+        <span className={`ob-instrument-card__risk is-${riskLevel}`}>
           {RISK_LABELS[riskLevel]}
         </span>
       </div>

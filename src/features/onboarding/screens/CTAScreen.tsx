@@ -2,6 +2,8 @@ import { usePersonalization } from "../hooks/usePersonalization";
 import { openDeeplink } from "../../../lib/navigation";
 import { trackEvent } from "../../../lib/analytics";
 import type { CTAConfig } from "../types/onboarding";
+import { PrimaryButton } from "../components/PrimaryButton";
+import { SecondaryButton } from "../components/SecondaryButton";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
 
@@ -43,26 +45,36 @@ export function CTAScreen({ screen, onNext, onPrev }: BaseScreenProps) {
   return (
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
       <div className="ob-inline-actions ob-inline-actions--stack">
-        {ctas.map((cta) => (
-          <button
-            key={cta.label}
-            type="button"
-            onClick={() => handleCTA(cta)}
-            className={getVisualType(cta) === "primary" ? "is-primary" : "is-secondary"}
-            aria-label={cta.label}
-          >
-            {cta.label}
-          </button>
-        ))}
+        {ctas.map((cta) =>
+          getVisualType(cta) === "primary" ? (
+            <PrimaryButton
+              key={cta.label}
+              onClick={() => handleCTA(cta)}
+              className="ob-inline-actions__button"
+              aria-label={cta.label}
+            >
+              {cta.label}
+            </PrimaryButton>
+          ) : (
+            <SecondaryButton
+              key={cta.label}
+              onClick={() => handleCTA(cta)}
+              className="ob-inline-actions__button"
+              aria-label={cta.label}
+            >
+              {cta.label}
+            </SecondaryButton>
+          ),
+        )}
       </div>
 
       <div className="ob-inline-actions">
-        <button className="is-secondary" type="button" onClick={onPrev} aria-label="Вернуться назад">
+        <SecondaryButton type="button" onClick={onPrev} aria-label="Вернуться назад">
           Назад
-        </button>
-        <button className="is-primary" type="button" onClick={onNext} aria-label="Пропустить шаг">
+        </SecondaryButton>
+        <PrimaryButton type="button" onClick={onNext} aria-label="Пропустить шаг">
           Пропустить
-        </button>
+        </PrimaryButton>
       </div>
     </ScreenShell>
   );

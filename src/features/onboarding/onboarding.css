@@ -712,6 +712,10 @@
   padding-bottom: var(--space-2);
 }
 
+.ob-screen--centered .ob-screen__body {
+  align-content: center;
+}
+
 .ob-screen--scrollable .ob-screen__body {
   overflow-y: auto;
   align-content: start;
@@ -1347,5 +1351,373 @@
   background: var(--finam-bg-primary);
   border-top: 1px solid var(--finam-border);
   z-index: 100;
+}
+
+/* Unified visual language: Home + Onboarding + Quiz + Finals */
+.ob-layout-root {
+  background: var(--finam-bg-primary);
+}
+
+.ob-layout-frame {
+  max-width: 480px;
+  background: var(--finam-bg-primary);
+  color: var(--finam-text-primary);
+}
+
+.ob-layout-header,
+.ob-layout-footer,
+.ob-hub,
+.ob-route-prep,
+.ob-layout-screen-wrap {
+  background: transparent;
+}
+
+.ob-layout-header {
+  gap: var(--space-1);
+}
+
+.ob-layout-step-label {
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--finam-text-secondary);
+}
+
+.ob-layout-step-label--counter {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--finam-text-secondary);
+}
+
+.ob-progress {
+  padding: 0;
+}
+
+.ob-progress__segment {
+  height: 4px;
+  background: var(--finam-border);
+}
+
+.ob-progress__fill {
+  background: var(--finam-primary);
+}
+
+.ob-progress__meta {
+  display: none;
+}
+
+.ob-screen,
+.ob-screen__body,
+.ob-quiz-question-screen,
+.ob-cards-list,
+.ob-risk-cards,
+.ob-tariff-grid {
+  gap: var(--space-2);
+}
+
+.ob-screen__title,
+.ob-quiz-question__text,
+.ob-quiz-result__profile-name,
+.ob-route-prep h2,
+.ob-hub__header h1 {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--finam-text-primary);
+}
+
+.ob-screen__subtitle,
+.ob-quiz-question__block-title,
+.ob-quiz-result__profile-description,
+.ob-quiz-result__allocation-title,
+.ob-goal-overlay__text,
+.ob-tariff-card__meta,
+.ob-tariff-card__description,
+.ob-route-prep p,
+.ob-content-tip {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--finam-text-secondary);
+}
+
+.ob-layout-hint,
+.ob-step-item__description,
+.ob-risk-card__description,
+.ob-goal-overlay__title,
+.ob-hero-meta,
+.ob-screen__disclaimer,
+.ob-glossary p,
+.ob-portfolio-table__th,
+.ob-portfolio-table__td,
+.ob-quiz-intro__benefits-title,
+.ob-quiz-result__breakdown-item,
+.ob-tariff-card__badge {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ob-card,
+.ob-step-card,
+.ob-instrument-card,
+.ob-risk-card,
+.ob-goal-overlay,
+.ob-quiz-intro__benefits,
+.ob-quiz-result__profile-badge,
+.ob-quiz-result__allocation,
+.ob-tariff-card,
+.ob-calculator-card,
+.ob-route-prep__icon,
+.ob-quiz-option,
+.ob-portfolio-table-wrap {
+  border-radius: 16px;
+  border: 1px solid var(--finam-border);
+  background: var(--finam-bg-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.ob-card,
+.ob-step-card,
+.ob-quiz-intro__benefits,
+.ob-quiz-result__profile-badge,
+.ob-quiz-result__allocation,
+.ob-tariff-card,
+.ob-calculator-card,
+.ob-quiz-option,
+.ob-goal-overlay,
+.ob-risk-card,
+.ob-instrument-card {
+  padding: 16px;
+}
+
+.ob-card--stagger {
+  transform: none;
+}
+
+.ob-layout-next,
+.ob-primary-button,
+.ob-inline-actions .ob-primary-button,
+.ob-route-prep .ob-primary-button {
+  min-height: 50px;
+  border-radius: 16px;
+  background: var(--finam-primary);
+  color: #fff;
+  border: 1px solid transparent;
+  box-shadow: none;
+  background-image: none;
+}
+
+.ob-layout-next:hover:enabled,
+.ob-primary-button:hover,
+.ob-inline-actions .ob-primary-button:hover,
+.ob-route-prep .ob-primary-button:hover {
+  background: var(--finam-primary-hover);
+  filter: none;
+}
+
+.ob-layout-footer--quiz .ob-layout-next {
+  background: var(--finam-primary);
+}
+
+.ob-secondary-button,
+.ob-inline-actions .ob-secondary-button {
+  min-height: 50px;
+  border-radius: 16px;
+  border: 1px solid var(--finam-accent-border);
+  background: var(--finam-bg-secondary);
+  color: var(--finam-primary);
+}
+
+.ob-secondary-button:hover,
+.ob-inline-actions .ob-secondary-button:hover {
+  border-color: var(--finam-primary);
+  background: rgba(47, 91, 204, 0.06);
+}
+
+.ob-layout-next:disabled,
+.ob-primary-button:disabled {
+  opacity: 0.6;
+  background: #9eb2ea;
+}
+
+.ob-quiz-option.is-selected,
+.ob-risk-card.is-active,
+.ob-instrument-card.is-highlighted,
+.ob-calculator-card.is-recommended,
+.ob-hub__lesson.is-current {
+  border-color: var(--finam-accent-border);
+  background: var(--finam-accent-light);
+  box-shadow: none;
+}
+
+.ob-hub__progress-track {
+  background: var(--finam-border);
+}
+
+.ob-hub__progress-track span {
+  background: var(--finam-primary);
+}
+
+.ob-tariff-card__badge {
+  color: var(--finam-primary);
+  background: rgba(47, 91, 204, 0.12);
+  border: 1px solid rgba(47, 91, 204, 0.3);
+}
+
+.ob-complete-check,
+.ob-success-state__icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: rgba(59, 178, 115, 0.14);
+  border: 1px solid rgba(59, 178, 115, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ob-complete-check svg,
+.ob-success-state__icon svg {
+  width: 34px;
+  height: 34px;
+  stroke: var(--finam-success);
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.ob-success-state {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+  padding: var(--space-3) var(--space-2);
+}
+
+.ob-success-state__title {
+  margin: 0;
+}
+
+.ob-success-state__description {
+  margin: 0;
+  color: var(--finam-text-secondary);
+  max-width: 32ch;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ob-quiz-intro-screen .ob-screen__title,
+.ob-quiz-result-screen .ob-screen__title {
+  font-size: 22px;
+}
+
+.ob-quiz-intro-screen .ob-screen__body,
+.ob-quiz-result-screen .ob-screen__body {
+  align-content: center;
+}
+
+.ob-hero-content {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.ob-inline-actions .ob-primary-button,
+.ob-inline-actions .ob-secondary-button {
+  width: 100%;
+}
+
+.ob-inline-actions--stack {
+  gap: var(--space-1);
+}
+
+.ob-inline-actions {
+  gap: var(--space-1);
+}
+
+.ob-instrument-card__risk {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ob-instrument-card__risk.is-low {
+  color: var(--finam-success);
+}
+
+.ob-instrument-card__risk.is-medium,
+.ob-instrument-card__risk.is-high {
+  color: var(--finam-primary);
+}
+
+.ob-cards-legend__item.is-interest {
+  border-color: rgba(59, 178, 115, 0.35);
+  color: var(--finam-success);
+}
+
+.ob-cards-legend__item.is-medium,
+.ob-cards-legend__item.is-high {
+  border-color: rgba(47, 91, 204, 0.28);
+  color: var(--finam-primary);
+}
+
+.ob-quiz-result__breakdown-color.is-stocks {
+  background: #2f5bcc;
+}
+
+.ob-quiz-result__breakdown-color.is-bonds {
+  background: #3bb273;
+}
+
+.ob-quiz-result__breakdown-color.is-alt {
+  background: #95a8db;
+}
+
+.ob-quiz-result__breakdown-color.is-cash {
+  background: #c9d3ee;
+}
+
+.ob-quiz-result__emoji,
+.ob-quiz-intro__emoji {
+  font-size: 56px;
+}
+
+.ob-quiz-result__profile-badge {
+  border-left: 4px solid var(--finam-primary);
+}
+
+.ob-quiz-result__breakdown-item {
+  border-radius: 12px;
+  background: #eef2fb;
+}
+
+.ob-pie-chart__summary {
+  color: var(--finam-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ob-layout-safe {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.ob-layout-footer {
+  padding: 12px 16px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+}
+
+@media (min-width: 481px) {
+  .ob-layout-frame {
+    max-width: 520px;
+  }
+
+  .ob-screen__title,
+  .ob-quiz-question__text,
+  .ob-route-prep h2,
+  .ob-hub__header h1 {
+    font-size: 24px;
+  }
 }
 

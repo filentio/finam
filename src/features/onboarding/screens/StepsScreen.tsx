@@ -1,4 +1,5 @@
 import { usePersonalization } from "../hooks/usePersonalization";
+import { StepCard } from "../components/StepCard";
 import type { StepItem } from "../types/onboarding";
 import type { BaseScreenProps } from "./ScreenProps";
 import { ScreenShell } from "./ScreenShell";
@@ -11,7 +12,7 @@ export function StepsScreen({ screen }: BaseScreenProps) {
     <ScreenShell title={screen.title} subtitle={screen.subtitle}>
       <ol className="ob-points">
         {items.map((item, index) => (
-          <li key={`${item.title}-${index}`} className="ob-card">
+          <StepCard key={`${item.title}-${index}`} as="li">
             <strong className="ob-step-item__title">
               {item.icon ? `${item.icon} ` : null}
               {item.title}
@@ -21,7 +22,7 @@ export function StepsScreen({ screen }: BaseScreenProps) {
                 {item.description_variants?.[amountInputKey] ?? item.description}
               </p>
             ) : null}
-          </li>
+          </StepCard>
         ))}
       </ol>
     </ScreenShell>

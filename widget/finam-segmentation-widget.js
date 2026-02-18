@@ -2926,10 +2926,21 @@
   background: var(--surface);
 }
 
+.segw__story-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .segw__seg-story-progress,
 .segw__story-progress {
   padding: 0 16px 8px;
   gap: 4px;
+}
+
+.segw__story-progress {
+  padding: 0;
 }
 
 .segw__seg-story-progress-segment,
@@ -2950,6 +2961,8 @@
 .segw__story-content {
   padding: 16px;
   gap: 16px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .segw__seg-story-close,
@@ -2958,6 +2971,12 @@
   background: var(--surface);
   color: var(--text);
   border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
 }
 
 .segw__seg-story-counter,
@@ -2965,6 +2984,15 @@
 .segw__onboarding-meta,
 .segw__story-hint {
   color: var(--muted);
+}
+
+.segw__story-top-label {
+  margin: 0;
+  text-align: right;
+}
+
+.segw__onboarding-meta {
+  display: none;
 }
 
 .segw__seg-intro-title,
@@ -3060,6 +3088,35 @@
   padding-bottom: calc(env(safe-area-inset-bottom) + var(--app-bottom-bar) + 12px);
 }
 
+.segw__seg-question {
+  min-height: auto;
+  gap: 16px;
+}
+
+.segw__seg-options {
+  margin-top: 0;
+}
+
+.segw__story-content.is-quiz-intro,
+.segw__story-content.is-quiz-result {
+  justify-content: center;
+}
+
+.segw__lesson1-screen--hero,
+.segw__lesson1-screen--cta,
+.segw__lesson2-screen--hero,
+.segw__lesson2-screen--cta,
+.segw__lesson3-screen--hero,
+.segw__lesson3-screen--cta,
+.segw__lesson4-screen--cta,
+.segw__lesson5-screen--hero,
+.segw__lesson5-screen--cta,
+.segw__lesson6-screen--hero,
+.segw__lesson6-screen--cta {
+  align-content: center !important;
+  margin: auto 0;
+}
+
 .segw__seg-story-next,
 .segw__seg-cta,
 .segw__story-next,
@@ -3098,6 +3155,18 @@
   opacity: 0.65;
   background: #9bb2ec !important;
   color: #fff !important;
+}
+
+.segw__seg-story-frame,
+.segw__story-frame,
+.segw__seg-story-footer,
+.segw__story-footer,
+.segw__seg-story-next,
+.segw__story-next,
+.segw__route-prep-card,
+.segw__quiz-result-badge,
+.segw__lesson6-tariff-badge {
+  background-image: none !important;
 }
 
 .segw__lesson1-highlight-icon,
@@ -3172,8 +3241,18 @@
         <div class="segw__story-background-layer" aria-hidden="true"></div>
         <div class="segw__story-content-layer">
           <div class="segw__story-header-layout">
+            <div class="segw__story-header-top">
+              <button
+                type="button"
+                class="segw__story-close"
+                data-action="onboarding-close"
+                aria-label="Закрыть обучение"
+              >
+                ×
+              </button>
+              <p class="segw__story-top-label" data-role="story-top-label">Урок 1 из 6</p>
+            </div>
             <div class="segw__story-progress" data-role="story-progress"></div>
-            <p class="segw__story-top-label" data-role="story-top-label">Урок 1 из 6</p>
           </div>
           <div class="segw__story-content" data-role="story-content"></div>
 
@@ -7841,6 +7920,24 @@
         );
         render(root, refs, state);
         return;
+      } else if (action === "onboarding-close") {
+        var closePayload = state.inlineOnboarding.payload;
+        trackEvent("onboarding_close", {
+          lesson_index: state.inlineOnboarding.activeStepIndex,
+          segment: closePayload ? closePayload.segment : undefined,
+        });
+        resetInlineOnboardingState(state);
+        state.segmentationFlow.resultPayload = null;
+        state.segmentationFlow.targetRoute = "";
+        state.segmentationFlow.inlineMode = true;
+        state.segmentationFlow.direction = -1;
+        state.segmentationFlow.stepIndex = 0;
+        state.segmentationFlow.lastRenderedScreenKey = "";
+        if (refs.result) {
+          refs.result.classList.add("is-hidden");
+        }
+        render(root, refs, state);
+        return;
       } else if (action === "onboarding-prev") {
         if (
           !state.inlineOnboarding.isActive ||
@@ -8368,7 +8465,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.38";
+  window.FinamSegmentationWidget.version = "1.0.39";
 
   ensureStyles();
   initExistingWidgets();

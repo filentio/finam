@@ -12,6 +12,7 @@ export function QuizIntroScreen() {
       className="ob-quiz-intro-screen"
       title="Определим ваш риск-профиль"
       subtitle="Это займёт всего 1 минуту и поможет подобрать подходящие инструменты."
+      centered
     >
       <div className="ob-quiz-intro">
         <div className="ob-quiz-intro__emoji" aria-hidden="true">

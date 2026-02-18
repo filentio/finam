@@ -1,4 +1,5 @@
 import { InstrumentCard } from "../components/InstrumentCard";
+import { StepCard } from "../components/StepCard";
 import { usePersonalization } from "../hooks/usePersonalization";
 import type { CardItem, Instrument, InstrumentCardConfig } from "../types/onboarding";
 import type { CardsScreenProps } from "./ScreenProps";
@@ -103,7 +104,9 @@ export function CardsScreen({
         ))}
       </div>
       {goalAccent?.text ? (
-        <div className="ob-card ob-goal-accent">{goalAccent.text}</div>
+        <StepCard as="div" className="ob-goal-accent">
+          {goalAccent.text}
+        </StepCard>
       ) : null}
       {showDisclaimer ? <Disclaimer /> : null}
     </ScreenShell>

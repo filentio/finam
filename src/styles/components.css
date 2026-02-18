@@ -1,55 +1,79 @@
-.btn-primary {
+.btn-primary,
+.ob-primary-button {
   background: var(--finam-primary);
   color: var(--text-inverse);
-  padding: var(--space-2) var(--space-4);
+  min-height: 50px;
+  padding: 0 var(--space-3);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
+  line-height: 1.5;
   font-weight: 600;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: all var(--transition-base);
-  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.ob-primary-button:hover {
   background: var(--finam-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
 }
 
-.btn-primary:active {
+.btn-primary:active,
+.ob-primary-button:active {
   transform: scale(0.985);
 }
 
-.btn-primary:disabled {
+.btn-primary:disabled,
+.ob-primary-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   transform: none;
 }
 
 .btn-primary:focus-visible,
+.ob-primary-button:focus-visible,
 .btn-secondary:focus-visible,
+.ob-secondary-button:focus-visible,
 .choice-card:focus-visible {
-  outline: 2px solid rgba(26, 86, 219, 0.55);
+  outline: 2px solid rgba(47, 91, 204, 0.45);
   outline-offset: 2px;
 }
 
-.btn-secondary {
+.btn-secondary,
+.ob-secondary-button {
   background: transparent;
-  color: var(--text-secondary);
-  padding: var(--space-2) var(--space-3);
+  color: var(--finam-primary);
+  min-height: 50px;
+  padding: 0 var(--space-3);
   border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  border: 1px solid var(--border-soft);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  font-weight: 600;
+  border: 1px solid var(--finam-accent-border);
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.btn-secondary:hover {
-  border-color: #cbd5e1;
-  color: var(--text-primary);
-  background: var(--bg-elevated);
+.btn-secondary:hover,
+.ob-secondary-button:hover {
+  border-color: var(--finam-primary);
+  color: var(--finam-primary);
+  background: rgba(47, 91, 204, 0.06);
 }
 
 .choice-card {
@@ -72,8 +96,8 @@
 
 .choice-card.selected {
   border-color: var(--finam-primary);
-  background: rgba(26, 86, 219, 0.05);
-  box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+  background: rgba(47, 91, 204, 0.08);
+  box-shadow: 0 0 0 3px rgba(47, 91, 204, 0.1);
 }
 
 .choice-card .radio-indicator {
