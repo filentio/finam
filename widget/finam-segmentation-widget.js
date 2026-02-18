@@ -7825,15 +7825,32 @@
     }
 
     var isDefaultHost = Boolean(targetElement && targetElement.id === "finam-segmentation-widget");
-    if (!isDefaultHost) {
-      return false;
+    return isDefaultHost;
+  }
+
+  function ensureFullscreenHost() {
+    if (!document.body) {
+      return null;
     }
 
-    var viewportWidth =
-      (window.visualViewport && window.visualViewport.width) ||
-      window.innerWidth ||
-      (document.documentElement ? document.documentElement.clientWidth : 0);
-    return viewportWidth > 0 && viewportWidth <= 768;
+    var host = document.getElementById("finam-segmentation-widget-fullscreen-host");
+    if (!host) {
+      host = document.createElement("div");
+      host.id = "finam-segmentation-widget-fullscreen-host";
+      host.setAttribute("data-segmentation-widget-fullscreen-host", "true");
+      document.body.appendChild(host);
+    }
+
+    host.style.position = "fixed";
+    host.style.inset = "0";
+    host.style.width = "100vw";
+    host.style.height = "100vh";
+    host.style.maxHeight = "100vh";
+    host.style.margin = "0";
+    host.style.padding = "0";
+    host.style.overflow = "hidden";
+    host.style.zIndex = "2147483000";
+    return host;
   }
 
   function mountInto(targetElement, replaceContent) {
@@ -7841,27 +7858,27 @@
       return null;
     }
 
+    var mountTarget = targetElement;
     if (shouldMountFullscreen(targetElement)) {
-      targetElement.style.position = "fixed";
-      targetElement.style.inset = "0";
-      targetElement.style.width = "100vw";
-      targetElement.style.height = "100vh";
-      targetElement.style.maxHeight = "100vh";
-      targetElement.style.margin = "0";
-      targetElement.style.padding = "0";
-      targetElement.style.overflow = "hidden";
-      targetElement.style.zIndex = "2147483000";
+      var fullscreenHost = ensureFullscreenHost();
+      if (fullscreenHost) {
+        mountTarget = fullscreenHost;
+      }
+
+      if (targetElement !== mountTarget) {
+        targetElement.style.display = "none";
+      }
+
       if (document.documentElement) {
         document.documentElement.style.overflow = "hidden";
       }
       if (document.body) {
-        document.body.style.margin = "0";
         document.body.style.overflow = "hidden";
       }
     }
 
     if (replaceContent) {
-      targetElement.innerHTML = "";
+      mountTarget.innerHTML = "";
     }
 
     var root = createWidgetRoot();
@@ -7869,7 +7886,7 @@
       return null;
     }
 
-    targetElement.appendChild(root);
+    mountTarget.appendChild(root);
     return initWidget(root);
   }
 
@@ -7893,11 +7910,10 @@
       return root;
     }
 
-    if (!root && scriptTag.parentElement && scriptTag.parentElement.tagName.toLowerCase() !== "head") {
-      root = createWidgetRoot();
-      if (root) {
-        scriptTag.parentElement.insertBefore(root, scriptTag);
-        initWidget(root);
+    if (!root) {
+      var defaultHost = document.getElementById("finam-segmentation-widget");
+      if (defaultHost) {
+        root = mountInto(defaultHost, true);
       }
     }
 
@@ -8060,7 +8076,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.35";
+  window.FinamSegmentationWidget.version = "1.0.36";
 
   ensureStyles();
   initExistingWidgets();
