@@ -12,6 +12,7 @@ import type {
 
 interface SegmentationFormProps {
   onComplete?: (payload: SegmentationPayload) => void;
+  onClose?: () => void;
 }
 
 const INITIAL_STATE: SegmentationState = {
@@ -215,7 +216,7 @@ function buildPayload(state: SegmentationState): SegmentationPayload | null {
   };
 }
 
-export function SegmentationForm({ onComplete }: SegmentationFormProps) {
+export function SegmentationForm({ onComplete, onClose }: SegmentationFormProps) {
   const [state, setState] = useState<SegmentationState>(INITIAL_STATE);
   const [selectedGoals, setSelectedGoals] = useState<InvestmentGoal[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
@@ -390,6 +391,10 @@ export function SegmentationForm({ onComplete }: SegmentationFormProps) {
   };
 
   const handleReset = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
     setState(INITIAL_STATE);
     setSelectedGoals([]);
     setResultPayload(null);

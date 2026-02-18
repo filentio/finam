@@ -139,12 +139,17 @@ function App() {
   const [sessionKey, setSessionKey] = useState(0);
   const [completed, setCompleted] = useState(false);
 
+  const navigateToRoot = () => {
+    window.history.replaceState({}, "", "/");
+  };
+
   const resetToSegmentation = () => {
     setCompleted(false);
     setPendingOnboarding(null);
     setOnboardingInput(null);
     setMode("segmentation");
     replaceSegmentParam(null);
+    navigateToRoot();
   };
 
   const prepareOnboarding = (input: DOSInput, source: string) => {
@@ -298,6 +303,7 @@ function App() {
       </section>
 
       <SegmentationForm
+        onClose={resetToSegmentation}
         onComplete={(payload) => {
           localStorage.setItem(
             "finam_segment",

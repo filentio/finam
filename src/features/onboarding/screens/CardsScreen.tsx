@@ -9,21 +9,24 @@ const CARDS: InstrumentCardConfig[] = [
   {
     instrument_id: "stocks",
     label: "Акции",
-    description: "Доли в компаниях. Потенциал роста и дивиденды.",
+    description:
+      "Доли в компаниях. Для старта чаще выбирают голубые фишки — крупные устойчивые эмитенты.",
     risk_level: "high",
     icon: "chart_line_up",
   },
   {
     instrument_id: "bonds",
     label: "Облигации",
-    description: "Более предсказуемый доход и меньшая волатильность.",
+    description:
+      "Более предсказуемый доход и меньшая волатильность. ОФЗ — государственные облигации для консервативного старта.",
     risk_level: "low",
     icon: "shield",
   },
   {
     instrument_id: "etf",
     label: "ETF",
-    description: "Диверсификация через один инструмент.",
+    description:
+      "ETF (биржевой фонд) — готовая корзина активов. Диверсификация через один инструмент.",
     risk_level: "medium",
     icon: "pie",
   },
@@ -40,7 +43,7 @@ export function CardsScreen({
   screen,
   highlightedInstruments,
 }: CardsScreenProps) {
-  const { getContentVariantObject, isInstrumentHighlighted } = usePersonalization();
+  const { getContentVariantObject, isInstrumentHighlighted, segment } = usePersonalization();
 
   const rawCards = ((screen.items as CardItem[] | undefined) ?? CARDS) as Array<
     CardItem | InstrumentCardConfig
@@ -66,8 +69,15 @@ export function CardsScreen({
   );
   const showDisclaimer = hasYieldNumbers || screen.screen_id === "4_2";
 
+  const subtitle =
+    screen.screen_id === "4_2"
+      ? segment === "novice"
+        ? "Для начинающих инвесторов рекомендуем начать с простых инструментов."
+        : "Подобрано на основе вашего опыта. После анкеты риска рекомендации уточняются."
+      : screen.subtitle;
+
   return (
-    <ScreenShell title={screen.title} subtitle={screen.subtitle}>
+    <ScreenShell title={screen.title} subtitle={subtitle}>
       <div className="ob-cards-legend">
         <span className="ob-cards-legend__item is-interest">Вас интересует</span>
         <span className="ob-cards-legend__item is-medium">Средний риск</span>

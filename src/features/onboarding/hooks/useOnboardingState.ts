@@ -354,6 +354,32 @@ export function onboardingReducer(
       };
     }
 
+    case "GO_TO_STEP": {
+      const maxStepIndex = Math.max(0, state.track.length - 1);
+      const targetStepIndex = Math.max(
+        0,
+        Math.min(action.payload.stepIndex, maxStepIndex),
+      );
+      const targetStep = state.track[targetStepIndex];
+      if (!targetStep) {
+        return state;
+      }
+
+      const targetScreens = getScreenCount(targetStep, state);
+      const screenIndex = Math.max(
+        0,
+        Math.min(action.payload.screenIndex ?? 0, Math.max(0, targetScreens - 1)),
+      );
+
+      return {
+        ...state,
+        current_step_index: targetStepIndex,
+        current_screen_index: screenIndex,
+        status: "in_progress",
+        last_active_at: nowIso(),
+      };
+    }
+
     case "SKIP_LESSON":
       return onboardingReducer(state, { type: "NEXT_STEP" });
 

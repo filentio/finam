@@ -274,6 +274,7 @@ export type OnboardingAction =
   | { type: "NEXT_SCREEN" }
   | { type: "PREV_SCREEN" }
   | { type: "NEXT_STEP" }
+  | { type: "GO_TO_STEP"; payload: { stepIndex: number; screenIndex?: number } }
   | { type: "SKIP_LESSON" }
   | { type: "SUBMIT_RISK_ANSWER"; payload: RiskQuizAnswer }
   | { type: "COMPLETE_RISK_QUIZ" }

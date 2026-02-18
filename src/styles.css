@@ -496,7 +496,7 @@ body {
   margin: 0 auto;
   display: flex;
   justify-content: center;
-  background: var(--finam-bg-primary);
+  background: transparent;
 }
 
 .seg-story__frame {
@@ -506,8 +506,8 @@ body {
   height: 100dvh;
   max-height: 100dvh;
   border-radius: 16px;
-  background: var(--finam-bg-primary);
-  color: var(--finam-text-primary);
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: #fff;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -523,13 +523,13 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px 8px;
-  background: var(--finam-bg-primary);
+  background: transparent;
 }
 
 .seg-story__close {
-  border: 1px solid var(--finam-border);
-  background: var(--finam-bg-card);
-  color: var(--finam-text-primary);
+  border: 0;
+  background: transparent;
+  color: #fff;
   font-size: 28px;
   line-height: 1;
   cursor: pointer;
@@ -543,13 +543,13 @@ body {
 }
 
 .seg-story__close:hover {
-  border-color: var(--finam-border-hover);
+  opacity: 0.85;
 }
 
 .seg-story__counter {
   font-size: 14px;
   font-weight: 600;
-  color: var(--finam-text-secondary);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .seg-story__progress {
@@ -559,23 +559,19 @@ body {
   display: flex;
   gap: 4px;
   padding: 0 16px 8px;
-  background: var(--finam-bg-primary);
+  background: transparent;
 }
 
 .seg-story__progress-segment {
   flex: 1;
   height: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.3);
   overflow: hidden;
 }
 
 .seg-story__progress-segment.is-done {
-  background: linear-gradient(
-    90deg,
-    var(--finam-accent) 0%,
-    var(--finam-accent-hover) 100%
-  );
+  background: #fff;
 }
 
 .seg-story__screen {
@@ -642,15 +638,16 @@ body {
 .seg-story__intro-subtitle {
   margin: 0 0 14px;
   font-size: 16px;
-  color: var(--finam-text-secondary);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .seg-story__intro-card {
   width: 100%;
   max-width: 420px;
   border-radius: 16px;
-  border: 1px solid var(--finam-border);
-  background: var(--finam-bg-card);
+  border: 0;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
   padding: 14px;
   margin-bottom: 14px;
 }
@@ -673,7 +670,7 @@ body {
 .seg-story__intro-time {
   margin: 0 0 12px;
   font-size: 12px;
-  color: var(--finam-text-muted);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .seg-story__question-content {
@@ -688,7 +685,7 @@ body {
 
 .seg-story__block-title {
   margin: 0 0 8px;
-  color: var(--finam-text-secondary);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -704,7 +701,7 @@ body {
 .seg-story__question-subtitle {
   margin: 0 0 10px;
   font-size: 14px;
-  color: var(--finam-text-secondary);
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .seg-story__options {
@@ -723,12 +720,12 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid var(--finam-border);
+  border: 0;
   border-radius: 16px;
   min-height: 44px;
   padding: 12px;
-  background: var(--finam-bg-card);
-  color: var(--finam-text-primary);
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
   text-align: left;
   cursor: pointer;
   transition:
@@ -739,14 +736,14 @@ body {
 }
 
 .seg-story__option:hover {
-  border-color: var(--finam-border-hover);
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
 
 .seg-story__option.is-selected {
-  border-color: var(--finam-accent);
-  background: var(--finam-accent-light);
-  color: var(--finam-text-primary);
+  border-color: transparent;
+  background: #fff;
+  color: #4facfe;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
   animation: segStoryOptionSelect 200ms ease;
 }
@@ -763,7 +760,11 @@ body {
 
 .seg-story__option-hint {
   font-size: 12px;
-  color: var(--finam-text-secondary);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.seg-story__option.is-selected .seg-story__option-hint {
+  color: rgba(79, 172, 254, 0.9);
 }
 
 @keyframes segStoryOptionSelect {
@@ -784,7 +785,7 @@ body {
   flex-shrink: 0;
   margin-top: 8px;
   padding-top: 10px;
-  background: var(--finam-bg-primary);
+  background: linear-gradient(to top, rgba(0, 102, 255, 0.16), rgba(0, 102, 255, 0));
 }
 
 .seg-story__ghost-btn {
@@ -793,11 +794,7 @@ body {
   border-radius: 16px;
   min-height: 48px;
   padding: 0 16px;
-  background: linear-gradient(
-    90deg,
-    var(--finam-accent) 0%,
-    var(--finam-accent-hover) 100%
-  );
+  background: rgba(255, 255, 255, 0.3);
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
@@ -810,8 +807,8 @@ body {
 }
 
 .seg-story__ghost-btn:disabled {
-  background: rgba(249, 115, 22, 0.4);
-  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
   cursor: not-allowed;
 }
 
@@ -838,8 +835,9 @@ body {
   width: 100%;
   max-width: 420px;
   border-radius: 16px;
-  border: 1px solid var(--finam-border);
-  background: var(--finam-bg-card);
+  border: 0;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
   padding: 14px;
   margin-bottom: 14px;
   text-align: left;
@@ -853,14 +851,14 @@ body {
   margin-bottom: 12px;
   font-size: 28px;
   font-weight: 700;
-  color: var(--finam-text-primary);
+  color: #fff;
 }
 
 .seg-story__result-description {
   margin: 0 0 14px;
   text-align: center;
   font-size: 14px;
-  color: var(--finam-text-secondary);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .seg-story__result-track h3 {

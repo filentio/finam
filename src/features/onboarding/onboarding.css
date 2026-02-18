@@ -280,6 +280,131 @@
   animation: none;
 }
 
+.ob-hub {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  padding-top: max(var(--space-2), env(safe-area-inset-top));
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+  gap: var(--space-2);
+}
+
+.ob-hub__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.ob-hub__header h1 {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.ob-hub__progress {
+  display: grid;
+  gap: 8px;
+}
+
+.ob-hub__progress-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--finam-text-secondary);
+  font-size: 13px;
+}
+
+.ob-hub__progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.ob-hub__progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--finam-accent) 0%,
+    var(--finam-accent-hover) 100%
+  );
+  transition: width var(--transition-base);
+}
+
+.ob-hub__lessons {
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: grid;
+  gap: 8px;
+}
+
+.ob-hub__lesson {
+  width: 100%;
+  border: 1px solid var(--finam-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--finam-text-primary);
+  min-height: 64px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ob-hub__lesson.is-current {
+  border-color: var(--finam-accent-border);
+  background: rgba(249, 115, 22, 0.12);
+}
+
+.ob-hub__lesson.is-completed {
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.ob-hub__lesson-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.ob-hub__lesson-body {
+  display: grid;
+  gap: 4px;
+}
+
+.ob-hub__lesson-body strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.ob-hub__lesson-body small {
+  color: var(--finam-text-secondary);
+  font-size: 12px;
+}
+
+.ob-hub__lesson-arrow {
+  color: var(--finam-text-secondary);
+  font-size: 12px;
+}
+
+.ob-hub__footer {
+  border-top: 1px solid var(--finam-border);
+  padding-top: 12px;
+}
+
 @keyframes obGlowPulse {
   0%,
   100% {
@@ -498,6 +623,17 @@
   margin: 0;
   font-size: 10px;
   color: var(--finam-text-muted);
+}
+
+.ob-glossary {
+  display: grid;
+  gap: 6px;
+}
+
+.ob-glossary p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--finam-text-secondary);
 }
 
 .ob-hero-meta {

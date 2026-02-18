@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { OnboardingProvider, useOnboardingContext } from "./OnboardingContext";
 import { calculateTariffCosts, CALCULATOR_DEFAULTS } from "./data/tariffs";
 import { RISK_QUIZ_QUESTIONS } from "./data/riskQuiz";
+import { LESSONS_BY_ID } from "./data/lessons";
 import { calculateRiskProfile } from "./hooks/useRiskScoring";
 import { useAnalytics, ANALYTICS_EVENTS } from "./hooks/useAnalytics";
 import { getVisibleScreens } from "./hooks/useOnboardingState";
@@ -108,6 +109,9 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
     }
     return window.localStorage.getItem(TAP_HINT_STORAGE_KEY) === "1";
   });
+  const [showHub, setShowHub] = useState<boolean>(true);
+  const completedLessonsRef = useRef<string[]>([]);
+  const lastStartedLessonRef = useRef<string | null>(null);
   const [transition, setTransition] = useState<{
     preset: TransitionPreset;
     direction: 1 | -1;
@@ -180,17 +184,80 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
     [progress, routePreparationDone],
   );
   const stepBackground = getStepBackground(currentStep);
+  const lessonSteps = useMemo(
+    () =>
+      state.track
+        .map((step, stepIndex) => {
+          if (step.type !== "lesson" || !step.lesson_id) {
+            return null;
+          }
+          const lesson = LESSONS_BY_ID[step.lesson_id];
+          return {
+            stepIndex,
+            lessonId: step.lesson_id,
+            lessonTitle: lesson?.title ?? step.lesson_id,
+            screensCount: lesson?.screens.length ?? 0,
+          };
+        })
+        .filter(Boolean) as Array<{
+        stepIndex: number;
+        lessonId: string;
+        lessonTitle: string;
+        screensCount: number;
+      }>,
+    [state.track],
+  );
+  const completedLessonSet = useMemo(
+    () => new Set(state.completed_lessons),
+    [state.completed_lessons],
+  );
 
   useEffect(() => {
     if (state.status === "not_started") {
       setRoutePreparationDone(true);
+      setShowHub(true);
       previousPositionRef.current = { stepIndex: -1, screenIndex: -1, stepType: null };
       lastViewedScreenRef.current = null;
     }
   }, [state.status]);
 
   useEffect(() => {
-    if (!routePreparationDone || state.status !== "in_progress") {
+    if (
+      state.status !== "in_progress" ||
+      !currentStep ||
+      currentStep.type !== "lesson" ||
+      state.current_screen_index !== 0
+    ) {
+      return;
+    }
+
+    const lessonId = currentStep.lesson_id ?? null;
+    const lessonKey = lessonId ? `${state.current_step_index}:${lessonId}` : null;
+    if (!lessonKey || lastStartedLessonRef.current === lessonKey) {
+      return;
+    }
+    lastStartedLessonRef.current = lessonKey;
+    track(ANALYTICS_EVENTS.LESSON_STARTED, {
+      lesson_id: lessonId,
+      lesson_index: state.current_step_index,
+    });
+  }, [currentStep, state.current_screen_index, state.current_step_index, state.status, track]);
+
+  useEffect(() => {
+    const previousCompleted = new Set(completedLessonsRef.current);
+    const added = state.completed_lessons.filter((lessonId) => !previousCompleted.has(lessonId));
+
+    if (added.length > 0) {
+      added.forEach((lessonId) => {
+        track(ANALYTICS_EVENTS.LESSON_COMPLETED, { lesson_id: lessonId });
+      });
+      setShowHub(true);
+    }
+    completedLessonsRef.current = state.completed_lessons;
+  }, [state.completed_lessons, track]);
+
+  useEffect(() => {
+    if (showHub || !routePreparationDone || state.status !== "in_progress") {
       return;
     }
 
@@ -245,6 +312,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
       stepType: nextStepType,
     };
   }, [
+    showHub,
     routePreparationDone,
     state.current_screen_index,
     state.current_step_index,
@@ -253,7 +321,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
   ]);
 
   useEffect(() => {
-    if (!routePreparationDone || !currentScreen || state.status !== "in_progress") {
+    if (showHub || !routePreparationDone || !currentScreen || state.status !== "in_progress") {
       return;
     }
 
@@ -298,6 +366,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
       screen_id: currentScreen.screen_id,
     });
   }, [
+    showHub,
     currentScreen,
     currentStep?.lesson_id,
     currentStep?.type,
@@ -311,6 +380,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
 
   useEffect(() => {
     if (
+      showHub ||
       state.status !== "in_progress" ||
       !routePreparationDone ||
       !currentStep ||
@@ -320,7 +390,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
     }
 
     dispatch({ type: "NEXT_STEP" });
-  }, [currentStep, dispatch, routePreparationDone, screens.length, state.status]);
+  }, [currentStep, dispatch, routePreparationDone, screens.length, showHub, state.status]);
 
   const calculatorOutput = useMemo(() => {
     const defaults = CALCULATOR_DEFAULTS[state.segment];
@@ -358,6 +428,11 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
       )
     : undefined;
   const handleClose = () => {
+    track("onboarding_close", {
+      lesson_index: state.current_step_index,
+      screen_index: state.current_screen_index,
+      lesson_id: currentStep?.lesson_id,
+    });
     if (onClose) {
       onClose();
       return;
@@ -424,6 +499,10 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
   };
 
   const handlePrev = () => {
+    if (state.current_step_index === 0 && state.current_screen_index === 0) {
+      setShowHub(true);
+      return;
+    }
     if (isRiskQuizStep && state.current_screen_index === 0) {
       return;
     }
@@ -541,6 +620,96 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
               <h2>Маршрут завершён</h2>
               <p>Вы прошли онбординг. Можно перейти к первому действию в приложении.</p>
             </section>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  if (showHub) {
+    const completedLessonsCount = lessonSteps.filter((lesson) =>
+      completedLessonSet.has(lesson.lessonId),
+    ).length;
+    const totalLessons = lessonSteps.length;
+    const progressPercent =
+      totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
+    const nextLesson =
+      lessonSteps.find((lesson) => !completedLessonSet.has(lesson.lessonId)) ??
+      lessonSteps[lessonSteps.length - 1];
+
+    return (
+      <div className="ob-layout-root">
+        <section className="ob-layout-frame" style={{ background: STEP_BACKGROUNDS.lesson }}>
+          <div className="ob-hub">
+            <header className="ob-hub__header">
+              <h1>Ваше обучение</h1>
+              <button type="button" className="ob-layout-close" onClick={handleClose} aria-label="Закрыть">
+                ×
+              </button>
+            </header>
+
+            <section className="ob-hub__progress" aria-label="Прогресс обучения">
+              <div className="ob-hub__progress-meta">
+                <span>
+                  Пройдено {completedLessonsCount} из {totalLessons}
+                </span>
+                <span>{progressPercent}%</span>
+              </div>
+              <div className="ob-hub__progress-track">
+                <span style={{ width: `${progressPercent}%` }} />
+              </div>
+            </section>
+
+            <div className="ob-hub__lessons">
+              {lessonSteps.map((lesson) => {
+                const isCompleted = completedLessonSet.has(lesson.lessonId);
+                const isCurrent = state.current_step_index === lesson.stepIndex && !isCompleted;
+
+                return (
+                  <button
+                    key={`${lesson.lessonId}-${lesson.stepIndex}`}
+                    type="button"
+                    className={`ob-hub__lesson ${
+                      isCompleted ? "is-completed" : isCurrent ? "is-current" : ""
+                    }`}
+                    onClick={() => {
+                      dispatch({
+                        type: "GO_TO_STEP",
+                        payload: { stepIndex: lesson.stepIndex, screenIndex: 0 },
+                      });
+                      setShowHub(false);
+                    }}
+                  >
+                    <span className="ob-hub__lesson-mark">{isCompleted ? "✓" : lesson.stepIndex + 1}</span>
+                    <span className="ob-hub__lesson-body">
+                      <strong>{lesson.lessonTitle}</strong>
+                      <small>
+                        {lesson.screensCount} экранов · ~{Math.max(1, Math.ceil(lesson.screensCount * 0.5))} мин
+                      </small>
+                    </span>
+                    <span className="ob-hub__lesson-arrow">{isCompleted ? "Готово" : "→"}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <footer className="ob-hub__footer">
+              <button
+                type="button"
+                className="ob-layout-next"
+                onClick={() => {
+                  if (nextLesson) {
+                    dispatch({
+                      type: "GO_TO_STEP",
+                      payload: { stepIndex: nextLesson.stepIndex, screenIndex: 0 },
+                    });
+                  }
+                  setShowHub(false);
+                }}
+              >
+                {completedLessonsCount === 0 ? "Начать обучение" : "Продолжить"}
+              </button>
+            </footer>
           </div>
         </section>
       </div>

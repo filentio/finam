@@ -22,6 +22,28 @@ export function PortfolioScreen({
   const alternatives = Math.max(0, 100 - stocks - bonds);
   const visibleItems = portfolio.items.slice(0, 5);
   const hiddenItemsCount = Math.max(0, portfolio.items.length - visibleItems.length);
+  const glossary = [
+    {
+      key: "etf",
+      visible: portfolio.items.some((item) => /ETF|TMOS/i.test(`${item.instrument} ${item.ticker}`)),
+      text: "ETF — биржевой фонд, который позволяет купить готовую корзину активов одной сделкой.",
+    },
+    {
+      key: "ofz",
+      visible: portfolio.items.some((item) => /ОФЗ|SU/i.test(`${item.instrument} ${item.ticker}`)),
+      text: "ОФЗ — облигации федерального займа: долговые бумаги государства с фиксированным купоном.",
+    },
+    {
+      key: "blue-chips",
+      visible: portfolio.items.some((item) => /SBER|LKOH|YDEX/i.test(item.ticker)),
+      text: "Голубые фишки — акции крупнейших и наиболее ликвидных компаний рынка.",
+    },
+    {
+      key: "lqdt",
+      visible: true,
+      text: "LQDT — фонд денежного рынка, который часто используют как «парковку» для свободных денег.",
+    },
+  ].filter((item) => item.visible);
 
   return (
     <ScreenShell
@@ -42,6 +64,13 @@ export function PortfolioScreen({
         <p className="ob-screen__subtitle">
           Ещё {hiddenItemsCount} инструментов в полной версии портфеля.
         </p>
+      ) : null}
+      {glossary.length > 0 ? (
+        <div className="ob-glossary">
+          {glossary.map((item) => (
+            <p key={item.key}>{item.text}</p>
+          ))}
+        </div>
       ) : null}
       <Disclaimer />
     </ScreenShell>
