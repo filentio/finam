@@ -1480,11 +1480,33 @@
   justify-content: center;
   text-align: center;
   padding: 14px;
+  overflow: hidden;
 }
 
 .segw__lesson1-visual-text {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.82);
+}
+
+.segw__lesson1-visual-graphic {
+  width: 100%;
+  max-width: 340px;
+  display: grid;
+  gap: 8px;
+}
+
+.segw__lesson1-visual-graphic svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+.segw__lesson1-visual-caption {
+  display: block;
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .segw__lesson1-highlight {
@@ -5305,6 +5327,59 @@
     return node;
   }
 
+  function createLesson1VisualGraphic(kind, captionText) {
+    var graphic = createStoryNode(
+      "div",
+      "segw__lesson1-visual-graphic segw__lesson1-visual-graphic--" + (kind || "hero"),
+    );
+    var svgMarkup = "";
+
+    if (kind === "myth") {
+      svgMarkup =
+        '<svg viewBox="0 0 320 140" aria-hidden="true" focusable="false">' +
+        '<rect x="1" y="1" width="318" height="138" rx="14" fill="#224ea6" stroke="rgba(255,255,255,0.28)"/>' +
+        '<rect x="18" y="22" width="128" height="96" rx="12" fill="#fee2e2" stroke="#fca5a5"/>' +
+        '<text x="82" y="58" text-anchor="middle" font-size="28" fill="#dc2626">✕</text>' +
+        '<text x="82" y="86" text-anchor="middle" font-size="13" fill="#7f1d1d">Миф</text>' +
+        '<rect x="174" y="22" width="128" height="96" rx="12" fill="#dcfce7" stroke="#86efac"/>' +
+        '<text x="238" y="58" text-anchor="middle" font-size="28" fill="#16a34a">✓</text>' +
+        '<text x="238" y="86" text-anchor="middle" font-size="13" fill="#14532d">Реальность</text>' +
+        '<path d="M146 70H174" stroke="#fff" stroke-width="3" stroke-linecap="round"/>' +
+        '<path d="M166 62L174 70L166 78" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+        "</svg>";
+    } else if (kind === "cta") {
+      svgMarkup =
+        '<svg viewBox="0 0 320 140" aria-hidden="true" focusable="false">' +
+        '<rect x="1" y="1" width="318" height="138" rx="14" fill="#224ea6" stroke="rgba(255,255,255,0.28)"/>' +
+        '<path d="M30 96C84 96 102 46 154 46C208 46 224 96 290 96" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>' +
+        '<circle cx="36" cy="96" r="10" fill="#bfdbfe"/>' +
+        '<circle cx="154" cy="46" r="10" fill="#fde68a"/>' +
+        '<circle cx="288" cy="96" r="10" fill="#86efac"/>' +
+        '<path d="M286 42V96" stroke="#fff" stroke-width="4" stroke-linecap="round"/>' +
+        '<path d="M286 42L252 54L286 66Z" fill="#ef4444"/>' +
+        '<text x="46" y="114" font-size="12" fill="rgba(255,255,255,0.9)">Старт</text>' +
+        '<text x="246" y="114" font-size="12" fill="rgba(255,255,255,0.9)">Финиш</text>' +
+        "</svg>";
+    } else {
+      svgMarkup =
+        '<svg viewBox="0 0 320 140" aria-hidden="true" focusable="false">' +
+        '<rect x="1" y="1" width="318" height="138" rx="14" fill="#224ea6" stroke="rgba(255,255,255,0.28)"/>' +
+        '<path d="M36 104C92 42 160 42 284 92" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 7"/>' +
+        '<circle cx="34" cy="104" r="12" fill="#bfdbfe"/>' +
+        '<circle cx="288" cy="92" r="12" fill="#86efac"/>' +
+        '<text x="30" y="109" font-size="11" fill="#1e3a8a">A</text>' +
+        '<text x="284" y="97" font-size="11" fill="#14532d">B</text>' +
+        '<text x="164" y="60" font-size="34" text-anchor="middle">🚀</text>' +
+        "</svg>";
+    }
+
+    graphic.innerHTML = svgMarkup;
+    if (captionText) {
+      graphic.appendChild(createStoryNode("span", "segw__lesson1-visual-caption", captionText));
+    }
+    return graphic;
+  }
+
   function renderStoryStepContent(contentRoot, step, inlineState) {
     if (!contentRoot || !step) {
       return;
@@ -5544,7 +5619,7 @@
       );
       var heroVisual = createStoryNode("div", "segw__lesson1-visual");
       heroVisual.appendChild(
-        createStoryNode("span", "segw__lesson1-visual-text", step.illustration_alt || "Путь к цели"),
+        createLesson1VisualGraphic("hero", step.illustration_alt || "Путь инвестора от старта к цели"),
       );
       heroRoot.appendChild(heroVisual);
       contentRoot.appendChild(heroRoot);
@@ -5572,7 +5647,7 @@
       mythRoot.appendChild(highlight);
       var mythVisual = createStoryNode("div", "segw__lesson1-visual");
       mythVisual.appendChild(
-        createStoryNode("span", "segw__lesson1-visual-text", "Миф перечёркнут, реальность с галочкой"),
+        createLesson1VisualGraphic("myth", "Миф заменяется рабочей практикой"),
       );
       mythRoot.appendChild(mythVisual);
       contentRoot.appendChild(mythRoot);
@@ -5657,7 +5732,7 @@
       var ctaRoot = createStoryNode("section", "segw__lesson1-screen segw__lesson1-screen--cta");
       ctaRoot.appendChild(createStoryNode("h3", "segw__lesson1-title", step.title || "Готовы начать?"));
       var ctaVisual = createStoryNode("div", "segw__lesson1-visual");
-      ctaVisual.appendChild(createStoryNode("span", "segw__lesson1-visual-text", "Финишная линия"));
+      ctaVisual.appendChild(createLesson1VisualGraphic("cta", "Маршрут к первой инвестиции"));
       ctaRoot.appendChild(ctaVisual);
 
       var ctaActions = createStoryNode("div", "segw__lesson1-cta-actions");
@@ -8076,7 +8151,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.36";
+  window.FinamSegmentationWidget.version = "1.0.37";
 
   ensureStyles();
   initExistingWidgets();
