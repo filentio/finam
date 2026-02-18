@@ -10,7 +10,10 @@ import { usePersonalization } from "./hooks/usePersonalization";
 import { normalizeDOSInput } from "./hooks/useSegmentation";
 import { OnboardingLayout, type TransitionPreset } from "./components/OnboardingLayout";
 import { OnboardingShell } from "./components/OnboardingShell";
+import { OnboardingHeader } from "./components/OnboardingHeader";
 import { PrimaryButton } from "./components/PrimaryButton";
+import { SecondaryButton } from "./components/SecondaryButton";
+import { StepCard } from "./components/StepCard";
 import { SuccessState } from "./components/SuccessState";
 import { HeroScreen } from "./screens/HeroScreen";
 import { ContentScreen } from "./screens/ContentScreen";
@@ -32,6 +35,7 @@ import type {
   StepType,
   TrackStep,
 } from "./types/onboarding";
+import { openDeeplink } from "../../lib/navigation";
 import "./onboarding.css";
 
 interface OnboardingProps {
@@ -113,6 +117,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
     return window.localStorage.getItem(TAP_HINT_STORAGE_KEY) === "1";
   });
   const [showHub, setShowHub] = useState<boolean>(true);
+  const [showLessonPicker, setShowLessonPicker] = useState(false);
   const completedLessonsRef = useRef<string[]>([]);
   const lastStartedLessonRef = useRef<string | null>(null);
   const [transition, setTransition] = useState<{
@@ -219,10 +224,17 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
     if (state.status === "not_started") {
       setRoutePreparationDone(true);
       setShowHub(true);
+      setShowLessonPicker(false);
       previousPositionRef.current = { stepIndex: -1, screenIndex: -1, stepType: null };
       lastViewedScreenRef.current = null;
     }
   }, [state.status]);
+
+  useEffect(() => {
+    if (!showHub && showLessonPicker) {
+      setShowLessonPicker(false);
+    }
+  }, [showHub, showLessonPicker]);
 
   useEffect(() => {
     if (
@@ -636,11 +648,95 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
       completedLessonSet.has(lesson.lessonId),
     ).length;
     const totalLessons = lessonSteps.length;
+    const safeLessonCount = Math.max(totalLessons, 1);
+    const remainingLessons = Math.max(0, totalLessons - completedLessonsCount);
     const progressPercent =
       totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
-    const nextLesson =
-      lessonSteps.find((lesson) => !completedLessonSet.has(lesson.lessonId)) ??
-      lessonSteps[lessonSteps.length - 1];
+    const firstLesson = lessonSteps[0] ?? null;
+    const lastLesson = lessonSteps[lessonSteps.length - 1] ?? null;
+    const nextLesson = lessonSteps.find((lesson) => !completedLessonSet.has(lesson.lessonId)) ?? null;
+    const activeLesson = nextLesson ?? lastLesson ?? firstLesson;
+    const activeLessonNumber = activeLesson
+      ? Math.max(1, lessonSteps.findIndex((lesson) => lesson.stepIndex === activeLesson.stepIndex) + 1)
+      : 1;
+    const allLessonsCompleted = totalLessons > 0 && completedLessonsCount >= totalLessons;
+    const justStarted =
+      completedLessonsCount === 0 &&
+      firstLesson !== null &&
+      state.current_step_index === firstLesson.stepIndex &&
+      state.current_screen_index === 0;
+    const actionsStepIndex = state.track.findIndex(
+      (step) => step.type === "first_purchase" || step.type === "personal_recommendations",
+    );
+    const hasActionsStep = actionsStepIndex >= 0;
+    const hubStepLabel = `Урок ${Math.min(activeLessonNumber, safeLessonCount)} из ${safeLessonCount}`;
+    const hubProgress: ProgressInfo = {
+      totalSteps: safeLessonCount,
+      completedSteps: Math.min(completedLessonsCount, safeLessonCount),
+      currentStepIndex: Math.max(
+        0,
+        Math.min(Math.min(activeLessonNumber, safeLessonCount) - 1, safeLessonCount - 1),
+      ),
+      currentStepProgress: 1,
+      overallProgress:
+        safeLessonCount > 0 ? Math.min(Math.max(activeLessonNumber / safeLessonCount, 0), 1) : 1,
+      currentStepLabel: hubStepLabel,
+    };
+    const primaryHubLabel = allLessonsCompleted
+      ? "Пересмотреть уроки"
+      : justStarted
+        ? "Начать обучение"
+        : `Продолжить с урока ${Math.min(activeLessonNumber, safeLessonCount)}`;
+
+    const handleOpenLesson = (stepIndex: number) => {
+      dispatch({
+        type: "GO_TO_STEP",
+        payload: { stepIndex, screenIndex: 0 },
+      });
+      setShowHub(false);
+      setShowLessonPicker(false);
+    };
+
+    const handlePrimaryHubAction = () => {
+      if (!activeLesson) {
+        return;
+      }
+      track("hub_continue_clicked", {
+        lesson_index: Math.min(activeLessonNumber, safeLessonCount),
+        completed_lessons: completedLessonsCount,
+        total_lessons: totalLessons,
+      });
+      handleOpenLesson(activeLesson.stepIndex);
+    };
+
+    const handleReturnLater = () => {
+      track("hub_return_later_clicked", {
+        completed_lessons: completedLessonsCount,
+        total_lessons: totalLessons,
+      });
+      pauseOnboarding();
+      onClose?.();
+    };
+
+    const handleGoToActions = () => {
+      if (!hasActionsStep) {
+        return;
+      }
+      track("hub_actions_clicked", {
+        step_type: state.track[actionsStepIndex]?.type,
+      });
+      dispatch({
+        type: "GO_TO_STEP",
+        payload: { stepIndex: actionsStepIndex, screenIndex: 0 },
+      });
+      setShowHub(false);
+      setShowLessonPicker(false);
+    };
+
+    const handleDeposit = () => {
+      track(ANALYTICS_EVENTS.FIRST_PURCHASE_CTA_CLICKED, { source: "hub" });
+      openDeeplink("finamtrade://deposit");
+    };
 
     return (
       <OnboardingShell>
@@ -648,83 +744,117 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
           className="ob-layout-frame"
           style={{ "--ob-step-bg": STEP_BACKGROUNDS.lesson } as CSSProperties}
         >
-          <div className="ob-hub">
-            <header className="ob-hub__header">
-              <h1>Ваше обучение</h1>
-              <button type="button" className="ob-layout-close" onClick={handleClose} aria-label="Закрыть">
-                ×
-              </button>
-            </header>
+          <div className="ob-layout-safe">
+            <OnboardingHeader progress={hubProgress} stepLabel={hubStepLabel} onClose={handleClose} />
+            <div className="ob-layout-content">
+              <div className="ob-layout-screen-wrap">
+                <section className={`ob-hub-screen ${showLessonPicker ? "is-lessons-open" : ""}`}>
+                  <section className="ob-hub-hero">
+                    <div className="ob-hub-hero__icon" aria-hidden="true">
+                      📈
+                    </div>
+                    <h1>{allLessonsCompleted ? "Ваш прогресс" : "Продолжаем обучение"}</h1>
+                    <p>
+                      {allLessonsCompleted
+                        ? "Все уроки пройдены. Можно пересмотреть материалы и перейти к действиям."
+                        : "Держим фокус на следующем шаге — продолжим с ближайшего урока."}
+                    </p>
+                  </section>
 
-            <section className="ob-hub__progress" aria-label="Прогресс обучения">
-              <div className="ob-hub__progress-meta">
-                <span>
-                  Пройдено {completedLessonsCount} из {totalLessons}
-                </span>
-                <span>{progressPercent}%</span>
+                  <StepCard as="section" className="ob-hub-progress-card">
+                    <p className="ob-hub-progress-card__line">
+                      Вы прошли {completedLessonsCount} из {totalLessons}
+                    </p>
+                    <p className="ob-hub-progress-card__line">
+                      Осталось {remainingLessons}
+                    </p>
+                    <div className="ob-hub-progress-card__bar" aria-hidden="true">
+                      <span style={{ width: `${progressPercent}%` }} />
+                    </div>
+                  </StepCard>
+
+                  <StepCard as="section" className="ob-hub-actions-card">
+                    <PrimaryButton className="ob-hub-action ob-hub-action--primary" onClick={handlePrimaryHubAction}>
+                      {primaryHubLabel}
+                    </PrimaryButton>
+
+                    {!allLessonsCompleted ? (
+                      <SecondaryButton
+                        className="ob-hub-action ob-hub-action--secondary"
+                        onClick={() => setShowLessonPicker((value) => !value)}
+                      >
+                        {showLessonPicker ? "Скрыть список уроков" : "Перейти к урокам"}
+                      </SecondaryButton>
+                    ) : (
+                      <SecondaryButton
+                        className="ob-hub-action ob-hub-action--secondary"
+                        onClick={handleGoToActions}
+                        disabled={!hasActionsStep}
+                      >
+                        Перейти к действиям
+                      </SecondaryButton>
+                    )}
+
+                    <SecondaryButton
+                      className="ob-hub-action ob-hub-action--secondary"
+                      onClick={handleReturnLater}
+                    >
+                      Вернуться позже
+                    </SecondaryButton>
+
+                    {hasActionsStep ? (
+                      <button
+                        type="button"
+                        className="ob-hub-action ob-hub-action--success"
+                        onClick={handleDeposit}
+                      >
+                        Пополнить счёт
+                      </button>
+                    ) : null}
+                  </StepCard>
+
+                  {showLessonPicker ? (
+                    <StepCard as="section" className="ob-hub-lessons-card">
+                      <div className="ob-hub__lessons">
+                        {lessonSteps.map((lesson, index) => {
+                          const isCompleted = completedLessonSet.has(lesson.lessonId);
+                          const isCurrent = activeLesson?.stepIndex === lesson.stepIndex && !isCompleted;
+
+                          return (
+                            <button
+                              key={`${lesson.lessonId}-${lesson.stepIndex}`}
+                              type="button"
+                              className={`ob-hub__lesson ${
+                                isCompleted ? "is-completed" : isCurrent ? "is-current" : ""
+                              }`}
+                              onClick={() => handleOpenLesson(lesson.stepIndex)}
+                            >
+                              <span className="ob-hub__lesson-mark">
+                                {isCompleted ? (
+                                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M5 12.5L10 17L19 8" />
+                                  </svg>
+                                ) : (
+                                  index + 1
+                                )}
+                              </span>
+                              <span className="ob-hub__lesson-body">
+                                <strong>{lesson.lessonTitle}</strong>
+                                <small>
+                                  {lesson.screensCount} экранов · ~
+                                  {Math.max(1, Math.ceil(lesson.screensCount * 0.5))} мин
+                                </small>
+                              </span>
+                              <span className="ob-hub__lesson-arrow">{isCompleted ? "Готово" : "→"}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </StepCard>
+                  ) : null}
+                </section>
               </div>
-              <div className="ob-hub__progress-track">
-                <span style={{ width: `${progressPercent}%` }} />
-              </div>
-            </section>
-
-            <div className="ob-hub__lessons">
-              {lessonSteps.map((lesson) => {
-                const isCompleted = completedLessonSet.has(lesson.lessonId);
-                const isCurrent = state.current_step_index === lesson.stepIndex && !isCompleted;
-
-                return (
-                  <button
-                    key={`${lesson.lessonId}-${lesson.stepIndex}`}
-                    type="button"
-                    className={`ob-hub__lesson ${
-                      isCompleted ? "is-completed" : isCurrent ? "is-current" : ""
-                    }`}
-                    onClick={() => {
-                      dispatch({
-                        type: "GO_TO_STEP",
-                        payload: { stepIndex: lesson.stepIndex, screenIndex: 0 },
-                      });
-                      setShowHub(false);
-                    }}
-                  >
-                    <span className="ob-hub__lesson-mark">
-                      {isCompleted ? (
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M5 12.5L10 17L19 8" />
-                        </svg>
-                      ) : (
-                        lesson.stepIndex + 1
-                      )}
-                    </span>
-                    <span className="ob-hub__lesson-body">
-                      <strong>{lesson.lessonTitle}</strong>
-                      <small>
-                        {lesson.screensCount} экранов · ~{Math.max(1, Math.ceil(lesson.screensCount * 0.5))} мин
-                      </small>
-                    </span>
-                    <span className="ob-hub__lesson-arrow">{isCompleted ? "Готово" : "→"}</span>
-                  </button>
-                );
-              })}
             </div>
-
-            <footer className="ob-hub__footer">
-              <PrimaryButton
-                className="ob-layout-next"
-                onClick={() => {
-                  if (nextLesson) {
-                    dispatch({
-                      type: "GO_TO_STEP",
-                      payload: { stepIndex: nextLesson.stepIndex, screenIndex: 0 },
-                    });
-                  }
-                  setShowHub(false);
-                }}
-              >
-                {completedLessonsCount === 0 ? "Начать обучение" : "Продолжить"}
-              </PrimaryButton>
-            </footer>
           </div>
         </section>
       </OnboardingShell>

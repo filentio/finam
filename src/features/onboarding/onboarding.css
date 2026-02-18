@@ -1904,3 +1904,215 @@
   }
 }
 
+/* Hub screen: center of control */
+.ob-hub-screen {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: grid;
+  align-content: center;
+  gap: 16px;
+  padding: 8px 0 16px;
+}
+
+.ob-hub-screen.is-lessons-open {
+  align-content: start;
+}
+
+.ob-hub-hero {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.ob-hub-hero__icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 999px;
+  border: 1px solid rgba(47, 91, 204, 0.28);
+  background: rgba(47, 91, 204, 0.12);
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  transform-origin: center;
+  animation: obHubIconIn 240ms ease-out;
+}
+
+.ob-hub-hero h1 {
+  margin: 0;
+  max-width: 420px;
+}
+
+.ob-hub-hero p {
+  margin: 0;
+  max-width: 420px;
+  color: var(--finam-text-secondary);
+}
+
+.ob-hub-progress-card {
+  display: grid;
+  gap: 8px;
+}
+
+.ob-hub-progress-card__line {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--finam-text-primary);
+}
+
+.ob-hub-progress-card__bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--finam-border);
+  overflow: hidden;
+}
+
+.ob-hub-progress-card__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--finam-primary);
+  transform-origin: left center;
+  animation: obHubBarFill 300ms ease-out;
+  transition: width 300ms ease;
+}
+
+.ob-hub-actions-card {
+  display: grid;
+  gap: 8px;
+}
+
+.ob-hub-action {
+  width: 100%;
+  opacity: 0;
+  animation: obHubActionIn 150ms ease-out forwards;
+}
+
+.ob-hub-actions-card .ob-hub-action:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.ob-hub-actions-card .ob-hub-action:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.ob-hub-actions-card .ob-hub-action:nth-child(3) {
+  animation-delay: 110ms;
+}
+
+.ob-hub-actions-card .ob-hub-action:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.ob-hub-action--success {
+  min-height: 50px;
+  border-radius: 16px;
+  border: 1px solid rgba(59, 178, 115, 0.35);
+  background: rgba(59, 178, 115, 0.14);
+  color: var(--finam-success);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.ob-hub-action--success:hover {
+  background: rgba(59, 178, 115, 0.2);
+}
+
+.ob-hub-action--success:active {
+  transform: scale(0.985);
+}
+
+.ob-hub-lessons-card {
+  display: grid;
+  gap: 8px;
+  animation: obHubActionIn 180ms ease-out both;
+}
+
+.ob-hub__lessons {
+  min-height: 0;
+  overflow: visible;
+  display: grid;
+  gap: 8px;
+}
+
+.ob-hub__lesson {
+  width: 100%;
+  border: 1px solid var(--finam-border);
+  border-radius: 16px;
+  background: var(--finam-bg-secondary);
+  color: var(--finam-text-primary);
+  min-height: 64px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ob-hub__lesson.is-current {
+  border-color: var(--finam-accent-border);
+  background: var(--finam-accent-light);
+}
+
+.ob-hub__lesson.is-completed {
+  border-color: rgba(59, 178, 115, 0.35);
+  background: rgba(59, 178, 115, 0.1);
+}
+
+@keyframes obHubBarFill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes obHubActionIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes obHubIconIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .ob-hub-screen {
+    min-height: 60%;
+  }
+}
+
+@media (min-width: 481px) {
+  .ob-hub-screen {
+    padding: 16px 0 24px;
+  }
+
+  .ob-hub-progress-card__line {
+    font-size: 17px;
+  }
+}
+
