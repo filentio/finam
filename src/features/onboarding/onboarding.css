@@ -1721,3 +1721,186 @@
   }
 }
 
+/* Adaptive shell: mobile story-mode + focused web card-mode */
+.ob-shell {
+  min-height: 100svh;
+  width: 100%;
+  background: var(--finam-bg-primary);
+}
+
+.ob-shell__background {
+  min-height: inherit;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  background: var(--finam-bg-primary);
+}
+
+.ob-shell__centered-content {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100svh;
+  display: flex;
+}
+
+.ob-layout-frame {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--finam-bg-secondary);
+  border-radius: 0;
+  box-shadow: none;
+  border: 0;
+}
+
+.ob-layout-safe {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  background: var(--ob-step-bg, var(--finam-bg-secondary));
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.ob-layout-header {
+  position: sticky;
+  top: 0;
+  z-index: 7;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.ob-layout-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.ob-layout-screen-wrap {
+  flex: 1;
+  min-height: 60%;
+}
+
+.ob-layout-content--with-footer .ob-screen__body {
+  padding-bottom: 24px;
+}
+
+.ob-layout-footer {
+  padding: 12px 16px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+}
+
+.ob-screen,
+.ob-screen__body {
+  gap: 16px;
+}
+
+.ob-screen__title,
+.ob-screen__subtitle,
+.ob-screen__body > p,
+.ob-route-prep p,
+.ob-success-state__description {
+  max-width: 420px;
+}
+
+.ob-screen__title,
+.ob-quiz-question__text,
+.ob-route-prep h2,
+.ob-hub__header h1 {
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.ob-screen__subtitle,
+.ob-quiz-question__block-title,
+.ob-route-prep p,
+.ob-success-state__description {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ob-screen--centered .ob-screen__body,
+.ob-route-prep,
+.ob-success-state {
+  align-content: center;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .ob-shell__background {
+    padding: 0;
+  }
+
+  .ob-shell__centered-content {
+    max-width: 480px;
+  }
+
+  .ob-layout-frame {
+    min-height: 100svh;
+    max-height: 100svh;
+  }
+
+  .ob-layout-footer {
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+@media (min-width: 481px) {
+  .ob-shell__background {
+    padding: 24px;
+  }
+
+  .ob-shell__centered-content {
+    min-height: auto;
+    max-height: calc(100svh - 48px);
+  }
+
+  .ob-layout-frame {
+    min-height: 640px;
+    max-height: min(860px, calc(100svh - 48px));
+    border-radius: 24px;
+    border: 1px solid var(--finam-border);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  }
+
+  .ob-layout-safe {
+    min-height: 640px;
+  }
+
+  .ob-layout-footer {
+    position: static;
+    margin-top: auto;
+    padding-bottom: 16px;
+  }
+
+  .ob-screen__title,
+  .ob-quiz-question__text,
+  .ob-route-prep h2,
+  .ob-hub__header h1 {
+    font-size: 24px;
+  }
+
+  .ob-screen__subtitle,
+  .ob-quiz-question__block-title,
+  .ob-route-prep p,
+  .ob-success-state__description {
+    font-size: 17px;
+  }
+
+  .ob-card,
+  .ob-step-card,
+  .ob-instrument-card,
+  .ob-risk-card,
+  .ob-goal-overlay,
+  .ob-quiz-intro__benefits,
+  .ob-quiz-result__profile-badge,
+  .ob-quiz-result__allocation,
+  .ob-tariff-card,
+  .ob-calculator-card,
+  .ob-quiz-option {
+    padding: 20px;
+  }
+}
+

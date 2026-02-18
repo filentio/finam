@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { OnboardingProvider, useOnboardingContext } from "./OnboardingContext";
 import { calculateTariffCosts, CALCULATOR_DEFAULTS } from "./data/tariffs";
 import { RISK_QUIZ_QUESTIONS } from "./data/riskQuiz";
@@ -9,6 +9,7 @@ import { getVisibleScreens } from "./hooks/useOnboardingState";
 import { usePersonalization } from "./hooks/usePersonalization";
 import { normalizeDOSInput } from "./hooks/useSegmentation";
 import { OnboardingLayout, type TransitionPreset } from "./components/OnboardingLayout";
+import { OnboardingShell } from "./components/OnboardingShell";
 import { PrimaryButton } from "./components/PrimaryButton";
 import { SuccessState } from "./components/SuccessState";
 import { HeroScreen } from "./screens/HeroScreen";
@@ -42,24 +43,24 @@ interface OnboardingProps {
 
 const OWN_CTA_SCREEN_TYPES = new Set<ScreenConfig["type"]>(["cta"]);
 const QUIZ_TOTAL_SEGMENTS = 6;
-const QUIZ_GRADIENT = "var(--finam-bg-primary)";
+const QUIZ_GRADIENT = "var(--finam-bg-secondary)";
 const TAP_HINT_STORAGE_KEY = "finam_onboarding_tip_shown";
 
 const LESSON_BACKGROUNDS: Record<string, string> = {
-  lesson_1: "var(--finam-bg-primary)",
-  lesson_2: "var(--finam-bg-primary)",
-  lesson_3: "var(--finam-bg-primary)",
-  lesson_4: "var(--finam-bg-primary)",
-  lesson_5: "var(--finam-bg-primary)",
-  lesson_6: "var(--finam-bg-primary)",
+  lesson_1: "var(--finam-bg-secondary)",
+  lesson_2: "var(--finam-bg-secondary)",
+  lesson_3: "var(--finam-bg-secondary)",
+  lesson_4: "var(--finam-bg-secondary)",
+  lesson_5: "var(--finam-bg-secondary)",
+  lesson_6: "var(--finam-bg-secondary)",
 };
 
 const STEP_BACKGROUNDS: Record<StepType, string> = {
-  lesson: "var(--finam-bg-primary)",
+  lesson: "var(--finam-bg-secondary)",
   risk_quiz: QUIZ_GRADIENT,
   risk_result: QUIZ_GRADIENT,
-  first_purchase: "var(--finam-bg-primary)",
-  personal_recommendations: "var(--finam-bg-primary)",
+  first_purchase: "var(--finam-bg-secondary)",
+  personal_recommendations: "var(--finam-bg-secondary)",
 };
 
 function getStepBackground(step: TrackStep | undefined): string {
@@ -581,19 +582,21 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
 
   if (state.status === "not_started") {
     return (
-      <div className="ob-layout-root">
+      <OnboardingShell>
         <section className="ob-layout-frame">
           <div className="ob-layout-safe">
-            <p className="ob-screen__subtitle">Подготовка персонального онбординга...</p>
+            <section className="ob-route-prep">
+              <p className="ob-screen__subtitle">Подготовка персонального онбординга...</p>
+            </section>
           </div>
         </section>
-      </div>
+      </OnboardingShell>
     );
   }
 
   if (state.status === "paused") {
     return (
-      <div className="ob-layout-root">
+      <OnboardingShell>
         <section className="ob-layout-frame">
           <div className="ob-layout-safe">
             <section className="ob-route-prep">
@@ -606,14 +609,17 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
             </section>
           </div>
         </section>
-      </div>
+      </OnboardingShell>
     );
   }
 
   if (state.status === "completed") {
     return (
-      <div className="ob-layout-root">
-        <section className="ob-layout-frame" style={{ background: STEP_BACKGROUNDS.first_purchase }}>
+      <OnboardingShell>
+        <section
+          className="ob-layout-frame"
+          style={{ "--ob-step-bg": STEP_BACKGROUNDS.first_purchase } as CSSProperties}
+        >
           <div className="ob-layout-safe">
             <SuccessState
               title="Маршрут завершён"
@@ -621,7 +627,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
             />
           </div>
         </section>
-      </div>
+      </OnboardingShell>
     );
   }
 
@@ -637,8 +643,11 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
       lessonSteps[lessonSteps.length - 1];
 
     return (
-      <div className="ob-layout-root">
-        <section className="ob-layout-frame" style={{ background: STEP_BACKGROUNDS.lesson }}>
+      <OnboardingShell>
+        <section
+          className="ob-layout-frame"
+          style={{ "--ob-step-bg": STEP_BACKGROUNDS.lesson } as CSSProperties}
+        >
           <div className="ob-hub">
             <header className="ob-hub__header">
               <h1>Ваше обучение</h1>
@@ -718,7 +727,7 @@ function OnboardingFlow({ userId, dosInput, onComplete, onClose }: OnboardingPro
             </footer>
           </div>
         </section>
-      </div>
+      </OnboardingShell>
     );
   }
 

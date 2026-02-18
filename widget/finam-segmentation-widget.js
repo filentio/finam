@@ -2905,7 +2905,7 @@
 .segw__questionnaire,
 .segw__onboarding {
   width: 100%;
-  padding: 0 16px;
+  padding: 0;
 }
 
 .segw__seg-story-frame,
@@ -2919,11 +2919,48 @@
   box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
 }
 
+.segw.segw--fullscreen .segw__questionnaire,
+.segw.segw--fullscreen .segw__onboarding {
+  padding: 0;
+}
+
+.segw.segw--fullscreen .segw__seg-story-frame,
+.segw.segw--fullscreen .segw__story-frame {
+  width: 100%;
+  max-width: 480px;
+  min-height: var(--segw-viewport-height);
+  height: var(--segw-viewport-height);
+  max-height: var(--segw-viewport-height);
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.segw.segw--embedded .segw__questionnaire,
+.segw.segw--embedded .segw__onboarding {
+  padding: 24px;
+}
+
+.segw.segw--embedded .segw__seg-story-frame,
+.segw.segw--embedded .segw__story-frame {
+  max-width: 520px;
+  min-height: 640px;
+  height: clamp(640px, 78svh, 860px);
+  max-height: min(860px, calc(100svh - 48px));
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
 .segw__seg-story-header,
 .segw__story-header-layout {
   padding: 16px;
   gap: 8px;
   background: var(--surface);
+}
+
+.segw.segw--embedded .segw__seg-story-header,
+.segw.segw--embedded .segw__story-header-layout {
+  padding: 20px 20px 12px;
 }
 
 .segw__story-header-top {
@@ -2937,6 +2974,13 @@
 .segw__story-progress {
   padding: 0 16px 8px;
   gap: 4px;
+}
+
+.segw.segw--embedded .segw__seg-story-progress,
+.segw.segw--embedded .segw__story-progress {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 12px;
 }
 
 .segw__story-progress {
@@ -2963,6 +3007,11 @@
   gap: 16px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.segw.segw--embedded .segw__seg-story-content,
+.segw.segw--embedded .segw__story-content {
+  padding: 20px;
 }
 
 .segw__seg-story-close,
@@ -3029,6 +3078,21 @@
   color: var(--muted) !important;
 }
 
+.segw.segw--embedded .segw__seg-intro-subtitle,
+.segw.segw--embedded .segw__seg-question-subtitle,
+.segw.segw--embedded .segw__onboarding-step-text,
+.segw.segw--embedded .segw__quiz-question-block-title,
+.segw.segw--embedded .segw__quiz-result-description,
+.segw.segw--embedded .segw__lesson1-subtitle,
+.segw.segw--embedded .segw__lesson1-body,
+.segw.segw--embedded .segw__lesson2-text,
+.segw.segw--embedded .segw__lesson3-text,
+.segw.segw--embedded .segw__lesson4-text,
+.segw.segw--embedded .segw__lesson5-text,
+.segw.segw--embedded .segw__lesson6-text {
+  max-width: 420px;
+}
+
 .segw__seg-block-title,
 .segw__lesson2-subtitle,
 .segw__lesson3-subtitle,
@@ -3086,6 +3150,13 @@
   border-top: 1px solid var(--border);
   padding: 12px 16px 0;
   padding-bottom: calc(env(safe-area-inset-bottom) + var(--app-bottom-bar) + 12px);
+}
+
+.segw.segw--embedded .segw__seg-story-footer,
+.segw.segw--embedded .segw__story-footer {
+  position: static;
+  margin-top: auto;
+  padding: 12px 20px 16px;
 }
 
 .segw__seg-question {
@@ -3178,13 +3249,9 @@
 }
 
 @media (min-width: 481px) {
-  .segw__questionnaire,
-  .segw__onboarding {
+  .segw.segw--embedded .segw__questionnaire,
+  .segw.segw--embedded .segw__onboarding {
     padding: 24px;
-  }
-  .segw__seg-story-frame,
-  .segw__story-frame {
-    max-width: 520px;
   }
   .segw__seg-intro-title,
   .segw__seg-result-title,
@@ -3198,6 +3265,21 @@
   .segw__lesson5-title,
   .segw__lesson6-title {
     font-size: 24px;
+  }
+  .segw__seg-intro-subtitle,
+  .segw__seg-question-subtitle,
+  .segw__onboarding-step-text,
+  .segw__quiz-question-block-title,
+  .segw__quiz-result-description,
+  .segw__lesson1-subtitle,
+  .segw__lesson1-body,
+  .segw__lesson2-text,
+  .segw__lesson3-text,
+  .segw__lesson4-text,
+  .segw__lesson5-text,
+  .segw__lesson6-text {
+    font-size: 17px;
+    max-width: 420px;
   }
 }
 `;
@@ -7353,6 +7435,19 @@
       return;
     }
 
+    var isEmbeddedMode = Boolean(root.classList && root.classList.contains("segw--embedded"));
+    if (isEmbeddedMode) {
+      var roundedViewportHeight = Math.max(1, Math.round(viewportHeight));
+      root.style.setProperty("--segw-viewport-height", roundedViewportHeight + "px");
+      root.style.removeProperty("height");
+      root.style.removeProperty("maxHeight");
+      root.style.overflow = "visible";
+      if (root.classList) {
+        root.classList.remove("segw--compact", "segw--tight", "segw--ultra-tight");
+      }
+      return;
+    }
+
     var rect = root.getBoundingClientRect();
     var topOffset = rect && isFinite(rect.top) ? Math.max(0, rect.top) : 0;
     var availableHeight = Math.max(1, Math.round(viewportHeight - topOffset));
@@ -8209,12 +8304,39 @@
       return false;
     }
 
+    var viewportWidth = 0;
+    if (
+      window.visualViewport &&
+      typeof window.visualViewport.width === "number" &&
+      isFinite(window.visualViewport.width) &&
+      window.visualViewport.width > 0
+    ) {
+      viewportWidth = window.visualViewport.width;
+    } else if (typeof window.innerWidth === "number" && isFinite(window.innerWidth) && window.innerWidth > 0) {
+      viewportWidth = window.innerWidth;
+    } else if (
+      document.documentElement &&
+      typeof document.documentElement.clientWidth === "number" &&
+      isFinite(document.documentElement.clientWidth) &&
+      document.documentElement.clientWidth > 0
+    ) {
+      viewportWidth = document.documentElement.clientWidth;
+    }
+
+    var forceDesktopFullscreen = readBoolAttr(SCRIPT_REF, "data-fullscreen-desktop");
     if (WIDGET_OPTIONS.fullscreen) {
-      return true;
+      if (forceDesktopFullscreen) {
+        return true;
+      }
+      return viewportWidth > 0 ? viewportWidth <= 480 : true;
     }
 
     var isDefaultHost = Boolean(targetElement && targetElement.id === "finam-segmentation-widget");
-    return isDefaultHost;
+    if (!isDefaultHost) {
+      return false;
+    }
+
+    return viewportWidth > 0 ? viewportWidth <= 480 : false;
   }
 
   function ensureFullscreenHost() {
@@ -8248,7 +8370,8 @@
     }
 
     var mountTarget = targetElement;
-    if (shouldMountFullscreen(targetElement)) {
+    var fullscreenMode = shouldMountFullscreen(targetElement);
+    if (fullscreenMode) {
       var fullscreenHost = ensureFullscreenHost();
       if (fullscreenHost) {
         mountTarget = fullscreenHost;
@@ -8275,6 +8398,8 @@
       return null;
     }
 
+    root.classList.toggle("segw--fullscreen", fullscreenMode);
+    root.classList.toggle("segw--embedded", !fullscreenMode);
     mountTarget.appendChild(root);
     return initWidget(root);
   }
@@ -8465,7 +8590,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.39";
+  window.FinamSegmentationWidget.version = "1.0.40";
 
   ensureStyles();
   initExistingWidgets();

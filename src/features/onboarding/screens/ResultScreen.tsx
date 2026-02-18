@@ -48,7 +48,12 @@ export function ResultScreen({ screen, riskResult }: ResultScreenProps) {
   const presentation = riskResult ? getProfilePresentation(riskResult.final_profile) : null;
 
   return (
-    <ScreenShell className="ob-quiz-result-screen" title={screen.title} subtitle={screen.subtitle}>
+    <ScreenShell
+      className="ob-quiz-result-screen"
+      title={screen.title}
+      subtitle={screen.subtitle}
+      centered
+    >
       {riskResult ? (
         <>
           <div className="ob-quiz-result__emoji" aria-hidden="true">

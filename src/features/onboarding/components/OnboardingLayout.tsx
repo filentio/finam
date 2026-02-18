@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { ProgressInfo } from "../types/onboarding";
+import { OnboardingShell } from "./OnboardingShell";
 import { OnboardingHeader } from "./OnboardingHeader";
 import { PrimaryButton } from "./PrimaryButton";
 
@@ -64,9 +65,13 @@ export function StepLayout({
   showTapHint = false,
   children,
 }: StepLayoutProps) {
+  const frameStyle = {
+    "--ob-step-bg": background,
+  } as CSSProperties;
+
   return (
-    <div className="ob-layout-root">
-      <section className={`ob-layout-frame ${quizMode ? "ob-layout-frame--quiz" : ""}`} style={{ background }}>
+    <OnboardingShell>
+      <section className={`ob-layout-frame ${quizMode ? "ob-layout-frame--quiz" : ""}`} style={frameStyle}>
         <div className={`ob-layout-safe ${showFooter ? "ob-layout-safe--with-footer" : ""}`}>
           <OnboardingHeader progress={progress} stepLabel={stepLabel} onClose={onClose} />
 
@@ -117,7 +122,7 @@ export function StepLayout({
           ) : null}
         </div>
       </section>
-    </div>
+    </OnboardingShell>
   );
 }
 
