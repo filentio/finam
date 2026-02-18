@@ -7652,6 +7652,12 @@
       return null;
     }
 
+    var existingWidget = document.querySelector("[" + WIDGET_ROOT_ATTR + "]");
+    if (existingWidget) {
+      scriptTag.setAttribute(SCRIPT_MOUNTED_ATTR, "true");
+      return existingWidget;
+    }
+
     var targetSelector = scriptTag.getAttribute("data-target");
     var root = null;
 
@@ -7828,7 +7834,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.29";
+  window.FinamSegmentationWidget.version = "1.0.30";
 
   ensureStyles();
   initExistingWidgets();
