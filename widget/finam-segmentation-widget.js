@@ -6766,17 +6766,19 @@
   }
 
   function getSegwViewportHeight() {
+    var candidates = [];
+
     if (
       window.visualViewport &&
       typeof window.visualViewport.height === "number" &&
       isFinite(window.visualViewport.height) &&
       window.visualViewport.height > 0
     ) {
-      return window.visualViewport.height;
+      candidates.push(window.visualViewport.height);
     }
 
     if (typeof window.innerHeight === "number" && isFinite(window.innerHeight) && window.innerHeight > 0) {
-      return window.innerHeight;
+      candidates.push(window.innerHeight);
     }
 
     if (
@@ -6785,10 +6787,14 @@
       isFinite(document.documentElement.clientHeight) &&
       document.documentElement.clientHeight > 0
     ) {
-      return document.documentElement.clientHeight;
+      candidates.push(document.documentElement.clientHeight);
     }
 
-    return 0;
+    if (!candidates.length) {
+      return 0;
+    }
+
+    return Math.min.apply(Math, candidates);
   }
 
   function applyViewportHeight(root) {
@@ -6805,6 +6811,9 @@
     var topOffset = rect && isFinite(rect.top) ? Math.max(0, rect.top) : 0;
     var availableHeight = Math.max(1, Math.round(viewportHeight - topOffset));
     root.style.setProperty("--segw-viewport-height", availableHeight + "px");
+    root.style.height = availableHeight + "px";
+    root.style.maxHeight = availableHeight + "px";
+    root.style.overflow = "hidden";
   }
 
   function bindViewportHeight(root) {
@@ -7831,7 +7840,7 @@
     mountDefaultHostIfPresent();
     ensureFallbackHostMounted();
   };
-  window.FinamSegmentationWidget.version = "1.0.31";
+  window.FinamSegmentationWidget.version = "1.0.32";
 
   ensureStyles();
   initExistingWidgets();
