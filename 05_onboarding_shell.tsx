@@ -17,6 +17,9 @@ import { prefillQuiz2AnswersFromQuiz1, getPrefilledQuiz2QuestionIds } from "./14
 import { computeQuiz1HashForQuiz2, computeStrategy } from "./15_quiz2_rules";
 import { computeQuiz2HashForBranch, resolveBranchId } from "./18_branch_rules";
 import { BranchLessonsScreen } from "./19_branch_lessons_screen";
+import { EntryGateScreen } from "./20_entry_gate_screen";
+import { deriveEntryGateState } from "./21_entry_gate_rules";
+import { FinalScreen } from "./22_final_screen";
 
 type Props = {
   storageEnabled?: boolean;
@@ -60,7 +63,10 @@ export default function OnboardingShell(props: Props) {
     if (!storageEnabled) return;
     const loaded = loadProgress();
     if (!loaded) return;
-    dispatch({ type: "HYDRATE", state: loaded });
+    const lastNonGate =
+      loaded.lastNonGateScreenId ??
+      (loaded.currentScreenId !== "ENTRY_GATE" ? loaded.currentScreenId : null);
+    dispatch({ type: "HYDRATE", state: { ...loaded, currentScreenId: "ENTRY_GATE", lastNonGateScreenId: lastNonGate } });
   }, [storageEnabled]);
 
   // Mark abandoned on exit.
@@ -91,7 +97,7 @@ export default function OnboardingShell(props: Props) {
 
   // If process is completed, force screenId to SCR_FINAL.
   useEffect(() => {
-    if (state.processStatus === "COMPLETED" && state.currentScreenId !== "SCR_FINAL") {
+    if (state.processStatus === "COMPLETED" && state.currentScreenId !== "SCR_FINAL" && state.currentScreenId !== "ENTRY_GATE") {
       dispatch({ type: "SET_CURRENT_SCREEN", screenId: "SCR_FINAL" });
     }
   }, [state.processStatus, state.currentScreenId]);
@@ -217,8 +223,9 @@ export default function OnboardingShell(props: Props) {
     setQuizError(null);
   };
 
-  // Screen render
-  const screenId = state.processStatus === "COMPLETED" ? "SCR_FINAL" : state.currentScreenId;
+  // Screen render:
+  // ENTRY_GATE must be the first screen on any entry, even if process is completed.
+  const screenId = state.currentScreenId === "ENTRY_GATE" ? "ENTRY_GATE" : state.processStatus === "COMPLETED" ? "SCR_FINAL" : state.currentScreenId;
 
   return (
     <div style={styles.shell}>
@@ -238,13 +245,33 @@ export default function OnboardingShell(props: Props) {
       </div>
 
       <div style={styles.body}>
-        {screenId === "SCR_ENTRY" && (
-          <EntryScreen
+        {screenId === "ENTRY_GATE" && (
+          <EntryGateScreen
+            screenId="ENTRY_GATE"
+            derived={deriveEntryGateState(state)}
             onStart={() => {
               setQuizError(null);
-              dispatch({ type: "START_PROCESS" });
-              dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "SCR_ENTRY" });
-              dispatch({ type: "SET_CURRENT_SCREEN", screenId: "QZ1_EXPERIENCE_GOALS" });
+              dispatch({ type: "RESET_ALL" });
+            }}
+            onResume={(resumeScreenId) => {
+              setQuizError(null);
+              dispatch({ type: "SET_CURRENT_SCREEN", screenId: resumeScreenId as ScreenId });
+            }}
+            onRestart={() => {
+              setQuizError(null);
+              dispatch({ type: "RESET_ALL" });
+            }}
+            onResetQuiz1={() => {
+              setQuizError(null);
+              dispatch({ type: "RESET_FROM_QUIZ1" });
+            }}
+            onResetQuiz2={() => {
+              setQuizError(null);
+              dispatch({ type: "RESET_FROM_QUIZ2" });
+            }}
+            onOpenFinal={() => {
+              setQuizError(null);
+              dispatch({ type: "SET_CURRENT_SCREEN", screenId: "SCR_FINAL" });
             }}
           />
         )}
@@ -363,14 +390,24 @@ export default function OnboardingShell(props: Props) {
         )}
 
         {screenId === "SCR_FINAL" && (
-          <FinalScreen
-            isCompleted={state.processStatus === "COMPLETED"}
-            onFinish={() => {
-              dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "SCR_FINAL" });
-              dispatch({ type: "COMPLETE_PROCESS" });
-              dispatch({ type: "SET_CURRENT_SCREEN", screenId: "SCR_FINAL" });
-            }}
-          />
+          state.quiz1.segment &&
+          state.quiz2.strategy &&
+          state.branch.branchId && (
+            <FinalScreen
+              screenId="SCR_FINAL"
+              segment={state.quiz1.segment}
+              strategy={state.quiz2.strategy}
+              branchId={state.branch.branchId}
+              onFinish={() => {
+                dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "SCR_FINAL" });
+                dispatch({ type: "COMPLETE_PROCESS" });
+                dispatch({ type: "SET_CURRENT_SCREEN", screenId: "SCR_FINAL" });
+              }}
+              onRestart={() => {
+                dispatch({ type: "RESET_ALL" });
+              }}
+            />
+          )
         )}
       </div>
 
@@ -380,18 +417,6 @@ export default function OnboardingShell(props: Props) {
         </button>
         <span style={styles.footerHint}>Back navigation is strictly controlled.</span>
       </div>
-    </div>
-  );
-}
-
-function EntryScreen(props: { onStart: () => void }) {
-  return (
-    <div style={styles.card}>
-      <h2 style={styles.h2}>Вход</h2>
-      <p style={styles.p}>Этот экран является точкой входа процесса онбординга.</p>
-      <button style={styles.primaryBtn} onClick={props.onStart}>
-        Начать
-      </button>
     </div>
   );
 }

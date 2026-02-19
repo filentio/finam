@@ -6,7 +6,7 @@ import { isQuiz2CompletionValid } from "./15_quiz2_rules";
 import { computeQuiz2HashForBranch, isBranchCompletionValid, resolveBranchId } from "./18_branch_rules";
 
 export const ALL_SCREEN_IDS: ScreenId[] = [
-  "SCR_ENTRY",
+  "ENTRY_GATE",
   "QZ1_EXPERIENCE_GOALS",
   "CL_COMMON_LESSONS",
   "QZ2_INVEST_PROFILE",
@@ -15,7 +15,7 @@ export const ALL_SCREEN_IDS: ScreenId[] = [
 ];
 
 export const SCREEN_TYPE_BY_ID: Record<ScreenId, ScreenType> = {
-  SCR_ENTRY: "entry",
+  ENTRY_GATE: "entry",
   QZ1_EXPERIENCE_GOALS: "quiz",
   CL_COMMON_LESSONS: "common_lesson",
   QZ2_INVEST_PROFILE: "quiz",
@@ -40,7 +40,7 @@ export type RouteEdge = {
 };
 
 export const ROUTE_EDGES: RouteEdge[] = [
-  { from: "SCR_ENTRY", to: "QZ1_EXPERIENCE_GOALS", condition: "NEXT", type: "linear" },
+  { from: "ENTRY_GATE", to: "QZ1_EXPERIENCE_GOALS", condition: "NEXT", type: "linear" },
   { from: "QZ1_EXPERIENCE_GOALS", to: "CL_COMMON_LESSONS", condition: "SUBMIT_VALID", type: "submit" },
   { from: "CL_COMMON_LESSONS", to: "QZ2_INVEST_PROFILE", condition: "SUBMIT_VALID", type: "submit" },
   {
@@ -53,8 +53,8 @@ export const ROUTE_EDGES: RouteEdge[] = [
 ];
 
 export const BACK_BY_SCREEN_ID: Record<ScreenId, ScreenId | null> = {
-  SCR_ENTRY: null,
-  QZ1_EXPERIENCE_GOALS: "SCR_ENTRY",
+  ENTRY_GATE: null,
+  QZ1_EXPERIENCE_GOALS: "ENTRY_GATE",
   CL_COMMON_LESSONS: "QZ1_EXPERIENCE_GOALS",
   QZ2_INVEST_PROFILE: "CL_COMMON_LESSONS",
   BR_BRANCH_LESSONS: "QZ2_INVEST_PROFILE",
@@ -89,13 +89,17 @@ export type ScreenGuardResult =
   | { allowed: false; redirectTo: ScreenId; reason: string };
 
 export function guardScreenAccess(state: OnboardingState, targetScreenId: ScreenId): ScreenGuardResult {
+  if (targetScreenId === "ENTRY_GATE") {
+    return { allowed: true };
+  }
+
   if (state.processStatus === "COMPLETED" && targetScreenId !== "SCR_FINAL") {
     return { allowed: false, redirectTo: "SCR_FINAL", reason: "PROCESS_COMPLETED_GUARD" };
   }
 
   // No skipping of quizzes.
   const isAfterQuiz1 =
-    targetScreenId !== "SCR_ENTRY" && targetScreenId !== "QZ1_EXPERIENCE_GOALS" && targetScreenId !== "SCR_FINAL";
+    targetScreenId !== "ENTRY_GATE" && targetScreenId !== "QZ1_EXPERIENCE_GOALS" && targetScreenId !== "SCR_FINAL";
   if (isAfterQuiz1 && !isQuiz1CompletionValid(state.quiz1.answers, state.quiz1.segment, state.quiz1.isCompleted)) {
     return { allowed: false, redirectTo: "QZ1_EXPERIENCE_GOALS", reason: "QUIZ1_REQUIRED" };
   }

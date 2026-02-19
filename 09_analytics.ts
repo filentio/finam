@@ -1,4 +1,8 @@
 export type AnalyticsEventName =
+  | "onboarding_entry_gate_view"
+  | "onboarding_entry_gate_action"
+  | "onboarding_final_view"
+  | "onboarding_final_cta_click"
   | "onboarding_quiz1_start"
   | "onboarding_quiz1_answer"
   | "onboarding_quiz1_complete"

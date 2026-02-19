@@ -5,7 +5,7 @@ export type ScreenStatus = "loading" | "active" | "completed" | "error";
 export type ScreenType = "entry" | "quiz" | "common_lesson" | "branch_lesson" | "final";
 
 export type ScreenId =
-  | "SCR_ENTRY"
+  | "ENTRY_GATE"
   | "QZ1_EXPERIENCE_GOALS"
   | "CL_COMMON_LESSONS"
   | "QZ2_INVEST_PROFILE"
@@ -69,6 +69,8 @@ export type BranchState = {
 export type OnboardingState = {
   processStatus: ProcessStatus;
   currentScreenId: ScreenId;
+  // Last non-gate screen for resume UX.
+  lastNonGateScreenId: ScreenId | null;
   screenStatusById: Record<ScreenId, ScreenStatus>;
 
   quiz1: {
@@ -100,6 +102,9 @@ export type OnboardingEvent =
   | { type: "ABANDON_PROCESS" }
   | { type: "COMPLETE_PROCESS" }
   | { type: "SET_CURRENT_SCREEN"; screenId: ScreenId }
+  | { type: "RESET_ALL" }
+  | { type: "RESET_FROM_QUIZ1" }
+  | { type: "RESET_FROM_QUIZ2" }
   | { type: "SET_SCREEN_STATUS"; screenId: ScreenId; status: ScreenStatus }
   | { type: "MARK_SCREEN_COMPLETED"; screenId: ScreenId }
   | { type: "SET_QUIZ1_ANSWERS"; answers: Quiz1Answers }
@@ -148,7 +153,7 @@ export const DEFAULT_BRANCH_STATE: BranchState = {
 
 export function getInitialOnboardingState(): OnboardingState {
   const allScreenIds: ScreenId[] = [
-    "SCR_ENTRY",
+    "ENTRY_GATE",
     "QZ1_EXPERIENCE_GOALS",
     "CL_COMMON_LESSONS",
     "QZ2_INVEST_PROFILE",
@@ -167,7 +172,8 @@ export function getInitialOnboardingState(): OnboardingState {
 
   return {
     processStatus: "NOT_STARTED",
-    currentScreenId: "SCR_ENTRY",
+    currentScreenId: "ENTRY_GATE",
+    lastNonGateScreenId: null,
     screenStatusById,
     quiz1: { answers: DEFAULT_QUIZ1_ANSWERS, isCompleted: false, segment: null },
     quiz2: {
@@ -212,7 +218,52 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
       return {
         ...state,
         currentScreenId: event.screenId,
+        lastNonGateScreenId: event.screenId === "ENTRY_GATE" ? state.lastNonGateScreenId : event.screenId,
       };
+
+    case "RESET_ALL": {
+      const base = getInitialOnboardingState();
+      return {
+        ...base,
+        processStatus: "IN_PROGRESS",
+        currentScreenId: "QZ1_EXPERIENCE_GOALS",
+        lastNonGateScreenId: "QZ1_EXPERIENCE_GOALS",
+      };
+    }
+
+    case "RESET_FROM_QUIZ1": {
+      const base = getInitialOnboardingState();
+      return {
+        ...base,
+        processStatus: "IN_PROGRESS",
+        currentScreenId: "QZ1_EXPERIENCE_GOALS",
+        lastNonGateScreenId: "QZ1_EXPERIENCE_GOALS",
+      };
+    }
+
+    case "RESET_FROM_QUIZ2": {
+      // Keep Quiz1 and completed common lessons, reset Quiz2 + branch.
+      // This reset is allowed only if upstream prerequisites are met (enforced by Entry Gate UI + guard).
+      const next: OnboardingState = {
+        ...state,
+        processStatus: "IN_PROGRESS",
+        currentScreenId: "QZ2_INVEST_PROFILE",
+        lastNonGateScreenId: "QZ2_INVEST_PROFILE",
+        quiz2: {
+          ...state.quiz2,
+          answers: DEFAULT_QUIZ2_ANSWERS,
+          isCompleted: false,
+          strategy: null,
+          segmentSnapshot: null,
+          quiz1Hash: null,
+          prefillAppliedFromQuiz1Hash: null,
+        },
+        branch: { ...DEFAULT_BRANCH_STATE },
+      };
+
+      // Reset completion flags/screens downstream of Quiz2.
+      return resetDownstreamAfterQuiz2Change(next);
+    }
 
     case "SET_SCREEN_STATUS":
       return {

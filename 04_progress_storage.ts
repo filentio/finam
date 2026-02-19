@@ -1,6 +1,5 @@
 import { getInitialOnboardingState, type OnboardingState, type ScreenId } from "./01_state_machine";
 import { ALL_SCREEN_IDS } from "./02_routes";
-import { isCommonLessonsCompletionValid } from "./11_common_lessons_rules";
 import { isQuiz2CompletionValid } from "./15_quiz2_rules";
 import { computeQuiz2HashForBranch, normalizeBranchState } from "./18_branch_rules";
 
@@ -39,6 +38,10 @@ export function loadProgress(): OnboardingState | null {
 
     // Migration: previous versions used CL01/CL02/CL03 placeholders.
     const anyState = parsed.state as unknown as { currentScreenId?: unknown };
+    // Migration: previous versions used SCR_ENTRY as entry screen.
+    if (anyState.currentScreenId === "SCR_ENTRY") {
+      (parsed.state as unknown as { currentScreenId: unknown }).currentScreenId = "ENTRY_GATE";
+    }
     if (anyState.currentScreenId === "CL01_PLACEHOLDER" || anyState.currentScreenId === "CL02_PLACEHOLDER" || anyState.currentScreenId === "CL03_PLACEHOLDER") {
       (parsed.state as unknown as { currentScreenId: unknown }).currentScreenId = "CL_COMMON_LESSONS";
     }
@@ -80,11 +83,6 @@ export function loadProgress(): OnboardingState | null {
     const merged = mergeWithInitial(parsed.state);
     if (!isValidScreenId(merged.currentScreenId)) return null;
 
-    // Restore rule: if common lessons completed for the current segment, resume at Quiz2.
-    if (merged.currentScreenId === "CL_COMMON_LESSONS" && isCommonLessonsCompletionValid(merged.commonLessons, merged.quiz1.segment)) {
-      merged.currentScreenId = "QZ2_INVEST_PROFILE";
-    }
-
     // Branch restore/normalize: if Quiz2 is valid and completed, branch context must be consistent.
     if (
       isQuiz2CompletionValid({
@@ -109,10 +107,6 @@ export function loadProgress(): OnboardingState | null {
         quiz2Answers: merged.quiz2.answers,
       });
       merged.branch = normalizeBranchState(merged.branch, { segment: merged.quiz1.segment, strategy: merged.quiz2.strategy, quiz2Hash });
-      // If branch is completed, resume at final.
-      if (merged.branch.isCompleted) {
-        merged.currentScreenId = "SCR_FINAL";
-      }
     }
 
     return merged;
@@ -135,6 +129,7 @@ export function mergeWithInitial(partial: OnboardingState): OnboardingState {
     ...partial,
     processStatus: partial.processStatus ?? base.processStatus,
     currentScreenId: partial.currentScreenId ?? base.currentScreenId,
+    lastNonGateScreenId: partial.lastNonGateScreenId ?? base.lastNonGateScreenId,
     screenStatusById: { ...base.screenStatusById, ...(partial.screenStatusById ?? {}) },
     completedScreenIds: { ...base.completedScreenIds, ...(partial.completedScreenIds ?? {}) },
     quiz1: {
