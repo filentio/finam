@@ -60,12 +60,28 @@
 ## 3) Таблица ветвления (segment + strategy → branchId)
 
 ### 3.1 Segment (результат анкеты №1)
-`segment` вычисляется детерминированно:
-- Если Q1 (квал статус) = `Да` → `qualified`
-- Иначе Q2 (опыт):
-  - `Еще нет опыта` или `Менее 1 года` → `novice`
-  - `От 1 до 3 лет` → `learner`
-  - `От 3 до 5 лет` или `Более 5 лет` → `experienced`
+#### 3.1.1 Quiz1 data model (сохранение в state)
+`quiz1.answers` хранится в `OnboardingState` и персистится в LocalStorage через общий прогресс.
+
+Формат (все поля обязательны для completion, но могут быть `null` в процессе заполнения):
+- `q1QualifiedStatus`: `QZ1_Q1_YES | QZ1_Q1_NO | null`
+- `q2Experience`: `QZ1_Q2_NO_EXPERIENCE | QZ1_Q2_LT_1Y | QZ1_Q2_1_3Y | QZ1_Q2_3_5Y | QZ1_Q2_GT_5Y | null`
+- `q3PlannedAmount`: `QZ1_Q3_LT_300K | QZ1_Q3_300K_2M | QZ1_Q3_2_5M | QZ1_Q3_GT_5M | null`
+- `q4MainGoal`: `QZ1_Q4_PURCHASE | QZ1_Q4_PASSIVE_INCOME | QZ1_Q4_GROWTH | QZ1_Q4_PRESERVE | null`
+- `q5PrimaryInterest`: `QZ1_Q5_FUNDS | QZ1_Q5_STOCKS | QZ1_Q5_TRUST | QZ1_Q5_BONDS | QZ1_Q5_IPO | QZ1_Q5_CURRENCY | QZ1_Q5_STRUCTURED | QZ1_Q5_DERIVATIVES | null`
+
+#### 3.1.2 Segment enum
+`Segment` (строгое перечисление): `NOVICE | LEARNER | EXPERIENCED | QUALIFIED`
+
+#### 3.1.3 Правила сегментации (детерминированно)
+Правила вынесены в `07_quiz1_rules.ts` (`QUIZ1_SEGMENT_RULES`) и применяются функцией `computeSegment(quiz1Answers) -> Segment`.
+
+Алгоритм:
+- Если `q1QualifiedStatus = QZ1_Q1_YES` → `QUALIFIED`
+- Иначе (строго `q1QualifiedStatus = QZ1_Q1_NO`) по `q2Experience`:
+  - `QZ1_Q2_NO_EXPERIENCE` или `QZ1_Q2_LT_1Y` → `NOVICE`
+  - `QZ1_Q2_1_3Y` → `LEARNER`
+  - `QZ1_Q2_3_5Y` или `QZ1_Q2_GT_5Y` → `EXPERIENCED`
 
 ### 3.2 Strategy (результат анкеты №2)
 `strategy` вычисляется детерминированно по score 0..8:
@@ -77,10 +93,10 @@
 
 | segment \\ strategy | conservative | balanced | aggressive |
 |---|---|---|---|
-| novice | BR_BEGINNER | BR_BEGINNER | BR_BEGINNER |
-| learner | BR_INTERMEDIATE | BR_INTERMEDIATE | BR_INTERMEDIATE |
-| experienced | BR_INTERMEDIATE | BR_INTERMEDIATE | BR_ADVANCED |
-| qualified | BR_ADVANCED | BR_ADVANCED | BR_ADVANCED |
+| NOVICE | BR_BEGINNER | BR_BEGINNER | BR_BEGINNER |
+| LEARNER | BR_INTERMEDIATE | BR_INTERMEDIATE | BR_INTERMEDIATE |
+| EXPERIENCED | BR_INTERMEDIATE | BR_INTERMEDIATE | BR_ADVANCED |
+| QUALIFIED | BR_ADVANCED | BR_ADVANCED | BR_ADVANCED |
 
 Для каждой комбинации существует ровно один branchId.
 
@@ -138,12 +154,25 @@ Back target:
 
 ---
 
+## 6.1) Аналитика (минимальная, без SDK)
+
+Единая точка входа: `track(eventName, payload)` в `09_analytics.ts`. Интеграция с внешними SDK запрещена на этом этапе.
+
+События Quiz1:
+- `onboarding_quiz1_start` (payload: `screenId`)
+- `onboarding_quiz1_answer` (payload: `questionId`, `answerId`)
+- `onboarding_quiz1_complete` (payload: `segment`)
+- `onboarding_quiz1_error` (payload: `errorType`, optional: `missingQuestionIds`)
+
+---
+
 ## 7) Edge cases
 
 - EC001: corrupted storage → старт с `SCR_ENTRY`, processStatus=NOT_STARTED
 - EC002: hash screenId недоступен по guard → redirect на ближайший обязательный экран (QZ1 или QZ2)
 - EC003: offline → экран в состоянии offline (действия блокируются)
 - EC004: deep link error → фиксированное модальное окно ошибки
+- EC005: quiz1 answers заполнены, но `segment` отсутствует или не совпадает с `computeSegment(answers)` → guard редиректит на `QZ1_EXPERIENCE_GOALS` (анкета считается НЕ пройденной)
 
 ---
 
