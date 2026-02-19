@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import type { CommonLessonsState, Segment } from "./01_state_machine";
-import { getCommonLessonIdsForSegment, getLessonById } from "./10_common_lessons_config";
+import { getCommonLessonIdsForSegment } from "./10_common_lessons_config";
 import { useTrack } from "./23_analytics_context";
 import { IS_DEV } from "./24_env";
+import { getLessonData } from "./33_lessons_data";
+import { LessonScreenRenderer } from "./32_lesson_renderer";
 
 export type CommonLessonsScreenProps = {
   screenId: "CL_COMMON_LESSONS";
   segment: Segment;
   progress: CommonLessonsState;
+  assetBaseUrl?: string;
   onResetForSegment: (segment: Segment) => void;
   onSetIndex: (index: number) => void;
   onResetAll: () => void;
@@ -29,8 +32,10 @@ export function CommonLessonsScreen(props: CommonLessonsScreenProps) {
       const total = lessonIds.length;
       const index = Math.min(Math.max(0, props.progress.currentIndex), Math.max(0, total - 1));
       const lessonId = lessonIds[index];
-      const lesson = getLessonById(lessonId);
-      return { ok: true as const, lessonIds, total, index, lessonId, lesson };
+      const data = getLessonData(lessonId as any);
+      const screen = data.screens[0];
+      if (!screen) throw new Error(`Lesson has no screens: lessonId=${lessonId}`);
+      return { ok: true as const, lessonIds, total, index, lessonId, screen };
     } catch (e) {
       return { ok: false as const, error: e instanceof Error ? e : new Error(String(e)) };
     }
@@ -92,22 +97,10 @@ export function CommonLessonsScreen(props: CommonLessonsScreenProps) {
     );
   }
 
-  const lesson = flowResult.lesson;
-
   return (
     <div style={styles.card}>
       <div style={styles.kicker}>Общие уроки</div>
-
-      <h2 style={styles.h2}>{lesson.title}</h2>
-      <div style={styles.body}>
-        <MarkdownText text={lesson.body} />
-      </div>
-
-      <div style={styles.ctaRow}>
-        <a href={lesson.ctaLink} style={styles.ctaLink}>
-          {lesson.ctaLabel}
-        </a>
-      </div>
+      <LessonScreenRenderer screen={flowResult.screen} assetBaseUrl={props.assetBaseUrl} />
 
       <div style={styles.actionsSingle}>
         {canNext ? (
@@ -124,70 +117,11 @@ export function CommonLessonsScreen(props: CommonLessonsScreenProps) {
   );
 }
 
-function MarkdownText(props: { text: string }) {
-  // Minimal markdown-like rendering for this stage:
-  // - empty lines -> paragraph breaks
-  // - lines starting with "- " -> bullets
-  const lines = props.text.split("\n");
-  const blocks: Array<{ type: "p" | "ul"; lines: string[] }> = [];
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i].trimEnd();
-    if (line.trim() === "") {
-      i += 1;
-      continue;
-    }
-    if (line.trim().startsWith("- ")) {
-      const ul: string[] = [];
-      while (i < lines.length && lines[i].trim().startsWith("- ")) {
-        ul.push(lines[i].trim().slice(2));
-        i += 1;
-      }
-      blocks.push({ type: "ul", lines: ul });
-      continue;
-    }
-    const p: string[] = [];
-    while (i < lines.length && lines[i].trim() !== "" && !lines[i].trim().startsWith("- ")) {
-      p.push(lines[i]);
-      i += 1;
-    }
-    blocks.push({ type: "p", lines: [p.join("\n")] });
-  }
-
-  return (
-    <div>
-      {blocks.map((b, idx) => {
-        if (b.type === "ul") {
-          return (
-            <ul key={idx} style={styles.ul}>
-              {b.lines.map((t, j) => (
-                <li key={j} style={styles.li}>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          );
-        }
-        return (
-          <p key={idx} style={styles.p}>
-            {b.lines[0]}
-          </p>
-        );
-      })}
-    </div>
-  );
-}
-
 const styles: Record<string, React.CSSProperties> = {
   card: { border: "1px solid #E5E7EB", background: "#FFF", borderRadius: 16, padding: 16 },
   kicker: { fontSize: 12, color: "#666" },
   h2: { margin: 0, marginBottom: 8, fontSize: 20, color: "#333" },
   body: { color: "#333", lineHeight: 1.5 },
-  p: { margin: "8px 0", color: "#333" },
-  ul: { margin: "8px 0", paddingLeft: 18 },
-  li: { margin: "6px 0" },
-  ctaRow: { marginTop: 12 },
-  ctaLink: { color: "#1E5AA8", textDecoration: "none", fontWeight: 600 },
   actionsSingle: { display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 16 },
   primaryBtn: {
     height: 44,

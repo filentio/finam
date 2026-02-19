@@ -418,6 +418,7 @@ export default function OnboardingShell(props: Props) {
             screenId="CL_COMMON_LESSONS"
             segment={state.quiz1.segment}
             progress={state.commonLessons}
+            assetBaseUrl={assetBaseUrl}
             onResetForSegment={(segment) => dispatch({ type: "RESET_COMMON_LESSONS_FOR_SEGMENT", segment })}
             onSetIndex={(index) => dispatch({ type: "SET_COMMON_LESSONS_INDEX", index })}
             onResetAll={() => dispatch({ type: "RESET_ALL" })}

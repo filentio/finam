@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import type { BranchId, Segment, Strategy } from "./01_state_machine";
-import { BRANCH_LESSONS, getBranchLessonById, type LessonId, type LessonAsset } from "./17_branch_config";
+import { BRANCH_LESSONS, type LessonId } from "./17_branch_config";
 import { useTrack } from "./23_analytics_context";
 import { IS_DEV } from "./24_env";
+import { getLessonData } from "./33_lessons_data";
+import { LessonScreenRenderer } from "./32_lesson_renderer";
 
 export type BranchLessonsScreenProps = {
   screenId: "BR_BRANCH_LESSONS";
@@ -28,10 +30,10 @@ export function BranchLessonsScreen(props: BranchLessonsScreenProps) {
       const total = lessonIds.length;
       const index = Math.min(Math.max(0, props.currentIndex), Math.max(0, total - 1));
       const lessonId = lessonIds[index] as LessonId;
-      const lesson = getBranchLessonById(lessonId);
-      const screen = toBranchLessonScreen(lesson);
-      validateBranchLessonScreen(screen);
-      return { ok: true as const, lessonIds, total, index, lessonId, lesson, screen };
+      const data = getLessonData(lessonId as any);
+      const screen = data.screens[0];
+      if (!screen) throw new Error(`Lesson has no screens: lessonId=${lessonId}`);
+      return { ok: true as const, lessonIds, total, index, lessonId, screen };
     } catch (e) {
       return { ok: false as const, error: e instanceof Error ? e : new Error(String(e)) };
     }
@@ -96,33 +98,10 @@ export function BranchLessonsScreen(props: BranchLessonsScreenProps) {
     );
   }
 
-  const screen = flowResult.screen;
-  const payload = screen.payload;
-
   return (
     <div style={styles.card}>
       <div style={styles.kicker}>Ветка обучения</div>
-
-      <h2 style={styles.h2}>{payload.title}</h2>
-      <div style={styles.body}>
-        <PlainTextWithLineBreaks text={payload.body} />
-      </div>
-
-      {payload.assets.length ? (
-        <div style={styles.assets}>
-          {payload.assets.map((a, i) => (
-            <img key={i} src={resolveAssetUrl(a.src, props.assetBaseUrl)} alt={a.alt} style={styles.assetImg} loading="lazy" />
-          ))}
-        </div>
-      ) : null}
-
-      {payload.ctaLabel && payload.ctaLink ? (
-        <div style={styles.ctaRow}>
-          <a href={payload.ctaLink} style={styles.ctaLink}>
-            {payload.ctaLabel}
-          </a>
-        </div>
-      ) : null}
+      <LessonScreenRenderer screen={flowResult.screen} assetBaseUrl={props.assetBaseUrl} />
 
       <div style={styles.actionsSingle}>
         {canNext ? (
@@ -139,82 +118,11 @@ export function BranchLessonsScreen(props: BranchLessonsScreenProps) {
   );
 }
 
-function resolveAssetUrl(src: string, assetBaseUrl?: string): string {
-  if (!assetBaseUrl) return src;
-  if (!src.startsWith("assets/")) return src;
-  const base = assetBaseUrl.endsWith("/") ? assetBaseUrl : `${assetBaseUrl}/`;
-  return `${base}${src}`;
-}
-
-type BranchLessonScreen = {
-  type: "TEXT_IMAGE_V1";
-  payload: {
-    title: string;
-    body: string;
-    assets: LessonAsset[];
-    ctaLabel: string | null;
-    ctaLink: string | null;
-  };
-};
-
-function toBranchLessonScreen(lesson: { title: string; body: string; assets: LessonAsset[]; ctaLabel: string | null; ctaLink: string | null }): BranchLessonScreen {
-  return {
-    type: "TEXT_IMAGE_V1",
-    payload: {
-      title: lesson.title,
-      body: lesson.body,
-      assets: lesson.assets,
-      ctaLabel: lesson.ctaLabel,
-      ctaLink: lesson.ctaLink,
-    },
-  };
-}
-
-function validateBranchLessonScreen(screen: BranchLessonScreen): void {
-  if (screen.type !== "TEXT_IMAGE_V1") {
-    throw new Error(`Unknown branch lesson screen type: ${String((screen as any)?.type)}`);
-  }
-  const p = screen.payload as any;
-  if (!p || typeof p !== "object") throw new Error("Branch lesson screen payload is missing.");
-  if (typeof p.title !== "string" || p.title.trim() === "") throw new Error("Branch lesson payload.title is invalid.");
-  if (typeof p.body !== "string" || p.body.trim() === "") throw new Error("Branch lesson payload.body is invalid.");
-  if (!Array.isArray(p.assets)) throw new Error("Branch lesson payload.assets must be an array.");
-  for (const a of p.assets) {
-    if (!a || typeof a !== "object") throw new Error("Branch lesson asset is invalid.");
-    if (a.type !== "image" && a.type !== "icon") throw new Error(`Branch lesson asset.type is invalid: ${String(a.type)}`);
-    if (typeof a.src !== "string" || a.src.trim() === "") throw new Error("Branch lesson asset.src is invalid.");
-    if (typeof a.alt !== "string") throw new Error("Branch lesson asset.alt is invalid.");
-  }
-  if (p.ctaLabel != null && typeof p.ctaLabel !== "string") throw new Error("Branch lesson payload.ctaLabel is invalid.");
-  if (p.ctaLink != null && typeof p.ctaLink !== "string") throw new Error("Branch lesson payload.ctaLink is invalid.");
-  if ((p.ctaLabel && !p.ctaLink) || (!p.ctaLabel && p.ctaLink)) {
-    throw new Error("Branch lesson CTA must have both ctaLabel and ctaLink, or neither.");
-  }
-}
-
-function PlainTextWithLineBreaks(props: { text: string }) {
-  const parts = props.text.split("\n");
-  return (
-    <div>
-      {parts.map((p, i) => (
-        <div key={i} style={styles.line}>
-          {p}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 const styles: Record<string, React.CSSProperties> = {
   card: { border: "1px solid #E5E7EB", background: "#FFF", borderRadius: 16, padding: 16 },
   kicker: { fontSize: 12, color: "#666" },
   h2: { margin: 0, marginBottom: 8, fontSize: 20, color: "#333" },
   body: { color: "#333", lineHeight: 1.5 },
-  line: { margin: "6px 0" },
-  assets: { marginTop: 12, display: "flex", flexDirection: "column", gap: 8 },
-  assetImg: { width: "100%", maxWidth: 640, borderRadius: 12, border: "1px solid #E5E7EB" },
-  ctaRow: { marginTop: 12 },
-  ctaLink: { color: "#1E5AA8", textDecoration: "none", fontWeight: 600 },
   actionsSingle: { display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 16 },
   primaryBtn: {
     height: 44,

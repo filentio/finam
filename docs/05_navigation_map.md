@@ -220,6 +220,53 @@ Common Lessons считаются завершёнными только если
 ### 3.5.1 Branch routing (segment + strategy → branchId)
 Источник истины: `17_branch_config.ts` (`BRANCH_BY_SEGMENT_STRATEGY`) и `18_branch_rules.ts` (`resolveBranchId`).
 
+---
+
+## 4) LessonScreen schema (P0) — единый формат экранов уроков
+
+### 4.1 Source of truth (строго)
+- Для Common Lessons и Branch Lessons источником истины является `LESSON_DATA` и `LessonScreen` schema:
+  - `30_lessons_schema.ts` — типизация `LessonScreen` (discriminated union по `screen.type`)
+  - `31_lessons_validate.ts` — валидатор `validateLessonScreen`
+  - `33_lessons_data.ts` — `getLessonData(lessonId)` (единственная точка получения данных урока)
+
+Запрещено:
+- хранить “скрин/сырой HTML” как контент урока
+- подменять экран на “просто картинку”, если данных/типа нет
+- silent fallback при неизвестном id/type/payload
+
+### 4.2 Типы экранов (поддерживаемые) и payload (минимальная схема)
+
+`LessonScreen = { id, type, title?, body?, payload, assets? }`
+
+Поддерживаемые `type` (строго):
+- `intro`: `payload = { subtitle?, description?, heroIcon? }`
+- `content`: `payload = { paragraphs: string[] }`
+- `cards`: `payload = { cards: {title, text, icon?}[] }`
+- `checklist`: `payload = { items: string[] }`
+- `quote`: `payload = { quote: string, author? }`
+- `myth_reality`: `payload = { myth: string, reality: string }`
+- `selection`: `payload = { options: {id, label, description?}[] }`
+- `interactive_choice`: `payload = { question: string, options: {id,label,description?}[], correctOptionId?, feedback? }`
+- `quest`: `payload = { steps: string[] }`
+- `bonus`: `payload = { title: string, bullets: string[] }`
+- `multi_cta`: `payload = { ctas: {label, link, style?}[] }`
+- `cta`: `payload = { label, link, note? }`
+- `completion`: `payload = { summary: string, nextCta? }`
+
+### 4.3 Assets (строго)
+- `assets` — массив `{type:'image'|'icon', src, alt}`
+- `src` может быть относительным `assets/...` (в виджете резолвится через `assetBaseUrl`) или абсолютным URL.
+- Изображения грузятся `loading="lazy"`.
+
+### 4.4 Валидация и обработка ошибок (строго)
+- `validateLessonScreen(screen)`:
+  - **dev**: бросает `throw` с понятной причиной
+  - **prod**: возвращает `{ok:false, reason}`
+- Если `lessonId` отсутствует или `LessonScreen` некорректен:
+  - **dev**: `throw`
+  - **prod**: error state + кнопка `Начать заново` (resetAll)
+
 | segment \\ strategy | conservative | balanced | aggressive |
 |---|---|---|---|
 | NOVICE | BR_BEGINNER | BR_BEGINNER | BR_BEGINNER |
