@@ -1,1 +1,12 @@
+## Finam onboarding widget (CDN embed)
+
+Release distribution is done via **Git tags**.
+
+- Publish a new tag for each release: `v1.0.1`, `v1.0.2`, ...
+- Use jsDelivr with an explicit tag (do not use `latest`).
+
+URL template:
+
+`https://cdn.jsdelivr.net/gh/filentio/finam@<TAG>/widget/finam-onboarding-widget.js`
+
 
