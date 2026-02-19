@@ -17,13 +17,8 @@
 | 02 | `QZ1_EXPERIENCE_GOALS` | Анкета №1 (5 вопросов) | 2 | quiz |
 | 03 | `CL_COMMON_LESSONS` | Общие уроки (контейнер, 1 экран = 1 lesson внутри блока) | 3 | common_lesson |
 | 04 | `QZ2_INVEST_PROFILE` | Анкета №2 (3–4 вопроса) | 4 | quiz |
-| 05 | `BR_BEGINNER_01` | Ветка Beginner экран 1 (заглушка) | 5 | branch_lesson |
-| 06 | `BR_BEGINNER_02` | Ветка Beginner экран 2 (заглушка) | 5 | branch_lesson |
-| 07 | `BR_INTERMEDIATE_01` | Ветка Intermediate экран 1 (заглушка) | 5 | branch_lesson |
-| 08 | `BR_INTERMEDIATE_02` | Ветка Intermediate экран 2 (заглушка) | 5 | branch_lesson |
-| 09 | `BR_ADVANCED_01` | Ветка Advanced экран 1 (заглушка) | 5 | branch_lesson |
-| 10 | `BR_ADVANCED_02` | Ветка Advanced экран 2 (заглушка) | 5 | branch_lesson |
-| 11 | `SCR_FINAL` | Финальный экран | 6 | final |
+| 05 | `BR_BRANCH_LESSONS` | Ветка обучения (контейнер, 1 урок = 1 экран внутри ветки) | 5 | branch_lesson |
+| 06 | `SCR_FINAL` | Финальный экран | 6 | final |
 
 Все ScreenID уникальны.
 
@@ -38,18 +33,10 @@
 | T001 | `SCR_ENTRY` | `QZ1_EXPERIENCE_GOALS` | NEXT | linear |
 | T002 | `QZ1_EXPERIENCE_GOALS` | `CL_COMMON_LESSONS` | SUBMIT_VALID | submit |
 | T003 | `CL_COMMON_LESSONS` | `QZ2_INVEST_PROFILE` | SUBMIT_VALID | submit |
-| T004 | `QZ2_INVEST_PROFILE` | `BR_*_01` | BRANCH_RESOLVED | branch |
-| T005 | `BR_BEGINNER_01` | `BR_BEGINNER_02` | NEXT | linear |
-| T006 | `BR_BEGINNER_02` | `SCR_FINAL` | NEXT | linear |
-| T007 | `BR_INTERMEDIATE_01` | `BR_INTERMEDIATE_02` | NEXT | linear |
-| T008 | `BR_INTERMEDIATE_02` | `SCR_FINAL` | NEXT | linear |
-| T009 | `BR_ADVANCED_01` | `BR_ADVANCED_02` | NEXT | linear |
-| T010 | `BR_ADVANCED_02` | `SCR_FINAL` | NEXT | linear |
+| T004 | `QZ2_INVEST_PROFILE` | `BR_BRANCH_LESSONS` | BRANCH_RESOLVED | branch |
+| T005 | `BR_BRANCH_LESSONS` | `SCR_FINAL` | SUBMIT_VALID | submit |
 
-Где `BR_*_01` определяется детерминированно на основе (segment + strategy) через `branchId`:
-- `BR_BEGINNER` → `BR_BEGINNER_01`
-- `BR_INTERMEDIATE` → `BR_INTERMEDIATE_01`
-- `BR_ADVANCED` → `BR_ADVANCED_01`
+`BR_BRANCH_LESSONS` отображает контент ветки, выбранной детерминированно на основе (segment + strategy) через `branchId`.
 
 ---
 
@@ -207,6 +194,52 @@ Common Lessons считаются завершёнными только если
 
 ---
 
+## 3.5 Branch routing + Branch Lessons (этап 5) — строго
+
+### 3.5.1 Branch routing (segment + strategy → branchId)
+Источник истины: `17_branch_config.ts` (`BRANCH_BY_SEGMENT_STRATEGY`) и `18_branch_rules.ts` (`resolveBranchId`).
+
+| segment \\ strategy | conservative | balanced | aggressive |
+|---|---|---|---|
+| NOVICE | BR_BEGINNER | BR_BEGINNER | BR_BEGINNER |
+| LEARNER | BR_INTERMEDIATE | BR_INTERMEDIATE | BR_INTERMEDIATE |
+| EXPERIENCED | BR_INTERMEDIATE | BR_INTERMEDIATE | BR_ADVANCED |
+| QUALIFIED | BR_ADVANCED | BR_ADVANCED | BR_ADVANCED |
+
+### 3.5.2 Branch lesson registry (без placeholder)
+Источник истины: `17_branch_config.ts` (`LESSON_REGISTRY`).
+
+`LessonId` (строгое перечисление): соответствует ScreenID слайдов `s02a_start_intro ... s31_cta`.
+
+Каждый `Lesson` содержит:
+- `lessonId`
+- `title` (строго)
+- `body` (строго)
+- `assets[]` (из `assets/images/<screenId>.png`)
+
+### 3.5.3 Branch lessons list (branchId → LessonId[]; порядок фиксирован)
+Источник истины: `17_branch_config.ts` (`BRANCH_LESSONS`).
+
+- `BR_BEGINNER` (11 уроков):
+  - s02a_start_intro, s02_reality, s03_goals, s04_concepts, s05_deposit, s06_first_buy, s06a_purchase_steps, s07_rules_updated, s08_instruments_updated, s09_choice_updated, s10_courses
+- `BR_INTERMEDIATE` (12 уроков):
+  - s11_portfolio_intro, s12_principles, s13_structure, s14_balance, s14a_portfolio_cta, s15_risks_intro, s16_risk_types, s17_protection, s18_reliable, s19_bonds, s20_capital_protection, s20a_risks_cta
+- `BR_ADVANCED` (13 уроков):
+  - s21_tariff_intro, s22_tariff_long, s23_tariff_strateg, s24_tariff_investor, s25_trust_management, s25a_tariff_cta, s26_diversification_intro, s27_what_is_div, s28_asset_allocation, s29_why_works, s30_example, s30a_diversification_cta, s31_cta
+
+### 3.5.4 UI контейнера ветки (строго)
+Экран `BR_BRANCH_LESSONS` — контейнер, внутри:
+- показывается один `LessonId` по `branch.currentIndex`
+- Next → `currentIndex + 1`
+- Back → `currentIndex - 1`
+- Finish (`Завершить`) доступен только на последнем уроке
+
+Completion ветки:
+- только при нажатии `Завершить` на последнем уроке
+- после completion: переход на `SCR_FINAL`
+
+---
+
 ## 4) Back navigation (строго)
 
 Back запрещён, если:
@@ -218,8 +251,7 @@ Back target:
 - `QZ1_EXPERIENCE_GOALS` → `SCR_ENTRY`
 - `CL_COMMON_LESSONS` → `QZ1_EXPERIENCE_GOALS`
 - `QZ2_INVEST_PROFILE` → `CL_COMMON_LESSONS`
-- `BR_*_01` → `QZ2_INVEST_PROFILE`
-- `BR_*_02` → `BR_*_01`
+- `BR_BRANCH_LESSONS` → `QZ2_INVEST_PROFILE`
 - `SCR_FINAL` → null
 
 ---
@@ -267,6 +299,21 @@ Back target:
 - если `isCompleted=true` и `segment == quiz1.segment` → открывается `QZ2_INVEST_PROFILE`
 - если `segment != quiz1.segment` → прогресс Common Lessons сбрасывается и стартует с первого урока нового сегмента
 
+### 6.0.2 Branch data model (сохранение в state)
+`branch` хранится в `OnboardingState` и персистится в LocalStorage через общий прогресс.
+
+Формат:
+- `branchId`: `BranchId | null`
+- `currentIndex`: number
+- `isCompleted`: boolean
+- `segmentSnapshot`: `Segment | null`
+- `strategySnapshot`: `Strategy | null`
+- `quiz2Hash`: string | null (детерминированный hash от `segment + strategy + quiz1Hash + quiz2Answers`)
+
+Restore rules:
+- если `branch.isCompleted=true` и snapshot/hash совпадают с текущим контекстом → открывается `SCR_FINAL`
+- если snapshot/hash не совпадают → ветка сбрасывается и стартует заново с первого урока (корректный `branchId` вычисляется через `resolveBranchId(segment, strategy)`)
+
 ---
 
 ## 6.1) Аналитика (минимальная, без SDK)
@@ -293,6 +340,13 @@ Back target:
 - `onboarding_quiz2_complete` (payload: `strategy`, `segment`)
 - `onboarding_quiz2_error` (payload: `errorType`, optional: `missingQuestionIds`)
 
+События Branch:
+- `onboarding_branch_start` (payload: `branchId`, `segment`, `strategy`, `totalLessons`)
+- `onboarding_branch_view_lesson` (payload: `branchId`, `lessonId`, `index`, `totalLessons`)
+- `onboarding_branch_next` (payload: `branchId`, `lessonId`, `toIndex`)
+- `onboarding_branch_back` (payload: `branchId`, `lessonId`, `toIndex`)
+- `onboarding_branch_complete` (payload: `branchId`, `segment`, `strategy`)
+
 ---
 
 ## 7) Edge cases
@@ -306,6 +360,9 @@ Back target:
 - EC007: пользователь пытается перейти на `QZ2_INVEST_PROFILE` при `commonLessons.isCompleted != true` → guard редиректит на `CL_COMMON_LESSONS`
 - EC008: quiz2 answers заполнены, но `strategy` отсутствует или не совпадает с `computeStrategy(quiz1Answers, quiz2Answers, segment)` → guard редиректит на `QZ2_INVEST_PROFILE` (анкета №2 считается НЕ пройденной)
 - EC009: `quiz2.quiz1Hash` отсутствует/не совпадает с текущим hash от Quiz1 → Quiz2 считается НЕ пройденной, требуется повторный submit
+- EC010: `branch.branchId` отсутствует/не совпадает с `resolveBranchId(segment, strategy)` → ветка считается НЕ инициализированной, guard редиректит на `QZ2_INVEST_PROFILE`
+- EC011: `branch.quiz2Hash` отсутствует/не совпадает с текущим hash от Quiz2 → ветка сбрасывается и стартует заново с первого урока
+- EC012: пользователь пытается открыть `SCR_FINAL` при `branch.isCompleted != true` → guard редиректит на `BR_BRANCH_LESSONS`
 
 ---
 
@@ -313,4 +370,5 @@ Back target:
 
 BL001: Финальные тексты Common Lessons не предоставлены продуктом. В `10_common_lessons_config.ts` используются временные, но содержательные тексты, которые требуют замены на финальные без изменения структуры/логики.
 BL002: Финальные правила стратегии и финальная матрица prefill Quiz2 не предоставлены продуктом. В `14_quiz2_prefill.ts` и `15_quiz2_rules.ts` реализованы временные, но детерминированные правила, требующие замены на финальные без изменения архитектуры/guard/хранилища.
+BL003: Если команда предоставит обновлённый финальный контент слайдов для веток (ScreenID `s02a_* ... s31_cta`), требуется синхронизация `17_branch_config.ts` (LESSON_REGISTRY и списки BRANCH_LESSONS) без изменения навигации/guard.
 
