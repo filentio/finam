@@ -1,0 +1,66 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LessonScreenRenderer snapshots > renders cards 1`] = `
+<LessonScreenRenderer
+  screen={
+    {
+      "id": "t_cards",
+      "payload": {
+        "cards": [
+          {
+            "text": "Документ, подтверждающий ваши права на актив.",
+            "title": "Ценная бумага",
+          },
+          {
+            "text": "Площадка для торговли ценными бумагами.",
+            "title": "Биржа",
+          },
+        ],
+      },
+      "title": "Понятия",
+      "type": "cards",
+    }
+  }
+/>
+`;
+
+exports[`LessonScreenRenderer snapshots > renders cta 1`] = `
+<LessonScreenRenderer
+  screen={
+    {
+      "body": "Сделайте первое пополнение счёта.",
+      "id": "t_cta",
+      "payload": {
+        "label": "Пополнить счёт",
+        "link": "finam://invest/deposit",
+      },
+      "title": "Начинаем",
+      "type": "cta",
+    }
+  }
+/>
+`;
+
+exports[`LessonScreenRenderer snapshots > renders intro 1`] = `
+<LessonScreenRenderer
+  assetBaseUrl="https://cdn.example/"
+  screen={
+    {
+      "assets": [
+        {
+          "alt": "gift",
+          "src": "assets/icons/s05_deposit__gift.svg",
+          "type": "icon",
+        },
+      ],
+      "id": "t_intro",
+      "payload": {
+        "description": "Разберемся в основах.",
+        "subtitle": "С чего начать",
+      },
+      "title": "УРОК 1",
+      "type": "intro",
+    }
+  }
+/>
+`;

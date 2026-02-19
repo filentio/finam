@@ -1,0 +1,184 @@
+{
+  "id": "66dnAOtNN5WckbC2QZC9os",
+  "title": "Дизайн для обучения новичков в инвестициях",
+  "createdAt": 1766506044874,
+  "createdAtIso": "2025-12-23T16:07:24.874000Z",
+  "updatedAt": 1771436114006,
+  "updatedAtIso": "2026-02-18T17:35:14.006000Z",
+  "isShared": true,
+  "segmentCount": 1,
+  "eventCounts": {
+    "chat": 44,
+    "liveStatus": 232,
+    "sandboxUpdate": 19,
+    "sessionProjectChanged": 1,
+    "planUpdate": 36,
+    "newPlanStep": 24,
+    "explanation": 40,
+    "resourceAccessed": 24,
+    "toolUsed": 146,
+    "statusUpdate": 38,
+    "fileOperationPromotion": 1,
+    "sidebarDisplay": 1,
+    "mobileWebDevFallback": 2,
+    "webdevHomepageUpdated": 2,
+    "contextTooLong": 1
+  },
+  "chatMessageCount": 44,
+  "attachmentsInChat": [
+    {
+      "messageTimestamp": 1766506044548,
+      "messageSender": "user",
+      "type": "file",
+      "filename": "Лид-магнитдляновичковЖариков(2).pptx",
+      "contentType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "contentLength": 102464,
+      "id": "NvN7Tir1OeqZkOr5dSZIVw",
+      "path": "/home/ubuntu/upload/Лид-магнитдляновичковЖариков(2).pptx"
+    },
+    {
+      "messageTimestamp": 1766506979466,
+      "messageSender": "assistant",
+      "type": "slides",
+      "filename": "Инвестиции для новичков",
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical",
+      "title": "Инвестиции для новичков"
+    },
+    {
+      "messageTimestamp": 1766561505511,
+      "messageSender": "assistant",
+      "type": "slides",
+      "filename": "Инвестиции для новичков",
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical",
+      "title": "Инвестиции для новичков"
+    },
+    {
+      "messageTimestamp": 1768211424439,
+      "messageSender": "assistant",
+      "type": "slides",
+      "filename": "Инвестиции для новичков",
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical",
+      "title": "Инвестиции для новичков"
+    },
+    {
+      "messageTimestamp": 1768211424439,
+      "messageSender": "assistant",
+      "type": "file",
+      "filename": "slide_notes.md",
+      "contentType": "text/markdown",
+      "contentLength": 29663,
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical/slide_notes.md",
+      "title": "1 - С чего начать?"
+    },
+    {
+      "messageTimestamp": 1768211491207,
+      "messageSender": "user",
+      "type": "image",
+      "filename": "pasted_file_8ufSfB_image.png",
+      "contentType": "image/png",
+      "contentLength": 101291,
+      "id": "iJ16BYnB57gQTjeRJ5Qs21",
+      "path": "/home/ubuntu/upload/pasted_file_8ufSfB_image.png"
+    },
+    {
+      "messageTimestamp": 1768211581032,
+      "messageSender": "assistant",
+      "type": "slides",
+      "filename": "Инвестиции для новичков",
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical",
+      "title": "Инвестиции для новичков"
+    },
+    {
+      "messageTimestamp": 1768214588973,
+      "messageSender": "user",
+      "type": "image",
+      "filename": "pasted_file_onMgCy_image.png",
+      "contentType": "image/png",
+      "contentLength": 167024,
+      "id": "hqAEkJdWfvIjVbau9y8WUU",
+      "path": "/home/ubuntu/upload/pasted_file_onMgCy_image.png"
+    },
+    {
+      "messageTimestamp": 1768214742284,
+      "messageSender": "assistant",
+      "type": "slides",
+      "filename": "Инвестиции для новичков",
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical",
+      "title": "Инвестиции для новичков"
+    },
+    {
+      "messageTimestamp": 1768215130522,
+      "messageSender": "assistant",
+      "type": "slides",
+      "filename": "Инвестиции для новичков",
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical",
+      "title": "Инвестиции для новичков"
+    },
+    {
+      "messageTimestamp": 1768215481119,
+      "messageSender": "assistant",
+      "type": "file",
+      "filename": "structure_and_cta.pdf",
+      "contentType": "application/pdf",
+      "contentLength": 406929,
+      "path": "/home/ubuntu/finam_investment_design/structure_and_cta.pdf"
+    },
+    {
+      "messageTimestamp": 1768215481119,
+      "messageSender": "assistant",
+      "type": "file",
+      "filename": "structure_and_cta.md",
+      "contentType": "text/markdown",
+      "contentLength": 22049,
+      "path": "/home/ubuntu/finam_investment_design/structure_and_cta.md",
+      "title": "Структура уроков и целевые действия (CTA)"
+    },
+    {
+      "messageTimestamp": 1768216339975,
+      "messageSender": "assistant",
+      "type": "file",
+      "filename": "audit_report.md",
+      "contentType": "text/markdown",
+      "contentLength": 8840,
+      "path": "/home/ubuntu/finam_investment_design/audit_report.md",
+      "title": "Аудит полноты экранов презентации"
+    },
+    {
+      "messageTimestamp": 1768217288473,
+      "messageSender": "assistant",
+      "type": "slides",
+      "filename": "Инвестиции для новичков",
+      "path": "/home/ubuntu/finam_investment_design/presentation_vertical",
+      "title": "Инвестиции для новичков"
+    },
+    {
+      "messageTimestamp": 1768218154295,
+      "messageSender": "user",
+      "type": "file",
+      "filename": "structure_and_cta(1).pdf",
+      "contentType": "application/pdf",
+      "contentLength": 406929,
+      "id": "jyXs9aUvURQppgBBz93Z7b",
+      "path": "/home/ubuntu/upload/structure_and_cta(1).pdf"
+    },
+    {
+      "messageTimestamp": 1768218664641,
+      "messageSender": "assistant",
+      "type": "image",
+      "filename": "visual_user_flow.png",
+      "contentType": "image/png",
+      "contentLength": 1175370,
+      "path": "/home/ubuntu/finam_investment_design/visual_user_flow.png"
+    },
+    {
+      "messageTimestamp": 1769077498231,
+      "messageSender": "user",
+      "type": "image",
+      "filename": "pasted_file_8Moovx_image.png",
+      "contentType": "image/webp",
+      "contentLength": 48070,
+      "id": "2hTvkY1YqcLf3DLzIEaFWy",
+      "path": "/home/ubuntu/upload/pasted_file_8Moovx_image.png"
+    }
+  ]
+}

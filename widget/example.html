@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Finam Onboarding Widget — Example</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; padding: 24px; }
+      .box { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; max-width: 760px; }
+    </style>
+  </head>
+  <body>
+    <h1>Widget example</h1>
+    <div class="box">
+      <div id="finam-onb"></div>
+    </div>
+
+    <script
+      src="./finam-onboarding-widget.js"
+      data-target="#finam-onb"
+      data-mode="modal"
+      data-open="auto"
+      data-disable-tracking="true"
+      data-storage-namespace="finam_onb_demo"
+      data-locale="ru"
+      data-theme="finam"
+    ></script>
+  </body>
+</html>
+
