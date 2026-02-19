@@ -80,7 +80,57 @@
   - `QZ1_Q2_3_5Y` или `QZ1_Q2_GT_5Y` → `EXPERIENCED`
 
 ### 3.2 Strategy (результат анкеты №2)
-`strategy` вычисляется детерминированно по score 0..8:
+#### 3.2.1 Quiz2 data model (сохранение в state)
+`quiz2.answers` хранится в `OnboardingState` и персистится в LocalStorage через общий прогресс.
+
+Формат (все поля обязательны для completion, но могут быть `null` в процессе заполнения):
+- `q1Horizon`: `QZ2_Q1_LT_1Y | QZ2_Q1_1_3Y | QZ2_Q1_3_5Y | QZ2_Q1_GT_5Y | null`
+- `q2DrawdownReaction`: `QZ2_Q2_SELL | QZ2_Q2_WAIT | QZ2_Q2_BUY_MORE | null`
+- `q3MonthlyShare`: `QZ2_Q3_LT_5 | QZ2_Q3_5_15 | QZ2_Q3_GT_15 | null`
+- `q4Preference`: `QZ2_Q4_PRESERVE | QZ2_Q4_BALANCE | QZ2_Q4_GROWTH | null`
+
+Доп. поля защиты от рассинхронизации:
+- `quiz2.segmentSnapshot`: `Segment | null`
+- `quiz2.quiz1Hash`: string | null (детерминированный hash от `quiz1Answers + segment`)
+- `quiz2.prefillAppliedFromQuiz1Hash`: string | null (чтобы не применять prefill повторно)
+
+#### 3.2.2 Prefill из Quiz1 (строго)
+Источник истины: `14_quiz2_prefill.ts` (`prefillQuiz2AnswersFromQuiz1`).
+
+Prefill применяется детерминированно и **не завершает** Quiz2 автоматически.
+
+Предзаполняемые поля:
+- `q1Horizon` (по `quiz1.q4MainGoal`):
+  - `QZ1_Q4_PURCHASE` → `QZ2_Q1_1_3Y`
+  - `QZ1_Q4_PASSIVE_INCOME` → `QZ2_Q1_GT_5Y`
+  - `QZ1_Q4_GROWTH` → `QZ2_Q1_3_5Y`
+  - `QZ1_Q4_PRESERVE` → `QZ2_Q1_GT_5Y`
+- `q4Preference` (по `quiz1.q1QualifiedStatus` и `quiz1.q2Experience`):
+  - если `QZ1_Q1_YES` → `QZ2_Q4_GROWTH`
+  - если `QZ1_Q1_NO`:
+    - `QZ1_Q2_NO_EXPERIENCE` или `QZ1_Q2_LT_1Y` → `QZ2_Q4_PRESERVE`
+    - `QZ1_Q2_1_3Y` → `QZ2_Q4_BALANCE`
+    - `QZ1_Q2_3_5Y` или `QZ1_Q2_GT_5Y` → `QZ2_Q4_GROWTH`
+
+Правило редактирования предзаполненных значений:
+- Предзаполненные значения **разрешено изменять** пользователю (не read-only). Это фиксировано в `14_quiz2_prefill.ts` (`QUIZ2_PREFILL_EDITABILITY`).
+
+#### 3.2.3 Strategy enum
+`Strategy` (строгое перечисление): `conservative | balanced | aggressive`
+
+#### 3.2.4 Правила стратегии (детерминированно)
+Источник истины: `15_quiz2_rules.ts` (`QUIZ2_STRATEGY_RULES`, `computeStrategy(...)`).
+
+Счёт:
+- Базовый score = сумма баллов по 4 ответам Quiz2 (каждый 0..2) → диапазон 0..8.
+- Затем применяется корректировка:
+  - `+ bySegment[segment]`, где:
+    - `NOVICE: -1`, `LEARNER: 0`, `EXPERIENCED: 0`, `QUALIFIED: +1`
+  - `+ byPlannedAmount[quiz1.q3PlannedAmount]`, где:
+    - `QZ1_Q3_LT_300K: 0`, `QZ1_Q3_300K_2M: 0`, `QZ1_Q3_2_5M: +1`, `QZ1_Q3_GT_5M: +1`
+- Итоговый score clamp в 0..8.
+
+Пороговые значения:
 - 0–2 → `conservative`
 - 3–5 → `balanced`
 - 6–8 → `aggressive`
@@ -236,6 +286,13 @@ Back target:
 - `onboarding_common_back` (payload: `lessonId`, `toIndex`)
 - `onboarding_common_complete` (payload: `segment`)
 
+События Quiz2:
+- `onboarding_quiz2_start` (payload: `segment`)
+- `onboarding_quiz2_prefill` (payload: `prefilledFields[]`)
+- `onboarding_quiz2_answer` (payload: `questionId`, `answerId`, `wasPrefilled`, `segment`)
+- `onboarding_quiz2_complete` (payload: `strategy`, `segment`)
+- `onboarding_quiz2_error` (payload: `errorType`, optional: `missingQuestionIds`)
+
 ---
 
 ## 7) Edge cases
@@ -247,10 +304,13 @@ Back target:
 - EC005: quiz1 answers заполнены, но `segment` отсутствует или не совпадает с `computeSegment(answers)` → guard редиректит на `QZ1_EXPERIENCE_GOALS` (анкета считается НЕ пройденной)
 - EC006: `quiz1.segment` изменился (или отличается от `commonLessons.segment`) → прогресс Common Lessons сбрасывается и пользователь проходит блок заново для нового сегмента
 - EC007: пользователь пытается перейти на `QZ2_INVEST_PROFILE` при `commonLessons.isCompleted != true` → guard редиректит на `CL_COMMON_LESSONS`
+- EC008: quiz2 answers заполнены, но `strategy` отсутствует или не совпадает с `computeStrategy(quiz1Answers, quiz2Answers, segment)` → guard редиректит на `QZ2_INVEST_PROFILE` (анкета №2 считается НЕ пройденной)
+- EC009: `quiz2.quiz1Hash` отсутствует/не совпадает с текущим hash от Quiz1 → Quiz2 считается НЕ пройденной, требуется повторный submit
 
 ---
 
 ## 8) BLOCKERS
 
 BL001: Финальные тексты Common Lessons не предоставлены продуктом. В `10_common_lessons_config.ts` используются временные, но содержательные тексты, которые требуют замены на финальные без изменения структуры/логики.
+BL002: Финальные правила стратегии и финальная матрица prefill Quiz2 не предоставлены продуктом. В `14_quiz2_prefill.ts` и `15_quiz2_rules.ts` реализованы временные, но детерминированные правила, требующие замены на финальные без изменения архитектуры/guard/хранилища.
 
