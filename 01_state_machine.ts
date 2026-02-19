@@ -50,10 +50,10 @@ export type Quiz1Answers = {
 };
 
 export type Quiz2Answers = {
-  q1Horizon: "До 1 года" | "1–3 года" | "3–5 лет" | "Более 5 лет" | null;
-  q2DrawdownReaction: "Продам" | "Подожду" | "Докуплю" | null;
-  q3MonthlyShare: "До 5%" | "5–15%" | "Более 15%" | null;
-  q4Preference: "Сохранение" | "Баланс" | "Рост" | null;
+  q1Horizon: "QZ2_Q1_LT_1Y" | "QZ2_Q1_1_3Y" | "QZ2_Q1_3_5Y" | "QZ2_Q1_GT_5Y" | null;
+  q2DrawdownReaction: "QZ2_Q2_SELL" | "QZ2_Q2_WAIT" | "QZ2_Q2_BUY_MORE" | null;
+  q3MonthlyShare: "QZ2_Q3_LT_5" | "QZ2_Q3_5_15" | "QZ2_Q3_GT_15" | null;
+  q4Preference: "QZ2_Q4_PRESERVE" | "QZ2_Q4_BALANCE" | "QZ2_Q4_GROWTH" | null;
 };
 
 export type CommonLessonsState = {
@@ -77,6 +77,10 @@ export type OnboardingState = {
     answers: Quiz2Answers;
     isCompleted: boolean;
     strategy: Strategy | null;
+    // Protection against upstream changes / storage desync.
+    segmentSnapshot: Segment | null;
+    quiz1Hash: string | null;
+    prefillAppliedFromQuiz1Hash: string | null;
   };
 
   commonLessons: CommonLessonsState;
@@ -102,7 +106,8 @@ export type OnboardingEvent =
   | { type: "SET_COMMON_LESSONS_INDEX"; index: number }
   | { type: "SET_COMMON_LESSONS_COMPLETED"; segment: Segment }
   | { type: "SET_QUIZ2_ANSWERS"; answers: Quiz2Answers }
-  | { type: "SET_QUIZ2_COMPLETED"; strategy: Strategy }
+  | { type: "APPLY_QUIZ2_PREFILL"; quiz1Hash: string; patch: Partial<Quiz2Answers>; prefilledFields: string[] }
+  | { type: "SET_QUIZ2_COMPLETED"; strategy: Strategy; segmentSnapshot: Segment; quiz1Hash: string }
   | { type: "SET_BRANCH_ID"; branchId: BranchId }
   | { type: "HYDRATE"; state: OnboardingState };
 
@@ -156,7 +161,14 @@ export function getInitialOnboardingState(): OnboardingState {
     currentScreenId: "SCR_ENTRY",
     screenStatusById,
     quiz1: { answers: DEFAULT_QUIZ1_ANSWERS, isCompleted: false, segment: null },
-    quiz2: { answers: DEFAULT_QUIZ2_ANSWERS, isCompleted: false, strategy: null },
+    quiz2: {
+      answers: DEFAULT_QUIZ2_ANSWERS,
+      isCompleted: false,
+      strategy: null,
+      segmentSnapshot: null,
+      quiz1Hash: null,
+      prefillAppliedFromQuiz1Hash: null,
+    },
     commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE },
     branch: { branchId: null },
     completedScreenIds,
@@ -207,21 +219,42 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
       };
 
     case "SET_QUIZ1_ANSWERS":
-      return {
+      return resetDownstreamAfterQuiz1Change({
         ...state,
         // Any answer change invalidates quiz completion and requires re-submit.
         quiz1: { ...state.quiz1, answers: event.answers, isCompleted: false, segment: null },
         // Any change to Quiz1 can change segment. Common lessons progress must be reset deterministically.
         commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE },
-      };
+        // Upstream change resets Quiz2 and branch selection.
+        quiz2: {
+          ...state.quiz2,
+          answers: DEFAULT_QUIZ2_ANSWERS,
+          isCompleted: false,
+          strategy: null,
+          segmentSnapshot: null,
+          quiz1Hash: null,
+          prefillAppliedFromQuiz1Hash: null,
+        },
+        branch: { branchId: null },
+      });
 
     case "SET_QUIZ1_COMPLETED":
       if (state.commonLessons.segment && state.commonLessons.segment !== event.segment) {
-        return {
+        return resetDownstreamAfterQuiz1Change({
           ...state,
           quiz1: { ...state.quiz1, isCompleted: true, segment: event.segment },
           commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE, segment: event.segment },
-        };
+          quiz2: {
+            ...state.quiz2,
+            answers: DEFAULT_QUIZ2_ANSWERS,
+            isCompleted: false,
+            strategy: null,
+            segmentSnapshot: null,
+            quiz1Hash: null,
+            prefillAppliedFromQuiz1Hash: null,
+          },
+          branch: { branchId: null },
+        });
       }
       return {
         ...state,
@@ -255,15 +288,43 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
       };
 
     case "SET_QUIZ2_ANSWERS":
-      return {
+      return resetDownstreamAfterQuiz2Change({
         ...state,
-        quiz2: { ...state.quiz2, answers: event.answers },
-      };
+        // Any answer change invalidates quiz completion and requires re-submit.
+        quiz2: {
+          ...state.quiz2,
+          answers: event.answers,
+          isCompleted: false,
+          strategy: null,
+          segmentSnapshot: null,
+          quiz1Hash: null,
+        },
+        branch: { branchId: null },
+      });
 
     case "SET_QUIZ2_COMPLETED":
       return {
         ...state,
-        quiz2: { ...state.quiz2, isCompleted: true, strategy: event.strategy },
+        quiz2: {
+          ...state.quiz2,
+          isCompleted: true,
+          strategy: event.strategy,
+          segmentSnapshot: event.segmentSnapshot,
+          quiz1Hash: event.quiz1Hash,
+        },
+      };
+
+    case "APPLY_QUIZ2_PREFILL":
+      if (state.quiz2.prefillAppliedFromQuiz1Hash === event.quiz1Hash) {
+        return state;
+      }
+      return {
+        ...state,
+        quiz2: {
+          ...state.quiz2,
+          answers: { ...state.quiz2.answers, ...event.patch },
+          prefillAppliedFromQuiz1Hash: event.quiz1Hash,
+        },
       };
 
     case "SET_BRANCH_ID":
@@ -277,5 +338,46 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
       return state;
     }
   }
+}
+
+function resetDownstreamAfterQuiz1Change(state: OnboardingState): OnboardingState {
+  const ids: ScreenId[] = [
+    "CL_COMMON_LESSONS",
+    "QZ2_INVEST_PROFILE",
+    "BR_BEGINNER_01",
+    "BR_BEGINNER_02",
+    "BR_INTERMEDIATE_01",
+    "BR_INTERMEDIATE_02",
+    "BR_ADVANCED_01",
+    "BR_ADVANCED_02",
+    "SCR_FINAL",
+  ];
+  const completedScreenIds = { ...state.completedScreenIds };
+  const screenStatusById = { ...state.screenStatusById };
+  for (const id of ids) {
+    completedScreenIds[id] = false;
+    screenStatusById[id] = "loading";
+  }
+  return { ...state, completedScreenIds, screenStatusById };
+}
+
+function resetDownstreamAfterQuiz2Change(state: OnboardingState): OnboardingState {
+  const ids: ScreenId[] = [
+    "QZ2_INVEST_PROFILE",
+    "BR_BEGINNER_01",
+    "BR_BEGINNER_02",
+    "BR_INTERMEDIATE_01",
+    "BR_INTERMEDIATE_02",
+    "BR_ADVANCED_01",
+    "BR_ADVANCED_02",
+    "SCR_FINAL",
+  ];
+  const completedScreenIds = { ...state.completedScreenIds };
+  const screenStatusById = { ...state.screenStatusById };
+  for (const id of ids) {
+    completedScreenIds[id] = false;
+    screenStatusById[id] = "loading";
+  }
+  return { ...state, completedScreenIds, screenStatusById };
 }
 

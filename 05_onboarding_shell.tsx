@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import {
-  DEFAULT_QUIZ2_ANSWERS,
   getInitialOnboardingState,
   onboardingReducer,
   type OnboardingState,
@@ -9,15 +8,16 @@ import {
 import { ALL_SCREEN_IDS, guardScreenAccess, getBackScreenId, getNextScreenId } from "./02_routes";
 import {
   assertBranchMappingCoverage,
-  computeStrategyFromQuiz2,
   getBranchId,
-  validateQuiz2Answers,
 } from "./03_branch_mapping";
 import { clearProgress, loadProgress, saveProgress } from "./04_progress_storage";
 import { computeSegment } from "./07_quiz1_rules";
 import { Quiz1Screen } from "./08_quiz1_screen";
 import { track } from "./09_analytics";
 import { CommonLessonsScreen } from "./12_common_lessons_screen";
+import { Quiz2Screen } from "./16_quiz2_screen";
+import { prefillQuiz2AnswersFromQuiz1, getPrefilledQuiz2QuestionIds } from "./14_quiz2_prefill";
+import { computeQuiz1HashForQuiz2, computeStrategy } from "./15_quiz2_rules";
 
 type Props = {
   storageEnabled?: boolean;
@@ -136,6 +136,33 @@ export default function OnboardingShell(props: Props) {
     state.screenStatusById,
   ]);
 
+  // Apply Quiz2 prefill deterministically (non-destructive).
+  useEffect(() => {
+    if (state.currentScreenId !== "QZ2_INVEST_PROFILE") return;
+    if (!state.quiz1.segment) return;
+
+    const quiz1Hash = computeQuiz1HashForQuiz2(state.quiz1.answers, state.quiz1.segment);
+    if (state.quiz2.prefillAppliedFromQuiz1Hash === quiz1Hash) return;
+
+    const suggestion = prefillQuiz2AnswersFromQuiz1(state.quiz1.answers);
+    const patch: Partial<typeof state.quiz2.answers> = {};
+    if (!state.quiz2.answers.q1Horizon && suggestion.q1Horizon) patch.q1Horizon = suggestion.q1Horizon;
+    if (!state.quiz2.answers.q4Preference && suggestion.q4Preference) patch.q4Preference = suggestion.q4Preference;
+
+    const prefilledFields = getPrefilledQuiz2QuestionIds(patch);
+    if (prefilledFields.length) {
+      track("onboarding_quiz2_prefill", { prefilledFields });
+    }
+    dispatch({ type: "APPLY_QUIZ2_PREFILL", quiz1Hash, patch, prefilledFields });
+  }, [
+    state.currentScreenId,
+    state.quiz1.segment,
+    state.quiz1.answers,
+    state.quiz2.answers.q1Horizon,
+    state.quiz2.answers.q4Preference,
+    state.quiz2.prefillAppliedFromQuiz1Hash,
+  ]);
+
   const canGoBack = useMemo(() => {
     return getBackScreenId(state) !== null && state.processStatus !== "COMPLETED";
   }, [state]);
@@ -236,29 +263,46 @@ export default function OnboardingShell(props: Props) {
         )}
 
         {screenId === "QZ2_INVEST_PROFILE" && (
-          <Quiz2Screen
-            state={state}
-            error={quizError}
-            onChange={(answers) => dispatch({ type: "SET_QUIZ2_ANSWERS", answers })}
-            onSubmit={() => {
-              const v = validateQuiz2Answers(state.quiz2.answers);
-              if (!v.ok) {
-                setQuizError(FIXED_ERROR_QUIZ_INVALID);
-                return;
-              }
-              if (!state.quiz1.segment) {
-                setQuizError(FIXED_ERROR_QUIZ_INVALID);
-                return;
-              }
-              const strategy = computeStrategyFromQuiz2(state.quiz2.answers);
-              const branchId = getBranchId(state.quiz1.segment, strategy);
-              dispatch({ type: "SET_QUIZ2_COMPLETED", strategy });
-              dispatch({ type: "SET_BRANCH_ID", branchId });
-              dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "QZ2_INVEST_PROFILE" });
-              dispatch({ type: "SET_CURRENT_SCREEN", screenId: getBranchStartScreen(branchId) });
-              setQuizError(null);
-            }}
-          />
+          state.quiz1.segment && (
+            <Quiz2Screen
+              screenId="QZ2_INVEST_PROFILE"
+              segment={state.quiz1.segment}
+              quiz1Answers={state.quiz1.answers}
+              answers={state.quiz2.answers}
+              externalError={quizError}
+              onInteract={() => setQuizError(null)}
+              onChangeAnswers={(answers) => {
+                setQuizError(null);
+                dispatch({ type: "SET_QUIZ2_ANSWERS", answers });
+              }}
+              onSubmitValid={() => {
+                try {
+                  const strategy = computeStrategy({
+                    quiz1Answers: state.quiz1.answers,
+                    quiz2Answers: state.quiz2.answers,
+                    segment: state.quiz1.segment!,
+                  });
+                  const quiz1Hash = computeQuiz1HashForQuiz2(state.quiz1.answers, state.quiz1.segment!);
+                  const branchId = getBranchId(state.quiz1.segment!, strategy);
+
+                  dispatch({
+                    type: "SET_QUIZ2_COMPLETED",
+                    strategy,
+                    segmentSnapshot: state.quiz1.segment!,
+                    quiz1Hash,
+                  });
+                  track("onboarding_quiz2_complete", { strategy, segment: state.quiz1.segment });
+                  dispatch({ type: "SET_BRANCH_ID", branchId });
+                  dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "QZ2_INVEST_PROFILE" });
+                  dispatch({ type: "SET_CURRENT_SCREEN", screenId: getBranchStartScreen(branchId) });
+                  setQuizError(null);
+                } catch (e) {
+                  track("onboarding_quiz2_error", { errorType: "STRATEGY_COMPUTE_FAILED" });
+                  setQuizError(FIXED_ERROR_QUIZ_INVALID);
+                }
+              }}
+            />
+          )
         )}
 
         {screenId === "BR_BEGINNER_01" && (
@@ -373,105 +417,6 @@ function FinalScreen(props: { isCompleted: boolean; onFinish: () => void }) {
       </button>
       {props.isCompleted && <p style={styles.p}>processStatus=COMPLETED</p>}
     </div>
-  );
-}
-
-function Quiz2Screen(props: {
-  state: OnboardingState;
-  error: string | null;
-  onChange: (answers: typeof DEFAULT_QUIZ2_ANSWERS) => void;
-  onSubmit: () => void;
-}) {
-  const a = props.state.quiz2.answers;
-  const set = (next: Partial<typeof DEFAULT_QUIZ2_ANSWERS>) => props.onChange({ ...a, ...next });
-
-  return (
-    <div style={styles.card}>
-      <h2 style={styles.h2}>Анкета №2 (инвест профиль)</h2>
-      <p style={styles.p}>Контент анкеты является базовым и не является финальным UI.</p>
-
-      <Fieldset title="Q1. Инвестиционный горизонт">
-        {(["До 1 года", "1–3 года", "3–5 лет", "Более 5 лет"] as const).map((v) => (
-          <Radio
-            key={v}
-            name="q2_1"
-            value={v}
-            checked={a.q1Horizon === v}
-            label={v}
-            onChange={() => set({ q1Horizon: v })}
-          />
-        ))}
-      </Fieldset>
-
-      <Fieldset title="Q2. Реакция на просадку 20%">
-        {(["Продам", "Подожду", "Докуплю"] as const).map((v) => (
-          <Radio
-            key={v}
-            name="q2_2"
-            value={v}
-            checked={a.q2DrawdownReaction === v}
-            label={v}
-            onChange={() => set({ q2DrawdownReaction: v })}
-          />
-        ))}
-      </Fieldset>
-
-      <Fieldset title="Q3. Доля дохода для инвестирования в месяц">
-        {(["До 5%", "5–15%", "Более 15%"] as const).map((v) => (
-          <Radio
-            key={v}
-            name="q2_3"
-            value={v}
-            checked={a.q3MonthlyShare === v}
-            label={v}
-            onChange={() => set({ q3MonthlyShare: v })}
-          />
-        ))}
-      </Fieldset>
-
-      <Fieldset title="Q4. Предпочтение">
-        {(["Сохранение", "Баланс", "Рост"] as const).map((v) => (
-          <Radio
-            key={v}
-            name="q2_4"
-            value={v}
-            checked={a.q4Preference === v}
-            label={v}
-            onChange={() => set({ q4Preference: v })}
-          />
-        ))}
-      </Fieldset>
-
-      {props.error && <div style={styles.errorBox}>{props.error}</div>}
-
-      <button style={styles.primaryBtn} onClick={props.onSubmit}>
-        Готово
-      </button>
-    </div>
-  );
-}
-
-function Fieldset(props: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={styles.fieldset}>
-      <div style={styles.fieldsetTitle}>{props.title}</div>
-      <div style={styles.fieldsetBody}>{props.children}</div>
-    </div>
-  );
-}
-
-function Radio(props: {
-  name: string;
-  value: string;
-  checked: boolean;
-  label: string;
-  onChange: () => void;
-}) {
-  return (
-    <label style={styles.choiceRow}>
-      <input type="radio" name={props.name} value={props.value} checked={props.checked} onChange={props.onChange} />
-      <span>{props.label}</span>
-    </label>
   );
 }
 

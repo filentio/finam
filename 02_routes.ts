@@ -2,6 +2,7 @@ import type { BranchId, OnboardingState, ScreenId, ScreenType } from "./01_state
 import { getBranchStartScreenId } from "./03_branch_mapping";
 import { isQuiz1CompletionValid } from "./07_quiz1_rules";
 import { isCommonLessonsCompletionValid } from "./11_common_lessons_rules";
+import { isQuiz2CompletionValid } from "./15_quiz2_rules";
 
 export const ALL_SCREEN_IDS: ScreenId[] = [
   "SCR_ENTRY",
@@ -140,7 +141,20 @@ export function guardScreenAccess(state: OnboardingState, targetScreenId: Screen
     targetScreenId === "BR_ADVANCED_01" ||
     targetScreenId === "BR_ADVANCED_02" ||
     targetScreenId === "SCR_FINAL";
-  if (isAfterQuiz2 && !state.quiz2.isCompleted) {
+  if (
+    isAfterQuiz2 &&
+    !isQuiz2CompletionValid({
+      quiz1Answers: state.quiz1.answers,
+      segment: state.quiz1.segment,
+      quiz2: {
+        answers: state.quiz2.answers,
+        isCompleted: state.quiz2.isCompleted,
+        strategy: state.quiz2.strategy,
+        quiz1Hash: state.quiz2.quiz1Hash,
+        segmentSnapshot: state.quiz2.segmentSnapshot,
+      },
+    })
+  ) {
     return { allowed: false, redirectTo: "QZ2_INVEST_PROFILE", reason: "QUIZ2_REQUIRED" };
   }
 
