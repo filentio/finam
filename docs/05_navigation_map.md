@@ -13,12 +13,12 @@
 
 | Порядок | ScreenID | Назначение | Этап | Тип |
 |---:|---|---|---|---|
-| 01 | `SCR_ENTRY` | Вход | 1 | entry |
+| 01 | `ENTRY_GATE` | Входной gate (разводящий экран) | 1 | entry |
 | 02 | `QZ1_EXPERIENCE_GOALS` | Анкета №1 (5 вопросов) | 2 | quiz |
 | 03 | `CL_COMMON_LESSONS` | Общие уроки (контейнер, 1 экран = 1 lesson внутри блока) | 3 | common_lesson |
 | 04 | `QZ2_INVEST_PROFILE` | Анкета №2 (3–4 вопроса) | 4 | quiz |
 | 05 | `BR_BRANCH_LESSONS` | Ветка обучения (контейнер, 1 урок = 1 экран внутри ветки) | 5 | branch_lesson |
-| 06 | `SCR_FINAL` | Финальный экран | 6 | final |
+| 06 | `SCR_FINAL` | Финальный экран (итог + CTA) | 6 | final |
 
 Все ScreenID уникальны.
 
@@ -30,7 +30,7 @@
 
 | ID | From | To | Условие | Тип |
 |---|---|---|---|---|
-| T001 | `SCR_ENTRY` | `QZ1_EXPERIENCE_GOALS` | NEXT | linear |
+| T001 | `ENTRY_GATE` | `QZ1_EXPERIENCE_GOALS` | NEXT | linear |
 | T002 | `QZ1_EXPERIENCE_GOALS` | `CL_COMMON_LESSONS` | SUBMIT_VALID | submit |
 | T003 | `CL_COMMON_LESSONS` | `QZ2_INVEST_PROFILE` | SUBMIT_VALID | submit |
 | T004 | `QZ2_INVEST_PROFILE` | `BR_BRANCH_LESSONS` | BRANCH_RESOLVED | branch |
@@ -247,8 +247,8 @@ Back запрещён, если:
 - для текущего экрана backTarget = null
 
 Back target:
-- `SCR_ENTRY` → null
-- `QZ1_EXPERIENCE_GOALS` → `SCR_ENTRY`
+- `ENTRY_GATE` → null
+- `QZ1_EXPERIENCE_GOALS` → `ENTRY_GATE`
 - `CL_COMMON_LESSONS` → `QZ1_EXPERIENCE_GOALS`
 - `QZ2_INVEST_PROFILE` → `CL_COMMON_LESSONS`
 - `BR_BRANCH_LESSONS` → `QZ2_INVEST_PROFILE`
@@ -284,8 +284,8 @@ Back target:
 Правила:
 - На каждом изменении состояния прогресс сохраняется.
 - При повторном входе:
-  - если processStatus=COMPLETED → открывается `SCR_FINAL`
-  - иначе открывается сохранённый `currentScreenId` (после проверки guard)
+  - всегда открывается `ENTRY_GATE` (gate обязателен)
+  - внутри `ENTRY_GATE` пользователь может продолжить по resume rules (см. раздел 6.2)
 
 ### 6.0.1 Common Lessons data model (сохранение в state)
 `commonLessons` хранится в `OnboardingState` и персистится в LocalStorage через общий прогресс.
@@ -316,9 +316,104 @@ Restore rules:
 
 ---
 
+## 6.2) ENTRY_GATE (разводящий экран) — resume/restart/reset (строго)
+
+Экран `ENTRY_GATE` является обязательной точкой входа: **любой вход в онбординг начинается с `ENTRY_GATE`**.
+
+### 6.2.1 Derived status (строго)
+Внутри `ENTRY_GATE` вычисляется derived state:
+- `hasProgress`: наличие значимого прогресса (не пустой initial state)
+- `isCompleted`: `processStatus == COMPLETED` **или** `branch.isCompleted == true`
+- `lastScreen`: `lastNonGateScreenId` из state (последний не-gate экран)
+- `resumeScreen`: вычисляется только по resume rules (см. 6.2.3)
+
+### 6.2.2 UI состояния (строго 3)
+
+A) `NEW_USER` (нет прогресса)
+- CTA: `Начать обучение`
+  - действие: `resetAll()` → переход на `QZ1_EXPERIENCE_GOALS`
+
+B) `IN_PROGRESS` (есть прогресс, но не completed)
+- CTA1: `Продолжить`
+  - действие: перейти на `resumeScreen` (см. 6.2.3)
+- CTA2: `Начать заново`
+  - действие: `resetAll()` → `QZ1_EXPERIENCE_GOALS`
+- CTA3: `Перепройти анкету` (показывается только если Quiz1 completed)
+  - действие: `resetFromQuiz1()` → `QZ1_EXPERIENCE_GOALS`
+
+C) `COMPLETED`
+- CTA1: `Открыть итог`
+  - действие: перейти на `SCR_FINAL`
+- CTA2: `Пройти заново`
+  - действие: `resetAll()` → `QZ1_EXPERIENCE_GOALS`
+- CTA3: `Перепройти инвест-профиль` (показывается только если допускается resetFromQuiz2)
+  - действие: `resetFromQuiz2()` → `QZ2_INVEST_PROFILE`
+
+Другие кнопки запрещены.
+
+### 6.2.3 Resume rules (строго)
+Правило выбора `resumeScreen`:
+- если `isCompleted == true` → `SCR_FINAL`
+- иначе:
+  - если Quiz1 incomplete → `QZ1_EXPERIENCE_GOALS`
+  - else если CommonLessons incomplete → `CL_COMMON_LESSONS`
+  - else если Quiz2 incomplete → `QZ2_INVEST_PROFILE`
+  - else если Branch incomplete → `BR_BRANCH_LESSONS`
+  - else → `SCR_FINAL`
+
+Запрещено использовать “последний сохранённый экран” для resume, если он противоречит этим правилам.
+
+### 6.2.4 Reset commands (строго)
+Реализованы три детерминированные команды:
+
+`resetAll()`:
+- очищает весь onboarding state (quiz1, common, quiz2, branch, processStatus)
+- переходит на `QZ1_EXPERIENCE_GOALS`
+
+`resetFromQuiz1()`:
+- очищает quiz1+downstream (common, quiz2, branch, processStatus)
+- переходит на `QZ1_EXPERIENCE_GOALS`
+
+`resetFromQuiz2()`:
+- очищает quiz2+branch+processStatus
+- оставляет quiz1 + commonLessons completed
+- переходит на `QZ2_INVEST_PROFILE`
+
+---
+
+## 6.3) SCR_FINAL (итоговый экран) — данные + CTA (строго)
+
+### 6.3.1 Отображаемые данные (строго)
+`SCR_FINAL` показывает:
+- `segment` (label)
+- `strategy` (label)
+- `branchId` (label)
+- текст: `Вы прошли обучение.` + краткий summary
+
+### 6.3.2 CTA (строго фиксированы)
+CTA1: `Перейти к пополнению`
+- destination: `DEEPLINK:finam://invest/deposit?promo=bonus1500&min=30000`
+
+CTA2: `К первой покупке`
+- destination: `DEEPLINK:finam://invest/market`
+
+CTA3: `Завершить`
+- действие: `processStatus=COMPLETED` (завершить онбординг в рамках каркаса)
+
+CTA4: `Пройти заново`
+- действие: `resetAll()` → `QZ1_EXPERIENCE_GOALS`
+
+---
+
 ## 6.1) Аналитика (минимальная, без SDK)
 
 Единая точка входа: `track(eventName, payload)` в `09_analytics.ts`. Интеграция с внешними SDK запрещена на этом этапе.
+
+События Entry Gate / Final:
+- `onboarding_entry_gate_view` (payload: `state` = NEW_USER|IN_PROGRESS|COMPLETED)
+- `onboarding_entry_gate_action` (payload: `action` = START|RESUME|RESTART|RESET_QUIZ1|RESET_QUIZ2|OPEN_FINAL)
+- `onboarding_final_view` (payload: `segment`, `strategy`, `branchId`)
+- `onboarding_final_cta_click` (payload: `ctaId`)
 
 События Quiz1:
 - `onboarding_quiz1_start` (payload: `screenId`)
@@ -351,7 +446,7 @@ Restore rules:
 
 ## 7) Edge cases
 
-- EC001: corrupted storage → старт с `SCR_ENTRY`, processStatus=NOT_STARTED
+- EC001: corrupted storage → старт с `ENTRY_GATE`, processStatus=NOT_STARTED
 - EC002: hash screenId недоступен по guard → redirect на ближайший обязательный экран (QZ1 или QZ2)
 - EC003: offline → экран в состоянии offline (действия блокируются)
 - EC004: deep link error → фиксированное модальное окно ошибки
@@ -363,6 +458,7 @@ Restore rules:
 - EC010: `branch.branchId` отсутствует/не совпадает с `resolveBranchId(segment, strategy)` → ветка считается НЕ инициализированной, guard редиректит на `QZ2_INVEST_PROFILE`
 - EC011: `branch.quiz2Hash` отсутствует/не совпадает с текущим hash от Quiz2 → ветка сбрасывается и стартует заново с первого урока
 - EC012: пользователь пытается открыть `SCR_FINAL` при `branch.isCompleted != true` → guard редиректит на `BR_BRANCH_LESSONS`
+ - EC013: processStatus=COMPLETED, но пользователь открывает онбординг → показывается `ENTRY_GATE` в состоянии COMPLETED (авторедиректы запрещены)
 
 ---
 
