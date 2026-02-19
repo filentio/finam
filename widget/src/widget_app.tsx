@@ -10,6 +10,7 @@ export type WidgetAppProps = {
   track: TrackFn;
   assetBaseUrl: string;
   onRequestClose: () => void;
+  debug: boolean;
 };
 
 export function WidgetApp(props: WidgetAppProps) {
@@ -20,11 +21,12 @@ export function WidgetApp(props: WidgetAppProps) {
           storageEnabled={true}
           storageNamespace={props.storageNamespace}
           assetBaseUrl={props.assetBaseUrl}
-          showDebugHeader={false}
+          showDebugHeader={props.debug}
+          onRequestClose={props.onRequestClose}
         />
       </AnalyticsProvider>
     ),
-    [props.track, props.storageNamespace, props.assetBaseUrl]
+    [props.track, props.storageNamespace, props.assetBaseUrl, props.onRequestClose, props.debug]
   );
 
   if (props.mode === "modal") {
@@ -131,16 +133,6 @@ function ModalFrame(props: { children: React.ReactNode; onRequestClose: () => vo
       onClick={(e) => e.stopPropagation()}
     >
       <div className="finam-onb-modal" ref={modalRef} tabIndex={-1} role="dialog" aria-modal="true">
-        <button
-          type="button"
-          className="finam-onb-close"
-          aria-label="Закрыть"
-          onClick={() => {
-            props.onRequestClose();
-          }}
-        >
-          ×
-        </button>
         {props.children}
       </div>
     </div>

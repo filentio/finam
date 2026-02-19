@@ -148,10 +148,18 @@ export const COMMON_LESSONS_BY_SEGMENT: Record<Segment, LessonId[]> = {
 };
 
 export function getCommonLessonIdsForSegment(segment: Segment): LessonId[] {
-  return COMMON_LESSONS_BY_SEGMENT[segment];
+  const ids = COMMON_LESSONS_BY_SEGMENT[segment];
+  if (!ids || !ids.length) {
+    throw new Error(`Common lessons mapping is missing or empty for segment=${segment}`);
+  }
+  return ids;
 }
 
 export function getLessonById(lessonId: LessonId): Lesson {
-  return LESSON_REGISTRY[lessonId];
+  const lesson = LESSON_REGISTRY[lessonId];
+  if (!lesson) {
+    throw new Error(`Common lesson not found in registry: lessonId=${lessonId}`);
+  }
+  return lesson;
 }
 

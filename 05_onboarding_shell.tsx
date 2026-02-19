@@ -20,12 +20,16 @@ import { EntryGateScreen } from "./20_entry_gate_screen";
 import { deriveEntryGateState } from "./21_entry_gate_rules";
 import { FinalScreen } from "./22_final_screen";
 import { useTrack } from "./23_analytics_context";
+import { getCommonLessonIdsForSegment } from "./10_common_lessons_config";
+import { BRANCH_LESSONS } from "./17_branch_config";
+import { IS_DEV } from "./24_env";
 
 type Props = {
   storageEnabled?: boolean;
   storageNamespace?: string;
   showDebugHeader?: boolean;
   assetBaseUrl?: string; // optional; used by embed widget to resolve /assets/*
+  onRequestClose?: () => void; // optional; shown only in embed/modal
 };
 
 const FIXED_ERROR_QUIZ_INVALID = "Заполните все вопросы анкеты";
@@ -51,6 +55,7 @@ export default function OnboardingShell(props: Props) {
   const storage = useMemo(() => createProgressStorage(storageNamespace), [storageNamespace]);
   const showDebugHeader = props.showDebugHeader ?? false;
   const assetBaseUrl = props.assetBaseUrl;
+  const onRequestClose = props.onRequestClose;
 
   const [state, dispatch] = useReducer(onboardingReducer, undefined, () => getInitialOnboardingState());
   const stateRef = useRef<OnboardingState>(state);
@@ -213,12 +218,88 @@ export default function OnboardingShell(props: Props) {
     state.branch.quiz2Hash,
   ]);
 
-  const canGoBack = useMemo(() => {
-    return getBackScreenId(state) !== null && state.processStatus !== "COMPLETED";
-  }, [state]);
+  // Screen render:
+  // ENTRY_GATE must be the first screen on any entry, even if process is completed.
+  const screenId =
+    state.currentScreenId === "ENTRY_GATE"
+      ? "ENTRY_GATE"
+      : state.processStatus === "COMPLETED"
+        ? "SCR_FINAL"
+        : state.currentScreenId;
 
-  const onBack = () => {
+  const headerTitle = useMemo(() => {
+    switch (screenId) {
+      case "ENTRY_GATE":
+        return "Онбординг";
+      case "QZ1_EXPERIENCE_GOALS":
+        return "Анкета 1/2";
+      case "CL_COMMON_LESSONS": {
+        const seg = state.quiz1.segment;
+        if (!seg) return "Общие уроки";
+        try {
+          const ids = getCommonLessonIdsForSegment(seg);
+          const total = ids.length;
+          const index = Math.min(Math.max(0, state.commonLessons.currentIndex), Math.max(0, total - 1));
+          return `Общие уроки ${index + 1}/${total}`;
+        } catch {
+          return "Общие уроки";
+        }
+      }
+      case "QZ2_INVEST_PROFILE":
+        return "Анкета 2/2";
+      case "BR_BRANCH_LESSONS": {
+        const bid = state.branch.branchId;
+        if (!bid) return "Ветка";
+        const total = BRANCH_LESSONS[bid]?.length ?? 0;
+        const index = Math.min(Math.max(0, state.branch.currentIndex), Math.max(0, total - 1));
+        return total ? `Урок ${index + 1}/${total}` : "Ветка";
+      }
+      case "SCR_FINAL":
+        return "Итог";
+    }
+  }, [screenId, state.quiz1.segment, state.commonLessons.currentIndex, state.branch.branchId, state.branch.currentIndex]);
+
+  const canGoBack = useMemo(() => {
+    if (screenId === "ENTRY_GATE") return false;
+    if (state.processStatus === "COMPLETED") return false;
+    return getBackScreenId(state) !== null;
+  }, [screenId, state]);
+
+  const onHeaderBack = () => {
     setQuizError(null);
+
+    if (screenId === "CL_COMMON_LESSONS" && state.quiz1.segment) {
+      try {
+        const ids = getCommonLessonIdsForSegment(state.quiz1.segment);
+        const total = ids.length;
+        const index = Math.min(Math.max(0, state.commonLessons.currentIndex), Math.max(0, total - 1));
+        if (index > 0) {
+          const lessonId = ids[index];
+          const nextIndex = index - 1;
+          track("onboarding_common_back", { lessonId, toIndex: nextIndex + 1 });
+          dispatch({ type: "SET_COMMON_LESSONS_INDEX", index: nextIndex });
+          return;
+        }
+      } catch (e) {
+        if (IS_DEV) throw e;
+        dispatch({ type: "RESET_ALL" });
+        return;
+      }
+    }
+
+    if (screenId === "BR_BRANCH_LESSONS" && state.branch.branchId) {
+      const ids = BRANCH_LESSONS[state.branch.branchId] ?? [];
+      const total = ids.length;
+      const index = Math.min(Math.max(0, state.branch.currentIndex), Math.max(0, total - 1));
+      if (index > 0) {
+        const lessonId = ids[index];
+        const nextIndex = index - 1;
+        track("onboarding_branch_back", { branchId: state.branch.branchId, lessonId, toIndex: nextIndex + 1 });
+        dispatch({ type: "SET_BRANCH_INDEX", index: nextIndex });
+        return;
+      }
+    }
+
     const back = getBackScreenId(state);
     if (!back) return;
     dispatch({ type: "SET_CURRENT_SCREEN", screenId: back });
@@ -230,10 +311,6 @@ export default function OnboardingShell(props: Props) {
     dispatch({ type: "HYDRATE", state: getInitialOnboardingState() });
     setQuizError(null);
   };
-
-  // Screen render:
-  // ENTRY_GATE must be the first screen on any entry, even if process is completed.
-  const screenId = state.currentScreenId === "ENTRY_GATE" ? "ENTRY_GATE" : state.processStatus === "COMPLETED" ? "SCR_FINAL" : state.currentScreenId;
 
   return (
     <div style={styles.shell}>
@@ -253,6 +330,30 @@ export default function OnboardingShell(props: Props) {
           </div>
         </div>
       ) : null}
+
+      <div style={styles.prodHeader}>
+        <div style={styles.prodHeaderSide}>
+          {canGoBack ? (
+            <button type="button" style={styles.headerBtn} onClick={onHeaderBack} aria-label="Назад">
+              Назад
+            </button>
+          ) : (
+            <div style={styles.headerBtnSpacer} />
+          )}
+        </div>
+        <div style={styles.prodHeaderCenter} aria-live="polite">
+          {headerTitle}
+        </div>
+        <div style={styles.prodHeaderSide}>
+          {onRequestClose ? (
+            <button type="button" style={styles.headerIconBtn} onClick={onRequestClose} aria-label="Закрыть">
+              ✕
+            </button>
+          ) : (
+            <div style={styles.headerBtnSpacer} />
+          )}
+        </div>
+      </div>
 
       <div style={styles.body}>
         {screenId === "ENTRY_GATE" && (
@@ -319,6 +420,7 @@ export default function OnboardingShell(props: Props) {
             progress={state.commonLessons}
             onResetForSegment={(segment) => dispatch({ type: "RESET_COMMON_LESSONS_FOR_SEGMENT", segment })}
             onSetIndex={(index) => dispatch({ type: "SET_COMMON_LESSONS_INDEX", index })}
+            onResetAll={() => dispatch({ type: "RESET_ALL" })}
             onComplete={() => {
               dispatch({ type: "SET_COMMON_LESSONS_COMPLETED", segment: state.quiz1.segment! });
               dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "CL_COMMON_LESSONS" });
@@ -392,6 +494,7 @@ export default function OnboardingShell(props: Props) {
             isCompleted={state.branch.isCompleted}
             assetBaseUrl={assetBaseUrl}
             onSetIndex={(index) => dispatch({ type: "SET_BRANCH_INDEX", index })}
+            onResetAll={() => dispatch({ type: "RESET_ALL" })}
             onComplete={() => {
               dispatch({ type: "SET_BRANCH_COMPLETED" });
               dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "BR_BRANCH_LESSONS" });
@@ -421,26 +524,6 @@ export default function OnboardingShell(props: Props) {
           )
         )}
       </div>
-
-      <div style={styles.footer}>
-        <button style={styles.secondaryBtn} disabled={!canGoBack} onClick={onBack}>
-          Back
-        </button>
-        <span style={styles.footerHint}>Back navigation is strictly controlled.</span>
-      </div>
-    </div>
-  );
-}
-
-function FinalScreen(props: { isCompleted: boolean; onFinish: () => void }) {
-  return (
-    <div style={styles.card}>
-      <h2 style={styles.h2}>Финальный экран</h2>
-      <p style={styles.p}>Процесс онбординга завершён.</p>
-      <button style={styles.primaryBtn} onClick={props.onFinish} disabled={props.isCompleted}>
-        Завершить
-      </button>
-      {props.isCompleted && <p style={styles.p}>processStatus=COMPLETED</p>}
     </div>
   );
 }
@@ -452,9 +535,49 @@ const styles: Record<string, React.CSSProperties> = {
   headerRight: { display: "flex", gap: 8 },
   badge: { display: "inline-block", padding: "4px 8px", borderRadius: 8, background: "#F0F2F5", color: "#333" },
   meta: { display: "flex", gap: 12, color: "#666", fontSize: 12 },
+  prodHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    height: 52,
+    marginBottom: 12,
+  },
+  prodHeaderSide: { width: 96, display: "flex", justifyContent: "flex-start", alignItems: "center" },
+  prodHeaderCenter: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: 600,
+    color: "#333",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  headerBtnSpacer: { width: 44, height: 44 },
+  headerBtn: {
+    minWidth: 44,
+    height: 44,
+    borderRadius: 12,
+    border: "1px solid #E5E7EB",
+    padding: "0 12px",
+    background: "#FFF",
+    color: "#333",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  headerIconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    border: "1px solid #E5E7EB",
+    background: "#FFF",
+    color: "#333",
+    fontWeight: 700,
+    cursor: "pointer",
+    lineHeight: "44px",
+  },
   body: { display: "flex", flexDirection: "column", gap: 12 },
-  footer: { display: "flex", alignItems: "center", gap: 12, marginTop: 12 },
-  footerHint: { color: "#666", fontSize: 12 },
   card: { border: "1px solid #E5E7EB", background: "#FFF", borderRadius: 16, padding: 16 },
   h2: { margin: 0, marginBottom: 8, fontSize: 20, color: "#333" },
   p: { margin: 0, marginBottom: 12, color: "#555", lineHeight: 1.4 },
@@ -470,16 +593,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "0 16px",
     background: "#F5A623",
     color: "#FFF",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  secondaryBtn: {
-    height: 44,
-    borderRadius: 12,
-    border: "1px solid #E5E7EB",
-    padding: "0 16px",
-    background: "#FFF",
-    color: "#333",
     fontWeight: 600,
     cursor: "pointer",
   },

@@ -15,6 +15,7 @@ export type WidgetConfig = {
   storageNamespace?: string;
   locale?: string;
   theme?: string;
+  debug?: boolean; // enables debug-only UI; default OFF
 };
 
 type Instance = {
@@ -27,6 +28,7 @@ type Instance = {
   isOpen: boolean;
   disableTracking: boolean;
   assetBaseUrl: string;
+  debug: boolean;
 };
 
 const DEFAULTS = {
@@ -36,6 +38,7 @@ const DEFAULTS = {
   storageNamespace: "finam_onb_v1",
   locale: "ru",
   theme: "finam",
+  debug: false,
 };
 
 const instancesByTarget = new Map<Element, Instance>();
@@ -57,6 +60,7 @@ function normalizeConfig(config: WidgetConfig | undefined): Required<WidgetConfi
     storageNamespace: config?.storageNamespace ?? DEFAULTS.storageNamespace,
     locale: config?.locale ?? DEFAULTS.locale,
     theme: config?.theme ?? DEFAULTS.theme,
+    debug: config?.debug ?? DEFAULTS.debug,
   };
 }
 
@@ -100,8 +104,6 @@ export function mount(target: string | Element, config?: WidgetConfig): void {
   const { hostEl, shadowRoot, mountEl } = createShadowHost(targetEl);
   const reactRoot = createRoot(mountEl);
 
-  const track = createTracker({ disabled: cfg.disableTracking, namespace: cfg.storageNamespace });
-
   const inst: Instance = {
     targetEl,
     hostEl,
@@ -112,6 +114,7 @@ export function mount(target: string | Element, config?: WidgetConfig): void {
     disableTracking: cfg.disableTracking,
     assetBaseUrl: ASSET_BASE_URL,
     isOpen: cfg.mode === "modal" ? false : true,
+    debug: cfg.debug,
   };
   instancesByTarget.set(targetEl, inst);
   renderInstance(inst);
@@ -190,6 +193,7 @@ function renderInstance(inst: Instance): void {
       assetBaseUrl={inst.assetBaseUrl}
       track={track}
       onRequestClose={() => close(inst.targetEl)}
+      debug={inst.debug}
     />
   );
 }
@@ -210,6 +214,7 @@ function autoMountFromScriptTags(): void {
       storageNamespace: s.dataset.storageNamespace ?? DEFAULTS.storageNamespace,
       locale: s.dataset.locale ?? DEFAULTS.locale,
       theme: s.dataset.theme ?? DEFAULTS.theme,
+      debug: parseBool(s.dataset.debug),
     };
     try {
       mount(target, cfg);

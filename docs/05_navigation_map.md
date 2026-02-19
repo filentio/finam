@@ -6,6 +6,17 @@
 - Порядок этапов фиксирован.
 - Пропуск анкет запрещён.
 - Любые UX‑решения “на усмотрение” запрещены.
+- Debug UI в прод‑интерфейсе запрещён. Debug может быть включён **только** через `data-debug="true"` в embed‑скрипте виджета. По умолчанию debug OFF.
+- Header обязателен и единый для всех экранов:
+  - слева: `Назад` (только если доступно)
+  - центр: заголовок/счётчик (например: `Анкета 1/2`, `Общие уроки 2/6`, `Урок 3/11`)
+  - справа: `Close` (крестик, если доступно)
+  - перекрытия элементов запрещены на любых размерах экрана
+  - hit‑area кнопок `Назад/Close` ≥ 40px (в реализации ≥ 44px)
+- Source of truth для уроков: только lesson registry/config. Автогенерация “лишних” экранов запрещена.
+- Ошибки данных (строго):
+  - Если `lessonId` отсутствует в registry: dev — `throw`, prod — error state + кнопка `Начать заново` (resetAll).
+  - Если тип экрана урока неизвестен или payload некорректен: dev — `throw`, prod — error state + `Начать заново` (resetAll).
 
 ---
 
@@ -51,7 +62,17 @@
 - `q2Experience`: `QZ1_Q2_NO_EXPERIENCE | QZ1_Q2_LT_1Y | QZ1_Q2_1_3Y | QZ1_Q2_3_5Y | QZ1_Q2_GT_5Y | null`
 - `q3PlannedAmount`: `QZ1_Q3_LT_300K | QZ1_Q3_300K_2M | QZ1_Q3_2_5M | QZ1_Q3_GT_5M | null`
 - `q4MainGoal`: `QZ1_Q4_PURCHASE | QZ1_Q4_PASSIVE_INCOME | QZ1_Q4_GROWTH | QZ1_Q4_PRESERVE | null`
-- `q5PrimaryInterest`: `QZ1_Q5_FUNDS | QZ1_Q5_STOCKS | QZ1_Q5_TRUST | QZ1_Q5_BONDS | QZ1_Q5_IPO | QZ1_Q5_CURRENCY | QZ1_Q5_STRUCTURED | QZ1_Q5_DERIVATIVES | null`
+- `q5Interests`: `Quiz1Q5AnswerId[]` (массив выбранных `answerId`)
+
+Где `Quiz1Q5AnswerId`:
+`QZ1_Q5_FUNDS | QZ1_Q5_STOCKS | QZ1_Q5_TRUST | QZ1_Q5_BONDS | QZ1_Q5_IPO | QZ1_Q5_CURRENCY | QZ1_Q5_STRUCTURED | QZ1_Q5_DERIVATIVES | QZ1_Q5_NONE`
+
+Правила Q5 (строго, без вариативности):
+- Тип: **MULTI-SELECT** (toggle по клику).
+- Валидация: вопрос валиден, если выбрано **минимум 1** значение.
+- Правило A для `QZ1_Q5_NONE` (“Ничего из перечисленного”):
+  - При выборе `QZ1_Q5_NONE` — очистить остальные значения (в массиве остаётся только `QZ1_Q5_NONE`).
+  - При выборе любого другого значения — снять `QZ1_Q5_NONE`.
 
 #### 3.1.2 Segment enum
 `Segment` (строгое перечисление): `NOVICE | LEARNER | EXPERIENCED | QUALIFIED`
