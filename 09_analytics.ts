@@ -32,3 +32,13 @@ export function track(eventName: AnalyticsEventName, payload: AnalyticsPayload =
   console.log("[track]", eventName, payload);
 }
 
+export function createTracker(input: { disabled: boolean; namespace: string }): (eventName: AnalyticsEventName, payload?: AnalyticsPayload) => void {
+  if (input.disabled) {
+    return () => undefined;
+  }
+  return (eventName, payload = {}) => {
+    // eslint-disable-next-line no-console
+    console.log("[track]", { namespace: input.namespace, eventName, payload });
+  };
+}
+

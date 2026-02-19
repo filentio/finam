@@ -102,7 +102,11 @@ export const BRANCH_LESSONS: Record<BranchId, LessonId[]> = {
   ],
 };
 
-export const LESSON_REGISTRY = {
+let _LESSON_REGISTRY: Record<LessonId, Lesson> | null = null;
+
+function ensureLessonRegistry(): Record<LessonId, Lesson> {
+  if (_LESSON_REGISTRY) return _LESSON_REGISTRY;
+  _LESSON_REGISTRY = {
   s02a_start_intro: {
     lessonId: "s02a_start_intro",
     title: "УРОК 1",
@@ -723,10 +727,12 @@ GLDRUB
     assets: [{ type: "image", src: "assets/images/s31_cta.png", alt: "Finam" }],
     analyticsMeta: { screenName: "s31_cta", lessonId: "s31_cta" },
   },
-} as unknown as Record<LessonId, Lesson>;
+  } as Record<LessonId, Lesson>;
+  return _LESSON_REGISTRY;
+}
 
 export function getBranchLessonById(lessonId: LessonId): Lesson {
-  const v = LESSON_REGISTRY[lessonId];
+  const v = ensureLessonRegistry()[lessonId];
   if (!v) {
     throw new Error(`Missing branch lesson registry entry: ${lessonId}`);
   }
@@ -734,61 +740,24 @@ export function getBranchLessonById(lessonId: LessonId): Lesson {
 }
 
 export function assertBranchConfigIntegrity(): void {
-  const ids: LessonId[] = [
-    "s02a_start_intro",
-    "s02_reality",
-    "s03_goals",
-    "s04_concepts",
-    "s05_deposit",
-    "s06_first_buy",
-    "s06a_purchase_steps",
-    "s07_rules_updated",
-    "s08_instruments_updated",
-    "s09_choice_updated",
-    "s10_courses",
-    "s11_portfolio_intro",
-    "s12_principles",
-    "s13_structure",
-    "s14_balance",
-    "s14a_portfolio_cta",
-    "s15_risks_intro",
-    "s16_risk_types",
-    "s17_protection",
-    "s18_reliable",
-    "s19_bonds",
-    "s20_capital_protection",
-    "s20a_risks_cta",
-    "s21_tariff_intro",
-    "s22_tariff_long",
-    "s23_tariff_strateg",
-    "s24_tariff_investor",
-    "s25_trust_management",
-    "s25a_tariff_cta",
-    "s26_diversification_intro",
-    "s27_what_is_div",
-    "s28_asset_allocation",
-    "s29_why_works",
-    "s30_example",
-    "s30a_diversification_cta",
-    "s31_cta",
-  ];
-
-  for (const lessonId of ids) {
-    if (!LESSON_REGISTRY[lessonId]) throw new Error(`Missing LESSON_REGISTRY entry: ${lessonId}`);
-  }
-
   for (const branchId of Object.keys(BRANCH_LESSONS) as BranchId[]) {
     const list = BRANCH_LESSONS[branchId];
     if (!list.length) throw new Error(`Branch lesson list is empty: ${branchId}`);
-    for (const lessonId of list) {
-      if (!LESSON_REGISTRY[lessonId]) throw new Error(`Branch ${branchId} references missing lessonId: ${lessonId}`);
-    }
   }
 
   for (const s of Object.keys(BRANCH_BY_SEGMENT_STRATEGY) as Segment[]) {
     for (const st of Object.keys(BRANCH_BY_SEGMENT_STRATEGY[s]) as Strategy[]) {
       const v = BRANCH_BY_SEGMENT_STRATEGY[s][st];
       if (!v) throw new Error(`Missing mapping for segment=${s} strategy=${st}`);
+    }
+  }
+}
+
+export function assertBranchLessonRegistryIntegrity(): void {
+  const reg = ensureLessonRegistry();
+  for (const branchId of Object.keys(BRANCH_LESSONS) as BranchId[]) {
+    for (const lessonId of BRANCH_LESSONS[branchId]) {
+      if (!reg[lessonId]) throw new Error(`Branch ${branchId} references missing lessonId: ${lessonId}`);
     }
   }
 }

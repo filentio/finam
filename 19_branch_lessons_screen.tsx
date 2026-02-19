@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import type { BranchId, Segment, Strategy } from "./01_state_machine";
 import { BRANCH_LESSONS, getBranchLessonById, type LessonId } from "./17_branch_config";
-import { track } from "./09_analytics";
+import { useTrack } from "./23_analytics_context";
 
 export type BranchLessonsScreenProps = {
   screenId: "BR_BRANCH_LESSONS";
@@ -15,6 +15,7 @@ export type BranchLessonsScreenProps = {
 };
 
 export function BranchLessonsScreen(props: BranchLessonsScreenProps) {
+  const track = useTrack();
   const lessonIds = useMemo(() => BRANCH_LESSONS[props.branchId], [props.branchId]);
   const total = lessonIds.length;
   const index = Math.min(Math.max(0, props.currentIndex), Math.max(0, total - 1));

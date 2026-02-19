@@ -7,10 +7,9 @@ import {
 } from "./01_state_machine";
 import { ALL_SCREEN_IDS, guardScreenAccess, getBackScreenId } from "./02_routes";
 import { assertBranchConfigIntegrity } from "./17_branch_config";
-import { clearProgress, loadProgress, saveProgress } from "./04_progress_storage";
+import { createProgressStorage } from "./04_progress_storage";
 import { computeSegment } from "./07_quiz1_rules";
 import { Quiz1Screen } from "./08_quiz1_screen";
-import { track } from "./09_analytics";
 import { CommonLessonsScreen } from "./12_common_lessons_screen";
 import { Quiz2Screen } from "./16_quiz2_screen";
 import { prefillQuiz2AnswersFromQuiz1, getPrefilledQuiz2QuestionIds } from "./14_quiz2_prefill";
@@ -20,9 +19,12 @@ import { BranchLessonsScreen } from "./19_branch_lessons_screen";
 import { EntryGateScreen } from "./20_entry_gate_screen";
 import { deriveEntryGateState } from "./21_entry_gate_rules";
 import { FinalScreen } from "./22_final_screen";
+import { useTrack } from "./23_analytics_context";
 
 type Props = {
   storageEnabled?: boolean;
+  storageNamespace?: string;
+  showDebugHeader?: boolean;
 };
 
 const FIXED_ERROR_QUIZ_INVALID = "Заполните все вопросы анкеты";
@@ -42,7 +44,11 @@ function readHash(): ScreenId | null {
 }
 
 export default function OnboardingShell(props: Props) {
+  const track = useTrack();
   const storageEnabled = props.storageEnabled ?? true;
+  const storageNamespace = props.storageNamespace ?? "onboarding_shell_v1";
+  const storage = useMemo(() => createProgressStorage(storageNamespace), [storageNamespace]);
+  const showDebugHeader = props.showDebugHeader ?? false;
 
   const [state, dispatch] = useReducer(onboardingReducer, undefined, () => getInitialOnboardingState());
   const stateRef = useRef<OnboardingState>(state);
@@ -61,13 +67,13 @@ export default function OnboardingShell(props: Props) {
   // Hydrate from storage.
   useEffect(() => {
     if (!storageEnabled) return;
-    const loaded = loadProgress();
+    const loaded = storage.loadProgress();
     if (!loaded) return;
     const lastNonGate =
       loaded.lastNonGateScreenId ??
       (loaded.currentScreenId !== "ENTRY_GATE" ? loaded.currentScreenId : null);
     dispatch({ type: "HYDRATE", state: { ...loaded, currentScreenId: "ENTRY_GATE", lastNonGateScreenId: lastNonGate } });
-  }, [storageEnabled]);
+  }, [storageEnabled, storage]);
 
   // Mark abandoned on exit.
   useEffect(() => {
@@ -75,20 +81,20 @@ export default function OnboardingShell(props: Props) {
     const onBeforeUnload = () => {
       const s = stateRef.current;
       if (s.processStatus === "IN_PROGRESS") {
-        saveProgress({ ...s, processStatus: "ABANDONED" });
+        storage.saveProgress({ ...s, processStatus: "ABANDONED" });
       } else {
-        saveProgress(s);
+        storage.saveProgress(s);
       }
     };
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [storageEnabled]);
+  }, [storageEnabled, storage]);
 
   // Persist on each state change.
   useEffect(() => {
     if (!storageEnabled) return;
-    saveProgress(state);
-  }, [state, storageEnabled]);
+    storage.saveProgress(state);
+  }, [state, storageEnabled, storage]);
 
   // Sync hash on screen change.
   useEffect(() => {
@@ -218,7 +224,7 @@ export default function OnboardingShell(props: Props) {
 
   const onReset = () => {
     if (!storageEnabled) return;
-    clearProgress();
+    storage.clearProgress();
     dispatch({ type: "HYDRATE", state: getInitialOnboardingState() });
     setQuizError(null);
   };
@@ -229,20 +235,22 @@ export default function OnboardingShell(props: Props) {
 
   return (
     <div style={styles.shell}>
-      <div style={styles.header}>
-        <div style={styles.headerLeft}>
-          <div style={styles.badge}>Onboarding Shell</div>
-          <div style={styles.meta}>
-            <span>processStatus={state.processStatus}</span>
-            <span>screenId={screenId}</span>
+      {showDebugHeader ? (
+        <div style={styles.header}>
+          <div style={styles.headerLeft}>
+            <div style={styles.badge}>Onboarding Shell</div>
+            <div style={styles.meta}>
+              <span>processStatus={state.processStatus}</span>
+              <span>screenId={screenId}</span>
+            </div>
+          </div>
+          <div style={styles.headerRight}>
+            <button style={styles.ghostBtn} onClick={onReset} disabled={!storageEnabled}>
+              Reset
+            </button>
           </div>
         </div>
-        <div style={styles.headerRight}>
-          <button style={styles.ghostBtn} onClick={onReset} disabled={!storageEnabled}>
-            Reset
-          </button>
-        </div>
-      </div>
+      ) : null}
 
       <div style={styles.body}>
         {screenId === "ENTRY_GATE" && (

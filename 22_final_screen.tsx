@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import type { BranchId, Segment, Strategy } from "./01_state_machine";
-import { track } from "./09_analytics";
+import { useTrack } from "./23_analytics_context";
 
 export type FinalScreenProps = {
   screenId: "SCR_FINAL";
@@ -12,6 +12,7 @@ export type FinalScreenProps = {
 };
 
 export function FinalScreen(props: FinalScreenProps) {
+  const track = useTrack();
   useEffect(() => {
     track("onboarding_final_view", { segment: props.segment, strategy: props.strategy, branchId: props.branchId });
   }, [props.segment, props.strategy, props.branchId]);

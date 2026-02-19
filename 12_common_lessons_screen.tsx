@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import type { CommonLessonsState, Segment } from "./01_state_machine";
 import { getCommonLessonIdsForSegment, getLessonById } from "./10_common_lessons_config";
-import { track } from "./09_analytics";
+import { useTrack } from "./23_analytics_context";
 
 export type CommonLessonsScreenProps = {
   screenId: "CL_COMMON_LESSONS";
@@ -13,6 +13,7 @@ export type CommonLessonsScreenProps = {
 };
 
 export function CommonLessonsScreen(props: CommonLessonsScreenProps) {
+  const track = useTrack();
   const lessonIds = useMemo(() => getCommonLessonIdsForSegment(props.segment), [props.segment]);
   const total = lessonIds.length;
 

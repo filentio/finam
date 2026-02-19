@@ -10,7 +10,7 @@ import {
 } from "./13_quiz2_config";
 import { getPrefilledQuiz2QuestionIds, prefillQuiz2AnswersFromQuiz1, QUIZ2_PREFILL_EDITABILITY } from "./14_quiz2_prefill";
 import { validateQuiz2Answers } from "./15_quiz2_rules";
-import { track } from "./09_analytics";
+import { useTrack } from "./23_analytics_context";
 import type { Quiz1Answers } from "./01_state_machine";
 
 export type Quiz2ScreenProps = {
@@ -27,6 +27,7 @@ export type Quiz2ScreenProps = {
 const QUESTION_IDS: Quiz2QuestionId[] = ["QZ2_Q1_HORIZON", "QZ2_Q2_DRAWDOWN_REACTION", "QZ2_Q3_MONTHLY_SHARE", "QZ2_Q4_PREFERENCE"];
 
 export function Quiz2Screen(props: Quiz2ScreenProps) {
+  const track = useTrack();
   const [showValidation, setShowValidation] = useState(false);
   const fieldRefs = useRef<Record<Quiz2QuestionId, HTMLDivElement | null>>({
     QZ2_Q1_HORIZON: null,

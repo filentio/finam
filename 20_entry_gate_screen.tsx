@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import type { EntryGateDerived, EntryGateUiState } from "./21_entry_gate_rules";
-import { track } from "./09_analytics";
+import { useTrack } from "./23_analytics_context";
 
 export type EntryGateScreenProps = {
   screenId: "ENTRY_GATE";
@@ -14,6 +14,7 @@ export type EntryGateScreenProps = {
 };
 
 export function EntryGateScreen(props: EntryGateScreenProps) {
+  const track = useTrack();
   const uiState = props.derived.uiState;
   useEffect(() => {
     track("onboarding_entry_gate_view", { state: uiState });

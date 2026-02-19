@@ -3,7 +3,7 @@ import { ALL_SCREEN_IDS } from "./02_routes";
 import { isQuiz2CompletionValid } from "./15_quiz2_rules";
 import { computeQuiz2HashForBranch, normalizeBranchState } from "./18_branch_rules";
 
-const STORAGE_KEY = "onboarding_shell_v1";
+const LEGACY_STORAGE_KEY = "onboarding_shell_v1";
 const STORAGE_VERSION = 1 as const;
 
 type StoredPayloadV1 = {
@@ -16,19 +16,19 @@ function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 }
 
-export function saveProgress(state: OnboardingState): void {
+export function saveProgress(state: OnboardingState, namespace: string = LEGACY_STORAGE_KEY): void {
   if (!isBrowser()) return;
   const payload: StoredPayloadV1 = {
     version: STORAGE_VERSION,
     savedAtMs: Date.now(),
     state: { ...state, lastSavedAtMs: Date.now() },
   };
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  window.localStorage.setItem(namespace, JSON.stringify(payload));
 }
 
-export function loadProgress(): OnboardingState | null {
+export function loadProgress(namespace: string = LEGACY_STORAGE_KEY): OnboardingState | null {
   if (!isBrowser()) return null;
-  const raw = window.localStorage.getItem(STORAGE_KEY);
+  const raw = window.localStorage.getItem(namespace) ?? (namespace === LEGACY_STORAGE_KEY ? null : window.localStorage.getItem(LEGACY_STORAGE_KEY));
   if (!raw) return null;
 
   try {
@@ -115,9 +115,17 @@ export function loadProgress(): OnboardingState | null {
   }
 }
 
-export function clearProgress(): void {
+export function clearProgress(namespace: string = LEGACY_STORAGE_KEY): void {
   if (!isBrowser()) return;
-  window.localStorage.removeItem(STORAGE_KEY);
+  window.localStorage.removeItem(namespace);
+}
+
+export function createProgressStorage(namespace: string) {
+  return {
+    saveProgress: (state: OnboardingState) => saveProgress(state, namespace),
+    loadProgress: () => loadProgress(namespace),
+    clearProgress: () => clearProgress(namespace),
+  };
 }
 
 export function mergeWithInitial(partial: OnboardingState): OnboardingState {

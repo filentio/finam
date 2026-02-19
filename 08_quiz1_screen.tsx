@@ -9,7 +9,7 @@ import {
   getQuiz1AnswerByQuestionId,
 } from "./06_quiz1_config";
 import { validateQuiz1Answers } from "./07_quiz1_rules";
-import { track } from "./09_analytics";
+import { useTrack } from "./23_analytics_context";
 
 export type Quiz1ScreenProps = {
   screenId: "QZ1_EXPERIENCE_GOALS";
@@ -29,6 +29,7 @@ const QUESTION_IDS: Quiz1QuestionId[] = [
 ];
 
 export function Quiz1Screen(props: Quiz1ScreenProps) {
+  const track = useTrack();
   const [showValidation, setShowValidation] = useState(false);
   const fieldRefs = useRef<Record<Quiz1QuestionId, HTMLDivElement | null>>({
     QZ1_Q1_QUALIFIED_STATUS: null,
