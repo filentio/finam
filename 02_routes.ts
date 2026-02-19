@@ -1,13 +1,12 @@
 import type { BranchId, OnboardingState, ScreenId, ScreenType } from "./01_state_machine";
 import { getBranchStartScreenId } from "./03_branch_mapping";
 import { isQuiz1CompletionValid } from "./07_quiz1_rules";
+import { isCommonLessonsCompletionValid } from "./11_common_lessons_rules";
 
 export const ALL_SCREEN_IDS: ScreenId[] = [
   "SCR_ENTRY",
   "QZ1_EXPERIENCE_GOALS",
-  "CL01_PLACEHOLDER",
-  "CL02_PLACEHOLDER",
-  "CL03_PLACEHOLDER",
+  "CL_COMMON_LESSONS",
   "QZ2_INVEST_PROFILE",
   "BR_BEGINNER_01",
   "BR_BEGINNER_02",
@@ -21,9 +20,7 @@ export const ALL_SCREEN_IDS: ScreenId[] = [
 export const SCREEN_TYPE_BY_ID: Record<ScreenId, ScreenType> = {
   SCR_ENTRY: "entry",
   QZ1_EXPERIENCE_GOALS: "quiz",
-  CL01_PLACEHOLDER: "common_lesson",
-  CL02_PLACEHOLDER: "common_lesson",
-  CL03_PLACEHOLDER: "common_lesson",
+  CL_COMMON_LESSONS: "common_lesson",
   QZ2_INVEST_PROFILE: "quiz",
   BR_BEGINNER_01: "branch_lesson",
   BR_BEGINNER_02: "branch_lesson",
@@ -52,10 +49,8 @@ export type RouteEdge = {
 
 export const ROUTE_EDGES: RouteEdge[] = [
   { from: "SCR_ENTRY", to: "QZ1_EXPERIENCE_GOALS", condition: "NEXT", type: "linear" },
-  { from: "QZ1_EXPERIENCE_GOALS", to: "CL01_PLACEHOLDER", condition: "SUBMIT_VALID", type: "submit" },
-  { from: "CL01_PLACEHOLDER", to: "CL02_PLACEHOLDER", condition: "NEXT", type: "linear" },
-  { from: "CL02_PLACEHOLDER", to: "CL03_PLACEHOLDER", condition: "NEXT", type: "linear" },
-  { from: "CL03_PLACEHOLDER", to: "QZ2_INVEST_PROFILE", condition: "NEXT", type: "linear" },
+  { from: "QZ1_EXPERIENCE_GOALS", to: "CL_COMMON_LESSONS", condition: "SUBMIT_VALID", type: "submit" },
+  { from: "CL_COMMON_LESSONS", to: "QZ2_INVEST_PROFILE", condition: "SUBMIT_VALID", type: "submit" },
   {
     from: "QZ2_INVEST_PROFILE",
     to: (state) => getBranchStartScreenId(assertBranchIdResolved(state.branch.branchId)),
@@ -73,10 +68,8 @@ export const ROUTE_EDGES: RouteEdge[] = [
 export const BACK_BY_SCREEN_ID: Record<ScreenId, ScreenId | null> = {
   SCR_ENTRY: null,
   QZ1_EXPERIENCE_GOALS: "SCR_ENTRY",
-  CL01_PLACEHOLDER: "QZ1_EXPERIENCE_GOALS",
-  CL02_PLACEHOLDER: "CL01_PLACEHOLDER",
-  CL03_PLACEHOLDER: "CL02_PLACEHOLDER",
-  QZ2_INVEST_PROFILE: "CL03_PLACEHOLDER",
+  CL_COMMON_LESSONS: "QZ1_EXPERIENCE_GOALS",
+  QZ2_INVEST_PROFILE: "CL_COMMON_LESSONS",
   BR_BEGINNER_01: "QZ2_INVEST_PROFILE",
   BR_BEGINNER_02: "BR_BEGINNER_01",
   BR_INTERMEDIATE_01: "QZ2_INVEST_PROFILE",
@@ -121,8 +114,22 @@ export function guardScreenAccess(state: OnboardingState, targetScreenId: Screen
   // No skipping of quizzes.
   const isAfterQuiz1 =
     targetScreenId !== "SCR_ENTRY" && targetScreenId !== "QZ1_EXPERIENCE_GOALS" && targetScreenId !== "SCR_FINAL";
-  if (isAfterQuiz1 && !isQuiz1CompletionValid(state.quiz1.answers, state.quiz1.segment)) {
+  if (isAfterQuiz1 && !isQuiz1CompletionValid(state.quiz1.answers, state.quiz1.segment, state.quiz1.isCompleted)) {
     return { allowed: false, redirectTo: "QZ1_EXPERIENCE_GOALS", reason: "QUIZ1_REQUIRED" };
+  }
+
+  // Common lessons are mandatory before Quiz2 and everything after.
+  const isAfterCommonLessons =
+    targetScreenId === "QZ2_INVEST_PROFILE" ||
+    targetScreenId === "BR_BEGINNER_01" ||
+    targetScreenId === "BR_BEGINNER_02" ||
+    targetScreenId === "BR_INTERMEDIATE_01" ||
+    targetScreenId === "BR_INTERMEDIATE_02" ||
+    targetScreenId === "BR_ADVANCED_01" ||
+    targetScreenId === "BR_ADVANCED_02" ||
+    targetScreenId === "SCR_FINAL";
+  if (isAfterCommonLessons && !isCommonLessonsCompletionValid(state.commonLessons, state.quiz1.segment)) {
+    return { allowed: false, redirectTo: "CL_COMMON_LESSONS", reason: "COMMON_LESSONS_REQUIRED" };
   }
 
   const isAfterQuiz2 =

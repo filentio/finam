@@ -7,9 +7,7 @@ export type ScreenType = "entry" | "quiz" | "common_lesson" | "branch_lesson" | 
 export type ScreenId =
   | "SCR_ENTRY"
   | "QZ1_EXPERIENCE_GOALS"
-  | "CL01_PLACEHOLDER"
-  | "CL02_PLACEHOLDER"
-  | "CL03_PLACEHOLDER"
+  | "CL_COMMON_LESSONS"
   | "QZ2_INVEST_PROFILE"
   | "BR_BEGINNER_01"
   | "BR_BEGINNER_02"
@@ -58,6 +56,12 @@ export type Quiz2Answers = {
   q4Preference: "Сохранение" | "Баланс" | "Рост" | null;
 };
 
+export type CommonLessonsState = {
+  currentIndex: number;
+  isCompleted: boolean;
+  segment: Segment | null;
+};
+
 export type OnboardingState = {
   processStatus: ProcessStatus;
   currentScreenId: ScreenId;
@@ -74,6 +78,8 @@ export type OnboardingState = {
     isCompleted: boolean;
     strategy: Strategy | null;
   };
+
+  commonLessons: CommonLessonsState;
 
   branch: {
     branchId: BranchId | null;
@@ -92,6 +98,9 @@ export type OnboardingEvent =
   | { type: "MARK_SCREEN_COMPLETED"; screenId: ScreenId }
   | { type: "SET_QUIZ1_ANSWERS"; answers: Quiz1Answers }
   | { type: "SET_QUIZ1_COMPLETED"; segment: Segment }
+  | { type: "RESET_COMMON_LESSONS_FOR_SEGMENT"; segment: Segment }
+  | { type: "SET_COMMON_LESSONS_INDEX"; index: number }
+  | { type: "SET_COMMON_LESSONS_COMPLETED"; segment: Segment }
   | { type: "SET_QUIZ2_ANSWERS"; answers: Quiz2Answers }
   | { type: "SET_QUIZ2_COMPLETED"; strategy: Strategy }
   | { type: "SET_BRANCH_ID"; branchId: BranchId }
@@ -112,13 +121,17 @@ export const DEFAULT_QUIZ2_ANSWERS: Quiz2Answers = {
   q4Preference: null,
 };
 
+export const DEFAULT_COMMON_LESSONS_STATE: CommonLessonsState = {
+  currentIndex: 0,
+  isCompleted: false,
+  segment: null,
+};
+
 export function getInitialOnboardingState(): OnboardingState {
   const allScreenIds: ScreenId[] = [
     "SCR_ENTRY",
     "QZ1_EXPERIENCE_GOALS",
-    "CL01_PLACEHOLDER",
-    "CL02_PLACEHOLDER",
-    "CL03_PLACEHOLDER",
+    "CL_COMMON_LESSONS",
     "QZ2_INVEST_PROFILE",
     "BR_BEGINNER_01",
     "BR_BEGINNER_02",
@@ -144,6 +157,7 @@ export function getInitialOnboardingState(): OnboardingState {
     screenStatusById,
     quiz1: { answers: DEFAULT_QUIZ1_ANSWERS, isCompleted: false, segment: null },
     quiz2: { answers: DEFAULT_QUIZ2_ANSWERS, isCompleted: false, strategy: null },
+    commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE },
     branch: { branchId: null },
     completedScreenIds,
     lastSavedAtMs: null,
@@ -197,12 +211,47 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
         ...state,
         // Any answer change invalidates quiz completion and requires re-submit.
         quiz1: { ...state.quiz1, answers: event.answers, isCompleted: false, segment: null },
+        // Any change to Quiz1 can change segment. Common lessons progress must be reset deterministically.
+        commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE },
       };
 
     case "SET_QUIZ1_COMPLETED":
+      if (state.commonLessons.segment && state.commonLessons.segment !== event.segment) {
+        return {
+          ...state,
+          quiz1: { ...state.quiz1, isCompleted: true, segment: event.segment },
+          commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE, segment: event.segment },
+        };
+      }
       return {
         ...state,
         quiz1: { ...state.quiz1, isCompleted: true, segment: event.segment },
+        commonLessons: {
+          ...state.commonLessons,
+          segment: state.commonLessons.segment ?? event.segment,
+        },
+      };
+
+    case "RESET_COMMON_LESSONS_FOR_SEGMENT":
+      return {
+        ...state,
+        commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE, segment: event.segment },
+      };
+
+    case "SET_COMMON_LESSONS_INDEX":
+      return {
+        ...state,
+        commonLessons: { ...state.commonLessons, currentIndex: event.index },
+      };
+
+    case "SET_COMMON_LESSONS_COMPLETED":
+      return {
+        ...state,
+        commonLessons: {
+          ...state.commonLessons,
+          isCompleted: true,
+          segment: event.segment,
+        },
       };
 
     case "SET_QUIZ2_ANSWERS":

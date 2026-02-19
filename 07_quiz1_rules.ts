@@ -51,7 +51,8 @@ export function computeSegment(answers: Quiz1Answers, rules: SegmentRuleConfig =
   return seg;
 }
 
-export function isQuiz1CompletionValid(answers: Quiz1Answers, storedSegment: Segment | null): boolean {
+export function isQuiz1CompletionValid(answers: Quiz1Answers, storedSegment: Segment | null, isCompleted: boolean): boolean {
+  if (!isCompleted) return false;
   const v = validateQuiz1Answers(answers);
   if (!v.ok) return false;
   if (!storedSegment) return false;

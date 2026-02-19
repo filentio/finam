@@ -2,7 +2,12 @@ export type AnalyticsEventName =
   | "onboarding_quiz1_start"
   | "onboarding_quiz1_answer"
   | "onboarding_quiz1_complete"
-  | "onboarding_quiz1_error";
+  | "onboarding_quiz1_error"
+  | "onboarding_common_start"
+  | "onboarding_common_view_lesson"
+  | "onboarding_common_next"
+  | "onboarding_common_back"
+  | "onboarding_common_complete";
 
 export type AnalyticsPayload = Record<string, unknown>;
 

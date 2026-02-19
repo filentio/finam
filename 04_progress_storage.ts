@@ -1,5 +1,6 @@
 import { getInitialOnboardingState, type OnboardingState, type ScreenId } from "./01_state_machine";
 import { ALL_SCREEN_IDS } from "./02_routes";
+import { isCommonLessonsCompletionValid } from "./11_common_lessons_rules";
 
 const STORAGE_KEY = "onboarding_shell_v1";
 const STORAGE_VERSION = 1 as const;
@@ -34,8 +35,19 @@ export function loadProgress(): OnboardingState | null {
     if (parsed.version !== STORAGE_VERSION) return null;
     if (!parsed.state) return null;
 
+    // Migration: previous versions used CL01/CL02/CL03 placeholders.
+    const anyState = parsed.state as unknown as { currentScreenId?: unknown };
+    if (anyState.currentScreenId === "CL01_PLACEHOLDER" || anyState.currentScreenId === "CL02_PLACEHOLDER" || anyState.currentScreenId === "CL03_PLACEHOLDER") {
+      (parsed.state as unknown as { currentScreenId: unknown }).currentScreenId = "CL_COMMON_LESSONS";
+    }
+
     const merged = mergeWithInitial(parsed.state);
     if (!isValidScreenId(merged.currentScreenId)) return null;
+
+    // Restore rule: if common lessons completed for the current segment, resume at Quiz2.
+    if (merged.currentScreenId === "CL_COMMON_LESSONS" && isCommonLessonsCompletionValid(merged.commonLessons, merged.quiz1.segment)) {
+      merged.currentScreenId = "QZ2_INVEST_PROFILE";
+    }
 
     return merged;
   } catch {
@@ -68,6 +80,10 @@ export function mergeWithInitial(partial: OnboardingState): OnboardingState {
       ...base.quiz2,
       ...(partial.quiz2 ?? {}),
       answers: { ...base.quiz2.answers, ...(partial.quiz2?.answers ?? {}) },
+    },
+    commonLessons: {
+      ...base.commonLessons,
+      ...(partial.commonLessons ?? {}),
     },
     branch: {
       ...base.branch,

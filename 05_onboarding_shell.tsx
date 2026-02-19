@@ -6,7 +6,7 @@ import {
   type OnboardingState,
   type ScreenId,
 } from "./01_state_machine";
-import { guardScreenAccess, getBackScreenId, getNextScreenId } from "./02_routes";
+import { ALL_SCREEN_IDS, guardScreenAccess, getBackScreenId, getNextScreenId } from "./02_routes";
 import {
   assertBranchMappingCoverage,
   computeStrategyFromQuiz2,
@@ -17,6 +17,7 @@ import { clearProgress, loadProgress, saveProgress } from "./04_progress_storage
 import { computeSegment } from "./07_quiz1_rules";
 import { Quiz1Screen } from "./08_quiz1_screen";
 import { track } from "./09_analytics";
+import { CommonLessonsScreen } from "./12_common_lessons_screen";
 
 type Props = {
   storageEnabled?: boolean;
@@ -34,6 +35,7 @@ function readHash(): ScreenId | null {
   if (typeof window === "undefined") return null;
   const raw = window.location.hash.replace("#", "").trim();
   if (!raw) return null;
+  if (!ALL_SCREEN_IDS.includes(raw as ScreenId)) return null;
   return raw as ScreenId;
 }
 
@@ -208,7 +210,7 @@ export default function OnboardingShell(props: Props) {
                 dispatch({ type: "SET_QUIZ1_COMPLETED", segment });
                 track("onboarding_quiz1_complete", { segment });
                 dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "QZ1_EXPERIENCE_GOALS" });
-                dispatch({ type: "SET_CURRENT_SCREEN", screenId: "CL01_PLACEHOLDER" });
+                dispatch({ type: "SET_CURRENT_SCREEN", screenId: "CL_COMMON_LESSONS" });
                 setQuizError(null);
               } catch (e) {
                 track("onboarding_quiz1_error", { errorType: "SEGMENT_COMPUTE_FAILED" });
@@ -218,25 +220,18 @@ export default function OnboardingShell(props: Props) {
           />
         )}
 
-        {screenId === "CL01_PLACEHOLDER" && (
-          <PlaceholderLessonScreen
-            title="Общий урок 1 (заглушка)"
-            description="Экран-заглушка. Контент урока не реализуется на этом этапе."
-            onNext={onNextLinear}
-          />
-        )}
-        {screenId === "CL02_PLACEHOLDER" && (
-          <PlaceholderLessonScreen
-            title="Общий урок 2 (заглушка)"
-            description="Экран-заглушка. Контент урока не реализуется на этом этапе."
-            onNext={onNextLinear}
-          />
-        )}
-        {screenId === "CL03_PLACEHOLDER" && (
-          <PlaceholderLessonScreen
-            title="Общий урок 3 (заглушка)"
-            description="Экран-заглушка. Контент урока не реализуется на этом этапе."
-            onNext={onNextLinear}
+        {screenId === "CL_COMMON_LESSONS" && state.quiz1.segment && (
+          <CommonLessonsScreen
+            screenId="CL_COMMON_LESSONS"
+            segment={state.quiz1.segment}
+            progress={state.commonLessons}
+            onResetForSegment={(segment) => dispatch({ type: "RESET_COMMON_LESSONS_FOR_SEGMENT", segment })}
+            onSetIndex={(index) => dispatch({ type: "SET_COMMON_LESSONS_INDEX", index })}
+            onComplete={() => {
+              dispatch({ type: "SET_COMMON_LESSONS_COMPLETED", segment: state.quiz1.segment! });
+              dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "CL_COMMON_LESSONS" });
+              dispatch({ type: "SET_CURRENT_SCREEN", screenId: "QZ2_INVEST_PROFILE" });
+            }}
           />
         )}
 
@@ -351,18 +346,6 @@ function EntryScreen(props: { onStart: () => void }) {
       <p style={styles.p}>Этот экран является точкой входа процесса онбординга.</p>
       <button style={styles.primaryBtn} onClick={props.onStart}>
         Начать
-      </button>
-    </div>
-  );
-}
-
-function PlaceholderLessonScreen(props: { title: string; description: string; onNext: () => void }) {
-  return (
-    <div style={styles.card}>
-      <h2 style={styles.h2}>{props.title}</h2>
-      <p style={styles.p}>{props.description}</p>
-      <button style={styles.primaryBtn} onClick={props.onNext}>
-        Далее
       </button>
     </div>
   );
