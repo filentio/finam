@@ -15,17 +15,15 @@
 |---:|---|---|---|---|
 | 01 | `SCR_ENTRY` | Вход | 1 | entry |
 | 02 | `QZ1_EXPERIENCE_GOALS` | Анкета №1 (5 вопросов) | 2 | quiz |
-| 03 | `CL01_PLACEHOLDER` | Общий урок 1 (заглушка) | 3 | common_lesson |
-| 04 | `CL02_PLACEHOLDER` | Общий урок 2 (заглушка) | 3 | common_lesson |
-| 05 | `CL03_PLACEHOLDER` | Общий урок 3 (заглушка) | 3 | common_lesson |
-| 06 | `QZ2_INVEST_PROFILE` | Анкета №2 (3–4 вопроса) | 4 | quiz |
-| 07 | `BR_BEGINNER_01` | Ветка Beginner экран 1 (заглушка) | 5 | branch_lesson |
-| 08 | `BR_BEGINNER_02` | Ветка Beginner экран 2 (заглушка) | 5 | branch_lesson |
-| 09 | `BR_INTERMEDIATE_01` | Ветка Intermediate экран 1 (заглушка) | 5 | branch_lesson |
-| 10 | `BR_INTERMEDIATE_02` | Ветка Intermediate экран 2 (заглушка) | 5 | branch_lesson |
-| 11 | `BR_ADVANCED_01` | Ветка Advanced экран 1 (заглушка) | 5 | branch_lesson |
-| 12 | `BR_ADVANCED_02` | Ветка Advanced экран 2 (заглушка) | 5 | branch_lesson |
-| 13 | `SCR_FINAL` | Финальный экран | 6 | final |
+| 03 | `CL_COMMON_LESSONS` | Общие уроки (контейнер, 1 экран = 1 lesson внутри блока) | 3 | common_lesson |
+| 04 | `QZ2_INVEST_PROFILE` | Анкета №2 (3–4 вопроса) | 4 | quiz |
+| 05 | `BR_BEGINNER_01` | Ветка Beginner экран 1 (заглушка) | 5 | branch_lesson |
+| 06 | `BR_BEGINNER_02` | Ветка Beginner экран 2 (заглушка) | 5 | branch_lesson |
+| 07 | `BR_INTERMEDIATE_01` | Ветка Intermediate экран 1 (заглушка) | 5 | branch_lesson |
+| 08 | `BR_INTERMEDIATE_02` | Ветка Intermediate экран 2 (заглушка) | 5 | branch_lesson |
+| 09 | `BR_ADVANCED_01` | Ветка Advanced экран 1 (заглушка) | 5 | branch_lesson |
+| 10 | `BR_ADVANCED_02` | Ветка Advanced экран 2 (заглушка) | 5 | branch_lesson |
+| 11 | `SCR_FINAL` | Финальный экран | 6 | final |
 
 Все ScreenID уникальны.
 
@@ -38,17 +36,15 @@
 | ID | From | To | Условие | Тип |
 |---|---|---|---|---|
 | T001 | `SCR_ENTRY` | `QZ1_EXPERIENCE_GOALS` | NEXT | linear |
-| T002 | `QZ1_EXPERIENCE_GOALS` | `CL01_PLACEHOLDER` | SUBMIT_VALID | submit |
-| T003 | `CL01_PLACEHOLDER` | `CL02_PLACEHOLDER` | NEXT | linear |
-| T004 | `CL02_PLACEHOLDER` | `CL03_PLACEHOLDER` | NEXT | linear |
-| T005 | `CL03_PLACEHOLDER` | `QZ2_INVEST_PROFILE` | NEXT | linear |
-| T006 | `QZ2_INVEST_PROFILE` | `BR_*_01` | BRANCH_RESOLVED | branch |
-| T007 | `BR_BEGINNER_01` | `BR_BEGINNER_02` | NEXT | linear |
-| T008 | `BR_BEGINNER_02` | `SCR_FINAL` | NEXT | linear |
-| T009 | `BR_INTERMEDIATE_01` | `BR_INTERMEDIATE_02` | NEXT | linear |
-| T010 | `BR_INTERMEDIATE_02` | `SCR_FINAL` | NEXT | linear |
-| T011 | `BR_ADVANCED_01` | `BR_ADVANCED_02` | NEXT | linear |
-| T012 | `BR_ADVANCED_02` | `SCR_FINAL` | NEXT | linear |
+| T002 | `QZ1_EXPERIENCE_GOALS` | `CL_COMMON_LESSONS` | SUBMIT_VALID | submit |
+| T003 | `CL_COMMON_LESSONS` | `QZ2_INVEST_PROFILE` | SUBMIT_VALID | submit |
+| T004 | `QZ2_INVEST_PROFILE` | `BR_*_01` | BRANCH_RESOLVED | branch |
+| T005 | `BR_BEGINNER_01` | `BR_BEGINNER_02` | NEXT | linear |
+| T006 | `BR_BEGINNER_02` | `SCR_FINAL` | NEXT | linear |
+| T007 | `BR_INTERMEDIATE_01` | `BR_INTERMEDIATE_02` | NEXT | linear |
+| T008 | `BR_INTERMEDIATE_02` | `SCR_FINAL` | NEXT | linear |
+| T009 | `BR_ADVANCED_01` | `BR_ADVANCED_02` | NEXT | linear |
+| T010 | `BR_ADVANCED_02` | `SCR_FINAL` | NEXT | linear |
 
 Где `BR_*_01` определяется детерминированно на основе (segment + strategy) через `branchId`:
 - `BR_BEGINNER` → `BR_BEGINNER_01`
@@ -102,6 +98,65 @@
 
 ---
 
+## 3.4 Common Lessons (этап 3) — lessonIds по сегментам (строго)
+
+Источник истины:
+- Реестр уроков: `10_common_lessons_config.ts` (`LESSON_REGISTRY`)
+- Mapping сегмент → порядок уроков: `10_common_lessons_config.ts` (`COMMON_LESSONS_BY_SEGMENT`)
+
+### 3.4.1 LessonId — полный список
+- `CL_INTRO_ACCOUNTS`
+- `CL_ORDER_TYPES`
+- `CL_RISK_RETURN`
+- `CL_DIVERSIFICATION`
+- `CL_FEES_TAXES`
+- `CL_REBALANCING`
+- `CL_DISCIPLINE_PLAN`
+- `CL_ADVANCED_PRODUCTS`
+
+### 3.4.2 Mapping: Segment → LessonId[] (порядок фиксирован)
+- `NOVICE`:
+  - `CL_INTRO_ACCOUNTS`
+  - `CL_ORDER_TYPES`
+  - `CL_RISK_RETURN`
+  - `CL_DIVERSIFICATION`
+  - `CL_FEES_TAXES`
+  - `CL_DISCIPLINE_PLAN`
+- `LEARNER`:
+  - `CL_ORDER_TYPES`
+  - `CL_RISK_RETURN`
+  - `CL_DIVERSIFICATION`
+  - `CL_FEES_TAXES`
+  - `CL_REBALANCING`
+- `EXPERIENCED`:
+  - `CL_RISK_RETURN`
+  - `CL_DIVERSIFICATION`
+  - `CL_REBALANCING`
+  - `CL_FEES_TAXES`
+  - `CL_DISCIPLINE_PLAN`
+- `QUALIFIED`:
+  - `CL_ADVANCED_PRODUCTS`
+  - `CL_REBALANCING`
+  - `CL_FEES_TAXES`
+
+### 3.4.3 Правила показа (строго)
+- Экран `CL_COMMON_LESSONS` является контейнером.
+- Внутри контейнера действует правило: **один урок = один экран** (переключение уроков по `commonLessons.currentIndex`).
+- Переход вперёд/назад внутри блока возможен только на `index ± 1`.
+- Прыжки на произвольный `lessonId/index` запрещены.
+
+### 3.4.4 Completion (строго)
+Common Lessons считаются завершёнными только если:
+- пользователь находится на последнем уроке (index = last)
+- и нажимает кнопку `Завершить`
+
+После completion:
+- `commonLessons.isCompleted=true`
+- `commonLessons.segment=quiz1.segment`
+- выполняется переход на `QZ2_INVEST_PROFILE`
+
+---
+
 ## 4) Back navigation (строго)
 
 Back запрещён, если:
@@ -111,10 +166,8 @@ Back запрещён, если:
 Back target:
 - `SCR_ENTRY` → null
 - `QZ1_EXPERIENCE_GOALS` → `SCR_ENTRY`
-- `CL01_PLACEHOLDER` → `QZ1_EXPERIENCE_GOALS`
-- `CL02_PLACEHOLDER` → `CL01_PLACEHOLDER`
-- `CL03_PLACEHOLDER` → `CL02_PLACEHOLDER`
-- `QZ2_INVEST_PROFILE` → `CL03_PLACEHOLDER`
+- `CL_COMMON_LESSONS` → `QZ1_EXPERIENCE_GOALS`
+- `QZ2_INVEST_PROFILE` → `CL_COMMON_LESSONS`
 - `BR_*_01` → `QZ2_INVEST_PROFILE`
 - `BR_*_02` → `BR_*_01`
 - `SCR_FINAL` → null
@@ -152,6 +205,18 @@ Back target:
   - если processStatus=COMPLETED → открывается `SCR_FINAL`
   - иначе открывается сохранённый `currentScreenId` (после проверки guard)
 
+### 6.0.1 Common Lessons data model (сохранение в state)
+`commonLessons` хранится в `OnboardingState` и персистится в LocalStorage через общий прогресс.
+
+Формат:
+- `segment`: `Segment | null` — сегмент, под который выбран список уроков (защита от рассинхронизации)
+- `currentIndex`: number — индекс текущего lesson в массиве `COMMON_LESSONS_BY_SEGMENT[segment]`
+- `isCompleted`: boolean — завершён ли блок общих уроков
+
+Правило восстановления:
+- если `isCompleted=true` и `segment == quiz1.segment` → открывается `QZ2_INVEST_PROFILE`
+- если `segment != quiz1.segment` → прогресс Common Lessons сбрасывается и стартует с первого урока нового сегмента
+
 ---
 
 ## 6.1) Аналитика (минимальная, без SDK)
@@ -164,6 +229,13 @@ Back target:
 - `onboarding_quiz1_complete` (payload: `segment`)
 - `onboarding_quiz1_error` (payload: `errorType`, optional: `missingQuestionIds`)
 
+События Common Lessons:
+- `onboarding_common_start` (payload: `segment`, `totalLessons`)
+- `onboarding_common_view_lesson` (payload: `segment`, `lessonId`, `index`, `totalLessons`)
+- `onboarding_common_next` (payload: `lessonId`, `toIndex`)
+- `onboarding_common_back` (payload: `lessonId`, `toIndex`)
+- `onboarding_common_complete` (payload: `segment`)
+
 ---
 
 ## 7) Edge cases
@@ -173,10 +245,12 @@ Back target:
 - EC003: offline → экран в состоянии offline (действия блокируются)
 - EC004: deep link error → фиксированное модальное окно ошибки
 - EC005: quiz1 answers заполнены, но `segment` отсутствует или не совпадает с `computeSegment(answers)` → guard редиректит на `QZ1_EXPERIENCE_GOALS` (анкета считается НЕ пройденной)
+- EC006: `quiz1.segment` изменился (или отличается от `commonLessons.segment`) → прогресс Common Lessons сбрасывается и пользователь проходит блок заново для нового сегмента
+- EC007: пользователь пытается перейти на `QZ2_INVEST_PROFILE` при `commonLessons.isCompleted != true` → guard редиректит на `CL_COMMON_LESSONS`
 
 ---
 
 ## 8) BLOCKERS
 
-Отсутствуют.
+BL001: Финальные тексты Common Lessons не предоставлены продуктом. В `10_common_lessons_config.ts` используются временные, но содержательные тексты, которые требуют замены на финальные без изменения структуры/логики.
 
