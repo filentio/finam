@@ -22,11 +22,11 @@ export function WidgetApp(props: WidgetAppProps) {
           storageNamespace={props.storageNamespace}
           assetBaseUrl={props.assetBaseUrl}
           showDebugHeader={props.debug}
-          onRequestClose={props.onRequestClose}
+          onRequestClose={props.mode === "modal" ? props.onRequestClose : undefined}
         />
       </AnalyticsProvider>
     ),
-    [props.track, props.storageNamespace, props.assetBaseUrl, props.onRequestClose, props.debug]
+    [props.track, props.storageNamespace, props.assetBaseUrl, props.onRequestClose, props.debug, props.mode]
   );
 
   if (props.mode === "modal") {
