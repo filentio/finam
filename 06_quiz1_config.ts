@@ -5,7 +5,7 @@ export type Quiz1QuestionId =
   | "QZ1_Q2_EXPERIENCE"
   | "QZ1_Q3_PLANNED_AMOUNT"
   | "QZ1_Q4_MAIN_GOAL"
-  | "QZ1_Q5_PRIMARY_INTEREST";
+  | "QZ1_Q5_INTERESTS";
 
 export type Quiz1AnswerId =
   | "QZ1_Q1_YES"
@@ -30,7 +30,8 @@ export type Quiz1AnswerId =
   | "QZ1_Q5_IPO"
   | "QZ1_Q5_CURRENCY"
   | "QZ1_Q5_STRUCTURED"
-  | "QZ1_Q5_DERIVATIVES";
+  | "QZ1_Q5_DERIVATIVES"
+  | "QZ1_Q5_NONE";
 
 export type Quiz1Option = {
   answerId: Quiz1AnswerId;
@@ -39,10 +40,11 @@ export type Quiz1Option = {
 
 export type Quiz1Question = {
   questionId: Quiz1QuestionId;
-  type: "single";
+  type: "single" | "multi";
   required: true;
   title: string;
   helperText: string | null;
+  minSelected?: number; // used for multi-select questions
   options: readonly Quiz1Option[];
 };
 
@@ -101,11 +103,12 @@ export const QUIZ1_QUESTIONS: readonly Quiz1Question[] = [
     ],
   },
   {
-    questionId: "QZ1_Q5_PRIMARY_INTEREST",
-    type: "single",
+    questionId: "QZ1_Q5_INTERESTS",
+    type: "multi",
     required: true,
     title: "Какие продукты/инструменты вам наиболее интересны?",
-    helperText: "Выберите один вариант",
+    helperText: "Выберите один или несколько вариантов",
+    minSelected: 1,
     options: [
       { answerId: "QZ1_Q5_FUNDS", label: "Фонды (ETF, ПИФ)" },
       { answerId: "QZ1_Q5_STOCKS", label: "Акции" },
@@ -115,13 +118,17 @@ export const QUIZ1_QUESTIONS: readonly Quiz1Question[] = [
       { answerId: "QZ1_Q5_CURRENCY", label: "Валюта" },
       { answerId: "QZ1_Q5_STRUCTURED", label: "Структурные продукты" },
       { answerId: "QZ1_Q5_DERIVATIVES", label: "Производные (фьючерсы, опционы)" },
+      { answerId: "QZ1_Q5_NONE", label: "Ничего из перечисленного" },
     ],
   },
 ];
 
 export const QUIZ1_QUESTION_ORDER: readonly Quiz1QuestionId[] = QUIZ1_QUESTIONS.map((q) => q.questionId);
 
-export function getQuiz1AnswerByQuestionId(answers: Quiz1Answers, questionId: Quiz1QuestionId): Quiz1AnswerId | null {
+export function getQuiz1AnswerByQuestionId(
+  answers: Quiz1Answers,
+  questionId: Quiz1QuestionId
+): Quiz1AnswerId | Quiz1AnswerId[] | null {
   switch (questionId) {
     case "QZ1_Q1_QUALIFIED_STATUS":
       return answers.q1QualifiedStatus;
@@ -131,8 +138,8 @@ export function getQuiz1AnswerByQuestionId(answers: Quiz1Answers, questionId: Qu
       return answers.q3PlannedAmount;
     case "QZ1_Q4_MAIN_GOAL":
       return answers.q4MainGoal;
-    case "QZ1_Q5_PRIMARY_INTEREST":
-      return answers.q5PrimaryInterest;
+    case "QZ1_Q5_INTERESTS":
+      return answers.q5Interests;
   }
 }
 

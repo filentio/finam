@@ -25,7 +25,7 @@ const QUESTION_IDS: Quiz1QuestionId[] = [
   "QZ1_Q2_EXPERIENCE",
   "QZ1_Q3_PLANNED_AMOUNT",
   "QZ1_Q4_MAIN_GOAL",
-  "QZ1_Q5_PRIMARY_INTEREST",
+  "QZ1_Q5_INTERESTS",
 ];
 
 export function Quiz1Screen(props: Quiz1ScreenProps) {
@@ -36,7 +36,7 @@ export function Quiz1Screen(props: Quiz1ScreenProps) {
     QZ1_Q2_EXPERIENCE: null,
     QZ1_Q3_PLANNED_AMOUNT: null,
     QZ1_Q4_MAIN_GOAL: null,
-    QZ1_Q5_PRIMARY_INTEREST: null,
+    QZ1_Q5_INTERESTS: null,
   });
 
   useEffect(() => {
@@ -66,9 +66,30 @@ export function Quiz1Screen(props: Quiz1ScreenProps) {
       case "QZ1_Q4_MAIN_GOAL":
         next.q4MainGoal = answerId as Quiz1Answers["q4MainGoal"];
         break;
-      case "QZ1_Q5_PRIMARY_INTEREST":
-        next.q5PrimaryInterest = answerId as Quiz1Answers["q5PrimaryInterest"];
+      case "QZ1_Q5_INTERESTS": {
+        const prev = next.q5Interests ?? [];
+        const alreadySelected = prev.includes(answerId as any);
+        const isNone = answerId === "QZ1_Q5_NONE";
+
+        if (isNone) {
+          // Rule A:
+          // - selecting "none" clears all others
+          // - selecting any other clears "none"
+          next.q5Interests = alreadySelected ? [] : ["QZ1_Q5_NONE"];
+        } else {
+          const withoutNone = prev.filter((id) => id !== "QZ1_Q5_NONE");
+          next.q5Interests = alreadySelected
+            ? withoutNone.filter((id) => id !== answerId)
+            : [...withoutNone, answerId as any];
+
+          // Canonical order for deterministic hashing/storage.
+          const order = new Map(question.options.map((o, i) => [o.answerId, i] as const));
+          next.q5Interests = [...next.q5Interests].sort(
+            (a, b) => (order.get(a as any) ?? 999) - (order.get(b as any) ?? 999)
+          ) as any;
+        }
         break;
+      }
     }
 
     props.onInteract?.();
@@ -110,19 +131,23 @@ export function Quiz1Screen(props: Quiz1ScreenProps) {
           <div style={styles.fieldsetTitle}>{q.title}</div>
           {q.helperText ? <div style={styles.helperText}>{q.helperText}</div> : null}
           <div style={styles.options}>
-            {q.options.map((opt) => (
-              <button
-                key={opt.answerId}
-                type="button"
-                style={{
-                  ...styles.optionBtn,
-                  ...(getQuiz1AnswerByQuestionId(props.answers, q.questionId) === opt.answerId ? styles.optionBtnSelected : null),
-                }}
-                onClick={() => onSelect(q, opt.answerId)}
-              >
-                {opt.label}
-              </button>
-            ))}
+            {q.options.map((opt) => {
+              const stored = getQuiz1AnswerByQuestionId(props.answers, q.questionId);
+              const selected = Array.isArray(stored) ? stored.includes(opt.answerId) : stored === opt.answerId;
+              return (
+                <button
+                  key={opt.answerId}
+                  type="button"
+                  style={{
+                    ...styles.optionBtn,
+                    ...(selected ? styles.optionBtnSelected : null),
+                  }}
+                  onClick={() => onSelect(q, opt.answerId)}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       ))}

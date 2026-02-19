@@ -80,6 +80,28 @@ export function loadProgress(namespace: string = LEGACY_STORAGE_KEY): Onboarding
       if (a.q4Preference === "Рост") a.q4Preference = "QZ2_Q4_GROWTH";
     }
 
+    // Migration: Quiz1 Q5 changed from single-select to multi-select (array of answerIds).
+    const anyQuiz1 = parsed.state as unknown as { quiz1?: { answers?: Record<string, unknown> } };
+    const q1a = anyQuiz1.quiz1?.answers;
+    if (q1a) {
+      const legacySingle = q1a.q5PrimaryInterest;
+      const currentMulti = q1a.q5Interests;
+      if (Array.isArray(currentMulti)) {
+        // normalize: "none" cannot coexist with others
+        if (currentMulti.includes("QZ1_Q5_NONE") && currentMulti.length > 1) {
+          q1a.q5Interests = ["QZ1_Q5_NONE"];
+        }
+      } else if (typeof currentMulti === "string") {
+        q1a.q5Interests = [currentMulti];
+      } else if (typeof legacySingle === "string") {
+        q1a.q5Interests = [legacySingle];
+        delete q1a.q5PrimaryInterest;
+      } else {
+        q1a.q5Interests = [];
+        delete q1a.q5PrimaryInterest;
+      }
+    }
+
     const merged = mergeWithInitial(parsed.state);
     if (!isValidScreenId(merged.currentScreenId)) return null;
 

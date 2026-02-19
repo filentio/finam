@@ -32,7 +32,8 @@ export type Quiz1Answers = {
     | "QZ1_Q4_GROWTH"
     | "QZ1_Q4_PRESERVE"
     | null;
-  q5PrimaryInterest:
+  // Multi-select. Valid when length >= 1. See rules for "QZ1_Q5_NONE".
+  q5Interests: Array<
     | "QZ1_Q5_FUNDS"
     | "QZ1_Q5_STOCKS"
     | "QZ1_Q5_TRUST"
@@ -41,7 +42,8 @@ export type Quiz1Answers = {
     | "QZ1_Q5_CURRENCY"
     | "QZ1_Q5_STRUCTURED"
     | "QZ1_Q5_DERIVATIVES"
-    | null;
+    | "QZ1_Q5_NONE"
+  >;
 };
 
 export type Quiz2Answers = {
@@ -126,7 +128,7 @@ export const DEFAULT_QUIZ1_ANSWERS: Quiz1Answers = {
   q2Experience: null,
   q3PlannedAmount: null,
   q4MainGoal: null,
-  q5PrimaryInterest: null,
+  q5Interests: [],
 };
 
 export const DEFAULT_QUIZ2_ANSWERS: Quiz2Answers = {

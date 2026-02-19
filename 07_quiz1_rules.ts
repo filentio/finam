@@ -26,7 +26,17 @@ export function validateQuiz1Answers(answers: Quiz1Answers): Quiz1ValidationResu
   if (!answers.q2Experience) missing.push("QZ1_Q2_EXPERIENCE");
   if (!answers.q3PlannedAmount) missing.push("QZ1_Q3_PLANNED_AMOUNT");
   if (!answers.q4MainGoal) missing.push("QZ1_Q4_MAIN_GOAL");
-  if (!answers.q5PrimaryInterest) missing.push("QZ1_Q5_PRIMARY_INTEREST");
+  // Q5 is multi-select: at least one must be selected.
+  if (!answers.q5Interests || answers.q5Interests.length < 1) {
+    missing.push("QZ1_Q5_INTERESTS");
+  } else {
+    // Rule A: selecting "none" clears all others and cannot coexist.
+    const hasNone = answers.q5Interests.includes("QZ1_Q5_NONE");
+    if (hasNone && answers.q5Interests.length !== 1) {
+      // Treat as invalid by marking question as missing/invalid.
+      missing.push("QZ1_Q5_INTERESTS");
+    }
+  }
   if (missing.length) return { ok: false, missingQuestionIds: missing };
   return { ok: true };
 }
