@@ -19,36 +19,36 @@ export type ScreenId =
   | "BR_ADVANCED_02"
   | "SCR_FINAL";
 
-export type Segment = "novice" | "learner" | "experienced" | "qualified";
+export type Segment = "NOVICE" | "LEARNER" | "EXPERIENCED" | "QUALIFIED";
 export type Strategy = "conservative" | "balanced" | "aggressive";
 export type BranchId = "BR_BEGINNER" | "BR_INTERMEDIATE" | "BR_ADVANCED";
 
 export type Quiz1Answers = {
-  q1QualifiedStatus: "Да" | "Нет" | null;
+  q1QualifiedStatus: "QZ1_Q1_YES" | "QZ1_Q1_NO" | null;
   q2Experience:
-    | "Еще нет опыта"
-    | "Менее 1 года"
-    | "От 1 до 3 лет"
-    | "От 3 до 5 лет"
-    | "Более 5 лет"
+    | "QZ1_Q2_NO_EXPERIENCE"
+    | "QZ1_Q2_LT_1Y"
+    | "QZ1_Q2_1_3Y"
+    | "QZ1_Q2_3_5Y"
+    | "QZ1_Q2_GT_5Y"
     | null;
-  q3PlannedAmount: "До 300 тыс" | "300 тыс - 2 млн" | "2 - 5 млн" | "Более 5 млн" | null;
+  q3PlannedAmount: "QZ1_Q3_LT_300K" | "QZ1_Q3_300K_2M" | "QZ1_Q3_2_5M" | "QZ1_Q3_GT_5M" | null;
   q4MainGoal:
-    | "Накопление на крупную покупку"
-    | "Получение пассивного дохода"
-    | "Рост капитала"
-    | "Сохранение и наследие"
+    | "QZ1_Q4_PURCHASE"
+    | "QZ1_Q4_PASSIVE_INCOME"
+    | "QZ1_Q4_GROWTH"
+    | "QZ1_Q4_PRESERVE"
     | null;
-  q5Interests: {
-    fundsEtfPif: boolean;
-    stocks: boolean;
-    trustManagement: boolean;
-    bonds: boolean;
-    ipo: boolean;
-    currency: boolean;
-    structuredProducts: boolean;
-    derivatives: boolean;
-  };
+  q5PrimaryInterest:
+    | "QZ1_Q5_FUNDS"
+    | "QZ1_Q5_STOCKS"
+    | "QZ1_Q5_TRUST"
+    | "QZ1_Q5_BONDS"
+    | "QZ1_Q5_IPO"
+    | "QZ1_Q5_CURRENCY"
+    | "QZ1_Q5_STRUCTURED"
+    | "QZ1_Q5_DERIVATIVES"
+    | null;
 };
 
 export type Quiz2Answers = {
@@ -102,16 +102,7 @@ export const DEFAULT_QUIZ1_ANSWERS: Quiz1Answers = {
   q2Experience: null,
   q3PlannedAmount: null,
   q4MainGoal: null,
-  q5Interests: {
-    fundsEtfPif: false,
-    stocks: false,
-    trustManagement: false,
-    bonds: false,
-    ipo: false,
-    currency: false,
-    structuredProducts: false,
-    derivatives: false,
-  },
+  q5PrimaryInterest: null,
 };
 
 export const DEFAULT_QUIZ2_ANSWERS: Quiz2Answers = {
@@ -204,7 +195,8 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
     case "SET_QUIZ1_ANSWERS":
       return {
         ...state,
-        quiz1: { ...state.quiz1, answers: event.answers },
+        // Any answer change invalidates quiz completion and requires re-submit.
+        quiz1: { ...state.quiz1, answers: event.answers, isCompleted: false, segment: null },
       };
 
     case "SET_QUIZ1_COMPLETED":

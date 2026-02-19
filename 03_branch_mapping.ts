@@ -1,25 +1,15 @@
 import type { BranchId, Quiz1Answers, Quiz2Answers, Segment, Strategy, ScreenId } from "./01_state_machine";
+import { computeSegment, validateQuiz1Answers as validateQuiz1AnswersV2 } from "./07_quiz1_rules";
 
+// Back-compat exports (segment/validation moved to 07_quiz1_rules.ts).
 export function computeSegmentFromQuiz1(answers: Quiz1Answers): Segment {
-  if (answers.q1QualifiedStatus === "Да") return "qualified";
-  if (answers.q1QualifiedStatus === "Нет") {
-    const exp = answers.q2Experience;
-    if (exp === "Еще нет опыта" || exp === "Менее 1 года") return "novice";
-    if (exp === "От 1 до 3 лет") return "learner";
-    if (exp === "От 3 до 5 лет" || exp === "Более 5 лет") return "experienced";
-  }
-  throw new Error("Quiz1 answers are not valid for segment computation.");
+  return computeSegment(answers);
 }
 
 export function validateQuiz1Answers(answers: Quiz1Answers): { ok: true } | { ok: false; reason: string } {
-  if (!answers.q1QualifiedStatus) return { ok: false, reason: "Q1_REQUIRED" };
-  if (!answers.q2Experience) return { ok: false, reason: "Q2_REQUIRED" };
-  if (!answers.q3PlannedAmount) return { ok: false, reason: "Q3_REQUIRED" };
-  if (!answers.q4MainGoal) return { ok: false, reason: "Q4_REQUIRED" };
-  const selectedCount = Object.values(answers.q5Interests).filter(Boolean).length;
-  if (selectedCount < 1) return { ok: false, reason: "Q5_MIN_1" };
-  if (selectedCount > 5) return { ok: false, reason: "Q5_MAX_5" };
-  return { ok: true };
+  const v = validateQuiz1AnswersV2(answers);
+  if (v.ok) return { ok: true };
+  return { ok: false, reason: "MISSING_REQUIRED_ANSWERS" };
 }
 
 export function computeStrategyFromQuiz2(answers: Quiz2Answers): Strategy {
@@ -101,22 +91,22 @@ export function validateQuiz2Answers(answers: Quiz2Answers): { ok: true } | { ok
 }
 
 export const BRANCH_MAPPING: Record<Segment, Record<Strategy, BranchId>> = {
-  novice: {
+  NOVICE: {
     conservative: "BR_BEGINNER",
     balanced: "BR_BEGINNER",
     aggressive: "BR_BEGINNER",
   },
-  learner: {
+  LEARNER: {
     conservative: "BR_INTERMEDIATE",
     balanced: "BR_INTERMEDIATE",
     aggressive: "BR_INTERMEDIATE",
   },
-  experienced: {
+  EXPERIENCED: {
     conservative: "BR_INTERMEDIATE",
     balanced: "BR_INTERMEDIATE",
     aggressive: "BR_ADVANCED",
   },
-  qualified: {
+  QUALIFIED: {
     conservative: "BR_ADVANCED",
     balanced: "BR_ADVANCED",
     aggressive: "BR_ADVANCED",
@@ -139,7 +129,7 @@ export function getBranchStartScreenId(branchId: BranchId): ScreenId {
 }
 
 export function assertBranchMappingCoverage(): void {
-  const segments: Segment[] = ["novice", "learner", "experienced", "qualified"];
+  const segments: Segment[] = ["NOVICE", "LEARNER", "EXPERIENCED", "QUALIFIED"];
   const strategies: Strategy[] = ["conservative", "balanced", "aggressive"];
 
   for (const s of segments) {

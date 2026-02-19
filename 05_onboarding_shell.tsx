@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import {
-  DEFAULT_QUIZ1_ANSWERS,
   DEFAULT_QUIZ2_ANSWERS,
   getInitialOnboardingState,
   onboardingReducer,
@@ -10,13 +9,14 @@ import {
 import { guardScreenAccess, getBackScreenId, getNextScreenId } from "./02_routes";
 import {
   assertBranchMappingCoverage,
-  computeSegmentFromQuiz1,
   computeStrategyFromQuiz2,
   getBranchId,
-  validateQuiz1Answers,
   validateQuiz2Answers,
 } from "./03_branch_mapping";
 import { clearProgress, loadProgress, saveProgress } from "./04_progress_storage";
+import { computeSegment } from "./07_quiz1_rules";
+import { Quiz1Screen } from "./08_quiz1_screen";
+import { track } from "./09_analytics";
 
 type Props = {
   storageEnabled?: boolean;
@@ -194,20 +194,26 @@ export default function OnboardingShell(props: Props) {
 
         {screenId === "QZ1_EXPERIENCE_GOALS" && (
           <Quiz1Screen
-            state={state}
-            error={quizError}
-            onChange={(answers) => dispatch({ type: "SET_QUIZ1_ANSWERS", answers })}
-            onSubmit={() => {
-              const v = validateQuiz1Answers(state.quiz1.answers);
-              if (!v.ok) {
-                setQuizError(FIXED_ERROR_QUIZ_INVALID);
-                return;
-              }
-              const segment = computeSegmentFromQuiz1(state.quiz1.answers);
-              dispatch({ type: "SET_QUIZ1_COMPLETED", segment });
-              dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "QZ1_EXPERIENCE_GOALS" });
-              dispatch({ type: "SET_CURRENT_SCREEN", screenId: "CL01_PLACEHOLDER" });
+            screenId="QZ1_EXPERIENCE_GOALS"
+            answers={state.quiz1.answers}
+            externalError={quizError}
+            onInteract={() => setQuizError(null)}
+            onChangeAnswers={(answers) => {
               setQuizError(null);
+              dispatch({ type: "SET_QUIZ1_ANSWERS", answers });
+            }}
+            onSubmitValid={() => {
+              try {
+                const segment = computeSegment(state.quiz1.answers);
+                dispatch({ type: "SET_QUIZ1_COMPLETED", segment });
+                track("onboarding_quiz1_complete", { segment });
+                dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "QZ1_EXPERIENCE_GOALS" });
+                dispatch({ type: "SET_CURRENT_SCREEN", screenId: "CL01_PLACEHOLDER" });
+                setQuizError(null);
+              } catch (e) {
+                track("onboarding_quiz1_error", { errorType: "SEGMENT_COMPUTE_FAILED" });
+                setQuizError(FIXED_ERROR_QUIZ_INVALID);
+              }
             }}
           />
         )}
@@ -387,149 +393,6 @@ function FinalScreen(props: { isCompleted: boolean; onFinish: () => void }) {
   );
 }
 
-function Quiz1Screen(props: {
-  state: OnboardingState;
-  error: string | null;
-  onChange: (answers: typeof DEFAULT_QUIZ1_ANSWERS) => void;
-  onSubmit: () => void;
-}) {
-  const a = props.state.quiz1.answers;
-  const set = (next: Partial<typeof DEFAULT_QUIZ1_ANSWERS>) => props.onChange({ ...a, ...next });
-
-  const selectedInterests = Object.entries(a.q5Interests)
-    .filter(([, v]) => v)
-    .map(([k]) => k)
-    .length;
-
-  return (
-    <div style={styles.card}>
-      <h2 style={styles.h2}>Анкета №1 (5 вопросов)</h2>
-      <p style={styles.p}>Контент анкеты является базовым и не является финальным UI.</p>
-
-      <Fieldset title="Q1. Есть ли у вас статус квалифицированного инвестора?">
-        <Radio
-          name="q1"
-          value="Да"
-          checked={a.q1QualifiedStatus === "Да"}
-          label="Да"
-          onChange={() => set({ q1QualifiedStatus: "Да" })}
-        />
-        <Radio
-          name="q1"
-          value="Нет"
-          checked={a.q1QualifiedStatus === "Нет"}
-          label="Нет"
-          onChange={() => set({ q1QualifiedStatus: "Нет" })}
-        />
-      </Fieldset>
-
-      <Fieldset title="Q2. Какой у вас опыт в инвестициях?">
-        {(
-          [
-            "Еще нет опыта",
-            "Менее 1 года",
-            "От 1 до 3 лет",
-            "От 3 до 5 лет",
-            "Более 5 лет",
-          ] as const
-        ).map((v) => (
-          <Radio
-            key={v}
-            name="q2"
-            value={v}
-            checked={a.q2Experience === v}
-            label={v}
-            onChange={() => set({ q2Experience: v })}
-          />
-        ))}
-      </Fieldset>
-
-      <Fieldset title="Q3. С какой суммы вы планируете инвестировать?">
-        {(["До 300 тыс", "300 тыс - 2 млн", "2 - 5 млн", "Более 5 млн"] as const).map((v) => (
-          <Radio
-            key={v}
-            name="q3"
-            value={v}
-            checked={a.q3PlannedAmount === v}
-            label={v}
-            onChange={() => set({ q3PlannedAmount: v })}
-          />
-        ))}
-      </Fieldset>
-
-      <Fieldset title="Q4. Ваша главная цель инвестиций?">
-        {(
-          [
-            "Накопление на крупную покупку",
-            "Получение пассивного дохода",
-            "Рост капитала",
-            "Сохранение и наследие",
-          ] as const
-        ).map((v) => (
-          <Radio
-            key={v}
-            name="q4"
-            value={v}
-            checked={a.q4MainGoal === v}
-            label={v}
-            onChange={() => set({ q4MainGoal: v })}
-          />
-        ))}
-      </Fieldset>
-
-      <Fieldset title="Q5. Какие продукты/инструменты вам наиболее интересны? (мин. 1, макс. 5)">
-        <Checkbox
-          checked={a.q5Interests.fundsEtfPif}
-          label="Фонды (ETF, ПИФ)"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, fundsEtfPif: v } })}
-        />
-        <Checkbox
-          checked={a.q5Interests.stocks}
-          label="Акции"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, stocks: v } })}
-        />
-        <Checkbox
-          checked={a.q5Interests.trustManagement}
-          label="Доверительное управление / готовые портфели"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, trustManagement: v } })}
-        />
-        <Checkbox
-          checked={a.q5Interests.bonds}
-          label="Облигации"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, bonds: v } })}
-        />
-        <Checkbox
-          checked={a.q5Interests.ipo}
-          label="IPO"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, ipo: v } })}
-        />
-        <Checkbox
-          checked={a.q5Interests.currency}
-          label="Валюта"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, currency: v } })}
-        />
-        <Checkbox
-          checked={a.q5Interests.structuredProducts}
-          label="Структурные продукты"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, structuredProducts: v } })}
-        />
-        <Checkbox
-          checked={a.q5Interests.derivatives}
-          label="Производные (фьючерсы, опционы)"
-          onChange={(v) => set({ q5Interests: { ...a.q5Interests, derivatives: v } })}
-        />
-        <div style={styles.smallMeta}>Выбрано: {selectedInterests}</div>
-      </Fieldset>
-
-      {props.error && <div style={styles.errorBox}>{props.error}</div>}
-
-      <button style={styles.primaryBtn} onClick={props.onSubmit}>
-        Готово
-      </button>
-    </div>
-  );
-}
-
 function Quiz2Screen(props: {
   state: OnboardingState;
   error: string | null;
@@ -629,15 +492,6 @@ function Radio(props: {
   );
 }
 
-function Checkbox(props: { checked: boolean; label: string; onChange: (v: boolean) => void }) {
-  return (
-    <label style={styles.choiceRow}>
-      <input type="checkbox" checked={props.checked} onChange={(e) => props.onChange(e.target.checked)} />
-      <span>{props.label}</span>
-    </label>
-  );
-}
-
 const styles: Record<string, React.CSSProperties> = {
   shell: { fontFamily: "Inter, system-ui, -apple-system, Segoe UI, sans-serif", padding: 16, maxWidth: 720 },
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
@@ -655,7 +509,6 @@ const styles: Record<string, React.CSSProperties> = {
   fieldsetTitle: { fontSize: 14, fontWeight: 600, color: "#333", marginBottom: 8 },
   fieldsetBody: { display: "flex", flexDirection: "column", gap: 8 },
   choiceRow: { display: "flex", gap: 8, alignItems: "center", color: "#333" },
-  smallMeta: { marginTop: 8, fontSize: 12, color: "#666" },
   errorBox: { margin: "12px 0", padding: 12, borderRadius: 12, background: "#FFEBEE", color: "#333" },
   primaryBtn: {
     height: 44,

@@ -1,5 +1,6 @@
 import type { BranchId, OnboardingState, ScreenId, ScreenType } from "./01_state_machine";
 import { getBranchStartScreenId } from "./03_branch_mapping";
+import { isQuiz1CompletionValid } from "./07_quiz1_rules";
 
 export const ALL_SCREEN_IDS: ScreenId[] = [
   "SCR_ENTRY",
@@ -120,7 +121,7 @@ export function guardScreenAccess(state: OnboardingState, targetScreenId: Screen
   // No skipping of quizzes.
   const isAfterQuiz1 =
     targetScreenId !== "SCR_ENTRY" && targetScreenId !== "QZ1_EXPERIENCE_GOALS" && targetScreenId !== "SCR_FINAL";
-  if (isAfterQuiz1 && !state.quiz1.isCompleted) {
+  if (isAfterQuiz1 && !isQuiz1CompletionValid(state.quiz1.answers, state.quiz1.segment)) {
     return { allowed: false, redirectTo: "QZ1_EXPERIENCE_GOALS", reason: "QUIZ1_REQUIRED" };
   }
 
