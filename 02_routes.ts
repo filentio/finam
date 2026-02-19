@@ -3,18 +3,14 @@ import { getBranchStartScreenId } from "./03_branch_mapping";
 import { isQuiz1CompletionValid } from "./07_quiz1_rules";
 import { isCommonLessonsCompletionValid } from "./11_common_lessons_rules";
 import { isQuiz2CompletionValid } from "./15_quiz2_rules";
+import { computeQuiz2HashForBranch, isBranchCompletionValid, resolveBranchId } from "./18_branch_rules";
 
 export const ALL_SCREEN_IDS: ScreenId[] = [
   "SCR_ENTRY",
   "QZ1_EXPERIENCE_GOALS",
   "CL_COMMON_LESSONS",
   "QZ2_INVEST_PROFILE",
-  "BR_BEGINNER_01",
-  "BR_BEGINNER_02",
-  "BR_INTERMEDIATE_01",
-  "BR_INTERMEDIATE_02",
-  "BR_ADVANCED_01",
-  "BR_ADVANCED_02",
+  "BR_BRANCH_LESSONS",
   "SCR_FINAL",
 ];
 
@@ -23,12 +19,7 @@ export const SCREEN_TYPE_BY_ID: Record<ScreenId, ScreenType> = {
   QZ1_EXPERIENCE_GOALS: "quiz",
   CL_COMMON_LESSONS: "common_lesson",
   QZ2_INVEST_PROFILE: "quiz",
-  BR_BEGINNER_01: "branch_lesson",
-  BR_BEGINNER_02: "branch_lesson",
-  BR_INTERMEDIATE_01: "branch_lesson",
-  BR_INTERMEDIATE_02: "branch_lesson",
-  BR_ADVANCED_01: "branch_lesson",
-  BR_ADVANCED_02: "branch_lesson",
+  BR_BRANCH_LESSONS: "branch_lesson",
   SCR_FINAL: "final",
 };
 
@@ -58,12 +49,7 @@ export const ROUTE_EDGES: RouteEdge[] = [
     condition: "BRANCH_RESOLVED",
     type: "branch",
   },
-  { from: "BR_BEGINNER_01", to: "BR_BEGINNER_02", condition: "NEXT", type: "linear" },
-  { from: "BR_BEGINNER_02", to: "SCR_FINAL", condition: "NEXT", type: "linear" },
-  { from: "BR_INTERMEDIATE_01", to: "BR_INTERMEDIATE_02", condition: "NEXT", type: "linear" },
-  { from: "BR_INTERMEDIATE_02", to: "SCR_FINAL", condition: "NEXT", type: "linear" },
-  { from: "BR_ADVANCED_01", to: "BR_ADVANCED_02", condition: "NEXT", type: "linear" },
-  { from: "BR_ADVANCED_02", to: "SCR_FINAL", condition: "NEXT", type: "linear" },
+  { from: "BR_BRANCH_LESSONS", to: "SCR_FINAL", condition: "SUBMIT_VALID", type: "submit" },
 ];
 
 export const BACK_BY_SCREEN_ID: Record<ScreenId, ScreenId | null> = {
@@ -71,12 +57,7 @@ export const BACK_BY_SCREEN_ID: Record<ScreenId, ScreenId | null> = {
   QZ1_EXPERIENCE_GOALS: "SCR_ENTRY",
   CL_COMMON_LESSONS: "QZ1_EXPERIENCE_GOALS",
   QZ2_INVEST_PROFILE: "CL_COMMON_LESSONS",
-  BR_BEGINNER_01: "QZ2_INVEST_PROFILE",
-  BR_BEGINNER_02: "BR_BEGINNER_01",
-  BR_INTERMEDIATE_01: "QZ2_INVEST_PROFILE",
-  BR_INTERMEDIATE_02: "BR_INTERMEDIATE_01",
-  BR_ADVANCED_01: "QZ2_INVEST_PROFILE",
-  BR_ADVANCED_02: "BR_ADVANCED_01",
+  BR_BRANCH_LESSONS: "QZ2_INVEST_PROFILE",
   SCR_FINAL: null,
 };
 
@@ -122,24 +103,14 @@ export function guardScreenAccess(state: OnboardingState, targetScreenId: Screen
   // Common lessons are mandatory before Quiz2 and everything after.
   const isAfterCommonLessons =
     targetScreenId === "QZ2_INVEST_PROFILE" ||
-    targetScreenId === "BR_BEGINNER_01" ||
-    targetScreenId === "BR_BEGINNER_02" ||
-    targetScreenId === "BR_INTERMEDIATE_01" ||
-    targetScreenId === "BR_INTERMEDIATE_02" ||
-    targetScreenId === "BR_ADVANCED_01" ||
-    targetScreenId === "BR_ADVANCED_02" ||
+    targetScreenId === "BR_BRANCH_LESSONS" ||
     targetScreenId === "SCR_FINAL";
   if (isAfterCommonLessons && !isCommonLessonsCompletionValid(state.commonLessons, state.quiz1.segment)) {
     return { allowed: false, redirectTo: "CL_COMMON_LESSONS", reason: "COMMON_LESSONS_REQUIRED" };
   }
 
   const isAfterQuiz2 =
-    targetScreenId === "BR_BEGINNER_01" ||
-    targetScreenId === "BR_BEGINNER_02" ||
-    targetScreenId === "BR_INTERMEDIATE_01" ||
-    targetScreenId === "BR_INTERMEDIATE_02" ||
-    targetScreenId === "BR_ADVANCED_01" ||
-    targetScreenId === "BR_ADVANCED_02" ||
+    targetScreenId === "BR_BRANCH_LESSONS" ||
     targetScreenId === "SCR_FINAL";
   if (
     isAfterQuiz2 &&
@@ -158,33 +129,49 @@ export function guardScreenAccess(state: OnboardingState, targetScreenId: Screen
     return { allowed: false, redirectTo: "QZ2_INVEST_PROFILE", reason: "QUIZ2_REQUIRED" };
   }
 
-  if (isAfterQuiz2 && !state.branch.branchId) {
-    return { allowed: false, redirectTo: "QZ2_INVEST_PROFILE", reason: "BRANCH_ID_REQUIRED" };
+  // Branch context must be deterministic and consistent with (segment + strategy).
+  if (isAfterQuiz2) {
+    const segment = state.quiz1.segment!;
+    const strategy = state.quiz2.strategy!;
+    const resolvedBranchId = resolveBranchId(segment, strategy);
+    if (state.branch.branchId !== resolvedBranchId) {
+      return { allowed: false, redirectTo: "QZ2_INVEST_PROFILE", reason: "BRANCH_ID_REQUIRED" };
+    }
+    if (!state.quiz2.quiz1Hash) {
+      return { allowed: false, redirectTo: "QZ2_INVEST_PROFILE", reason: "BRANCH_UPSTREAM_HASH_REQUIRED" };
+    }
+    const quiz2Hash = computeQuiz2HashForBranch({
+      segment,
+      strategy,
+      quiz1Hash: state.quiz2.quiz1Hash,
+      quiz2Answers: state.quiz2.answers,
+    });
+    if (state.branch.quiz2Hash !== quiz2Hash) {
+      return { allowed: false, redirectTo: "QZ2_INVEST_PROFILE", reason: "BRANCH_UPSTREAM_HASH_MISMATCH" };
+    }
   }
 
-  // Final screen requires full completion of branch placeholders (both screens visited).
+  // Final screen requires completed branch.
   if (targetScreenId === "SCR_FINAL") {
-    const requiredCompleted = getBranchRequiredCompletedScreenIds(state.branch.branchId);
-    for (const id of requiredCompleted) {
-      if (!state.completedScreenIds[id]) {
-        return { allowed: false, redirectTo: id, reason: "FINAL_REQUIRES_BRANCH_COMPLETION" };
-      }
+    const segment = state.quiz1.segment!;
+    const strategy = state.quiz2.strategy!;
+    const quiz2Hash = state.branch.quiz2Hash;
+    if (!isBranchCompletionValid(state.branch, { segment, strategy, quiz2Hash })) {
+      return { allowed: false, redirectTo: "BR_BRANCH_LESSONS", reason: "FINAL_REQUIRES_BRANCH_COMPLETION" };
+    }
+  }
+
+  // If branch already completed, entering branch screen redirects to final.
+  if (targetScreenId === "BR_BRANCH_LESSONS") {
+    const segment = state.quiz1.segment;
+    const strategy = state.quiz2.strategy;
+    const quiz2Hash = state.branch.quiz2Hash;
+    if (isBranchCompletionValid(state.branch, { segment, strategy, quiz2Hash })) {
+      return { allowed: false, redirectTo: "SCR_FINAL", reason: "BRANCH_ALREADY_COMPLETED" };
     }
   }
 
   return { allowed: true };
-}
-
-export function getBranchRequiredCompletedScreenIds(branchId: BranchId | null): ScreenId[] {
-  if (!branchId) return [];
-  switch (branchId) {
-    case "BR_BEGINNER":
-      return ["BR_BEGINNER_01", "BR_BEGINNER_02"];
-    case "BR_INTERMEDIATE":
-      return ["BR_INTERMEDIATE_01", "BR_INTERMEDIATE_02"];
-    case "BR_ADVANCED":
-      return ["BR_ADVANCED_01", "BR_ADVANCED_02"];
-  }
 }
 
 export function assertRouteIntegrity(): void {

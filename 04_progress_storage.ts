@@ -1,6 +1,8 @@
 import { getInitialOnboardingState, type OnboardingState, type ScreenId } from "./01_state_machine";
 import { ALL_SCREEN_IDS } from "./02_routes";
 import { isCommonLessonsCompletionValid } from "./11_common_lessons_rules";
+import { isQuiz2CompletionValid } from "./15_quiz2_rules";
+import { computeQuiz2HashForBranch, normalizeBranchState } from "./18_branch_rules";
 
 const STORAGE_KEY = "onboarding_shell_v1";
 const STORAGE_VERSION = 1 as const;
@@ -41,6 +43,18 @@ export function loadProgress(): OnboardingState | null {
       (parsed.state as unknown as { currentScreenId: unknown }).currentScreenId = "CL_COMMON_LESSONS";
     }
 
+    // Migration: previous versions used BR_*_01 / BR_*_02 branch placeholders.
+    if (
+      anyState.currentScreenId === "BR_BEGINNER_01" ||
+      anyState.currentScreenId === "BR_BEGINNER_02" ||
+      anyState.currentScreenId === "BR_INTERMEDIATE_01" ||
+      anyState.currentScreenId === "BR_INTERMEDIATE_02" ||
+      anyState.currentScreenId === "BR_ADVANCED_01" ||
+      anyState.currentScreenId === "BR_ADVANCED_02"
+    ) {
+      (parsed.state as unknown as { currentScreenId: unknown }).currentScreenId = "BR_BRANCH_LESSONS";
+    }
+
     // Migration: previous Quiz2 stored human-readable labels.
     const anyQuiz2 = parsed.state as unknown as { quiz2?: { answers?: Record<string, unknown> } };
     const a = anyQuiz2.quiz2?.answers;
@@ -69,6 +83,36 @@ export function loadProgress(): OnboardingState | null {
     // Restore rule: if common lessons completed for the current segment, resume at Quiz2.
     if (merged.currentScreenId === "CL_COMMON_LESSONS" && isCommonLessonsCompletionValid(merged.commonLessons, merged.quiz1.segment)) {
       merged.currentScreenId = "QZ2_INVEST_PROFILE";
+    }
+
+    // Branch restore/normalize: if Quiz2 is valid and completed, branch context must be consistent.
+    if (
+      isQuiz2CompletionValid({
+        quiz1Answers: merged.quiz1.answers,
+        segment: merged.quiz1.segment,
+        quiz2: {
+          answers: merged.quiz2.answers,
+          isCompleted: merged.quiz2.isCompleted,
+          strategy: merged.quiz2.strategy,
+          quiz1Hash: merged.quiz2.quiz1Hash,
+          segmentSnapshot: merged.quiz2.segmentSnapshot,
+        },
+      }) &&
+      merged.quiz1.segment &&
+      merged.quiz2.strategy &&
+      merged.quiz2.quiz1Hash
+    ) {
+      const quiz2Hash = computeQuiz2HashForBranch({
+        segment: merged.quiz1.segment,
+        strategy: merged.quiz2.strategy,
+        quiz1Hash: merged.quiz2.quiz1Hash,
+        quiz2Answers: merged.quiz2.answers,
+      });
+      merged.branch = normalizeBranchState(merged.branch, { segment: merged.quiz1.segment, strategy: merged.quiz2.strategy, quiz2Hash });
+      // If branch is completed, resume at final.
+      if (merged.branch.isCompleted) {
+        merged.currentScreenId = "SCR_FINAL";
+      }
     }
 
     return merged;

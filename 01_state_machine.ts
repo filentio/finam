@@ -9,12 +9,7 @@ export type ScreenId =
   | "QZ1_EXPERIENCE_GOALS"
   | "CL_COMMON_LESSONS"
   | "QZ2_INVEST_PROFILE"
-  | "BR_BEGINNER_01"
-  | "BR_BEGINNER_02"
-  | "BR_INTERMEDIATE_01"
-  | "BR_INTERMEDIATE_02"
-  | "BR_ADVANCED_01"
-  | "BR_ADVANCED_02"
+  | "BR_BRANCH_LESSONS"
   | "SCR_FINAL";
 
 export type Segment = "NOVICE" | "LEARNER" | "EXPERIENCED" | "QUALIFIED";
@@ -62,6 +57,15 @@ export type CommonLessonsState = {
   segment: Segment | null;
 };
 
+export type BranchState = {
+  branchId: BranchId | null;
+  currentIndex: number;
+  isCompleted: boolean;
+  segmentSnapshot: Segment | null;
+  strategySnapshot: Strategy | null;
+  quiz2Hash: string | null;
+};
+
 export type OnboardingState = {
   processStatus: ProcessStatus;
   currentScreenId: ScreenId;
@@ -85,9 +89,7 @@ export type OnboardingState = {
 
   commonLessons: CommonLessonsState;
 
-  branch: {
-    branchId: BranchId | null;
-  };
+  branch: BranchState;
 
   completedScreenIds: Record<ScreenId, boolean>;
   lastSavedAtMs: number | null;
@@ -108,7 +110,10 @@ export type OnboardingEvent =
   | { type: "SET_QUIZ2_ANSWERS"; answers: Quiz2Answers }
   | { type: "APPLY_QUIZ2_PREFILL"; quiz1Hash: string; patch: Partial<Quiz2Answers>; prefilledFields: string[] }
   | { type: "SET_QUIZ2_COMPLETED"; strategy: Strategy; segmentSnapshot: Segment; quiz1Hash: string }
-  | { type: "SET_BRANCH_ID"; branchId: BranchId }
+  | { type: "SET_BRANCH_CONTEXT"; branchId: BranchId; segmentSnapshot: Segment; strategySnapshot: Strategy; quiz2Hash: string }
+  | { type: "SET_BRANCH_INDEX"; index: number }
+  | { type: "SET_BRANCH_COMPLETED" }
+  | { type: "RESET_BRANCH" }
   | { type: "HYDRATE"; state: OnboardingState };
 
 export const DEFAULT_QUIZ1_ANSWERS: Quiz1Answers = {
@@ -132,18 +137,22 @@ export const DEFAULT_COMMON_LESSONS_STATE: CommonLessonsState = {
   segment: null,
 };
 
+export const DEFAULT_BRANCH_STATE: BranchState = {
+  branchId: null,
+  currentIndex: 0,
+  isCompleted: false,
+  segmentSnapshot: null,
+  strategySnapshot: null,
+  quiz2Hash: null,
+};
+
 export function getInitialOnboardingState(): OnboardingState {
   const allScreenIds: ScreenId[] = [
     "SCR_ENTRY",
     "QZ1_EXPERIENCE_GOALS",
     "CL_COMMON_LESSONS",
     "QZ2_INVEST_PROFILE",
-    "BR_BEGINNER_01",
-    "BR_BEGINNER_02",
-    "BR_INTERMEDIATE_01",
-    "BR_INTERMEDIATE_02",
-    "BR_ADVANCED_01",
-    "BR_ADVANCED_02",
+    "BR_BRANCH_LESSONS",
     "SCR_FINAL",
   ];
 
@@ -170,7 +179,7 @@ export function getInitialOnboardingState(): OnboardingState {
       prefillAppliedFromQuiz1Hash: null,
     },
     commonLessons: { ...DEFAULT_COMMON_LESSONS_STATE },
-    branch: { branchId: null },
+    branch: { ...DEFAULT_BRANCH_STATE },
     completedScreenIds,
     lastSavedAtMs: null,
   };
@@ -235,7 +244,7 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
           quiz1Hash: null,
           prefillAppliedFromQuiz1Hash: null,
         },
-        branch: { branchId: null },
+        branch: { ...DEFAULT_BRANCH_STATE },
       });
 
     case "SET_QUIZ1_COMPLETED":
@@ -253,7 +262,7 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
             quiz1Hash: null,
             prefillAppliedFromQuiz1Hash: null,
           },
-          branch: { branchId: null },
+          branch: { ...DEFAULT_BRANCH_STATE },
         });
       }
       return {
@@ -299,7 +308,7 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
           segmentSnapshot: null,
           quiz1Hash: null,
         },
-        branch: { branchId: null },
+        branch: { ...DEFAULT_BRANCH_STATE },
       });
 
     case "SET_QUIZ2_COMPLETED":
@@ -327,10 +336,35 @@ export function onboardingReducer(state: OnboardingState, event: OnboardingEvent
         },
       };
 
-    case "SET_BRANCH_ID":
+    case "SET_BRANCH_CONTEXT":
       return {
         ...state,
-        branch: { branchId: event.branchId },
+        branch: {
+          branchId: event.branchId,
+          currentIndex: 0,
+          isCompleted: false,
+          segmentSnapshot: event.segmentSnapshot,
+          strategySnapshot: event.strategySnapshot,
+          quiz2Hash: event.quiz2Hash,
+        },
+      };
+
+    case "SET_BRANCH_INDEX":
+      return {
+        ...state,
+        branch: { ...state.branch, currentIndex: event.index },
+      };
+
+    case "SET_BRANCH_COMPLETED":
+      return {
+        ...state,
+        branch: { ...state.branch, isCompleted: true },
+      };
+
+    case "RESET_BRANCH":
+      return {
+        ...state,
+        branch: { ...DEFAULT_BRANCH_STATE },
       };
 
     default: {
@@ -344,12 +378,7 @@ function resetDownstreamAfterQuiz1Change(state: OnboardingState): OnboardingStat
   const ids: ScreenId[] = [
     "CL_COMMON_LESSONS",
     "QZ2_INVEST_PROFILE",
-    "BR_BEGINNER_01",
-    "BR_BEGINNER_02",
-    "BR_INTERMEDIATE_01",
-    "BR_INTERMEDIATE_02",
-    "BR_ADVANCED_01",
-    "BR_ADVANCED_02",
+    "BR_BRANCH_LESSONS",
     "SCR_FINAL",
   ];
   const completedScreenIds = { ...state.completedScreenIds };
@@ -364,12 +393,7 @@ function resetDownstreamAfterQuiz1Change(state: OnboardingState): OnboardingStat
 function resetDownstreamAfterQuiz2Change(state: OnboardingState): OnboardingState {
   const ids: ScreenId[] = [
     "QZ2_INVEST_PROFILE",
-    "BR_BEGINNER_01",
-    "BR_BEGINNER_02",
-    "BR_INTERMEDIATE_01",
-    "BR_INTERMEDIATE_02",
-    "BR_ADVANCED_01",
-    "BR_ADVANCED_02",
+    "BR_BRANCH_LESSONS",
     "SCR_FINAL",
   ];
   const completedScreenIds = { ...state.completedScreenIds };

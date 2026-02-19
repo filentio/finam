@@ -12,7 +12,12 @@ export type AnalyticsEventName =
   | "onboarding_common_view_lesson"
   | "onboarding_common_next"
   | "onboarding_common_back"
-  | "onboarding_common_complete";
+  | "onboarding_common_complete"
+  | "onboarding_branch_start"
+  | "onboarding_branch_view_lesson"
+  | "onboarding_branch_next"
+  | "onboarding_branch_back"
+  | "onboarding_branch_complete";
 
 export type AnalyticsPayload = Record<string, unknown>;
 

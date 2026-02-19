@@ -5,11 +5,8 @@ import {
   type OnboardingState,
   type ScreenId,
 } from "./01_state_machine";
-import { ALL_SCREEN_IDS, guardScreenAccess, getBackScreenId, getNextScreenId } from "./02_routes";
-import {
-  assertBranchMappingCoverage,
-  getBranchId,
-} from "./03_branch_mapping";
+import { ALL_SCREEN_IDS, guardScreenAccess, getBackScreenId } from "./02_routes";
+import { assertBranchConfigIntegrity } from "./17_branch_config";
 import { clearProgress, loadProgress, saveProgress } from "./04_progress_storage";
 import { computeSegment } from "./07_quiz1_rules";
 import { Quiz1Screen } from "./08_quiz1_screen";
@@ -18,6 +15,8 @@ import { CommonLessonsScreen } from "./12_common_lessons_screen";
 import { Quiz2Screen } from "./16_quiz2_screen";
 import { prefillQuiz2AnswersFromQuiz1, getPrefilledQuiz2QuestionIds } from "./14_quiz2_prefill";
 import { computeQuiz1HashForQuiz2, computeStrategy } from "./15_quiz2_rules";
+import { computeQuiz2HashForBranch, resolveBranchId } from "./18_branch_rules";
+import { BranchLessonsScreen } from "./19_branch_lessons_screen";
 
 type Props = {
   storageEnabled?: boolean;
@@ -48,7 +47,7 @@ export default function OnboardingShell(props: Props) {
 
   // One-time integrity check.
   useEffect(() => {
-    assertBranchMappingCoverage();
+    assertBranchConfigIntegrity();
   }, []);
 
   // Keep ref updated.
@@ -163,6 +162,43 @@ export default function OnboardingShell(props: Props) {
     state.quiz2.prefillAppliedFromQuiz1Hash,
   ]);
 
+  // Normalize branch context on entry to branch lessons.
+  useEffect(() => {
+    if (state.currentScreenId !== "BR_BRANCH_LESSONS") return;
+    if (!state.quiz1.segment) return;
+    if (!state.quiz2.strategy) return;
+    if (!state.quiz2.quiz1Hash) return;
+
+    const segment = state.quiz1.segment;
+    const strategy = state.quiz2.strategy;
+    const branchId = resolveBranchId(segment, strategy);
+    const quiz2Hash = computeQuiz2HashForBranch({
+      segment,
+      strategy,
+      quiz1Hash: state.quiz2.quiz1Hash,
+      quiz2Answers: state.quiz2.answers,
+    });
+
+    if (
+      state.branch.branchId !== branchId ||
+      state.branch.segmentSnapshot !== segment ||
+      state.branch.strategySnapshot !== strategy ||
+      state.branch.quiz2Hash !== quiz2Hash
+    ) {
+      dispatch({ type: "SET_BRANCH_CONTEXT", branchId, segmentSnapshot: segment, strategySnapshot: strategy, quiz2Hash });
+    }
+  }, [
+    state.currentScreenId,
+    state.quiz1.segment,
+    state.quiz2.strategy,
+    state.quiz2.quiz1Hash,
+    state.quiz2.answers,
+    state.branch.branchId,
+    state.branch.segmentSnapshot,
+    state.branch.strategySnapshot,
+    state.branch.quiz2Hash,
+  ]);
+
   const canGoBack = useMemo(() => {
     return getBackScreenId(state) !== null && state.processStatus !== "COMPLETED";
   }, [state]);
@@ -172,14 +208,6 @@ export default function OnboardingShell(props: Props) {
     const back = getBackScreenId(state);
     if (!back) return;
     dispatch({ type: "SET_CURRENT_SCREEN", screenId: back });
-  };
-
-  const onNextLinear = () => {
-    setQuizError(null);
-    const next = getNextScreenId(state);
-    if (!next) return;
-    dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: state.currentScreenId });
-    dispatch({ type: "SET_CURRENT_SCREEN", screenId: next });
   };
 
   const onReset = () => {
@@ -283,7 +311,13 @@ export default function OnboardingShell(props: Props) {
                     segment: state.quiz1.segment!,
                   });
                   const quiz1Hash = computeQuiz1HashForQuiz2(state.quiz1.answers, state.quiz1.segment!);
-                  const branchId = getBranchId(state.quiz1.segment!, strategy);
+                  const branchId = resolveBranchId(state.quiz1.segment!, strategy);
+                  const quiz2Hash = computeQuiz2HashForBranch({
+                    segment: state.quiz1.segment!,
+                    strategy,
+                    quiz1Hash,
+                    quiz2Answers: state.quiz2.answers,
+                  });
 
                   dispatch({
                     type: "SET_QUIZ2_COMPLETED",
@@ -292,9 +326,15 @@ export default function OnboardingShell(props: Props) {
                     quiz1Hash,
                   });
                   track("onboarding_quiz2_complete", { strategy, segment: state.quiz1.segment });
-                  dispatch({ type: "SET_BRANCH_ID", branchId });
+                  dispatch({
+                    type: "SET_BRANCH_CONTEXT",
+                    branchId,
+                    segmentSnapshot: state.quiz1.segment!,
+                    strategySnapshot: strategy,
+                    quiz2Hash,
+                  });
                   dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "QZ2_INVEST_PROFILE" });
-                  dispatch({ type: "SET_CURRENT_SCREEN", screenId: getBranchStartScreen(branchId) });
+                  dispatch({ type: "SET_CURRENT_SCREEN", screenId: "BR_BRANCH_LESSONS" });
                   setQuizError(null);
                 } catch (e) {
                   track("onboarding_quiz2_error", { errorType: "STRATEGY_COMPUTE_FAILED" });
@@ -305,46 +345,20 @@ export default function OnboardingShell(props: Props) {
           )
         )}
 
-        {screenId === "BR_BEGINNER_01" && (
-          <BranchPlaceholderScreen
-            title="Ветка Beginner — экран 1 (заглушка)"
-            subtitle={branchSubtitle(state)}
-            onNext={onNextLinear}
-          />
-        )}
-        {screenId === "BR_BEGINNER_02" && (
-          <BranchPlaceholderScreen
-            title="Ветка Beginner — экран 2 (заглушка)"
-            subtitle={branchSubtitle(state)}
-            onNext={onNextLinear}
-          />
-        )}
-        {screenId === "BR_INTERMEDIATE_01" && (
-          <BranchPlaceholderScreen
-            title="Ветка Intermediate — экран 1 (заглушка)"
-            subtitle={branchSubtitle(state)}
-            onNext={onNextLinear}
-          />
-        )}
-        {screenId === "BR_INTERMEDIATE_02" && (
-          <BranchPlaceholderScreen
-            title="Ветка Intermediate — экран 2 (заглушка)"
-            subtitle={branchSubtitle(state)}
-            onNext={onNextLinear}
-          />
-        )}
-        {screenId === "BR_ADVANCED_01" && (
-          <BranchPlaceholderScreen
-            title="Ветка Advanced — экран 1 (заглушка)"
-            subtitle={branchSubtitle(state)}
-            onNext={onNextLinear}
-          />
-        )}
-        {screenId === "BR_ADVANCED_02" && (
-          <BranchPlaceholderScreen
-            title="Ветка Advanced — экран 2 (заглушка)"
-            subtitle={branchSubtitle(state)}
-            onNext={onNextLinear}
+        {screenId === "BR_BRANCH_LESSONS" && state.branch.branchId && state.quiz1.segment && state.quiz2.strategy && (
+          <BranchLessonsScreen
+            screenId="BR_BRANCH_LESSONS"
+            branchId={state.branch.branchId}
+            segment={state.quiz1.segment}
+            strategy={state.quiz2.strategy}
+            currentIndex={state.branch.currentIndex}
+            isCompleted={state.branch.isCompleted}
+            onSetIndex={(index) => dispatch({ type: "SET_BRANCH_INDEX", index })}
+            onComplete={() => {
+              dispatch({ type: "SET_BRANCH_COMPLETED" });
+              dispatch({ type: "MARK_SCREEN_COMPLETED", screenId: "BR_BRANCH_LESSONS" });
+              dispatch({ type: "SET_CURRENT_SCREEN", screenId: "SCR_FINAL" });
+            }}
           />
         )}
 
@@ -370,19 +384,6 @@ export default function OnboardingShell(props: Props) {
   );
 }
 
-function getBranchStartScreen(branchId: OnboardingState["branch"]["branchId"]): ScreenId {
-  if (branchId === "BR_BEGINNER") return "BR_BEGINNER_01";
-  if (branchId === "BR_INTERMEDIATE") return "BR_INTERMEDIATE_01";
-  return "BR_ADVANCED_01";
-}
-
-function branchSubtitle(state: OnboardingState): string {
-  const segment = state.quiz1.segment ?? "unknown";
-  const strategy = state.quiz2.strategy ?? "unknown";
-  const branchId = state.branch.branchId ?? "unknown";
-  return `segment=${segment} strategy=${strategy} branchId=${branchId}`;
-}
-
 function EntryScreen(props: { onStart: () => void }) {
   return (
     <div style={styles.card}>
@@ -390,18 +391,6 @@ function EntryScreen(props: { onStart: () => void }) {
       <p style={styles.p}>Этот экран является точкой входа процесса онбординга.</p>
       <button style={styles.primaryBtn} onClick={props.onStart}>
         Начать
-      </button>
-    </div>
-  );
-}
-
-function BranchPlaceholderScreen(props: { title: string; subtitle: string; onNext: () => void }) {
-  return (
-    <div style={styles.card}>
-      <h2 style={styles.h2}>{props.title}</h2>
-      <p style={styles.p}>{props.subtitle}</p>
-      <button style={styles.primaryBtn} onClick={props.onNext}>
-        Далее
       </button>
     </div>
   );
