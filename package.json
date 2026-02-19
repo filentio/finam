@@ -2,14 +2,18 @@
   "name": "finam-onboarding-widget",
   "private": true,
   "scripts": {
-    "build:widget": "node widget/build.mjs"
+    "build:widget": "node widget/build.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.1.0",
+    "react-test-renderer": "^18.3.1",
+    "vitest": "^3.2.4"
   }
 }
 
