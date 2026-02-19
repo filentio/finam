@@ -10,6 +10,7 @@ export type BranchLessonsScreenProps = {
   strategy: Strategy;
   currentIndex: number;
   isCompleted: boolean;
+  assetBaseUrl?: string;
   onSetIndex: (index: number) => void;
   onComplete: () => void;
 };
@@ -82,7 +83,7 @@ export function BranchLessonsScreen(props: BranchLessonsScreenProps) {
       {lesson.assets.length ? (
         <div style={styles.assets}>
           {lesson.assets.map((a, i) => (
-            <img key={i} src={a.src} alt={a.alt} style={styles.assetImg} />
+            <img key={i} src={resolveAssetUrl(a.src, props.assetBaseUrl)} alt={a.alt} style={styles.assetImg} loading="lazy" />
           ))}
         </div>
       ) : null}
@@ -113,6 +114,13 @@ export function BranchLessonsScreen(props: BranchLessonsScreenProps) {
       {props.isCompleted ? <div style={styles.completedHint}>Ветка завершена.</div> : null}
     </div>
   );
+}
+
+function resolveAssetUrl(src: string, assetBaseUrl?: string): string {
+  if (!assetBaseUrl) return src;
+  if (!src.startsWith("assets/")) return src;
+  const base = assetBaseUrl.endsWith("/") ? assetBaseUrl : `${assetBaseUrl}/`;
+  return `${base}${src}`;
 }
 
 function PlainTextWithLineBreaks(props: { text: string }) {

@@ -7,12 +7,13 @@ export type WidgetAppProps = {
   mode: "inline" | "modal";
   storageNamespace: string;
   track: TrackFn;
+  assetBaseUrl: string;
 };
 
 export function WidgetApp(props: WidgetAppProps) {
   const content = (
     <AnalyticsProvider track={props.track}>
-      <OnboardingShell storageEnabled={true} storageNamespace={props.storageNamespace} />
+      <OnboardingShell storageEnabled={true} storageNamespace={props.storageNamespace} assetBaseUrl={props.assetBaseUrl} />
     </AnalyticsProvider>
   );
 

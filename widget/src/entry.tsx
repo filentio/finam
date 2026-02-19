@@ -33,6 +33,15 @@ const DEFAULTS = {
 
 const instancesByTarget = new Map<Element, Instance>();
 
+const ASSET_BASE_URL = (() => {
+  if (typeof document === "undefined") return "";
+  const s = document.currentScript as HTMLScriptElement | null;
+  if (!s?.src) return "";
+  // script:  https://cdn/.../widget/finam-onboarding-widget.js
+  // assets:  https://cdn/.../assets/...
+  return new URL("../", s.src).toString();
+})();
+
 function normalizeConfig(config: WidgetConfig | undefined): Required<WidgetConfig> {
   return {
     mode: config?.mode ?? DEFAULTS.mode,
@@ -85,7 +94,7 @@ export function mount(target: string | Element, config?: WidgetConfig): void {
 
   const track = createTracker({ disabled: cfg.disableTracking, namespace: cfg.storageNamespace });
 
-  reactRoot.render(<WidgetApp mode={cfg.mode} storageNamespace={cfg.storageNamespace} track={track} />);
+  reactRoot.render(<WidgetApp mode={cfg.mode} storageNamespace={cfg.storageNamespace} assetBaseUrl={ASSET_BASE_URL} track={track} />);
 
   instancesByTarget.set(targetEl, { targetEl, hostEl, shadowRoot, reactRoot, namespace: cfg.storageNamespace });
 }

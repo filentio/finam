@@ -25,6 +25,7 @@ type Props = {
   storageEnabled?: boolean;
   storageNamespace?: string;
   showDebugHeader?: boolean;
+  assetBaseUrl?: string; // optional; used by embed widget to resolve /assets/*
 };
 
 const FIXED_ERROR_QUIZ_INVALID = "Заполните все вопросы анкеты";
@@ -49,6 +50,7 @@ export default function OnboardingShell(props: Props) {
   const storageNamespace = props.storageNamespace ?? "onboarding_shell_v1";
   const storage = useMemo(() => createProgressStorage(storageNamespace), [storageNamespace]);
   const showDebugHeader = props.showDebugHeader ?? false;
+  const assetBaseUrl = props.assetBaseUrl;
 
   const [state, dispatch] = useReducer(onboardingReducer, undefined, () => getInitialOnboardingState());
   const stateRef = useRef<OnboardingState>(state);
@@ -388,6 +390,7 @@ export default function OnboardingShell(props: Props) {
             strategy={state.quiz2.strategy}
             currentIndex={state.branch.currentIndex}
             isCompleted={state.branch.isCompleted}
+            assetBaseUrl={assetBaseUrl}
             onSetIndex={(index) => dispatch({ type: "SET_BRANCH_INDEX", index })}
             onComplete={() => {
               dispatch({ type: "SET_BRANCH_COMPLETED" });
