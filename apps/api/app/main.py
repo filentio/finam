@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 import redis
 
@@ -11,6 +12,7 @@ from app.routes import (
     applications_router,
     admin_sync_router,
     auth_hh_router,
+    candidate_profile_router,
     cover_letters_router,
     health_router,
     search_profiles_router,
@@ -42,6 +44,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Middleware
     app.add_middleware(RequestIdMiddleware)
+    if settings.CORS_ALLOW_ORIGINS:
+        origins = [x.strip() for x in settings.CORS_ALLOW_ORIGINS.split(",") if x.strip()]
+        allow_all = "*" in origins
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"] if allow_all else origins,
+            allow_credentials=False if allow_all else True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+            expose_headers=["X-Request-Id"],
+        )
 
     # Logging: ensure request_id field always exists
     logging.getLogger().addFilter(RequestIdFilter())
@@ -49,6 +62,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Routes
     app.include_router(health_router)
     app.include_router(auth_hh_router, prefix="/api/v1")
+    app.include_router(candidate_profile_router, prefix="/api/v1")
     app.include_router(search_profiles_router, prefix="/api/v1")
     app.include_router(vacancies_router, prefix="/api/v1")
     app.include_router(cover_letters_router, prefix="/api/v1")

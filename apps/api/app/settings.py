@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/hh_mvp"
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # CORS (for local Next.js UI)
+    # Comma-separated list, use "*" to allow all (credentials will be disabled).
+    CORS_ALLOW_ORIGINS: str = "http://localhost:3000"
+
     # HH OAuth (stage 4)
     HH_CLIENT_ID: str | None = None
     HH_CLIENT_SECRET: str | None = None

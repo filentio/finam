@@ -17,10 +17,12 @@ class CandidateProfile(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
+    full_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    desired_role: Mapped[str | None] = mapped_column(String(200), nullable=True)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     skills_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
     achievements_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
-    links_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
+    links_json: Mapped[list[dict] | None] = mapped_column(JSON_VARIANT, nullable=True)
 
     # Allowlist of numbers/facts (e.g. ["15 лет", "3 проекта", "200 000 ₽"])
     facts_numbers_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
