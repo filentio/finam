@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.*
+*.sqlite
+*.db
+*.log
+.DS_Store
+
+# Alembic
+apps/api/alembic/versions/__pycache__/
+

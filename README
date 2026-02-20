@@ -1,1 +1,19 @@
+## HH MVP service
+
+Документация:
+- `docs/` — PRD/NFR/Scope/Acceptance + архитектура/данные/API/ADR/интеграция HH.
+
+Технический каркас (Stage 3):
+- `apps/api/` — FastAPI + SQLAlchemy + Alembic + pytest.
+- `infra/docker-compose.yml` — Postgres + Redis + API.
+
+Запуск:
+
+```bash
+make up
+make migrate
+```
+
+Подробности: `apps/api/README.md`.
+
 
