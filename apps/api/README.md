@@ -72,3 +72,19 @@ pytest -q apps/api/tests
 4) Отключить HH аккаунт:
 - `POST /api/v1/auth/hh/disconnect`
 
+## Поиск вакансий HH (Stage 5)
+MVP ingestion запускается на ручке профиля поиска:
+- `POST /api/v1/search-profiles/{id}/run`
+
+Поведение (Stage 5):
+- делает запрос к HH API `/vacancies` по параметрам из `search_profiles.filters_json`;
+- нормализует и делает upsert в таблицу `vacancies` (уникальность по `(source='hh', external_vacancy_id)`);
+- создаёт/обновляет связи в `matches` для этого профиля поиска.
+
+Пример:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/search-profiles/<PROFILE_UUID>/run"
+curl "http://localhost:8000/api/v1/vacancies?search_profile_id=<PROFILE_UUID>"
+```
+

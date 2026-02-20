@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+import asyncio
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 
 from app.db.deps import get_db
@@ -16,6 +16,7 @@ from app.schemas.search_profiles import (
     SearchProfileUpdate,
 )
 from app.utils.stub_auth import get_or_create_stub_user
+from app.services.search_runner import run_search_profile_ingestion, run_search_profile_job
 
 
 router = APIRouter(prefix="/search-profiles", tags=["search_profiles"])
@@ -103,12 +104,27 @@ def delete_profile(profile_id: uuid.UUID, db: Session = Depends(get_db)) -> Resp
 
 
 @router.post("/{profile_id}/run", response_model=RunOut, status_code=202)
-def run_profile(profile_id: uuid.UUID, db: Session = Depends(get_db)) -> RunOut:
+async def run_profile(profile_id: uuid.UUID, request: Request, db: Session = Depends(get_db)) -> RunOut:
     user = get_or_create_stub_user(db)
     sp = db.get(SearchProfile, profile_id)
     if sp is None or sp.user_id != user.id:
         raise HTTPException(status_code=404, detail="Профиль поиска не найден.")
 
-    # Stage 3 scaffold: no real job queue integration yet.
-    return RunOut(run_id=uuid.uuid4(), status="queued")
+    request_id = getattr(request.state, "request_id", None)
+    run_id = uuid.uuid4()
+
+    # MVP choice: in-process background job (no external queue yet).
+    if request.app.state.settings.APP_ENV == "test":
+        await run_search_profile_ingestion(db=db, user_id=user.id, search_profile_id=profile_id, request_id=request_id, max_pages=1)
+    else:
+        asyncio.create_task(
+            run_search_profile_job(
+                session_local=request.app.state.SessionLocal,
+                user_id=user.id,
+                search_profile_id=profile_id,
+                request_id=request_id,
+            )
+        )
+
+    return RunOut(run_id=run_id, status="queued")
 
