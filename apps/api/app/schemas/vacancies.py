@@ -68,4 +68,5 @@ class MatchOut(APIModel):
 class CoverLetterGenerateIn(APIModel):
     resume_id: str
     template_id: UUID | None = None
+    tone: str | None = None
 

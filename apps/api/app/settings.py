@@ -33,6 +33,15 @@ class Settings(BaseSettings):
             return self.PUBLIC_BASE_URL.rstrip("/") + "/api/v1/auth/hh/callback"
         raise RuntimeError("HH_REDIRECT_URI (preferred) or PUBLIC_BASE_URL must be set.")
 
+    # OpenAI (Stage 7)
+    OPENAI_API_KEY: str | None = None
+    OPENAI_MODEL: str = "gpt-5.2"
+    OPENAI_TIMEOUT_SECONDS: int = 20
+
+    COVER_LETTER_MIN_CHARS: int = 400
+    COVER_LETTER_MAX_CHARS: int = 4000
+    COVER_LETTER_FORBIDDEN_PHRASES: list[str] | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:

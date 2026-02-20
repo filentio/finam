@@ -3,16 +3,18 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.deps import get_db
 from app.models.cover_letter import CoverLetter
+from app.models.candidate_profile import CandidateProfile
+from app.models.cover_template import CoverTemplate
 from app.models.match import Match
 from app.models.search_profile import SearchProfile
 from app.models.vacancy import Vacancy
-from app.schemas.cover_letters import CoverLetterOut
+from app.schemas.cover_letters import CoverLetterGenerateOut, CoverLetterOut
 from app.schemas.vacancies import (
     CoverLetterGenerateIn,
     MatchCreateIn,
@@ -22,6 +24,9 @@ from app.schemas.vacancies import (
     VacancyListItem,
 )
 from app.services.matcher import compute_match
+from app.services.cover_letter_gpt_generator import CoverLetterGptGenerator
+from app.services.cover_letter_validator import validate_cover_letter
+from app.services.openai_client import OpenAIResponsesClient, OpenAIRequestFailed, OpenAIUnavailable
 from app.utils.stub_auth import get_or_create_stub_user
 
 
@@ -187,38 +192,83 @@ def create_match(vacancy_id: uuid.UUID, payload: MatchCreateIn, db: Session = De
     )
 
 
-@router.post("/{vacancy_id}/cover-letter/generate", response_model=CoverLetterOut, status_code=201)
-def generate_cover_letter(
-    vacancy_id: uuid.UUID, payload: CoverLetterGenerateIn, db: Session = Depends(get_db)
-) -> CoverLetterOut:
+@router.post("/{vacancy_id}/cover-letter/generate", response_model=CoverLetterGenerateOut, status_code=201)
+async def generate_cover_letter(
+    vacancy_id: uuid.UUID, payload: CoverLetterGenerateIn, request: Request, db: Session = Depends(get_db)
+) -> CoverLetterGenerateOut:
     user = get_or_create_stub_user(db)
     v = db.get(Vacancy, vacancy_id)
     if v is None:
         raise HTTPException(status_code=404, detail="Вакансия не найдена.")
 
+    settings = request.app.state.settings
+    request_id = getattr(request.state, "request_id", None)
+
+    profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == user.id).one_or_none()
+    if profile is None:
+        raise HTTPException(
+            status_code=409,
+            detail={"error": {"code": "CANDIDATE_PROFILE_REQUIRED", "message": "Нужен профиль кандидата для генерации письма."}},
+        )
+
+    template: CoverTemplate | None = None
+    if payload.template_id:
+        template = db.get(CoverTemplate, payload.template_id)
+    if template is None:
+        template = db.query(CoverTemplate).filter(CoverTemplate.is_default.is_(True)).one_or_none()
+    if template is None:
+        template = db.query(CoverTemplate).order_by(CoverTemplate.created_at.desc()).limit(1).one_or_none()
+
+    generator = CoverLetterGptGenerator(settings=settings, openai=OpenAIResponsesClient(settings=settings))
+
+    try:
+        structured = await generator.generate_cover_letter_gpt(
+            vacancy=v,
+            candidate_profile=profile,
+            template=template,
+            tone=payload.tone or "neutral",
+            request_id=request_id,
+        )
+    except OpenAIUnavailable:
+        raise HTTPException(status_code=503, detail={"error": {"code": "OPENAI_UNAVAILABLE", "message": "OpenAI недоступен."}})
+    except OpenAIRequestFailed as e:
+        raise HTTPException(status_code=502, detail={"error": {"code": "OPENAI_REQUEST_FAILED", "message": "Ошибка запроса к OpenAI.", "details": {"status_code": e.status_code}}})
+
+    validation = validate_cover_letter(
+        letter_text=structured["letter_text"],
+        numbers_used=structured["numbers_used"],
+        allowlist_numbers=profile.facts_numbers_json or [],
+        settings=settings,
+    )
+
     now = datetime.now(timezone.utc)
-    text = f"Здравствуйте! Меня заинтересовала вакансия «{v.title}». Готов(а) обсудить детали."
+    status = "draft" if validation.is_valid else "draft_invalid"
 
     cl = CoverLetter(
         user_id=user.id,
         vacancy_id=vacancy_id,
         resume_id=payload.resume_id,
-        template_id=payload.template_id,
-        status="draft",
-        text=text,
+        template_id=template.id if template else None,
+        status=status,
+        text=structured["letter_text"],
         version=1,
+        facts_used_json=structured["facts_used"],
+        numbers_used_json=structured["numbers_used"],
+        risk_flags_json=structured["risk_flags"],
+        validation_json=validation.to_json(),
         generated_at=now,
     )
     db.add(cl)
     db.commit()
     db.refresh(cl)
-    return CoverLetterOut(
-        id=cl.id,
+
+    return CoverLetterGenerateOut(
+        cover_letter_id=cl.id,
+        letter_text=cl.text,
         status=cl.status,
-        text=cl.text,
-        version=cl.version,
-        vacancy_id=cl.vacancy_id,
-        resume_id=cl.resume_id,
-        generated_at=cl.generated_at,
+        facts_used=cl.facts_used_json or [],
+        numbers_used=cl.numbers_used_json or [],
+        risk_flags=cl.risk_flags_json or [],
+        validation=cl.validation_json or {"is_valid": False, "errors": [], "warnings": []},
     )
 

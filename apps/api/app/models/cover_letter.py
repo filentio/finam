@@ -7,6 +7,7 @@ from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func, Index
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+from app.models._types import JSON_VARIANT
 
 
 class CoverLetter(Base):
@@ -28,6 +29,11 @@ class CoverLetter(Base):
     status: Mapped[str] = mapped_column(String, nullable=False, default="draft")  # draft/edited
     text: Mapped[str] = mapped_column(Text, nullable=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
+    facts_used_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
+    numbers_used_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
+    risk_flags_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
+    validation_json: Mapped[dict | None] = mapped_column(JSON_VARIANT, nullable=True)
 
     generated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

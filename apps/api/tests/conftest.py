@@ -32,6 +32,11 @@ def client() -> TestClient:
         HH_OAUTH_AUTHORIZE_URL="https://hh.ru/oauth/authorize",
         HH_OAUTH_TOKEN_URL="https://hh.ru/oauth/token",
         AUTH_STATE_TTL_SECONDS=600,
+        OPENAI_API_KEY="test-openai-key",
+        OPENAI_MODEL="gpt-test",
+        OPENAI_TIMEOUT_SECONDS=5,
+        COVER_LETTER_MIN_CHARS=10,
+        COVER_LETTER_MAX_CHARS=5000,
     )
     app = create_app(settings)
     Base.metadata.create_all(bind=app.state.engine)

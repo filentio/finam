@@ -1,5 +1,6 @@
 from app.models.application import Application
 from app.models.audit_log import AuditLog
+from app.models.candidate_profile import CandidateProfile
 from app.models.cover_letter import CoverLetter
 from app.models.cover_template import CoverTemplate
 from app.models.hh_account import HHAccount
@@ -17,6 +18,7 @@ __all__ = [
     "Match",
     "CoverTemplate",
     "CoverLetter",
+    "CandidateProfile",
     "Application",
     "AuditLog",
     "IdempotencyKey",

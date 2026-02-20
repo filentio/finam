@@ -111,3 +111,31 @@ curl "http://localhost:8000/api/v1/vacancies?search_profile_id=<PROFILE_UUID>"
 Чтобы вернуть reasons:
 - `GET /api/v1/vacancies?search_profile_id=<PROFILE_UUID>&include_reasons=true`
 
+## Генерация сопроводительных писем через GPT (Stage 7)
+Генерация выполняется **на сервере** через OpenAI **Responses API** и возвращает **строго структурированный JSON** (Structured Outputs).
+
+### Настройка
+Переменные окружения:
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` (например `gpt-5.2`)
+- `OPENAI_TIMEOUT_SECONDS`
+- `COVER_LETTER_MIN_CHARS`, `COVER_LETTER_MAX_CHARS`
+- `COVER_LETTER_FORBIDDEN_PHRASES` (опционально, JSON list)
+
+### Guardrails (обязательные)
+- **facts-only**: модель не должна выдумывать факты о кандидате
+- **numbers allowlist**: любые числа/проценты/суммы/«X лет» разрешены только если они есть в `candidate_profile.facts_numbers_json`
+- проверка длины письма
+- проверка запрещённых фраз
+
+Ошибки валидации (минимум):
+- `UNVERIFIED_NUMBER`
+- `LENGTH_OUT_OF_RANGE`
+- `FORBIDDEN_PHRASE`
+
+### Генерация
+Endpoint:
+- `POST /api/v1/vacancies/{vacancy_id}/cover-letter/generate`
+
+Важно: требует `candidate_profile`, иначе вернёт `409 CANDIDATE_PROFILE_REQUIRED`.
+
