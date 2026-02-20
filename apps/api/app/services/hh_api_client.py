@@ -111,6 +111,29 @@ class HHApiClient:
     async def get_vacancy(self, vacancy_id: str, access_token: str | None = None, request_id: str | None = None) -> dict[str, Any]:
         return await self._get_json(f"/vacancies/{vacancy_id}", params=None, access_token=access_token, request_id=request_id)
 
+    async def list_negotiations(
+        self,
+        *,
+        access_token: str,
+        page: int = 0,
+        per_page: int = 20,
+        request_id: str | None = None,
+        status: str | None = None,
+    ) -> dict[str, Any]:
+        params: dict[str, Any] = {"page": page, "per_page": per_page}
+        if status:
+            params["status"] = status
+        return await self._get_json("/negotiations", params=params, access_token=access_token, request_id=request_id)
+
+    async def get_negotiation(
+        self,
+        *,
+        negotiation_id: str,
+        access_token: str,
+        request_id: str | None = None,
+    ) -> dict[str, Any]:
+        return await self._get_json(f"/negotiations/{negotiation_id}", params=None, access_token=access_token, request_id=request_id)
+
     async def apply_to_vacancy(
         self,
         *,

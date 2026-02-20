@@ -27,6 +27,10 @@ class ApplicationOut(APIModel):
     hh_negotiation_id: str | None = None
     error_code: str | None = None
     error_message: str | None = None
+    response_status: str | None = None
+    response_updated_at: datetime | None = None
+    last_synced_at: datetime | None = None
+    sync_error_code: str | None = None
     last_attempt_at: datetime | None = None
     attempt_count: int
     created_at: datetime

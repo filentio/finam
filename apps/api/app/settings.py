@@ -47,6 +47,11 @@ class Settings(BaseSettings):
     HH_APPLY_HOURLY_LIMIT: int = 5
     HH_APPLY_MAX_RETRIES: int = 2
 
+    # Stage 9 sync
+    ADMIN_SYNC_TOKEN: str | None = None
+    SYNC_INTERVAL_SECONDS: int = 900
+    MAX_NEGOTIATIONS_PER_SYNC: int = 200
+
 
 @lru_cache
 def get_settings() -> Settings:

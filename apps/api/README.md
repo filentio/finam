@@ -175,3 +175,54 @@ Endpoint:
 - `HH_RATE_LIMITED` — 429 от HH
 - `HH_UNAVAILABLE` — временная недоступность HH
 
+## Синхронизация статусов откликов из HH (Stage 9)
+После отправки отклика `application.hh_negotiation_id` (в БД: `external_application_id`) используется для polling синхронизации статуса переговоров через `GET /negotiations/{id}`.
+
+### Как запускать синк (cron-friendly)
+1) Установить переменную окружения:
+- `ADMIN_SYNC_TOKEN`
+
+2) Дёргать endpoint (из cron/CI/любого scheduler):
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/admin/sync/negotiations" \
+  -H "X-Admin-Token: $ADMIN_SYNC_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "mode": "by_ids" }'
+```
+
+Опционально, для конкретного пользователя:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/admin/sync/negotiations" \
+  -H "X-Admin-Token: $ADMIN_SYNC_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "user_id": "00000000-0000-0000-0000-000000000001", "mode": "by_ids" }'
+```
+
+### Какие поля обновляются в applications
+- `response_status` — нормализованный статус (см. ниже)
+- `response_updated_at` — время обновления переговоров по HH
+- `response_payload_json` — минимальный sanitized payload (без PII)
+- `last_synced_at` — время последнего синка
+- `sync_error_code/sync_error_text` — ошибка синка (если была)
+
+### Маппинг HH state.id → response_status (MVP)
+- **invited**: `phone_interview`, `interview`, `assessment`, `offer`
+- **rejected**: `discard`, `discard_by_employer`, `rejected`, `rejected_by_employer`
+- **closed**: `hired`, `closed`
+- **pending/viewed**: `response`, `consider`, `active` (если `viewed_by_opponent=true` → `viewed`, иначе `pending`)
+- **unknown**: любое другое значение (сохраняем сырое значение в payload)
+
+### Что делать при reauth_required
+Если HH вернул 401 во время синка, аккаунт помечается как `hh_accounts.status=reauth_required`.
+Действие: пользователь должен переподключить HH OAuth (Stage 4).
+
+### Метрики (Prometheus)
+Экспортируются в `/metrics`:
+- `hh_sync_runs_total{status="success|failed"}`
+- `hh_sync_updated_total`
+- `hh_sync_errors_total{code="..."}`
+- `hh_sync_duration_seconds`
+- `hh_unauthorized_accounts_total`
+

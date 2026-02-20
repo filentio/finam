@@ -9,6 +9,7 @@ import redis
 from app.db.session import create_engine_from_url, create_sessionmaker
 from app.routes import (
     applications_router,
+    admin_sync_router,
     auth_hh_router,
     cover_letters_router,
     health_router,
@@ -52,6 +53,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(vacancies_router, prefix="/api/v1")
     app.include_router(cover_letters_router, prefix="/api/v1")
     app.include_router(applications_router, prefix="/api/v1")
+    app.include_router(admin_sync_router, prefix="/api/v1")
 
     # Metrics
     Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
