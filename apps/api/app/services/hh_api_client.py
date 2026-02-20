@@ -25,6 +25,12 @@ class HHApiRequestFailed(HHApiError):
         self.status_code = status_code
 
 
+class HHApiApplyFailed(HHApiRequestFailed):
+    def __init__(self, status_code: int, message: str, details: dict[str, Any] | None = None) -> None:
+        super().__init__(status_code, message)
+        self.details = details or {}
+
+
 @dataclass(frozen=True)
 class HHApiClient:
     base_url: str = "https://api.hh.ru"
@@ -104,4 +110,87 @@ class HHApiClient:
 
     async def get_vacancy(self, vacancy_id: str, access_token: str | None = None, request_id: str | None = None) -> dict[str, Any]:
         return await self._get_json(f"/vacancies/{vacancy_id}", params=None, access_token=access_token, request_id=request_id)
+
+    async def apply_to_vacancy(
+        self,
+        *,
+        vacancy_id: str,
+        resume_id: str,
+        message: str,
+        access_token: str,
+        request_id: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Create applicant response (negotiation) for a vacancy.
+        HH docs reference "apply-to-vacancy"; in practice this is handled via negotiations.
+        We use POST /negotiations with form fields: vacancy_id, resume_id, message.
+        """
+        timeout = httpx.Timeout(self.timeout_seconds, connect=5.0)
+        backoff = 0.5
+
+        data = {
+            "vacancy_id": vacancy_id,
+            "resume_id": resume_id,
+            "message": message,
+        }
+
+        for attempt in range(1, self.max_retries + 2):
+            try:
+                async with httpx.AsyncClient(base_url=self.base_url, timeout=timeout) as client:
+                    resp = await client.post(
+                        "/negotiations",
+                        data=data,
+                        headers={
+                            **self._headers(access_token),
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                    )
+            except httpx.RequestError:
+                if attempt > self.max_retries:
+                    raise HHApiUnavailable("Network error calling HH apply.")
+                sleep_s = backoff * (2 ** (attempt - 1)) + random.random() * 0.2
+                logger.warning("HH apply network error, retrying", extra={"request_id": request_id, "attempt": attempt})
+                await asyncio.sleep(sleep_s)
+                continue
+
+            if resp.status_code == 429:
+                if attempt > self.max_retries:
+                    raise HHApiApplyFailed(429, "HH rate limited (429).")
+                retry_after = resp.headers.get("Retry-After")
+                sleep_s = float(retry_after) if retry_after and retry_after.isdigit() else backoff * (2 ** (attempt - 1))
+                logger.warning("HH apply rate limited, retrying", extra={"request_id": request_id, "attempt": attempt})
+                await asyncio.sleep(sleep_s)
+                continue
+
+            if 500 <= resp.status_code <= 599:
+                if attempt > self.max_retries:
+                    raise HHApiUnavailable(f"HH apply unavailable ({resp.status_code}).")
+                sleep_s = backoff * (2 ** (attempt - 1)) + random.random() * 0.2
+                logger.warning("HH apply 5xx, retrying", extra={"request_id": request_id, "attempt": attempt})
+                await asyncio.sleep(sleep_s)
+                continue
+
+            if resp.status_code >= 400:
+                details = None
+                try:
+                    details = resp.json()
+                except Exception:
+                    details = {"text": resp.text[:200]}
+                raise HHApiApplyFailed(resp.status_code, "HH apply failed.", details=details)
+
+            # Success: parse negotiation id from Location header if present
+            negotiation_id = None
+            loc = resp.headers.get("Location") or resp.headers.get("location")
+            if loc and "/negotiations/" in loc:
+                negotiation_id = loc.rsplit("/", 1)[-1]
+
+            raw_resp: dict[str, Any] = {}
+            try:
+                raw_resp = resp.json()
+            except Exception:
+                raw_resp = {}
+
+            return {"negotiation_id": negotiation_id, "status": "created", "raw_response": raw_resp}
+
+        raise HHApiUnavailable("HH apply retries exhausted.")
 

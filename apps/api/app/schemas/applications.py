@@ -23,6 +23,8 @@ class ApplicationOut(APIModel):
     approved_at: datetime | None = None
     queued_at: datetime | None = None
     sent_at: datetime | None = None
+    failed_at: datetime | None = None
+    hh_negotiation_id: str | None = None
     error_code: str | None = None
     error_message: str | None = None
     last_attempt_at: datetime | None = None

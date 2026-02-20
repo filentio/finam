@@ -139,3 +139,39 @@ Endpoint:
 
 Важно: требует `candidate_profile`, иначе вернёт `409 CANDIDATE_PROFILE_REQUIRED`.
 
+## Отправка отклика в HH (Stage 8)
+Отправка выполняется **только после одобрения** и **через HH OAuth**.
+
+### Полный flow (MVP)
+1) Подключить HH OAuth:
+- `GET /api/v1/auth/hh/start` → пройти OAuth → callback
+- проверить: `GET /api/v1/auth/hh/status`
+
+2) Запустить поиск вакансий:
+- создать профиль поиска: `POST /api/v1/search-profiles`
+- запустить: `POST /api/v1/search-profiles/{id}/run`
+- посмотреть выдачу: `GET /api/v1/vacancies?search_profile_id={id}`
+
+3) Подготовить письмо:
+- создать `candidate_profile` (на этапе 8 endpoint не добавлен; можно создавать напрямую в БД)
+- сгенерировать письмо: `POST /api/v1/vacancies/{vacancy_id}/cover-letter/generate`
+
+4) Создать отклик и отправить:
+- `POST /api/v1/applications` (указать `cover_letter_id`)
+- `POST /api/v1/applications/{id}/approve`
+- `POST /api/v1/applications/{id}/send` (header `Idempotency-Key`)
+
+Статусы:
+- `approved` → `queued` → `sent` | `failed`
+
+### Ошибки send (основные `error_code`)
+- `HH_NOT_CONNECTED` — нет активного HH OAuth
+- `COVER_LETTER_REQUIRED` — нет черновика письма
+- `COVER_LETTER_INVALID` — письмо не прошло валидацию
+- `HH_DIRECT_VACANCY` — нельзя отправить отклик через HH API
+- `RATE_LIMIT_LOCAL` — превышен локальный лимит отправки
+- `HH_UNAUTHORIZED` — 401 от HH, требуется re-auth
+- `HH_FORBIDDEN` — 403 от HH
+- `HH_RATE_LIMITED` — 429 от HH
+- `HH_UNAVAILABLE` — временная недоступность HH
+

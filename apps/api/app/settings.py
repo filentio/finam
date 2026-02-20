@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     COVER_LETTER_MAX_CHARS: int = 4000
     COVER_LETTER_FORBIDDEN_PHRASES: list[str] | None = None
 
+    # HH apply (Stage 8) - local rate limits (conservative defaults)
+    HH_APPLY_DAILY_LIMIT: int = 20
+    HH_APPLY_HOURLY_LIMIT: int = 5
+    HH_APPLY_MAX_RETRIES: int = 2
+
 
 @lru_cache
 def get_settings() -> Settings:

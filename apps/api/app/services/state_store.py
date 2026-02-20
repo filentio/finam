@@ -14,6 +14,13 @@ class StateStore:
     def delete(self, key: str) -> int:  # pragma: no cover
         raise NotImplementedError
 
+    # Optional Redis-like helpers (used for local rate limits)
+    def incr(self, key: str) -> int:  # pragma: no cover
+        raise NotImplementedError
+
+    def expire(self, key: str, ttl_seconds: int) -> bool:  # pragma: no cover
+        raise NotImplementedError
+
 
 @dataclass
 class InMemoryStateStore(StateStore):
@@ -40,4 +47,24 @@ class InMemoryStateStore(StateStore):
         existed = 1 if key in self._data else 0
         self._data.pop(key, None)
         return existed
+
+    def incr(self, key: str) -> int:
+        current = self.get(key)
+        try:
+            n = int(current) if current is not None else 0
+        except ValueError:
+            n = 0
+        n += 1
+        # keep existing expiry if present
+        expires_at = self._data.get(key, (None, None))[1]
+        self._data[key] = (str(n), expires_at)
+        return n
+
+    def expire(self, key: str, ttl_seconds: int) -> bool:
+        if key not in self._data:
+            return False
+        value, _ = self._data[key]
+        expires_at = time.time() + ttl_seconds if ttl_seconds > 0 else None
+        self._data[key] = (value, expires_at)
+        return True
 
