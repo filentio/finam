@@ -88,3 +88,26 @@ curl -X POST "http://localhost:8000/api/v1/search-profiles/<PROFILE_UUID>/run"
 curl "http://localhost:8000/api/v1/vacancies?search_profile_id=<PROFILE_UUID>"
 ```
 
+## Matcher/Ranker (Stage 6)
+После `run` профиля поиска сервис вычисляет **score (0..100)** и сохраняет объяснимые **reasons** в `matches`.
+
+Короткие правила MVP:
+- стоп-лист компаний/ключевых слов → `is_blocked=true`, `score=0` (в выдачу не попадают)
+- ключевые слова/skills из `filters.keywords` (или из `filters.text`) повышают score при совпадениях в title/snippet
+- `salary_min` даёт бонус/штраф
+- `experience` и `area_name` дают небольшой бонус/штраф при совпадении/расхождении
+
+### Пересчёт score вручную для вакансии
+`POST /api/v1/vacancies/{vacancy_id}/match` с body:
+
+```json
+{ "search_profile_id": "<PROFILE_UUID>" }
+```
+
+### Выдача вакансий по профилю
+По умолчанию сортируется по score:
+- `GET /api/v1/vacancies?search_profile_id=<PROFILE_UUID>&sort=score`
+
+Чтобы вернуть reasons:
+- `GET /api/v1/vacancies?search_profile_id=<PROFILE_UUID>&include_reasons=true`
+

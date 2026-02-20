@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -21,6 +21,7 @@ from app.schemas.vacancies import (
     VacancyListOut,
     VacancyListItem,
 )
+from app.services.matcher import compute_match
 from app.utils.stub_auth import get_or_create_stub_user
 
 
@@ -32,6 +33,8 @@ def list_vacancies(
     search_profile_id: uuid.UUID | None = None,
     limit: int = 50,
     cursor: str | None = None,
+    sort: str = Query(default="score", pattern="^(score|date)$"),
+    include_reasons: bool = False,
     db: Session = Depends(get_db),
 ) -> VacancyListOut:
     _ = cursor  # reserved for future cursor pagination
@@ -60,6 +63,8 @@ def list_vacancies(
                     apply_via_hh=v.apply_via_hh,
                     external_apply_url=v.external_apply_url,
                     score=None,
+                    is_blocked=False,
+                    blocked_reason=None,
                     reasons=[],
                 )
             )
@@ -70,14 +75,17 @@ def list_vacancies(
         raise HTTPException(status_code=404, detail="Профиль поиска не найден.")
 
     # Join matches for the given profile.
-    rows = (
+    q2 = (
         db.query(Vacancy, Match)
         .join(Match, Match.vacancy_id == Vacancy.id)
         .filter(Match.search_profile_id == search_profile_id)
-        .order_by(Match.score.desc(), Vacancy.published_at.desc().nullslast())
-        .limit(limit)
-        .all()
+        .filter(Match.is_blocked.is_(False))
     )
+    if sort == "date":
+        q2 = q2.order_by(Vacancy.published_at.desc().nullslast(), Match.score.desc())
+    else:
+        q2 = q2.order_by(Match.score.desc(), Vacancy.published_at.desc().nullslast())
+    rows = q2.limit(limit).all()
     for v, m in rows:
         reasons = m.reasons_json or []
         items.append(
@@ -94,7 +102,9 @@ def list_vacancies(
                 apply_via_hh=v.apply_via_hh,
                 external_apply_url=v.external_apply_url,
                 score=float(m.score),
-                reasons=[] if reasons is None else reasons,  # reasons schema is flexible in scaffold
+                is_blocked=bool(m.is_blocked),
+                blocked_reason=m.blocked_reason,
+                reasons=reasons if include_reasons else [],
             )
         )
     return VacancyListOut(items=items, next_cursor=None)
@@ -135,6 +145,7 @@ def create_match(vacancy_id: uuid.UUID, payload: MatchCreateIn, db: Session = De
         raise HTTPException(status_code=404, detail="Профиль поиска не найден.")
 
     now = datetime.now(timezone.utc)
+    computed = compute_match(sp, v)
 
     m = (
         db.query(Match)
@@ -146,19 +157,34 @@ def create_match(vacancy_id: uuid.UUID, payload: MatchCreateIn, db: Session = De
             user_id=user.id,
             search_profile_id=payload.search_profile_id,
             vacancy_id=vacancy_id,
-            score=0,
-            reasons_json=[],
+            score=computed["score"],
+            reasons_json=computed["reasons"],
+            missing_skills_json=computed["missing_skills"],
+            is_blocked=computed["is_blocked"],
+            blocked_reason=computed["blocked_reason"],
             computed_at=now,
         )
         db.add(m)
     else:
-        m.score = 0
-        m.reasons_json = []
+        m.score = computed["score"]
+        m.reasons_json = computed["reasons"]
+        m.missing_skills_json = computed["missing_skills"]
+        m.is_blocked = computed["is_blocked"]
+        m.blocked_reason = computed["blocked_reason"]
         m.computed_at = now
         db.add(m)
     db.commit()
     db.refresh(m)
-    return MatchOut(id=m.id, vacancy_id=m.vacancy_id, search_profile_id=m.search_profile_id, score=float(m.score), reasons=[])
+    return MatchOut(
+        id=m.id,
+        vacancy_id=m.vacancy_id,
+        search_profile_id=m.search_profile_id,
+        score=float(m.score),
+        reasons=m.reasons_json or [],
+        missing_skills=m.missing_skills_json,
+        is_blocked=bool(m.is_blocked),
+        blocked_reason=m.blocked_reason,
+    )
 
 
 @router.post("/{vacancy_id}/cover-letter/generate", response_model=CoverLetterOut, status_code=201)

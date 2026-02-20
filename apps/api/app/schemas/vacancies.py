@@ -7,11 +7,10 @@ from uuid import UUID
 from app.schemas.common import APIModel
 
 
-class Reason(APIModel):
-    factor: str
-    weight: float | None = None
-    value: float | None = None
-    meta: dict[str, Any] | None = None
+class MatchReason(APIModel):
+    type: str  # positive|negative|info
+    code: str
+    text: str
 
 
 class VacancyListItem(APIModel):
@@ -27,7 +26,9 @@ class VacancyListItem(APIModel):
     apply_via_hh: bool
     external_apply_url: str | None = None
     score: float | None = None
-    reasons: list[Reason] = []
+    is_blocked: bool = False
+    blocked_reason: str | None = None
+    reasons: list[MatchReason] = []
 
 
 class VacancyListOut(APIModel):
@@ -58,7 +59,10 @@ class MatchOut(APIModel):
     vacancy_id: UUID
     search_profile_id: UUID
     score: float
-    reasons: list[Any]
+    reasons: list[MatchReason]
+    missing_skills: list[str] | None = None
+    is_blocked: bool
+    blocked_reason: str | None = None
 
 
 class CoverLetterGenerateIn(APIModel):

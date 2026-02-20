@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, UniqueConstraint, Index
+from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, Text, UniqueConstraint, Index, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -26,7 +26,13 @@ class Match(Base):
     vacancy_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vacancies.id", ondelete="CASCADE"), nullable=False, index=True)
 
     score: Mapped[float] = mapped_column(Numeric(6, 3), nullable=False, default=0)
-    reasons_json: Mapped[dict | list] = mapped_column(JSON_VARIANT, nullable=False, default=list)
+    reasons_json: Mapped[list[dict]] = mapped_column(JSON_VARIANT, nullable=False, default=list)
+    missing_skills_json: Mapped[list[str] | None] = mapped_column(JSON_VARIANT, nullable=True)
+    is_blocked: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    blocked_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 

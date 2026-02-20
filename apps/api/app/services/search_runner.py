@@ -15,6 +15,7 @@ from app.models.search_profile import SearchProfile
 from app.models.vacancy import Vacancy
 from app.services.hh_api_client import HHApiClient
 from app.services.hh_normalizer import normalize_hh_vacancy
+from app.services.matcher import compute_match
 
 logger = logging.getLogger(__name__)
 
@@ -66,25 +67,6 @@ def build_hh_search_params(filters_json: dict[str, Any]) -> dict[str, Any]:
     return params
 
 
-def _should_exclude_by_stoplist(vacancy_title: str, employer_id: str | None, employer_name: str | None, stoplist_json: dict[str, Any]) -> bool:
-    companies = stoplist_json.get("companies") or []
-    if employer_id and str(employer_id) in {str(x) for x in companies}:
-        return True
-
-    keywords = stoplist_json.get("keywords") or []
-    title_l = (vacancy_title or "").lower()
-    emp_l = (employer_name or "").lower()
-    for kw in keywords:
-        if not isinstance(kw, str):
-            continue
-        k = kw.strip().lower()
-        if not k:
-            continue
-        if k in title_l or k in emp_l:
-            return True
-    return False
-
-
 @dataclass(frozen=True)
 class RunResult:
     run_id: uuid.UUID
@@ -108,8 +90,6 @@ async def run_search_profile_ingestion(
     access_token = acc.access_token_ciphertext if (acc and acc.status == "active" and acc.access_token_ciphertext) else None
 
     params = build_hh_search_params(sp.filters_json or {})
-    stoplist_json = sp.stoplist_json or {}
-
     client = HHApiClient()
     now = datetime.now(timezone.utc)
     run_id = uuid.uuid4()
@@ -129,9 +109,6 @@ async def run_search_profile_ingestion(
                 continue
             n = normalize_hh_vacancy(item)
             if not n.external_vacancy_id:
-                continue
-
-            if _should_exclude_by_stoplist(n.title, n.employer_id, n.employer_name, stoplist_json):
                 continue
 
             v = (
@@ -168,18 +145,27 @@ async def run_search_profile_ingestion(
                 .filter(Match.search_profile_id == search_profile_id, Match.vacancy_id == v.id)
                 .one_or_none()
             )
+            match_payload = compute_match(sp, v)
             if m is None:
                 m = Match(
                     user_id=user_id,
                     search_profile_id=search_profile_id,
                     vacancy_id=v.id,
-                    score=0,
-                    reasons_json=[],
+                    score=match_payload["score"],
+                    reasons_json=match_payload["reasons"],
+                    missing_skills_json=match_payload["missing_skills"],
+                    is_blocked=match_payload["is_blocked"],
+                    blocked_reason=match_payload["blocked_reason"],
                     computed_at=now,
                 )
                 db.add(m)
             else:
                 m.computed_at = now
+                m.score = match_payload["score"]
+                m.reasons_json = match_payload["reasons"]
+                m.missing_skills_json = match_payload["missing_skills"]
+                m.is_blocked = match_payload["is_blocked"]
+                m.blocked_reason = match_payload["blocked_reason"]
                 db.add(m)
             matched += 1
 

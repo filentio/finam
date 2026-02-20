@@ -56,6 +56,7 @@ def test_run_search_profile_ingests_vacancies_and_upserts(client, mocker):
     assert len(items) == 1
     assert items[0]["external_vacancy_id"] == "100"
     assert items[0]["title"].startswith("Python Developer")
+    assert items[0]["score"] is not None
 
     # Second run should upsert vacancy without creating duplicates
     r4 = client.post(f"/api/v1/search-profiles/{profile_id}/run")
