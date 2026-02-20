@@ -12,6 +12,9 @@ venv/
 *.log
 .DS_Store
 
+# Temp
+.tmp/
+
 # Alembic
 apps/api/alembic/versions/__pycache__/
 

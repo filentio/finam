@@ -51,6 +51,24 @@ pytest -q apps/api/tests
 - `APP_ENV`
 - `LOG_LEVEL`
 
-Плейсхолдеры HH OAuth (на этапе 3 не используются):
-- `HH_CLIENT_ID`, `HH_CLIENT_SECRET`, `HH_REDIRECT_URI`
+## HH OAuth (Stage 4)
+Настройте переменные:
+- `HH_CLIENT_ID`
+- `HH_CLIENT_SECRET`
+- `HH_REDIRECT_URI` (предпочтительно) или `PUBLIC_BASE_URL`
+- (опционально) `HH_OAUTH_AUTHORIZE_URL`, `HH_OAUTH_TOKEN_URL`
+
+### Как пройти флоу локально
+1) Откройте в браузере:
+- `GET /api/v1/auth/hh/start` — старт авторизации
+- `GET /api/v1/auth/hh/start?force_login=true` — “войти под другим пользователем” (HH параметр `force_login=true`)
+
+2) После успешного логина HH сделает redirect на `HH_REDIRECT_URI`, например:
+- `GET /api/v1/auth/hh/callback?code=...&state=...`
+
+3) Проверить состояние:
+- `GET /api/v1/auth/hh/status`
+
+4) Отключить HH аккаунт:
+- `POST /api/v1/auth/hh/disconnect`
 

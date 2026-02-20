@@ -22,7 +22,17 @@ from app.settings import Settings
 
 @pytest.fixture()
 def client() -> TestClient:
-    settings = Settings(DATABASE_URL="sqlite+pysqlite:///:memory:", APP_ENV="test", LOG_LEVEL="WARNING")
+    settings = Settings(
+        DATABASE_URL="sqlite+pysqlite:///:memory:",
+        APP_ENV="test",
+        LOG_LEVEL="WARNING",
+        HH_CLIENT_ID="test_client_id",
+        HH_CLIENT_SECRET="test_client_secret",
+        HH_REDIRECT_URI="http://localhost:8000/api/v1/auth/hh/callback",
+        HH_OAUTH_AUTHORIZE_URL="https://hh.ru/oauth/authorize",
+        HH_OAUTH_TOKEN_URL="https://hh.ru/oauth/token",
+        AUTH_STATE_TTL_SECONDS=600,
+    )
     app = create_app(settings)
     Base.metadata.create_all(bind=app.state.engine)
     return TestClient(app)
