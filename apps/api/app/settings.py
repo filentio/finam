@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -45,6 +47,27 @@ class Settings(BaseSettings):
     COVER_LETTER_MIN_CHARS: int = 400
     COVER_LETTER_MAX_CHARS: int = 4000
     COVER_LETTER_FORBIDDEN_PHRASES: list[str] | None = None
+
+    @field_validator("COVER_LETTER_FORBIDDEN_PHRASES", mode="before")
+    @classmethod
+    def _parse_cover_letter_forbidden_phrases(cls, v):
+        # Accept unset / empty string and treat as None.
+        if v is None:
+            return None
+        if v == "":
+            return None
+        if isinstance(v, str):
+            s = v.strip()
+            if not s:
+                return None
+            # Prefer JSON list: ["a","b"]
+            try:
+                parsed = json.loads(s)
+                return parsed
+            except Exception:
+                # Fallback: comma-separated
+                return [x.strip() for x in s.split(",") if x.strip()]
+        return v
 
     # HH apply (Stage 8) - local rate limits (conservative defaults)
     HH_APPLY_DAILY_LIMIT: int = 20
