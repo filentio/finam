@@ -32,7 +32,19 @@ const filtersSchema = z.object({
   text: z.string().optional().nullable(),
   area: z.string().optional().nullable(),
   experience: z.string().optional().nullable(),
-  salary_min: z.coerce.number().int().positive().optional().nullable(),
+  salary_min: z
+    .preprocess((v) => {
+      if (v === "" || v === null || v === undefined) return undefined;
+      if (typeof v === "number" && Number.isNaN(v)) return undefined;
+      if (typeof v === "string") {
+        const trimmed = v.trim();
+        if (!trimmed) return undefined;
+        const n = Number(trimmed);
+        return Number.isNaN(n) ? v : n;
+      }
+      return v;
+    }, z.number().int().positive())
+    .optional(),
   employment: z.string().optional().nullable(),
   schedule: z.string().optional().nullable(),
 });
@@ -59,7 +71,9 @@ function toPayload(v: FormValues) {
     employment: v.filters.employment || undefined,
     schedule: v.filters.schedule || undefined,
   };
-  if (v.filters.salary_min) filters.salary = v.filters.salary_min;
+  if (typeof v.filters.salary_min === "number" && Number.isFinite(v.filters.salary_min) && v.filters.salary_min > 0) {
+    filters.salary = v.filters.salary_min;
+  }
   const stoplist: Record<string, unknown> = {
     companies: v.stoplist.companies || [],
     keywords: v.stoplist.keywords || [],
@@ -139,6 +153,7 @@ function EditorDialog({
       onOpenChange(false);
     } catch (e) {
       if (e instanceof ApiError) toast.error(`${e.message}${e.errorCode ? ` (${e.errorCode})` : ""}`);
+      else if (e instanceof Error && e.message) toast.error(e.message);
       else toast.error("Ошибка сохранения");
     }
   }
@@ -171,7 +186,13 @@ function EditorDialog({
           </div>
           <div className="space-y-2">
             <Label>Salary min</Label>
-            <Input type="number" {...form.register("filters.salary_min")} placeholder="150000" />
+            <Input
+              type="number"
+              {...form.register("filters.salary_min", {
+                setValueAs: (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
+              })}
+              placeholder="150000"
+            />
           </div>
           <div className="space-y-2">
             <Label>Employment</Label>
