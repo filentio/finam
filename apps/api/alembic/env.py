@@ -62,6 +62,13 @@ def run_migrations_online() -> None:
             )
         )
         connection.execute(sa.text("ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(255)"))
+        # Ensure the DDL above is committed before Alembic opens its transaction.
+        # Otherwise, SQLAlchemy may keep an outer implicit transaction open and roll everything back on close.
+        try:
+            connection.commit()
+        except Exception:
+            # Some DBAPI/SQLAlchemy configs may be in autocommit; safe to ignore.
+            pass
 
         context.configure(connection=connection, target_metadata=target_metadata)
 
