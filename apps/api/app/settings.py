@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     # CORS (for local Next.js UI)
     # Comma-separated list, use "*" to allow all (credentials will be disabled).
-    CORS_ALLOW_ORIGINS: str = "http://localhost:3000"
+    CORS_ALLOW_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
 
     # HH OAuth (stage 4)
     HH_CLIENT_ID: str | None = None
