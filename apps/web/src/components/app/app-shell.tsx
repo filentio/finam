@@ -9,7 +9,6 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuthStatus } from "@/lib/hooks/use-auth-status";
-import { apiBaseUrl } from "@/lib/api";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -99,8 +98,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Button
                     size="sm"
                     onClick={() => {
-                      if (!apiBaseUrl) return;
-                      const url = new URL("/api/v1/auth/hh/start", apiBaseUrl);
+                      // Use same-origin /api/v1 proxy (Next rewrites).
+                      const url = new URL("/api/v1/auth/hh/start", window.location.origin);
                       if (needReconnect) url.searchParams.set("force_login", "true");
                       window.location.href = url.toString();
                     }}

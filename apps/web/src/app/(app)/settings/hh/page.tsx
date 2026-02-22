@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { apiBaseUrl, apiFetch, ApiError } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
 import { useAuthStatus, authStatusKey } from "@/lib/hooks/use-auth-status";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -55,8 +55,7 @@ export default function HHSettingsPage() {
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               onClick={() => {
-                if (!apiBaseUrl) return toast.error("NEXT_PUBLIC_API_BASE_URL не задан");
-                window.location.href = new URL("/api/v1/auth/hh/start", apiBaseUrl).toString();
+                window.location.href = new URL("/api/v1/auth/hh/start", window.location.origin).toString();
               }}
             >
               Подключить HH
@@ -64,8 +63,7 @@ export default function HHSettingsPage() {
             <Button
               variant="secondary"
               onClick={() => {
-                if (!apiBaseUrl) return toast.error("NEXT_PUBLIC_API_BASE_URL не задан");
-                const url = new URL("/api/v1/auth/hh/start", apiBaseUrl);
+                const url = new URL("/api/v1/auth/hh/start", window.location.origin);
                 url.searchParams.set("force_login", "true");
                 window.location.href = url.toString();
               }}

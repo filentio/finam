@@ -66,11 +66,13 @@ export async function apiFetch<T>(
   path: string,
   opts: RequestInit & { query?: Record<string, string | number | boolean | undefined | null> } = {}
 ): Promise<T> {
-  if (!apiBaseUrl) {
+  // Prefer same-origin requests (Next.js rewrite proxies /api/v1/* to backend).
+  // This avoids CORS issues in local dev setups.
+  const base = path.startsWith("/api/v1/") ? "" : apiBaseUrl;
+  if (!base && !path.startsWith("/")) {
     throw new ApiError({ status: 0, message: "NEXT_PUBLIC_API_BASE_URL is not configured." });
   }
-
-  const url = new URL(path, apiBaseUrl);
+  const url = base ? new URL(path, base) : new URL(path, "http://localhost");
   if (opts.query) {
     for (const [k, v] of Object.entries(opts.query)) {
       if (v === undefined || v === null) continue;
@@ -83,7 +85,8 @@ export async function apiFetch<T>(
   headers.set("X-Request-Id", requestId);
   if (opts.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
 
-  const res = await fetch(url.toString(), {
+  const requestUrl = base ? url.toString() : `${path}${url.search}`;
+  const res = await fetch(requestUrl, {
     ...opts,
     headers,
     cache: "no-store",
