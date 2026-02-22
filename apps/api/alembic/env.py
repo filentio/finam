@@ -4,6 +4,7 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
+import sqlalchemy as sa
 from sqlalchemy import engine_from_config, pool
 
 from app.db.base import Base
@@ -48,6 +49,20 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        # Alembic's default version table uses VARCHAR(32). Our revision ids are longer,
+        # so ensure the version column can store them.
+        connection.execute(
+            sa.text(
+                """
+                CREATE TABLE IF NOT EXISTS alembic_version (
+                  version_num VARCHAR(255) NOT NULL,
+                  CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+                )
+                """
+            )
+        )
+        connection.execute(sa.text("ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(255)"))
+
         context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
