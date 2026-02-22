@@ -92,6 +92,12 @@ def update_profile(profile_id: uuid.UUID, payload: SearchProfileUpdate, db: Sess
     return _to_out(sp)
 
 
+@router.put("/{profile_id}", response_model=SearchProfileOut)
+def replace_profile(profile_id: uuid.UUID, payload: SearchProfileUpdate, db: Session = Depends(get_db)) -> SearchProfileOut:
+    # UI uses PUT; for MVP we treat it as a partial update (same as PATCH).
+    return update_profile(profile_id=profile_id, payload=payload, db=db)
+
+
 @router.delete("/{profile_id}", status_code=204)
 def delete_profile(profile_id: uuid.UUID, db: Session = Depends(get_db)) -> Response:
     user = get_or_create_stub_user(db)
