@@ -111,6 +111,23 @@ class HHApiClient:
     async def get_vacancy(self, vacancy_id: str, access_token: str | None = None, request_id: str | None = None) -> dict[str, Any]:
         return await self._get_json(f"/vacancies/{vacancy_id}", params=None, access_token=access_token, request_id=request_id)
 
+    async def list_resumes(self, *, access_token: str, request_id: str | None = None) -> dict[str, Any]:
+        """
+        List resumes of the current applicant.
+        HH API: GET /resumes/mine (requires applicant OAuth).
+        """
+        return await self._get_json("/resumes/mine", params=None, access_token=access_token, request_id=request_id)
+
+    async def get_resume(self, *, resume_id: str, access_token: str, request_id: str | None = None) -> dict[str, Any]:
+        """
+        Get resume details by id.
+        HH API: GET /resumes/{resume_id} (requires applicant OAuth).
+        """
+        rid = str(resume_id).strip()
+        if not rid:
+            raise HHApiRequestFailed(400, "Resume id is required.")
+        return await self._get_json(f"/resumes/{rid}", params=None, access_token=access_token, request_id=request_id)
+
     async def list_negotiations(
         self,
         *,

@@ -20,7 +20,7 @@ export function useApplications(filters?: { status?: string | null }) {
 export function useCreateApplication() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { vacancy_id: string; resume_id: string; cover_letter_id?: string | null }) =>
+    mutationFn: (payload: { vacancy_id: string; resume_id?: string | null; cover_letter_id?: string | null }) =>
       apiFetch<Application>("/api/v1/applications", { method: "POST", body: JSON.stringify(payload) }),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: applicationsKey });

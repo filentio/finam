@@ -76,10 +76,16 @@ def create_application(payload: ApplicationCreateIn, db: Session = Depends(get_d
     if v is None:
         raise HTTPException(status_code=404, detail="Вакансия не найдена.")
 
+    resume_id = (payload.resume_id or "").strip() if payload.resume_id is not None else ""
+    if not resume_id:
+        resume_id = (user.default_resume_id or "").strip()
+    if not resume_id:
+        raise HTTPException(status_code=409, detail={"code": "RESUME_REQUIRED", "message": "Нужно выбрать резюме по умолчанию."})
+
     a = Application(
         user_id=user.id,
         vacancy_id=payload.vacancy_id,
-        resume_id=payload.resume_id,
+        resume_id=resume_id,
         cover_letter_id=payload.cover_letter_id,
         status="draft",
         attempt_count=0,

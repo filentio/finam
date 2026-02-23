@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.db.deps import get_db
 from app.models.candidate_profile import CandidateProfile
 from app.models.cover_letter import CoverLetter
+from app.models.hh_resume import HHResume
 from app.schemas.cover_letters import CoverLetterEditIn, CoverLetterOut
 from app.services.cover_letter_validator import validate_cover_letter
 from app.utils.stub_auth import get_or_create_stub_user
@@ -27,7 +28,17 @@ def edit_cover_letter(
 
     settings_obj = request.app.state.settings
     profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == user.id).one_or_none()
-    allow = profile.facts_numbers_json if profile else None
+    allow_profile = profile.facts_numbers_json if profile else []
+    allow_resume: list[str] = []
+    if cl.resume_id:
+        cached = (
+            db.query(HHResume)
+            .filter(HHResume.user_id == user.id, HHResume.resume_id == cl.resume_id)
+            .one_or_none()
+        )
+        if cached and cached.numbers_allowlist_json:
+            allow_resume = cached.numbers_allowlist_json
+    allow = list(dict.fromkeys((allow_profile or []) + (allow_resume or [])))
 
     cl.text = payload.text
     validation = validate_cover_letter(

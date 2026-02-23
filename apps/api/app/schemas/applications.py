@@ -10,7 +10,7 @@ from app.schemas.common import APIModel
 
 class ApplicationCreateIn(APIModel):
     vacancy_id: UUID
-    resume_id: str = Field(min_length=1, max_length=200)
+    resume_id: str | None = Field(default=None, min_length=1, max_length=200)
     cover_letter_id: UUID | None = None
 
 

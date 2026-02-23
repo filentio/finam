@@ -126,3 +126,32 @@ export type SyncNegotiationsOut = {
   duration_ms: number;
 };
 
+export type HhResumeListItem = {
+  id: string;
+  title: string | null;
+  updated_at: string | null;
+};
+
+export type HhResumeListOut = {
+  items: HhResumeListItem[];
+};
+
+export type HhResumeCacheOut = {
+  resume_id: string;
+  title: string | null;
+  cached_at: string;
+};
+
+export type HhResumeCachedOut = {
+  resume_id: string;
+  title: string | null;
+  updated_at_from_hh: string | null;
+  normalized_text: string | null;
+  numbers_allowlist: string[];
+  raw_json?: Record<string, unknown> | null;
+};
+
+export type DefaultResumeOut = {
+  resume_id: string | null;
+};
+

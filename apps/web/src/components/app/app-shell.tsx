@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Search, FileText, Send, User, Settings } from "lucide-react";
+import { LayoutDashboard, Search, FileText, Send, User, Settings, IdCard } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +13,7 @@ import { useAuthStatus } from "@/lib/hooks/use-auth-status";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/search-profiles", label: "Поиск вакансий", icon: Search },
+  { href: "/resumes", label: "Резюме", icon: IdCard },
   { href: "/letters", label: "Письма", icon: FileText },
   { href: "/applications", label: "Отклики", icon: Send },
   { href: "/profile", label: "Профиль", icon: User },

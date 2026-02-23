@@ -22,6 +22,7 @@ import { useSearchProfiles } from "@/lib/hooks/use-search-profiles";
 import { useVacancies } from "@/lib/hooks/use-vacancies";
 import { useGenerateCoverLetter, useUpdateCoverLetter } from "@/lib/hooks/use-cover-letters";
 import { useCreateApplication, useApproveApplication, useSendApplication } from "@/lib/hooks/use-applications";
+import { useDefaultResume } from "@/lib/hooks/use-default-resume";
 
 type Validation = { is_valid?: boolean } & Record<string, unknown>;
 
@@ -105,15 +106,14 @@ function LetterDialog({
   open,
   onOpenChange,
   vacancy,
-  resumeId,
-  setResumeId,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   vacancy: VacancyListItem | null;
-  resumeId: string;
-  setResumeId: (v: string) => void;
 }) {
+  const def = useDefaultResume();
+  const [override, setOverride] = React.useState(false);
+  const [resumeId, setResumeId] = React.useState("");
   const gen = useGenerateCoverLetter();
   const upd = useUpdateCoverLetter();
   const [coverLetterId, setCoverLetterId] = React.useState<string | null>(null);
@@ -133,13 +133,20 @@ function LetterDialog({
     setNumbersUsed([]);
     setRiskFlags([]);
     setStatus("");
+    setOverride(false);
+    setResumeId("");
   }, [open, vacancy?.id]);
 
   async function generate() {
     if (!vacancy) return;
-    if (!resumeId.trim()) return toast.error("resume_id обязателен");
+    const rid = (override ? resumeId : def.data?.resume_id || "").trim();
+    if (!rid) {
+      return toast.error(
+        "Нужно выбрать резюме по умолчанию (Резюме → Использовать по умолчанию) или ввести resume_id вручную."
+      );
+    }
     try {
-      const out = await gen.mutateAsync({ vacancyId: vacancy.id, resume_id: resumeId.trim(), tone: null });
+      const out = await gen.mutateAsync({ vacancyId: vacancy.id, resume_id: rid, tone: null });
       setCoverLetterId(out.cover_letter_id);
       setText(out.letter_text);
       setValidation(out.validation);
@@ -177,8 +184,17 @@ function LetterDialog({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>resume_id</Label>
-            <Input value={resumeId} onChange={(e) => setResumeId(e.target.value)} placeholder="resume_id из HH" />
+            <Label>Резюме</Label>
+            <div className="flex h-10 items-center gap-2">
+              <Badge variant="secondary">{def.data?.resume_id || "не выбрано"}</Badge>
+              <label className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" checked={override} onChange={(e) => setOverride(e.target.checked)} />
+                другой resume_id
+              </label>
+            </div>
+            {override ? (
+              <Input value={resumeId} onChange={(e) => setResumeId(e.target.value)} placeholder="resume_id из HH" />
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label>status</Label>
@@ -248,15 +264,14 @@ function ApplyDialog({
   open,
   onOpenChange,
   vacancy,
-  resumeId,
-  setResumeId,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   vacancy: VacancyListItem | null;
-  resumeId: string;
-  setResumeId: (v: string) => void;
 }) {
+  const def = useDefaultResume();
+  const [override, setOverride] = React.useState(false);
+  const [resumeId, setResumeId] = React.useState("");
   const gen = useGenerateCoverLetter();
   const upd = useUpdateCoverLetter();
   const createApp = useCreateApplication();
@@ -276,13 +291,21 @@ function ApplyDialog({
     setValidation(null);
     setApplicationId(null);
     setIdempotencyKey(crypto.randomUUID());
+    setOverride(false);
+    setResumeId("");
   }, [open, vacancy?.id]);
+
+  const chosenResumeId = (override ? resumeId : def.data?.resume_id || "").trim();
 
   async function stepGenerate() {
     if (!vacancy) return;
-    if (!resumeId.trim()) return toast.error("resume_id обязателен");
+    if (!chosenResumeId) {
+      return toast.error(
+        "Нужно выбрать резюме по умолчанию (Резюме → Использовать по умолчанию) или ввести resume_id вручную."
+      );
+    }
     try {
-      const out = await gen.mutateAsync({ vacancyId: vacancy.id, resume_id: resumeId.trim(), tone: null });
+      const out = await gen.mutateAsync({ vacancyId: vacancy.id, resume_id: chosenResumeId, tone: null });
       setCoverLetterId(out.cover_letter_id);
       setText(out.letter_text);
       setValidation(out.validation);
@@ -308,11 +331,11 @@ function ApplyDialog({
   async function stepCreateApplication() {
     if (!vacancy) return;
     try {
-      const out = await createApp.mutateAsync({
-        vacancy_id: vacancy.id,
-        resume_id: resumeId.trim(),
-        cover_letter_id: coverLetterId,
-      });
+      const out = await createApp.mutateAsync(
+        override
+          ? { vacancy_id: vacancy.id, resume_id: chosenResumeId, cover_letter_id: coverLetterId }
+          : { vacancy_id: vacancy.id, cover_letter_id: coverLetterId }
+      );
       setApplicationId(out.id);
       toast.success("Draft отклика создан");
     } catch (e) {
@@ -351,14 +374,23 @@ function ApplyDialog({
         <DialogHeader>
           <DialogTitle>Откликнуться</DialogTitle>
           <DialogDescription>
-            Flow: письмо → draft → approve → send (Idempotency-Key). Для MVP `resume_id` вводится вручную.
+            Flow: письмо → draft → approve → send (Idempotency-Key). По умолчанию используется резюме из раздела «Резюме».
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>resume_id</Label>
-            <Input value={resumeId} onChange={(e) => setResumeId(e.target.value)} placeholder="resume_id из HH" />
+            <Label>Резюме</Label>
+            <div className="flex h-10 items-center gap-2">
+              <Badge variant="secondary">{def.data?.resume_id || "не выбрано"}</Badge>
+              <label className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" checked={override} onChange={(e) => setOverride(e.target.checked)} />
+                другой resume_id
+              </label>
+            </div>
+            {override ? (
+              <Input value={resumeId} onChange={(e) => setResumeId(e.target.value)} placeholder="resume_id из HH" />
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label>Idempotency-Key</Label>
@@ -397,7 +429,7 @@ function ApplyDialog({
               <div className="mt-2 flex items-center gap-2">
                 <Button
                   onClick={stepCreateApplication}
-                  disabled={createApp.isPending || !resumeId.trim()}
+                  disabled={createApp.isPending || (!chosenResumeId && override)}
                 >
                   Create draft
                 </Button>
@@ -462,7 +494,6 @@ function VacanciesInner() {
   const [letterOpen, setLetterOpen] = React.useState(false);
   const [applyOpen, setApplyOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<VacancyListItem | null>(null);
-  const [resumeId, setResumeId] = React.useState("");
 
   return (
     <div>
@@ -552,8 +583,8 @@ function VacanciesInner() {
         <div className="mt-6 text-sm text-muted-foreground">Пока нет вакансий. Запустите run профиля поиска.</div>
       ) : null}
 
-      <LetterDialog open={letterOpen} onOpenChange={setLetterOpen} vacancy={selected} resumeId={resumeId} setResumeId={setResumeId} />
-      <ApplyDialog open={applyOpen} onOpenChange={setApplyOpen} vacancy={selected} resumeId={resumeId} setResumeId={setResumeId} />
+      <LetterDialog open={letterOpen} onOpenChange={setLetterOpen} vacancy={selected} />
+      <ApplyDialog open={applyOpen} onOpenChange={setApplyOpen} vacancy={selected} />
     </div>
   );
 }

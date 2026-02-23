@@ -14,6 +14,7 @@ from app.models.cover_template import CoverTemplate
 from app.models.match import Match
 from app.models.search_profile import SearchProfile
 from app.models.vacancy import Vacancy
+from app.models.hh_resume import HHResume
 from app.schemas.cover_letters import CoverLetterGenerateOut, CoverLetterOut
 from app.schemas.vacancies import (
     CoverLetterGenerateIn,
@@ -234,10 +235,21 @@ async def generate_cover_letter(
     except OpenAIRequestFailed as e:
         raise HTTPException(status_code=502, detail={"error": {"code": "OPENAI_REQUEST_FAILED", "message": "Ошибка запроса к OpenAI.", "details": {"status_code": e.status_code}}})
 
+    resume_allow: list[str] = []
+    if payload.resume_id:
+        cached = (
+            db.query(HHResume)
+            .filter(HHResume.user_id == user.id, HHResume.resume_id == payload.resume_id)
+            .one_or_none()
+        )
+        if cached and cached.numbers_allowlist_json:
+            resume_allow = cached.numbers_allowlist_json
+    allow_union = list(dict.fromkeys((profile.facts_numbers_json or []) + resume_allow))
+
     validation = validate_cover_letter(
         letter_text=structured["letter_text"],
         numbers_used=structured["numbers_used"],
-        allowlist_numbers=profile.facts_numbers_json or [],
+        allowlist_numbers=allow_union,
         settings=settings,
     )
 
