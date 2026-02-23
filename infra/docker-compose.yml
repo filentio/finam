@@ -78,16 +78,16 @@ services:
     build:
       context: ../apps/web
       dockerfile: Dockerfile
-      args:
-        # 0 = disable strict SSL for npm install inside container (helps with UNABLE_TO_VERIFY_LEAF_SIGNATURE)
-        NPM_STRICT_SSL: "0"
-        NPM_REGISTRY: "https://registry.npmjs.org/"
     environment:
       # Next.js will proxy /api/v1/* to this base (see apps/web/next.config.mjs rewrites).
       NEXT_PUBLIC_API_BASE_URL: http://api:8000
       # Server-only (used by Next route handler /api/admin/sync-negotiations)
       ADMIN_SYNC_TOKEN: ${ADMIN_SYNC_TOKEN:-}
       NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-HH Apply MVP}
+      # npm/network hardening for container startup
+      NPM_STRICT_SSL: "0"
+      NPM_REGISTRY: "https://registry.npmjs.org/"
+      NPM_INSTALL_RETRIES: "10"
       # Better file watching on Docker Desktop / Windows
       WATCHPACK_POLLING: "true"
       CHOKIDAR_USEPOLLING: "true"
