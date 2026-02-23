@@ -9,7 +9,13 @@ ARG NPM_REGISTRY=https://registry.npmjs.org/
 
 COPY package.json package-lock.json ./
 # npm ci is stricter and can fail if lockfile differs; for local dev we prefer a more forgiving install.
-RUN if [ "$NPM_STRICT_SSL" = "0" ]; then npm config set strict-ssl false; npm config set registry http://registry.npmjs.org/; else npm config set registry "$NPM_REGISTRY"; fi \
+RUN if [ "$NPM_STRICT_SSL" = "0" ]; then \
+    npm config set strict-ssl false; \
+    export NODE_TLS_REJECT_UNAUTHORIZED=0; \
+    npm config set registry http://registry.npmjs.org/; \
+  else \
+    npm config set registry "$NPM_REGISTRY"; \
+  fi \
   && npm config set fund false \
   && npm config set audit false \
   && npm install --no-audit --no-fund
