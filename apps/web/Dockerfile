@@ -3,7 +3,8 @@ FROM node:22-alpine
 WORKDIR /web
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# npm ci is stricter and can fail if lockfile differs; for local dev we prefer a more forgiving install.
+RUN npm install --no-audit --no-fund
 
 COPY . .
 
