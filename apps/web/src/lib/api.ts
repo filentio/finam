@@ -83,7 +83,9 @@ export async function apiFetch<T>(
   const requestId = makeRequestId();
   const headers = new Headers(opts.headers || {});
   headers.set("X-Request-Id", requestId);
-  if (opts.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+  if (opts.body && !headers.has("Content-Type") && !(opts.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
 
   const requestUrl = base ? url.toString() : `${path}${url.search}`;
   const res = await fetch(requestUrl, {

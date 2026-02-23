@@ -16,6 +16,7 @@ from app.routes import (
     cover_letters_router,
     hh_resumes_router,
     health_router,
+    resume_import_router,
     search_profiles_router,
     user_settings_router,
     vacancies_router,
@@ -67,6 +68,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(candidate_profile_router, prefix="/api/v1")
     app.include_router(hh_resumes_router, prefix="/api/v1")
     app.include_router(user_settings_router, prefix="/api/v1")
+    app.include_router(resume_import_router, prefix="/api/v1")
     app.include_router(search_profiles_router, prefix="/api/v1")
     app.include_router(vacancies_router, prefix="/api/v1")
     app.include_router(cover_letters_router, prefix="/api/v1")

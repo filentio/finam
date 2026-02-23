@@ -155,3 +155,50 @@ export type DefaultResumeOut = {
   resume_id: string | null;
 };
 
+export type ResumeExperienceItem = {
+  company: string | null;
+  role: string | null;
+  from: string | null;
+  to: string | null;
+  description: string | null;
+};
+
+export type ResumeParsed = {
+  profession: string | null;
+  skills: string[];
+  experience: ResumeExperienceItem[];
+  keywords: string[];
+};
+
+export type ResumeSourceOut = {
+  id: string;
+  source_type: "url" | "file" | string;
+  source_url: string | null;
+  file_name: string | null;
+  file_mime: string | null;
+  status: string;
+  error_code: string | null;
+  error_text: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ResumeGetOut = {
+  exists: boolean;
+  updated_at: string | null;
+  source: ResumeSourceOut | null;
+  parsed: ResumeParsed | null;
+  keywords: string[];
+  numbers_allowlist: string[];
+  raw_text?: string | null;
+};
+
+export type ResumeImportOut = {
+  parsed: ResumeParsed;
+  stats: { chars: number; words: number };
+  warnings: string[];
+  keywords: string[];
+  numbers_allowlist: string[];
+  raw_text_preview: string | null;
+};
+

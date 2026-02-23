@@ -5,6 +5,7 @@ from app.routes.candidate_profile import router as candidate_profile_router
 from app.routes.cover_letters import router as cover_letters_router
 from app.routes.hh_resumes import router as hh_resumes_router
 from app.routes.health import router as health_router
+from app.routes.resume_import import router as resume_import_router
 from app.routes.search_profiles import router as search_profiles_router
 from app.routes.user_settings import router as user_settings_router
 from app.routes.vacancies import router as vacancies_router
@@ -15,6 +16,7 @@ __all__ = [
     "admin_sync_router",
     "candidate_profile_router",
     "hh_resumes_router",
+    "resume_import_router",
     "search_profiles_router",
     "vacancies_router",
     "cover_letters_router",
