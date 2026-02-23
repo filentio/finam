@@ -79,8 +79,8 @@ services:
       context: ../apps/web
       dockerfile: Dockerfile
     environment:
-      # Next.js will proxy /api/v1/* to this base (see apps/web/next.config.mjs rewrites).
-      NEXT_PUBLIC_API_BASE_URL: http://api:8000
+      # Server-side API proxy target (used by Next route handlers).
+      API_BASE_URL: http://api:8000
       # Server-only (used by Next route handler /api/admin/sync-negotiations)
       ADMIN_SYNC_TOKEN: ${ADMIN_SYNC_TOKEN:-}
       NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-HH Apply MVP}

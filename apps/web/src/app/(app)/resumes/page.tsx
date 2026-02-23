@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -37,9 +38,15 @@ export default function ResumesPage() {
         title="Резюме (HH)"
         description="Загрузите список резюме, кэшируйте детали и выберите резюме по умолчанию."
         right={
-          <Button onClick={loadList} disabled={!connected || list.isFetching}>
-            {list.isFetching ? "Загрузка..." : "Загрузить список резюме"}
-          </Button>
+          connected ? (
+            <Button onClick={loadList} disabled={list.isFetching}>
+              {list.isFetching ? "Загрузка..." : "Загрузить список резюме"}
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link href="/settings/hh">Подключить HH</Link>
+            </Button>
+          )
         }
       />
 

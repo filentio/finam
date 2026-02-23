@@ -21,7 +21,7 @@ cp .env.example .env.local
 
 ```bash
 # backend (в отдельном терминале)
-make up
+docker compose -f infra/docker-compose.yml up -d --build
 
 # ui
 cd apps/web
@@ -32,7 +32,8 @@ npm run dev
 
 ### Env vars
 
-- **`NEXT_PUBLIC_API_BASE_URL`**: base URL backend API, напр. `http://localhost:8000`
+- **`API_BASE_URL`**: base URL backend API для server-side proxy в Next.js, напр. `http://localhost:8000`
+- **`NEXT_PUBLIC_API_BASE_URL`**: legacy/совместимость (можно не трогать, предпочтительнее `API_BASE_URL`)
 - **`ADMIN_SYNC_TOKEN`**: токен для admin sync (server-side only)
 - **`NEXT_PUBLIC_APP_NAME`**: опциональное имя приложения в UI
 
