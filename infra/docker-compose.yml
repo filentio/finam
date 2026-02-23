@@ -72,7 +72,33 @@ services:
       redis:
         condition: service_healthy
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    environment:
+      # Next.js will proxy /api/v1/* to this base (see apps/web/next.config.mjs rewrites).
+      NEXT_PUBLIC_API_BASE_URL: http://api:8000
+      # Server-only (used by Next route handler /api/admin/sync-negotiations)
+      ADMIN_SYNC_TOKEN: ${ADMIN_SYNC_TOKEN:-}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-HH Apply MVP}
+      # Better file watching on Docker Desktop / Windows
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../apps/web:/web
+      - web_node_modules:/web/node_modules
+      - web_next_cache:/web/.next
+    depends_on:
+      - api
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+  web_node_modules:
+  web_next_cache:
 
