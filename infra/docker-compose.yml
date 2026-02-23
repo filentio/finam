@@ -81,6 +81,7 @@ services:
       args:
         # 0 = disable strict SSL for npm install inside container (helps with UNABLE_TO_VERIFY_LEAF_SIGNATURE)
         NPM_STRICT_SSL: "0"
+        NPM_REGISTRY: "https://registry.npmjs.org/"
     environment:
       # Next.js will proxy /api/v1/* to this base (see apps/web/next.config.mjs rewrites).
       NEXT_PUBLIC_API_BASE_URL: http://api:8000
