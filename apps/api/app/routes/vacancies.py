@@ -9,12 +9,11 @@ from sqlalchemy.orm import Session
 
 from app.db.deps import get_db
 from app.models.cover_letter import CoverLetter
-from app.models.candidate_profile import CandidateProfile
 from app.models.cover_template import CoverTemplate
 from app.models.match import Match
+from app.models.resume import Resume
 from app.models.search_profile import SearchProfile
 from app.models.vacancy import Vacancy
-from app.models.hh_resume import HHResume
 from app.schemas.cover_letters import CoverLetterGenerateOut, CoverLetterOut
 from app.schemas.vacancies import (
     CoverLetterGenerateIn,
@@ -28,6 +27,7 @@ from app.services.matcher import compute_match
 from app.services.cover_letter_gpt_generator import CoverLetterGptGenerator
 from app.services.cover_letter_validator import validate_cover_letter
 from app.services.openai_client import OpenAIResponsesClient, OpenAIRequestFailed, OpenAIUnavailable
+from app.services.resume_compactor import build_resume_context
 from app.utils.stub_auth import get_or_create_stub_user
 
 
@@ -207,17 +207,16 @@ async def generate_cover_letter(
     user = get_or_create_stub_user(db)
     v = db.get(Vacancy, vacancy_id)
     if v is None:
-        raise HTTPException(status_code=404, detail="Вакансия не найдена.")
+        raise HTTPException(status_code=404, detail={"code": "VACANCY_NOT_FOUND", "message": "Вакансия не найдена."})
 
     settings = request.app.state.settings
     request_id = getattr(request.state, "request_id", None)
 
-    profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == user.id).one_or_none()
-    if profile is None:
-        raise HTTPException(
-            status_code=409,
-            detail={"error": {"code": "CANDIDATE_PROFILE_REQUIRED", "message": "Нужен профиль кандидата для генерации письма."}},
-        )
+    resume = db.query(Resume).filter(Resume.user_id == user.id).one_or_none()
+    if resume is None or not (resume.raw_text or resume.parsed_json):
+        raise HTTPException(status_code=409, detail={"code": "RESUME_REQUIRED", "message": "Сначала импортируйте резюме."})
+    resume_context = build_resume_context(resume)
+    resume_allow = resume.numbers_allowlist_json or []
 
     template: CoverTemplate | None = None
     if payload.template_id:
@@ -230,9 +229,10 @@ async def generate_cover_letter(
     generator = CoverLetterGptGenerator(settings=settings, openai=OpenAIResponsesClient(settings=settings))
 
     try:
-        structured = await generator.generate_cover_letter_gpt(
+        structured = await generator.generate_cover_letter_from_resume(
             vacancy=v,
-            candidate_profile=profile,
+            resume_context=resume_context,
+            numbers_allowlist=resume_allow,
             template=template,
             tone=payload.tone or "neutral",
             request_id=request_id,
@@ -242,21 +242,10 @@ async def generate_cover_letter(
     except OpenAIRequestFailed as e:
         raise HTTPException(status_code=502, detail={"error": {"code": "OPENAI_REQUEST_FAILED", "message": "Ошибка запроса к OpenAI.", "details": {"status_code": e.status_code}}})
 
-    resume_allow: list[str] = []
-    if payload.resume_id:
-        cached = (
-            db.query(HHResume)
-            .filter(HHResume.user_id == user.id, HHResume.resume_id == payload.resume_id)
-            .one_or_none()
-        )
-        if cached and cached.numbers_allowlist_json:
-            resume_allow = cached.numbers_allowlist_json
-    allow_union = list(dict.fromkeys((profile.facts_numbers_json or []) + resume_allow))
-
     validation = validate_cover_letter(
         letter_text=structured["letter_text"],
         numbers_used=structured["numbers_used"],
-        allowlist_numbers=allow_union,
+        allowlist_numbers=resume_allow,
         settings=settings,
     )
 
@@ -266,7 +255,7 @@ async def generate_cover_letter(
     cl = CoverLetter(
         user_id=user.id,
         vacancy_id=vacancy_id,
-        resume_id=payload.resume_id,
+        resume_id=str(resume.id),
         template_id=template.id if template else None,
         status=status,
         text=structured["letter_text"],
@@ -289,5 +278,36 @@ async def generate_cover_letter(
         numbers_used=cl.numbers_used_json or [],
         risk_flags=cl.risk_flags_json or [],
         validation=cl.validation_json or {"is_valid": False, "errors": [], "warnings": []},
+    )
+
+
+@router.get("/{vacancy_id}/cover-letter", response_model=CoverLetterOut)
+def get_latest_cover_letter(vacancy_id: uuid.UUID, db: Session = Depends(get_db)) -> CoverLetterOut:
+    user = get_or_create_stub_user(db)
+    v = db.get(Vacancy, vacancy_id)
+    if v is None:
+        raise HTTPException(status_code=404, detail={"code": "VACANCY_NOT_FOUND", "message": "Вакансия не найдена."})
+
+    cl = (
+        db.query(CoverLetter)
+        .filter(CoverLetter.user_id == user.id, CoverLetter.vacancy_id == vacancy_id)
+        .order_by(CoverLetter.created_at.desc(), CoverLetter.generated_at.desc(), CoverLetter.id.desc())
+        .limit(1)
+        .one_or_none()
+    )
+    if cl is None:
+        raise HTTPException(status_code=404, detail="Письмо по вакансии не найдено.")
+    return CoverLetterOut(
+        id=cl.id,
+        status=cl.status,
+        text=cl.text,
+        version=cl.version,
+        vacancy_id=cl.vacancy_id,
+        resume_id=cl.resume_id,
+        generated_at=cl.generated_at,
+        facts_used=cl.facts_used_json,
+        numbers_used=cl.numbers_used_json,
+        risk_flags=cl.risk_flags_json,
+        validation=cl.validation_json,
     )
 

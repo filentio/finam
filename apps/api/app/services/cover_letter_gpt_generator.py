@@ -64,6 +64,11 @@ def _template_payload(t: CoverTemplate | None) -> dict[str, Any]:
     return {"template_text": t.template_text}
 
 
+def _resume_context_payload(resume_context: dict[str, Any]) -> dict[str, Any]:
+    # Trust our compactor output; keep it JSON-safe.
+    return resume_context or {}
+
+
 @dataclass(frozen=True)
 class CoverLetterGptGenerator:
     settings: Settings
@@ -114,4 +119,57 @@ class CoverLetterGptGenerator:
             "numbers_used": list(result.get("numbers_used") or []),
             "risk_flags": list(result.get("risk_flags") or []),
         }
+
+    async def generate_cover_letter_from_resume(
+        self,
+        *,
+        vacancy: Vacancy,
+        resume_context: dict[str, Any],
+        numbers_allowlist: list[str],
+        template: CoverTemplate | None = None,
+        tone: str = "neutral",
+        request_id: str | None = None,
+    ) -> dict[str, Any]:
+        tone = tone if tone in {"formal", "neutral", "energetic"} else "neutral"
+
+        vacancy_payload = _vacancy_payload(vacancy)
+        has_detail = bool((vacancy_payload.get("description") or "").strip())
+
+        instructions = (
+            "Ты генерируешь сопроводительное письмо на русском языке.\n"
+            "Правила (обязательные):\n"
+            "- Не выдумывай факты. Используй ТОЛЬКО информацию из resume_context.\n"
+            "- Любые числа (проценты, суммы, количества, сроки, 'X лет') можно использовать ТОЛЬКО если они есть в numbers_allowlist.\n"
+            "- Если фактов не хватает, делай письмо нейтральным и добавляй риск-флаг LOW_FACTS.\n"
+            "- Если у вакансии нет detail/description, письмо должно быть короче и добавь риск-флаг NO_VACANCY_DETAIL.\n"
+            "- Верни результат строго по JSON Schema.\n"
+        )
+
+        user_input = json.dumps(
+            {
+                "vacancy": vacancy_payload,
+                "resume_context": _resume_context_payload(resume_context),
+                "numbers_allowlist": numbers_allowlist or [],
+                "template": _template_payload(template),
+                "tone": tone,
+            },
+            ensure_ascii=False,
+        )
+
+        result = await self.openai.create_structured_json(
+            instructions=instructions,
+            user_input=user_input,
+            schema_name="cover_letter",
+            schema=LETTER_SCHEMA,
+            request_id=request_id,
+        )
+        out = {
+            "letter_text": str(result.get("letter_text") or ""),
+            "facts_used": list(result.get("facts_used") or []),
+            "numbers_used": list(result.get("numbers_used") or []),
+            "risk_flags": list(result.get("risk_flags") or []),
+        }
+        if not has_detail and "NO_VACANCY_DETAIL" not in out["risk_flags"]:
+            out["risk_flags"].append("NO_VACANCY_DETAIL")
+        return out
 

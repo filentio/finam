@@ -6,8 +6,6 @@ from datetime import datetime, timezone
 
 import httpx
 
-from app.models.candidate_profile import CandidateProfile
-from app.models.cover_letter import CoverLetter
 from app.models.vacancy import Vacancy
 from app.services.openai_client import OpenAIResponsesClient
 
@@ -33,42 +31,42 @@ def _seed_vacancy(client) -> str:
         return str(v.id)
 
 
-def _seed_candidate_profile(client, *, allowlist: list[str]):
+def _seed_resume(client, *, allowlist: list[str]):
+    from app.models.resume import Resume
+
     session_local = client.app.state.SessionLocal
     with session_local() as db:
         user_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
-        existing = db.query(CandidateProfile).filter(CandidateProfile.user_id == user_id).one_or_none()
+        existing = db.query(Resume).filter(Resume.user_id == user_id).one_or_none()
         if existing is not None:
             db.delete(existing)
             db.commit()
-        p = CandidateProfile(
+        r = Resume(
             user_id=user_id,
-            summary="Backend developer",
-            skills_json=["Python", "FastAPI"],
-            achievements_json=[],
-            links_json=[],
-            facts_numbers_json=allowlist,
+            raw_text="Backend developer. Python, FastAPI.",
+            parsed_json={"profession": "Backend developer", "skills": ["Python", "FastAPI"], "experience": [], "keywords": []},
+            numbers_allowlist_json=allowlist,
         )
-        db.add(p)
+        db.add(r)
         db.commit()
 
 
-def test_generate_requires_profile(client, mocker):
+def test_generate_requires_resume(client, mocker):
     vacancy_id = _seed_vacancy(client)
     # Mock OpenAI anyway (shouldn't be called)
     mocker.patch.object(OpenAIResponsesClient, "create_structured_json", autospec=True)
 
     r = client.post(
         f"/api/v1/vacancies/{vacancy_id}/cover-letter/generate",
-        json={"resume_id": "hh_resume_1", "template_id": None, "tone": "neutral"},
+        json={},
     )
     assert r.status_code == 409
-    assert r.json()["detail"]["error"]["code"] == "CANDIDATE_PROFILE_REQUIRED"
+    assert r.json()["detail"]["code"] == "RESUME_REQUIRED"
 
 
 def test_generate_blocks_unverified_number(client, mocker):
     vacancy_id = _seed_vacancy(client)
-    _seed_candidate_profile(client, allowlist=["15 лет"])
+    _seed_resume(client, allowlist=["15 лет"])
 
     mocker.patch.object(
         OpenAIResponsesClient,
@@ -84,7 +82,7 @@ def test_generate_blocks_unverified_number(client, mocker):
 
     r = client.post(
         f"/api/v1/vacancies/{vacancy_id}/cover-letter/generate",
-        json={"resume_id": "hh_resume_1", "template_id": None, "tone": "neutral"},
+        json={},
     )
     assert r.status_code == 201
     body = r.json()
@@ -92,16 +90,10 @@ def test_generate_blocks_unverified_number(client, mocker):
     assert body["validation"]["is_valid"] is False
     assert any(e["error_code"] == "UNVERIFIED_NUMBER" for e in body["validation"]["errors"])
 
-    session_local = client.app.state.SessionLocal
-    with session_local() as db:
-        cl = db.get(CoverLetter, uuid.UUID(body["cover_letter_id"]))
-        assert cl is not None
-        assert cl.status == "draft_invalid"
-
 
 def test_generate_success_valid(client, mocker):
     vacancy_id = _seed_vacancy(client)
-    _seed_candidate_profile(client, allowlist=["10 лет"])
+    _seed_resume(client, allowlist=["10 лет"])
 
     mocker.patch.object(
         OpenAIResponsesClient,
@@ -117,7 +109,7 @@ def test_generate_success_valid(client, mocker):
 
     r = client.post(
         f"/api/v1/vacancies/{vacancy_id}/cover-letter/generate",
-        json={"resume_id": "hh_resume_1", "template_id": None, "tone": "neutral"},
+        json={},
     )
     assert r.status_code == 201
     body = r.json()

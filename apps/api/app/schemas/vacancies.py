@@ -66,7 +66,8 @@ class MatchOut(APIModel):
 
 
 class CoverLetterGenerateIn(APIModel):
-    resume_id: str
+    # Legacy field (HH resume id). Stage R3.1 uses imported resume from `resumes` table.
+    resume_id: str | None = None
     template_id: UUID | None = None
     tone: str | None = None
 

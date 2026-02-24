@@ -74,11 +74,12 @@ def validate_cover_letter(
             errors.append(ValidationIssue("FORBIDDEN_PHRASE", f"Запрещённая фраза: «{phrase}»."))
             break
 
+    allowlist_provided = allowlist_numbers is not None
     allow = {normalize_number_phrase(x) for x in (allowlist_numbers or []) if isinstance(x, str) and x.strip()}
 
     extracted = [normalize_number_phrase(m.group(0)) for m in NUMBER_RE.finditer(text)]
     for num in extracted:
-        if allow and num not in allow:
+        if allowlist_provided and num not in allow:
             errors.append(ValidationIssue("UNVERIFIED_NUMBER", f"Число/величина не в allowlist: «{num}»."))
             break
 
@@ -86,7 +87,7 @@ def validate_cover_letter(
         if not isinstance(num, str):
             continue
         n = normalize_number_phrase(num)
-        if allow and n not in allow:
+        if allowlist_provided and n not in allow:
             errors.append(ValidationIssue("UNVERIFIED_NUMBER", f"Число из numbers_used не в allowlist: «{num}»."))
             break
 

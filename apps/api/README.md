@@ -124,7 +124,7 @@ curl "http://localhost:8000/api/v1/vacancies?search_profile_id=<PROFILE_UUID>"
 
 ### Guardrails (обязательные)
 - **facts-only**: модель не должна выдумывать факты о кандидате
-- **numbers allowlist**: любые числа/проценты/суммы/«X лет» разрешены только если они есть в `candidate_profile.facts_numbers_json`
+- **numbers allowlist**: любые числа/проценты/суммы/«X лет» разрешены только если они есть в `resumes.numbers_allowlist_json` (импортированное резюме, Stage R1)
 - проверка длины письма
 - проверка запрещённых фраз
 
@@ -137,7 +137,10 @@ curl "http://localhost:8000/api/v1/vacancies?search_profile_id=<PROFILE_UUID>"
 Endpoint:
 - `POST /api/v1/vacancies/{vacancy_id}/cover-letter/generate`
 
-Важно: требует `candidate_profile`, иначе вернёт `409 CANDIDATE_PROFILE_REQUIRED`.
+Важно: требует импортированное резюме (`/api/v1/resume`), иначе вернёт `409 RESUME_REQUIRED`.
+
+### Получить последнее письмо по вакансии (для UI)
+- `GET /api/v1/vacancies/{vacancy_id}/cover-letter` (последнее по `created_at desc`)
 
 ## Отправка отклика в HH (Stage 8)
 Отправка выполняется **только после одобрения** и **через HH OAuth**.
