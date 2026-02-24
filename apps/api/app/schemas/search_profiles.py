@@ -29,6 +29,10 @@ class SearchProfileOut(APIModel):
     is_active: bool
     filters: dict[str, Any]
     stoplist: dict[str, Any]
+    generated_from_resume: bool = False
+    template_json: dict[str, Any] | None = None
+    date_filter_days: int | None = None
+    sort_mode: str = "relevance"
     updated_at: datetime
 
 

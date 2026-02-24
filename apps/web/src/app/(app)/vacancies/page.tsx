@@ -57,7 +57,9 @@ function VacancyCard({
           <span>{v.employer_name || "—"}</span>
           <span>{v.area_name || "—"}</span>
           <Salary from={v.salary_from} to={v.salary_to} />
-          <span>{v.published_at ? new Date(v.published_at).toLocaleDateString() : "—"}</span>
+          <span>
+            {v.published_at ? new Date(v.published_at).toLocaleDateString() : <span className="text-muted-foreground">дата неизвестна</span>}
+          </span>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -482,6 +484,7 @@ function VacanciesInner() {
   const profiles = useSearchProfiles();
 
   const [sort, setSort] = React.useState<"score" | "date">("score");
+  const [days, setDays] = React.useState<number | null>(null);
   const [includeReasons, setIncludeReasons] = React.useState(false);
 
   const profileFromUrl = searchParams.get("profile_id") || "";
@@ -489,7 +492,7 @@ function VacanciesInner() {
 
   React.useEffect(() => setProfileId(profileFromUrl), [profileFromUrl]);
 
-  const vacancies = useVacancies({ searchProfileId: profileId || undefined, sort, includeReasons });
+  const vacancies = useVacancies({ searchProfileId: profileId || undefined, sort, days, includeReasons });
 
   const [letterOpen, setLetterOpen] = React.useState(false);
   const [applyOpen, setApplyOpen] = React.useState(false);
@@ -525,6 +528,21 @@ function VacanciesInner() {
             >
               <option value="score">score</option>
               <option value="date">date</option>
+            </select>
+            <select
+              className="h-10 rounded-md border bg-background px-3 text-sm"
+              value={days === null ? "" : String(days)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setDays(v ? Number(v) : null);
+              }}
+            >
+              <option value="">все даты</option>
+              <option value="1">за 1 день</option>
+              <option value="3">за 3 дня</option>
+              <option value="7">за 7 дней</option>
+              <option value="14">за 14 дней</option>
+              <option value="30">за 30 дней</option>
             </select>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={includeReasons} onChange={(e) => setIncludeReasons(e.target.checked)} />

@@ -6,6 +6,7 @@ import { apiFetch } from "@/lib/api";
 import type { SearchProfile } from "@/lib/types";
 
 export const searchProfilesKey = ["search-profiles"] as const;
+export const searchProfileKey = (id: string) => ["search-profiles", id] as const;
 
 type SearchProfilesListOut = { items: SearchProfile[] };
 type RunOut = { run_id: string; status: string };
@@ -20,6 +21,14 @@ export function useSearchProfiles() {
   return useQuery({
     queryKey: searchProfilesKey,
     queryFn: () => apiFetch<SearchProfilesListOut>("/api/v1/search-profiles"),
+  });
+}
+
+export function useSearchProfile(id: string | undefined) {
+  return useQuery({
+    queryKey: id ? searchProfileKey(id) : ["search-profiles", null],
+    queryFn: () => apiFetch<SearchProfile>(`/api/v1/search-profiles/${id}`),
+    enabled: !!id,
   });
 }
 
@@ -66,6 +75,48 @@ export function useDeleteSearchProfile() {
 export function useRunSearchProfile() {
   return useMutation({
     mutationFn: (id: string) => apiFetch<RunOut>(`/api/v1/search-profiles/${id}/run`, { method: "POST" }),
+  });
+}
+
+export function useGenerateTemplateFromResume() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiFetch<{ template_json: Record<string, unknown>; date_filter_days: number | null; sort_mode: string }>(
+        `/api/v1/search-profiles/${id}/generate-template-from-resume`,
+        { method: "POST", body: "{}" }
+      ),
+    onSuccess: async (_data, id) => {
+      await qc.invalidateQueries({ queryKey: searchProfileKey(id) });
+      await qc.invalidateQueries({ queryKey: searchProfilesKey });
+    },
+  });
+}
+
+export function useUpdateSearchTemplate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: {
+      id: string;
+      template_json: Record<string, unknown>;
+      date_filter_days: number | null;
+      sort_mode: "relevance" | "date";
+    }) =>
+      apiFetch<{ template_json: Record<string, unknown>; date_filter_days: number | null; sort_mode: string }>(
+        `/api/v1/search-profiles/${payload.id}/template`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            template_json: payload.template_json,
+            date_filter_days: payload.date_filter_days,
+            sort_mode: payload.sort_mode,
+          }),
+        }
+      ),
+    onSuccess: async (_data, vars) => {
+      await qc.invalidateQueries({ queryKey: searchProfileKey(vars.id) });
+      await qc.invalidateQueries({ queryKey: searchProfilesKey });
+    },
   });
 }
 

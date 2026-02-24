@@ -19,6 +19,7 @@ describe("react-query keys", () => {
       "vacancies",
       "p1",
       "date",
+      null,
       true,
     ]);
   });

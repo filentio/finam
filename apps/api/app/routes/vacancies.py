@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.exc import IntegrityError
@@ -40,6 +40,7 @@ def list_vacancies(
     limit: int = 50,
     cursor: str | None = None,
     sort: str = Query(default="score", pattern="^(score|date)$"),
+    days: int | None = Query(default=None, ge=1, le=365),
     include_reasons: bool = False,
     db: Session = Depends(get_db),
 ) -> VacancyListOut:
@@ -53,6 +54,9 @@ def list_vacancies(
     items: list[VacancyListItem] = []
 
     if search_profile_id is None:
+        if days:
+            cutoff = datetime.now(timezone.utc) - timedelta(days=int(days))
+            q = q.filter((Vacancy.published_at.is_(None)) | (Vacancy.published_at >= cutoff))
         vacancies = q.order_by(Vacancy.published_at.desc().nullslast(), Vacancy.created_at.desc()).limit(limit).all()
         for v in vacancies:
             items.append(
@@ -87,6 +91,9 @@ def list_vacancies(
         .filter(Match.search_profile_id == search_profile_id)
         .filter(Match.is_blocked.is_(False))
     )
+    if days:
+        cutoff = datetime.now(timezone.utc) - timedelta(days=int(days))
+        q2 = q2.filter((Vacancy.published_at.is_(None)) | (Vacancy.published_at >= cutoff))
     if sort == "date":
         q2 = q2.order_by(Vacancy.published_at.desc().nullslast(), Match.score.desc())
     else:

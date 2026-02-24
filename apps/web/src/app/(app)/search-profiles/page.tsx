@@ -321,6 +321,9 @@ export default function SearchProfilesPage() {
                         Run
                       </Button>
                       <Button size="sm" variant="outline" asChild>
+                        <Link href={`/search-profiles/${p.id}/template`}>Шаблон</Link>
+                      </Button>
+                      <Button size="sm" variant="outline" asChild>
                         <Link href={`/vacancies?profile_id=${p.id}`}>Vacancies</Link>
                       </Button>
                       <Button size="sm" variant="destructive" onClick={() => onDelete(p.id)} disabled={del.isPending}>

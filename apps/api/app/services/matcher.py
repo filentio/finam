@@ -40,14 +40,67 @@ def _vacancy_search_text(vacancy: Vacancy) -> str:
     if isinstance(snippet, dict):
         snippet_req = str(snippet.get("requirement") or "")
         snippet_resp = str(snippet.get("responsibility") or "")
+    desc = ""
+    if isinstance(raw, dict) and isinstance(raw.get("description"), str):
+        desc = raw.get("description") or ""
     parts = [
         vacancy.title or "",
         vacancy.employer_name or "",
         vacancy.area_name or "",
         snippet_req,
         snippet_resp,
+        desc,
     ]
     return " ".join([p for p in parts if p])
+
+
+def _effective_filters(search_profile: SearchProfile) -> dict[str, Any]:
+    """
+    If template_json exists (Stage R2), derive matching filters from it.
+    Otherwise use legacy filters_json.
+    """
+    base = search_profile.filters_json or {}
+    tpl = search_profile.template_json if hasattr(search_profile, "template_json") else None
+    if not isinstance(tpl, dict):
+        return base
+
+    out: dict[str, Any] = dict(base)
+    target_role = tpl.get("target_role") if isinstance(tpl.get("target_role"), str) else None
+    query = tpl.get("query") if isinstance(tpl.get("query"), str) else None
+    must = tpl.get("must_have") if isinstance(tpl.get("must_have"), list) else []
+    nice = tpl.get("nice_to_have") if isinstance(tpl.get("nice_to_have"), list) else []
+    salary_min = tpl.get("salary_min")
+
+    keywords: list[str] = []
+    for x in must + nice:
+        if isinstance(x, str) and x.strip():
+            keywords.append(x.strip())
+    if isinstance(target_role, str) and target_role.strip():
+        keywords.extend(_tokenize(target_role))
+
+    if keywords:
+        out["keywords"] = keywords[:40]
+    if query and query.strip():
+        out["text"] = query.strip()
+        out["query"] = query.strip()
+    if isinstance(salary_min, int) and salary_min > 0:
+        out["salary_min"] = salary_min
+    return out
+
+
+def _effective_stoplist(search_profile: SearchProfile) -> dict[str, Any]:
+    base = search_profile.stoplist_json or {}
+    out = dict(base) if isinstance(base, dict) else {}
+    tpl = search_profile.template_json if hasattr(search_profile, "template_json") else None
+    if isinstance(tpl, dict):
+        excl = tpl.get("exclude_keywords")
+        if isinstance(excl, list):
+            extra = [x.strip() for x in excl if isinstance(x, str) and x.strip()]
+            existing = out.get("keywords") or []
+            if not isinstance(existing, list):
+                existing = []
+            out["keywords"] = list(dict.fromkeys([*(str(x) for x in existing), *extra]))
+    return out
 
 
 @dataclass(frozen=True)
@@ -67,8 +120,8 @@ def compute_match(search_profile: SearchProfile, vacancy: Vacancy) -> dict[str, 
       is_blocked: bool
       blocked_reason: str | None
     """
-    filters = search_profile.filters_json or {}
-    stoplist = search_profile.stoplist_json or {}
+    filters = _effective_filters(search_profile)
+    stoplist = _effective_stoplist(search_profile)
 
     reasons: list[dict[str, str]] = []
 

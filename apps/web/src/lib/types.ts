@@ -12,6 +12,10 @@ export type SearchProfile = {
   is_active: boolean;
   filters: Record<string, unknown>;
   stoplist: Record<string, unknown>;
+  generated_from_resume?: boolean;
+  template_json?: Record<string, unknown> | null;
+  date_filter_days?: number | null;
+  sort_mode?: "relevance" | "date" | string;
   updated_at: string;
 };
 
